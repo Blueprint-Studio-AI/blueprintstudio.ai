@@ -1,16 +1,23 @@
 // app/page.tsx
-import SnapScroller from "@/components/home/layout/SnapScroller";
-// import { GestureProvider } from '@/contexts/GestureContext';
-import { GestureProvider } from "@/contexts/GestureClassifier/GestureContext";
-import GestureTestBox from "@/components/home/GestureTestBox";
-import GestureTestBox2 from "@/components/home/GestureTestBox";
-import SnapSection from "@/components/home/layout/SnapSection";
+import { GestureProvider, useGestureContext } from '@/features/gestureHandler';
+import GestureTestBox2 from "@/components/home/GestureTestBox2";
 
-export default function Home() {
+export default function() {
   return (
     <main>
       <GestureProvider>
-        {/* <SnapScroller>
+        <GestureTestBox2/>
+      </GestureProvider>
+    </main>
+  );
+}
+
+// import SnapScroller from "@/components/home/layout/SnapScroller";
+// import { GestureProvider } from '@/contexts/GestureContext';
+// import GestureTestBox from "@/components/home/GestureTestBox";
+// import SnapSection from "@/components/home/layout/SnapSection";
+
+{/* <SnapScroller>
           <SnapSection>
             <div className="w-screen h-screen bg-red-300"/>
           </SnapSection>
@@ -21,8 +28,3 @@ export default function Home() {
             <div className="w-screen h-screen bg-yellow-300"/>
           </SnapSection>
         </SnapScroller> */}
-        <GestureTestBox2/>
-      </GestureProvider>
-    </main>
-  );
-}
