@@ -3,6 +3,12 @@ import { MotionValue } from 'framer-motion';
 
 export type InputType = 'wheel' | 'trackpad' | 'touch' | 'drag';
 
+export interface GestureData {
+  x: number;
+  y: number;
+  isActive: boolean;
+}
+
 export interface GestureContextType {
   gestureType: string;
   direction: string;

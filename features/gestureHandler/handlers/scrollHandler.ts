@@ -1,18 +1,33 @@
 // src/features/gestureHandler/handlers/scrollHandler.ts
-import { HandlerProps } from '../types';
 
-export function setupScrollHandler(
-  element: HTMLElement,
-  { x, y }: Pick<HandlerProps, 'x' | 'y'>
-) {
-  const handleWheel = (e: WheelEvent) => {
-    x.set(x.get() + e.deltaX);
-    y.set(y.get() + e.deltaY);
-  };
+import { GestureData } from '../types';
 
-  element.addEventListener('wheel', handleWheel);
+const DEBOUNCE_DELAY = 150; // milliseconds
 
-  return () => {
-    element.removeEventListener('wheel', handleWheel);
+let debounceTimer: NodeJS.Timeout | null = null;
+let isScrollActive = false;
+
+function debounceScroll(): void {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+  
+  isScrollActive = true;
+  
+  debounceTimer = setTimeout(() => {
+    isScrollActive = false;
+  }, DEBOUNCE_DELAY);
+}
+
+export function handleScroll(event: WheelEvent): GestureData {
+  const x = event.deltaX;
+  const y = event.deltaY;
+
+  debounceScroll();
+
+  return {
+    x,
+    y,
+    isActive: isScrollActive
   };
 }
