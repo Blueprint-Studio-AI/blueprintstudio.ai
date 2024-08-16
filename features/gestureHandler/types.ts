@@ -1,7 +1,8 @@
 // src/features/gestureHandler/types.ts
 import { MotionValue } from 'framer-motion';
+import { MutableRefObject } from 'react';
 
-export type InputType = 'wheel' | 'trackpad' | 'touch' | 'drag';
+export type InputType = 'wheel' | 'touch' | 'mouse';
 
 export interface GestureData {
   x: number;
@@ -9,17 +10,14 @@ export interface GestureData {
   isActive: boolean;
 }
 
-export interface GestureContextType {
-  gestureType: string;
-  direction: string;
-  x: MotionValue<number>;
-  y: MotionValue<number>;
-  activeInputs: Set<InputType>;
+export interface HandlerProps {
+  onGestureChange: (data: GestureData) => void;
+  activeInput: (inputType: InputType) => void;
 }
 
-export interface HandlerProps {
-  x: MotionValue<number>;
-  y: MotionValue<number>;
-  activateInput: (inputType: InputType) => void;
-  onGestureChange: () => void;
+export interface GestureContextType {
+  x: number;
+  y: number;
+  isActive: MutableRefObject<boolean>;
+  activeInputs: Set<InputType>;
 }

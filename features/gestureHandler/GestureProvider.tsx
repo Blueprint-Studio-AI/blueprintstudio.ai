@@ -1,50 +1,38 @@
 // src/features/gestureHandler/GestureProvider.tsx
 "use client";
 
-import React, { useRef, useState, useCallback } from 'react';
-import { useMotionValue } from 'framer-motion';
+import React, { useRef, useCallback, useState } from 'react';
+// import { useMotionValue } from 'framer-motion';
 import { GestureContext } from './index';
-import { GestureContextType, InputType } from './types';
+import { GestureContextType, GestureData, InputType } from './types';
 import { useGestureHandlers } from './handlers';
-import { classifyGesture } from './utils/gestureClassifier';
 
-export const GestureProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function GestureProvider({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const [gestureType, setGestureType] = useState('none');
-  const [direction, setDirection] = useState('none');
-  const [activeInputs, setActiveInputs] = useState<Set<InputType>>(new Set());
+  const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
+  const isActive = useRef(false);
+  const [activeInputs, setActiveInputs] = useState<Set<InputType>>(new Set())
 
-  const activateInput = useCallback((inputType: InputType) => {
-    setActiveInputs(prev => new Set(prev).add(inputType));
-    setTimeout(() => {
-      setActiveInputs(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(inputType);
-        return newSet;
-      });
-    }, 500);
+  const handleGestureChange = useCallback((data: GestureData) => {
+    setX(data.x);
+    setY(data.y);
+    isActive.current = data.isActive;
   }, []);
 
-  const handleGestureChange = useCallback(() => {
-    const { gestureType: newGestureType, direction: newDirection } = classifyGesture(x, y);
-    setGestureType(newGestureType);
-    setDirection(newDirection);
-  }, [x, y]);
+  const activeInput = useCallback((inputType: InputType) => {
+    setActiveInputs(prev => new Set(prev).add(inputType));
+  }, [])
 
   useGestureHandlers(containerRef, {
-    x,
-    y,
-    activateInput,
     onGestureChange: handleGestureChange,
+    activeInput,
   });
 
   const value: GestureContextType = {
-    gestureType,
-    direction,
     x,
     y,
+    isActive,
     activeInputs,
   };
 
