@@ -34,7 +34,7 @@ function completeGesture(): void {
   isActive = false;
 }
 
-//Used by classifier
+//Currently unused
 export function getScrollState(): GestureData | null {
   return isActive ? { x: accumulatorX, y: accumulatorY, isActive } : null;
 }
