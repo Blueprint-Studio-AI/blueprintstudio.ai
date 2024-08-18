@@ -1,5 +1,5 @@
 // app/page.tsx
-import { GestureProvider, useGestureContext } from '@/features/gestureHandler';
+import { GestureProvider } from '@/features/gestureHandler';
 import GestureTestBox2 from "@/components/home/GestureTestBox2";
 
 export default function() {

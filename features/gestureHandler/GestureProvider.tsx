@@ -1,43 +1,27 @@
 // src/features/gestureHandler/GestureProvider.tsx
 "use client";
 
-import React, { useRef, useCallback, useState } from 'react';
-// import { useMotionValue } from 'framer-motion';
-import { GestureContext } from './index';
-import { GestureContextType, GestureData, InputType } from './types';
-import { useGestureHandlers } from './handlers';
+import React, { useRef, useState } from 'react';
+import { GestureContext } from './GestureContext';
+import { useScrollHandler } from '@/features/gestureHandler/handlers/scrollHandler';
+import { GestureDirection, InputType } from './types';
 
 export function GestureProvider({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
-  const isActive = useRef(false);
-  const [activeInputs, setActiveInputs] = useState<Set<InputType>>(new Set())
+  const [direction, setDirection] = useState<GestureDirection>(null);
+  const [activeInput, setActiveInput] = useState<InputType>(null);
 
-  const handleGestureChange = useCallback((data: GestureData) => {
-    setX(data.x);
-    setY(data.y);
-    isActive.current = data.isActive;
-  }, []);
+  useScrollHandler(containerRef);
 
-  const activeInput = useCallback((inputType: InputType) => {
-    setActiveInputs(prev => new Set(prev).add(inputType));
-  }, [])
-
-  useGestureHandlers(containerRef, {
-    onGestureChange: handleGestureChange,
+  const contextValue = {
+    direction,
+    setDirection,
     activeInput,
-  });
-
-  const value: GestureContextType = {
-    x,
-    y,
-    isActive,
-    activeInputs,
-  };
+    setActiveInput,
+  }
 
   return (
-    <GestureContext.Provider value={value}>
+    <GestureContext.Provider value={contextValue}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
         {children}
       </div>
