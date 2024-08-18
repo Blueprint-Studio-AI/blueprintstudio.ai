@@ -1,5 +1,7 @@
 // @/features/gestureHandler/GestureContext.tsx
-import React, { createContext, useState, useContext } from 'react';
+"use client";
+
+import { createContext, useContext } from 'react';
 import { GestureDirection, InputType } from './types';
 
 interface GestureContextType {

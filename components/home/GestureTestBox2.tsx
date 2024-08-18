@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 export default function GestureTestBox2() {
   const { direction, activeInput } = useGestureContext();
+
   const [lastDirection, setLastDirection] = useState<GestureDirection>(null);
 
   useEffect(() => {
