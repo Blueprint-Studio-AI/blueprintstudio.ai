@@ -1,24 +1,38 @@
 // @/features/gestureHandler/GestureProvider.tsx
 "use client";
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { GestureContext } from './GestureContext';
 import { useScrollHandler } from './handlers/scrollHandler';
 import { GestureDirection, InputType } from './types';
 
 export function GestureProvider({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [direction, setDirection] = useState<GestureDirection>(null);
-  const [activeInput, setActiveInput] = useState<InputType>(null);
+  
+  const goUp = () => {
+    console.log('Go Up');
+  }
 
-  // useScrollHandler(containerRef);
+  const goLeft = () => {
+    console.log('Go Left');
+  }
+
+  const goRight = () => {
+    console.log('Go Right');
+  }
+
+  const goDown = () => {
+    console.log('Go Down');
+  }
 
   const value = {
-    direction,
-    setDirection,
-    activeInput,
-    setActiveInput,
+    goUp,
+    goLeft,
+    goRight,
+    goDown,
   };
+
+  useScrollHandler(containerRef);
 
   return (
     <GestureContext.Provider value={value}>

@@ -1,6 +1,6 @@
 import { GestureDirection, GestureData } from '@/features/gestureHandler/types';
 
-const THRESHOLD = 10; // ms for judgement
+const THRESHOLD = 25; //Classification threshold
 
 export function classifyScrollGesture(data: GestureData): GestureDirection {
   if (Math.abs(data.x) > Math.abs(data.y)) {

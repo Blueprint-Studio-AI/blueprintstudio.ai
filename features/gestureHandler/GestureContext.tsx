@@ -2,13 +2,12 @@
 "use client";
 
 import { createContext, useContext } from 'react';
-import { GestureDirection, InputType } from './types';
 
 interface GestureContextType {
-  direction: GestureDirection;
-  setDirection: (direction: GestureDirection) => void;
-  activeInput: InputType;
-  setActiveInput: (input: InputType) => void;
+  goUp: () => void;
+  goLeft: () => void;
+  goRight: () => void;
+  goDown: () => void;
 }
 
 //context
