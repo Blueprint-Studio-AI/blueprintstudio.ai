@@ -2,7 +2,7 @@ import { useEffect, useContext } from 'react';
 import { processScroll } from './scrollProcessor';
 import { classifyScrollGesture } from './scrollClassifier';
 import { debounceScrollDirection } from './debounceScrollDirection';
-import { GestureContext } from '@/app/page';
+import { GestureContext } from '@/features/GestureHandler/GestureContext';
 
 
 export function useScrollHandler(containerRef: React.RefObject<HTMLElement>) {
@@ -14,16 +14,16 @@ export function useScrollHandler(containerRef: React.RefObject<HTMLElement>) {
 
     const handleWheel = (event: WheelEvent) => {
       const scrollData = processScroll(event);
-      // console.log(scrollData);
+      console.log(scrollData);
       
       if (scrollData) {
         const direction = classifyScrollGesture(scrollData);
         // console.log(direction)
         debounceScrollDirection(direction, (debouncedDirection) => {
           if (debouncedDirection === 'up') goUp();
-          if (debouncedDirection === 'left') console.log('Go Left');
-          if (debouncedDirection === 'right') console.log('Go Right');
-          if (debouncedDirection === 'down') console.log('Go Down');
+          if (debouncedDirection === 'left') goLeft();
+          if (debouncedDirection === 'right') goRight();
+          if (debouncedDirection === 'down') goDown();
         });
         // doubleScrollHandler(scrollData, direction, (callback) => {
         //   if (callback) console.log(direction);

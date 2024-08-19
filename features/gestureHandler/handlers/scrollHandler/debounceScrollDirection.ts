@@ -1,4 +1,4 @@
-import { GestureDirection } from "@/features/gestureHandler/types";
+import { GestureDirection } from "@/features/GestureHandler/types";
 
 let lastDirection: GestureDirection = null;
 let lastCallTime = 0;

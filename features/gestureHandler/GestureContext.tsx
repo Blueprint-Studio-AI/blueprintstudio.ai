@@ -2,7 +2,6 @@
 "use client";
 
 import { createContext } from 'react';
-import React from 'react';
 
 export interface GestureContextValue {
   goUp: () => void;
@@ -11,21 +10,10 @@ export interface GestureContextValue {
   goDown: () => void;
 }
 
-const goUp = () => {
-  console.log('Go Up');
-}
-
-const goLeft = () => {
-  console.log('Go Left');
-}
-
-const goRight = () => {
-  console.log('Go Right');
-}
-
-const goDown = () => {
-  console.log('Go Down');
-}
+const goUp = () => console.log('Go Up');
+const goLeft = () => console.log('Go Left');
+const goRight = () => console.log('Go Right');
+const goDown = () => console.log('Go Down');
 
 export const gestureContextValue = {
   goUp,
@@ -34,4 +22,4 @@ export const gestureContextValue = {
   goDown,
 };
 
-// export const GestureContext = React.createContext<GestureContextValue>({goUp: ()=>{}, goLeft: ()=>{}, goRight: ()=>{}, goDown: ()=>{}, });
+export const GestureContext = createContext<GestureContextValue>({goUp: ()=>{}, goLeft: ()=>{}, goRight: ()=>{}, goDown: ()=>{}, });

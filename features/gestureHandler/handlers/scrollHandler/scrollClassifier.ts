@@ -1,4 +1,4 @@
-import { GestureDirection, GestureData } from '@/features/gestureHandler/types';
+import { GestureDirection, GestureData } from '@/features/GestureHandler/types';
 
 const THRESHOLD = 25; //Classification threshold
 
