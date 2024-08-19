@@ -1,14 +1,33 @@
 // app/page.tsx
+"use client";
 
-import { GestureProvider } from '@/features/gestureHandler';
+// import { GestureContext, gestureContextValue } from '@/features/gestureHandler/GestureContext';
 import GestureTestBox2 from "@/components/home/GestureTestBox2";
+import { createContext } from "react";
+
+export interface GestureContextValue {
+  goUp: () => void;
+  goLeft: () => void;
+  goRight: () => void;
+  goDown: () => void;
+}
+
+export const GestureContext = createContext<GestureContextValue>({goUp: ()=>{}, goLeft: ()=>{}, goRight: ()=>{}, goDown: ()=>{}, });
 
 export default function HomePage() {
+
+  const gestureContextValue: GestureContextValue = {
+    goUp: () => console.log('Go Up'),
+    goLeft: () => console.log('Go Left'),
+    goRight: () => console.log('Go Right'),
+    goDown: () => console.log('Go Down'),
+  }
+
   return (
     <main>
-      <GestureProvider>
+      <GestureContext.Provider value={gestureContextValue}>
         <GestureTestBox2/>
-      </GestureProvider>
+      </GestureContext.Provider>
     </main>
   );
 }

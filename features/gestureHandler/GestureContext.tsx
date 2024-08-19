@@ -1,25 +1,37 @@
 // @/features/gestureHandler/GestureContext.tsx
 "use client";
 
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
+import React from 'react';
 
-interface GestureContextType {
+export interface GestureContextValue {
   goUp: () => void;
   goLeft: () => void;
   goRight: () => void;
   goDown: () => void;
 }
 
-//context
-const GestureContext = createContext<GestureContextType | undefined>(undefined);
+const goUp = () => {
+  console.log('Go Up');
+}
 
-//hook
-export const useGestureContext = (): GestureContextType => {
-  const context = useContext(GestureContext);
-  if (context === undefined) {
-    throw new Error('useGestureContext must be used within a GestureProvider');
-  }
-  return context;
+const goLeft = () => {
+  console.log('Go Left');
+}
+
+const goRight = () => {
+  console.log('Go Right');
+}
+
+const goDown = () => {
+  console.log('Go Down');
+}
+
+export const gestureContextValue = {
+  goUp,
+  goLeft,
+  goRight,
+  goDown,
 };
 
-export { GestureContext };
+// export const GestureContext = React.createContext<GestureContextValue>({goUp: ()=>{}, goLeft: ()=>{}, goRight: ()=>{}, goDown: ()=>{}, });

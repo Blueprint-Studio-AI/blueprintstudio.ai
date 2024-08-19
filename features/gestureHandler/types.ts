@@ -11,8 +11,8 @@ export interface GestureData {
   isActive: boolean;
 }
 
-export interface GestureContextType {
-  direction: GestureDirection;
-  activeInputs: Set<InputType>;
-  containerRef: MutableRefObject<HTMLDivElement | null>;
-}
+// export interface GestureContextType {
+//   direction: GestureDirection;
+//   activeInputs: Set<InputType>;
+//   containerRef: MutableRefObject<HTMLDivElement | null>;
+// }
