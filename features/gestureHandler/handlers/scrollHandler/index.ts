@@ -3,6 +3,7 @@ import { processScroll } from './scrollProcessor';
 import { classifyScrollGesture } from './scrollClassifier';
 import { debounceScrollDirection } from './debounceScrollDirection';
 import { GestureContext } from '@/features/GestureHandler/GestureContext';
+import { doubleScrollHandler } from '@/features/GestureHandler/Handlers/scrollHandler/doubleScrollHandler';
 
 
 export function useScrollHandler(containerRef: React.RefObject<HTMLElement>) {
@@ -14,20 +15,20 @@ export function useScrollHandler(containerRef: React.RefObject<HTMLElement>) {
 
     const handleWheel = (event: WheelEvent) => {
       const scrollData = processScroll(event);
-      console.log(scrollData);
+      // console.log(scrollData);
       
       if (scrollData) {
         const direction = classifyScrollGesture(scrollData);
         // console.log(direction)
+        
+        // doubleScrollHandler(scrollData, direction); This is a bitch
+
         debounceScrollDirection(direction, (debouncedDirection) => {
           if (debouncedDirection === 'up') goUp();
           if (debouncedDirection === 'left') goLeft();
           if (debouncedDirection === 'right') goRight();
           if (debouncedDirection === 'down') goDown();
         });
-        // doubleScrollHandler(scrollData, direction, (callback) => {
-        //   if (callback) console.log(direction);
-        // });
       }
 
     }
