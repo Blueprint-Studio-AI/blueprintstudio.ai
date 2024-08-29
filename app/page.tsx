@@ -1,7 +1,6 @@
 // app/page.tsx
 "use client";
 
-import { GestureContext, gestureContextValue } from '@/features/GestureHandler/GestureContext';
 import GestureTestBox2 from "@/components/home/GestureTestBox2";
 import GestureHandler from '@/features/GestureHandler';
 
@@ -11,8 +10,6 @@ export default function HomePage() {
       <GestureHandler>
         <GestureTestBox2/>
       </GestureHandler>
-      {/* <GestureContext.Provider value={gestureContextValue}> */}
-      {/* </GestureContext.Provider> */}
     </main>
   );
 }

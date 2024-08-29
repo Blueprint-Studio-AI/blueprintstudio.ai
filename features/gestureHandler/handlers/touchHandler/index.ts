@@ -1,43 +1,44 @@
+// @/features/GestureHandler/Handlers/touchHandler/index.tsx
 import { useEffect, useState, useContext } from "react";
 import { GestureContext } from "../../GestureContext";
 import { GestureData } from '../../types';
 
-export default function useTouchHandler(ref: React.RefObject<HTMLDivElement>) {
-    // const { setGestureData } = useContext(GestureContext);
-    const [startPosition, setStartPosition] = useState<{ x: number, y: number } | null>(null);
+export function useTouchHandler(ref: React.RefObject<HTMLDivElement>) {
+    // const { goUp, goLeft, goRight, goDown, setGestureData } = useContext(GestureContext);
+    const [startTouch, setStartTouch] = useState<Touch | null>(null);
     
     useEffect(() => {
         const element = ref.current;
         if (!element) return;
 
         const handleTouchStart = (e: TouchEvent) => {
-            const touch = e.touches[0];
-            setStartPosition({ x: touch.clientX, y: touch.clientY });
-            // setGestureData({ x: 0, y: 0, isActive: true });
+            if (e.touches.length > 0) {
+                setStartTouch(e.touches[0]);
+                console.log('Start touch:', e.touches[0])
+            }
+            const startTouch = e.touches[0];
         };
 
         const handleTouchMove = (e: TouchEvent) => {
-            if (!startPosition) return;
-            const touch = e.touches[0];
-            const deltaX = touch.clientX - startPosition.x;
-            const deltaY = touch.clientY - startPosition.y;
-            // setGestureData({ x: deltaX, y: deltaY, isActive: true });
+            if (!startTouch) return;
+            const currentTouch = e.touches[0];
+            console.log('Touch move:', currentTouch);
         };
 
         const handleTouchEnd = () => {
-            setStartPosition(null);
-            // setGestureData({ x: 0, y: 0, isActive: false });
+            setStartTouch(null);
+            console.log('Touch ended');
         };
 
 
         element.addEventListener("touchstart", handleTouchStart);
-        element.addEventListener("touchmove", handleTouchStart);
-        element.addEventListener("touchend", handleTouchStart);
+        element.addEventListener("touchmove", handleTouchMove);
+        element.addEventListener("touchend", handleTouchEnd);
 
         return () => {
             element.removeEventListener('touchstart', handleTouchStart);
             element.removeEventListener('touchmove', handleTouchMove);
             element.removeEventListener('touchend', handleTouchEnd);
         };
-    }, [ref, setGestureData, startPosition])
+    }, [ref, startTouch])
 }

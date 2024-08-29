@@ -1,4 +1,4 @@
-// @/features/gestureHandler/GestureContext.tsx
+// @/features/gestureHandler/GestureContext.ts
 "use client";
 
 import { createContext } from 'react';
