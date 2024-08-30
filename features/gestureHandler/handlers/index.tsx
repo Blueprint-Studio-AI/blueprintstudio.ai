@@ -1,5 +1,5 @@
 // @/features/GestureHandler/Handlers/index.tsx
-import { ReactNode, useRef } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 import { useBackScrollHandler } from "./backScrollHandler";
 import { useScrollHandler } from "./scrollHandler";
 import { useKeyHandler } from "./keyHandler";
@@ -17,15 +17,6 @@ export default function Handlers({ children }: {children: ReactNode}) {
     return (
         <div ref={viewportRef} className="size-full">
             {children}
-            {/* <div className="absolute top-0 left-0 bg-red-500 size-full"/> */}
-            <div style={{
-                position: "absolute",
-                top: "0px",
-                left: "0px",
-                backgroundColor: "red",
-                width: "100%",
-                height: "100%",
-                }}/>
         </div>
     );
 }
