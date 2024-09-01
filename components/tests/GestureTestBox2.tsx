@@ -36,7 +36,7 @@ export default function GestureTestBox2() {
 
   return (
     <div className="h-svh w-screen flex flex-col items-center justify-center bg-gray-100">
-      {/* <motion.div style={{ x, y }} className="absolute w-32 h-32 bg-red-500 rounded-full"/> */}
+      <motion.div style={{ x, y }} className="absolute w-32 h-32 bg-red-500 rounded-full"/>
       <div className="w-64 h-64 bg-blue-500 rounded-lg flex flex-col items-center justify-center text-white text-center">
         <button onClick={goUp}>Go Up</button>
         <button onClick={goLeft}>Go Left</button>

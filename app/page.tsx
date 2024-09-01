@@ -1,32 +1,20 @@
 // app/page.tsx
 "use client";
 
-import GestureTestBox2 from "@/components/home/GestureTestBox2";
+import GestureTestBox2 from "@/components/tests/GestureTestBox2";
 import GestureHandler from '@/features/GestureHandler';
+import TikTok from '@/components/home/TikTok'
+import { usePreventDefaultScroll } from "@/utils/hooks/usePreventDefaultScroll";
 
-export default function HomePage() {
+export default function Home() {
+  usePreventDefaultScroll();
+
   return (
     <main>
+      {/* <div className="h-[200vh] w-screen bg-blue-200"/> */}
       <GestureHandler>
-        <GestureTestBox2/>
+        <TikTok/>
       </GestureHandler>
     </main>
   );
 }
-
-// import SnapScroller from "@/components/home/layout/SnapScroller";
-// import { GestureProvider } from '@/contexts/GestureContext';
-// import GestureTestBox from "@/components/home/GestureTestBox";
-// import SnapSection from "@/components/home/layout/SnapSection";
-
-{/* <SnapScroller>
-          <SnapSection>
-            <div className="w-screen h-screen bg-red-300"/>
-          </SnapSection>
-          <SnapSection>
-            <div className="w-screen h-screen bg-blue-300"/>
-          </SnapSection>
-          <SnapSection>
-            <div className="w-screen h-screen bg-yellow-300"/>
-          </SnapSection>
-        </SnapScroller> */}
