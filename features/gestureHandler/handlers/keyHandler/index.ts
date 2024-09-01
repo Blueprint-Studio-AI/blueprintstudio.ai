@@ -1,10 +1,10 @@
 // @/features/gestureHandler/handlers/keyHandler.ts
 
-import { useEffect, useContext } from 'react';
-import { GestureContext } from '../../GestureContext';
+import { useEffect } from 'react';
+import { useGestureContext } from '../../useGestureContext';
 
 export const useKeyHandler = () => {
-  const { goUp, goLeft, goRight, goDown } = useContext(GestureContext);
+  const { goUp, goLeft, goRight, goDown } = useGestureContext();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

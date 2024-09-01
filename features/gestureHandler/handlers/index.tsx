@@ -11,7 +11,7 @@ export default function Handlers({ children }: {children: ReactNode}) {
 
     useBackScrollHandler(viewportRef); //prevents "go back" gesture on desktop browsers
     useScrollHandler(viewportRef); //doesn't work with "double scroll"
-    useKeyHandler(); //may need an intersection observer internally to keys don't go rogue all the time
+    useKeyHandler(); //may need an intersection observer internally so keys don't go rogue all the time
     useTouchHandler(viewportRef);
 
     return (

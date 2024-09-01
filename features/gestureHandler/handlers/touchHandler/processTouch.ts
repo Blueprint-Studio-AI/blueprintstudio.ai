@@ -4,12 +4,12 @@ import { GestureData } from "../../types";
 
 let startTouch: Touch | null = null;
 
-export function processTouch(event: TouchEvent): void {
+export function processTouch(event: TouchEvent): GestureData | null {
     switch (event.type) {
       case 'touchstart':
         if (event.touches.length > 0) {
           startTouch = event.touches[0];
-          console.log('Start touch:', startTouch);
+          return { x: 0, y: 0, isActive: true };
         }
         break;
   
@@ -18,14 +18,14 @@ export function processTouch(event: TouchEvent): void {
           const currentTouch = event.touches[0];
           const deltaX = currentTouch.clientX - startTouch.clientX;
           const deltaY = currentTouch.clientY - startTouch.clientY;
-          const gestureData: GestureData = { x: deltaX, y: deltaY, isActive: true };
-          console.log('Gesture data:', gestureData);
+          return { x: deltaX, y: deltaY, isActive: true };
         }
         break;
   
       case 'touchend':
-        console.log('Touch ended');
         startTouch = null;
-        break;
+        return { x: 0, y: 0, isActive: false};
     }
+
+    return null;
   }

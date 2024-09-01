@@ -2,12 +2,12 @@ import { useEffect, useContext } from 'react';
 import { processScroll } from './scrollProcessor';
 import { classifyScrollGesture } from './scrollClassifier';
 import { debounceScrollDirection } from './debounceScrollDirection';
-import { GestureContext } from '@/features/GestureHandler/GestureContext';
 import { doubleScrollHandler } from '@/features/GestureHandler/Handlers/scrollHandler/doubleScrollHandler';
+import { useGestureContext } from '../../useGestureContext';
 
 
 export function useScrollHandler(containerRef: React.RefObject<HTMLElement>) {
-  const { goUp, goLeft, goRight, goDown } = useContext(GestureContext);
+  const { goUp, goLeft, goRight, goDown } = useGestureContext();
 
   useEffect(() => {
     const container = containerRef.current;
