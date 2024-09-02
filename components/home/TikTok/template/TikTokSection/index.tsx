@@ -1,6 +1,6 @@
 // @/components/home/TikTok/template/TikTokSection/index.tsx
 
-import { motion, MotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface TikTokSectionProps {
