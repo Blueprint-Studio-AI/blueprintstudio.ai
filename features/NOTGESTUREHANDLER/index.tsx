@@ -2,7 +2,7 @@
 import { ReactNode, useCallback, useRef } from "react";
 import { GestureContext, GestureContextValue } from "./GestureContext";
 import Handlers from './Handlers';
-import { animate, AnimationPlaybackControls, useMotionValue } from "framer-motion";
+import { AnimationPlaybackControls, useMotionValue } from "framer-motion";
 import { smoothMotion } from "./utils/smoothMotion";
 import { GestureDirection } from "./types";
 
