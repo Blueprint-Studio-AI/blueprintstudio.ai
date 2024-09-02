@@ -2,7 +2,7 @@
 import { ReactNode, useCallback, useRef } from "react";
 import { GestureContext, GestureContextValue } from "./GestureContext";
 import Handlers from './Handlers';
-import { AnimationPlaybackControls, useMotionValue } from "framer-motion";
+import { animate, AnimationPlaybackControls, useMotionValue } from "framer-motion";
 import { smoothMotion } from "./utils/smoothMotion";
 import { GestureDirection } from "./types";
 
@@ -52,9 +52,21 @@ export default function GestureHandler({ children }: {children: ReactNode}) {
             x.set(newX);
             y.set(newY);
         } else {
-            // If gesture is not active (i.e., returning to origin), use smooth motion
+            // If gesture is not active (i.e., returning to origin)
+
             xAnimation.current = smoothMotion(x, newX);
             yAnimation.current = smoothMotion(y, newY);
+
+            // xAnimation.current = animate(x, newX, {
+            //     type: "tween",
+            //     duration: 0.1,
+            //     ease: "linear"
+            // });
+            // yAnimation.current = animate(y, newY, {
+            //     type: "tween",
+            //     duration: 0.1,
+            //     ease: "linear"
+            // });
         }
     }, [x, y, isActive]);
 

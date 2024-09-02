@@ -11,7 +11,6 @@ export default function Home() {
 
   return (
     <main>
-      {/* <div className="h-[200vh] w-screen bg-blue-200"/> */}
       <GestureHandler>
         <TikTok/>
       </GestureHandler>

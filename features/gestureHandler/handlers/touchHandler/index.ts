@@ -15,8 +15,7 @@ export function useTouchHandler(ref: React.RefObject<HTMLDivElement>) {
         const { isTap, isClickableElement } = handleTap(event);
     
         if (event.type === 'touchmove') {
-            // Stop scrolling/rubber-banding
-            event.preventDefault();
+            event.preventDefault(); // Stop scrolling/rubber-banding
         } else if (isTap || isClickableElement) {
             // Allow taps and events on clickable elements to propagate
             return;
