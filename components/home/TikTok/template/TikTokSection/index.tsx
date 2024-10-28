@@ -1,7 +1,7 @@
 // @/components/home/TikTok/template/TikTokSection/index.tsx
-
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { PROJECTS } from "../../content/projects";
+import { PADDING, SECTION_HEIGHT } from "../constants";
 
 interface TikTokSectionProps {
     project: string;
@@ -9,23 +9,24 @@ interface TikTokSectionProps {
     index: number;
 }
 
-type ProjectComponentType = React.ComponentType<{}>;
-
 export default function TikTokSection({ project, isActive, index }: TikTokSectionProps) {
-    const [ProjectContent, setProjectContent] = useState<ProjectComponentType | null>(null);
-
-    useEffect(() => {
-        import(`@/components/home/TikTok/content/${project}`).then(module => {
-            setProjectContent(() => module.default);
-        });
-    }, [project]);
+    const ProjectContent = PROJECTS[project as keyof typeof PROJECTS];
 
     return (
         <motion.div
-            className="absolute h-[95svh] w-screen bg-blue-200 border border-black"
-            style={{ top: `calc(${index * 95}svh)` }} // align vertically
+            className={`absolute h-[${SECTION_HEIGHT}svh] w-screen bg-blue-200`}
+            style={{ top: `calc(${index * SECTION_HEIGHT}svh)` }} // align vertically
         >
-            {ProjectContent && <ProjectContent />}
+            <div
+                className={`h-full w-full bg-black`}
+                style={{ padding: `${PADDING}px` }}
+            >
+                <div className="tiktok-wrapper">
+                    <div className="h-full w-full bg-white">
+                        <ProjectContent isActive={isActive} />
+                    </div>
+                </div>
+            </div>
         </motion.div>
     );
 }

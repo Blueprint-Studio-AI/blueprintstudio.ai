@@ -28,4 +28,8 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .tiktok-wrapper {
+    @apply h-full w-full rounded-3xl overflow-hidden;
+  }
 }

@@ -4,6 +4,7 @@ import { useState, useRef, RefObject } from "react";
 import { animate, MotionValue, useMotionValue, useTransform } from "framer-motion";
 import { useGestureContext } from "@/features/GestureHandler/useGestureContext";
 import { useGestureAction } from "@/features/GestureHandler/useGestureAction";
+import { SECTION_HEIGHT } from "../template/constants";
 
 export function useSectionLogic(projectsCount: number) {
     const [activeSection, setActiveSection] = useState(0);
@@ -22,7 +23,7 @@ export function useSectionLogic(projectsCount: number) {
         setActiveSection(newIndex);
         
         const containerHeight = containerRef.current?.clientHeight || 0;
-        const newY = -newIndex * containerHeight * 0.95; // 95svh
+        const newY = -newIndex * containerHeight * (SECTION_HEIGHT/100); // svh
         
         animate(y, newY, {
             type: "tween",
