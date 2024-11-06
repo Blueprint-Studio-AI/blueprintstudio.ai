@@ -15,7 +15,7 @@ export default function Handlers({ children }: {children: ReactNode}) {
     useTouchHandler(viewportRef);
 
     return (
-        <div ref={viewportRef} className="size-full">
+        <div ref={viewportRef} >
             {children}
         </div>
     );

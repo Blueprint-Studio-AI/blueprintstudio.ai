@@ -27,7 +27,7 @@ export function useSectionLogic(projectsCount: number) {
         
         animate(y, newY, {
             type: "tween",
-            duration: 0.2,
+            duration: 0.15,
             ease: "easeOut"
         });
     };

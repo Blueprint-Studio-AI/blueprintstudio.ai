@@ -1,6 +1,6 @@
 import { GestureContextValue } from "../../GestureContext";
 
-const THRESHOLD = 100;
+const THRESHOLD = 80;
 
 export function checkTouchThreshold(
     x: number,

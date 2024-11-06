@@ -14,8 +14,11 @@ export default function TikTokSection({ project, isActive, index }: TikTokSectio
 
     return (
         <motion.div
-            className={`absolute h-[${SECTION_HEIGHT}svh] w-screen bg-blue-200`}
-            style={{ top: `calc(${index * SECTION_HEIGHT}svh)` }} // align vertically
+            className={`absolute w-screen`}
+            style={{
+                top: `calc(${index * SECTION_HEIGHT}svh)`,  // align vertically
+                height: `${SECTION_HEIGHT}svh`  // height
+            }}
         >
             <div
                 className={`h-full w-full bg-black`}
