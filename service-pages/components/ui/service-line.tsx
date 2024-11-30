@@ -44,7 +44,7 @@ export function ServiceLine({ name, description, href }: ServiceLineProps) {
                 className="absolute inset-0 flex items-center justify-center"
                 animate={{ 
                   rotate: isHovered ? 45 : 0,
-                  scale: isHovered ? 1.1 : 1
+                  scale: isHovered ? 1.3 : 1
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
