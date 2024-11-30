@@ -18,7 +18,7 @@ export function SectionTitle({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`mx-auto max-w-2xl mb-16 ${className}`}
+      className={`max-w-2xl mb-16 ${className}`}
     >
       <motion.div
         initial={{ width: 0 }}
