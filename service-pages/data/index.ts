@@ -321,13 +321,6 @@ import {
             description: 'Forward-thinking planning',
             icon: Compass,
             features: []
-          },
-          {
-            slug: 'sustainability-tech',
-            name: 'Sustainability Tech',
-            description: 'Sustainable technology solutions',
-            icon: Leaf,
-            features: []
           }
         ]
       }

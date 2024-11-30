@@ -1,6 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { Button } from "@/service-pages/components/ui/button";
+import { Fingerprint } from 'lucide-react';
 
 export function Hero() {
   const { scrollY } = useScroll();
@@ -8,64 +7,73 @@ export function Hero() {
   const y = useTransform(scrollY, [0, 300], [0, 100]);
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center pt-32 pb-24 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] aspect-square rounded-full"
-          style={{
-            background: "radial-gradient(circle at center, rgba(var(--primary-rgb), 0.03) 0%, transparent 70%)",
-          }}
-        />
-      </div>
+    <>
+      <section className="relative min-h-screen flex flex-col">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] aspect-square rounded-full"
+            style={{
+              background: "radial-gradient(circle at center, rgba(var(--primary-rgb), 0.03) 0%, transparent 70%)",
+            }}
+          />
+        </div>
 
-      {/* Content */}
-      <div className="container relative z-10">
+        {/* Top Content */}
+        <div className="container flex-1 relative z-10 pt-16 flex justify-center items-end">
         <motion.div
-          style={{ opacity, y }}
-          className="relative"
-        >
-          {/* Main Title */}
+            style={{ opacity, y }}
+            className="relative w-full pb-20 sm:pb-0" // Added padding-bottom for mobile devices
+            >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center"
+            className="flex flex-col items-center justify-center gap-8"
           >
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-8">
-              <span className="inline-block relative">
-                Services
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl" />
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12">
-              Full service studio at your command.
+            <Fingerprint className="w-8 h-8 text-muted-foreground" />
+            <p className="text-xl text-muted-foreground ">
+              scroll to see the goods
             </p>
+            </motion.div>
+          </motion.div>
+        </div>
 
+        {/* Bottom Content */}
+        <div className="flex-1 flex items-end">
+          <motion.div
+            style={{ opacity, y }}
+            className="relative w-full pb-20 sm:pb-0" // Added padding-bottom for mobile devices
+            >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex justify-center"
+              transition={{ duration: 0.8 }}
             >
-              <Button 
-                size="lg" 
-                className="h-14 px-8 text-lg relative overflow-hidden group"
+              <h1 
+                className="font-serif font-medium leading-[0.85] tracking-tight text-center mx-auto"
+                style={{ fontSize: 'clamp(4rem, 28vw, 30rem)',
+                letterSpacing: '0.02em' // Normal letter-spacing relative to the font size
+                }}
               >
-                <span className="relative z-10 flex items-center">
-                  Start Your Project
-                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 group-hover:opacity-80 transition-opacity" />
-              </Button>
+                Services
+              </h1>
             </motion.div>
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-    </section>
+      {/* Gradient Overlap Section */}
+      <div className="relative -mt-[0vw]">
+        <div 
+          className="h-[10vw] bg-gradient-to-t from-background via-background/80 to-transparent"
+          style={{
+            maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)'
+          }}
+        />
+      </div>
+    </>
   );
 }

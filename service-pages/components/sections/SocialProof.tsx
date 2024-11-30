@@ -56,7 +56,7 @@ export function SocialProof() {
             Why blueprint
           </h2>
           <p className="text-xl text-muted-foreground">
-            We combine creativity, technology, and strategy to deliver exceptional results.
+            Taste, technology, and strategy deliver exceptional results
           </p>
         </motion.div>
 
@@ -111,7 +111,7 @@ export function SocialProof() {
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent lg:hidden" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-end lg:hidden">
                   <h3 className="text-2xl md:text-3xl font-bold mb-2">TokenWorks</h3>
-                  <p className="text-muted-foreground">eCommerce Transformation</p>
+                  <p className="text-muted-foreground">High Converting eCommerce Site</p>
                 </div>
               </div>
 
@@ -119,11 +119,11 @@ export function SocialProof() {
               <div className="p-8 lg:py-16 lg:pr-16 flex flex-col justify-center">
                 <div className="hidden lg:block mb-8">
                   <h3 className="text-3xl font-bold mb-2">TokenWorks</h3>
-                  <p className="text-muted-foreground">eCommerce Transformation</p>
+                  <p className="text-muted-foreground">High Converting eCommerce Site</p>
                 </div>
 
                 <p className="text-lg text-muted-foreground mb-8">
-                  Complete digital transformation from WordPress to a modern, headless Next.js architecture while maintaining WooCommerce functionality. Full-service redesign including branding, photography, and videography.
+                  Full-service design & build including branding, design, development, photography, and videography.
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
