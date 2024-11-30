@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { services } from '@/service-pages/data';
 import { useState } from 'react';
 import { SectionTitle } from '../ui/section-title';
+import { ServiceLine } from '../ui/service-line';
 
 const container = {
   hidden: { opacity: 0 },
@@ -98,30 +99,12 @@ export function Services() {
                   <div className={`lg:hidden ${expandedService === coreService.slug ? 'block' : 'hidden'}`}>
                     <div className="space-y-3 mt-4 pl-8">
                       {coreService.serviceLines.map((serviceLine) => (
-                        <Link
+                          <ServiceLine
                           key={serviceLine.slug}
+                          name={serviceLine.name}
+                          description={serviceLine.description}
                           href={`/services/${coreService.slug}/${serviceLine.slug}`}
-                          className="block group"
-                        >
-                          <div className="p-4 rounded-lg border border-primary/10 hover:border-primary/20 hover:bg-primary/5 transition-all duration-200">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="text-base font-medium group-hover:text-primary transition-colors duration-200">
-                                  {serviceLine.name}
-                                </h4>
-                                <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-200">
-                                  {serviceLine.description}
-                                </p>
-                              </div>
-                              <div className="relative w-8 h-8 shrink-0 ml-4">
-                                <div className="absolute inset-0 rounded-full bg-primary/5 transition-transform duration-200 group-hover:scale-110" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <ArrowUpRight className="w-4 h-4 text-primary transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
+                        />
                       ))}
                     </div>
                   </div>
@@ -150,29 +133,11 @@ export function Services() {
                         variants={item}
                         layout
                       >
-                        <Link 
+                        <ServiceLine
+                          name={serviceLine.name}
+                          description={serviceLine.description}
                           href={`/services/${activeService}/${serviceLine.slug}`}
-                          className="block group"
-                        >
-                          <div className="p-4 rounded-lg border border-primary/10 hover:border-primary/20 hover:bg-primary/5 transition-all duration-200">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="text-base font-medium group-hover:text-primary transition-colors duration-200">
-                                  {serviceLine.name}
-                                </h4>
-                                <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-200">
-                                  {serviceLine.description}
-                                </p>
-                              </div>
-                              <div className="relative w-8 h-8 shrink-0 ml-4">
-                                <div className="absolute inset-0 rounded-full bg-primary/5 transition-transform duration-200 group-hover:scale-110" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <ArrowUpRight className="w-4 h-4 text-primary transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
+                        />
                       </motion.div>
                     ))}
                 </motion.div>
