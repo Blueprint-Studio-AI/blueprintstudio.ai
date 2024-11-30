@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Rocket, Sparkles, ArrowUpRight } from 'lucide-react';
 import { Button } from "@/service-pages/components/ui/button";
+import { SectionTitle } from '../ui/section-title';
 
 export function CTA() {
   return (
@@ -11,26 +12,11 @@ export function CTA() {
       </div>
       
       <div className="container relative px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-2xl mb-16"
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: "3rem" }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="h-1 bg-primary mb-6"
-          />
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-            Start Now
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            We don't waste time on scope negotiation. We crush bottlenecks with urgency and accelerate your success.   
-          </p>
-        </motion.div>
+        
+        <SectionTitle
+          title="Start Now"
+          description="We don't waste time on scope negotiation. We crush bottlenecks with urgency and accelerate your success."
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

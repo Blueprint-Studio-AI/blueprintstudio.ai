@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { services } from '@/service-pages/data';
 import { useState } from 'react';
+import { SectionTitle } from '../ui/section-title';
 
 const container = {
   hidden: { opacity: 0 },
@@ -32,7 +33,12 @@ export function Services() {
 
   const handleServiceClick = (slug: string) => {
     if (window.innerWidth < 1024) {
-      setExpandedService(expandedService === slug ? null : slug);
+      // If clicking the same service that's already expanded, close it
+      if (expandedService === slug) {
+        setExpandedService(null);
+        return;
+      }
+      setExpandedService(slug);
     }
     setActiveService(slug);
   };
@@ -42,26 +48,11 @@ export function Services() {
       <div className="absolute inset-0 bg-dot-pattern opacity-5" />
       
       <div className="container px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-2xl mb-16"
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: "3rem" }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="h-1 bg-primary mb-6"
-          />
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-            What We Do
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            Design & build solutions that transform businesses and drive growth.
-          </p>
-        </motion.div>
+
+        <SectionTitle
+          title="What We Do"
+          description="Design & build solutions that transform businesses and drive growth."
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Core Services List - Left Side */}
@@ -79,11 +70,11 @@ export function Services() {
                   }}
                   onMouseEnter={() => window.innerWidth >= 1024 && setActiveService(coreService.slug)}
                   onClick={() => handleServiceClick(coreService.slug)}
-                  className="relative group cursor-pointer"
+                  className="relative group"
                 >
                   <div 
                     className={`p-8 rounded-xl border transition-all duration-200 ${
-                      activeService === coreService.slug 
+                      activeService === coreService.slug && (expandedService === coreService.slug || window.innerWidth >= 1024)
                         ? 'bg-primary/5 border-primary/20 scale-[1.02]' 
                         : 'border-transparent hover:bg-primary/5 hover:border-primary/10'
                     }`}

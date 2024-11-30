@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Palette, Brain, Blocks, Clock, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Button } from '@/service-pages/components/ui/button';
+import { SectionTitle } from '../ui/section-title';
 
 const coreStrengths = [
   { 
@@ -39,26 +40,11 @@ export function SocialProof() {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
       
       <div className="container relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-2xl mb-16"
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: "3rem" }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="h-1 bg-primary mb-6"
-          />
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-            Why blueprint
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            Taste, technology, and strategy deliver exceptional results
-          </p>
-        </motion.div>
+        
+        <SectionTitle
+          title="Client Stories"
+          description="See how we've helped leading companies achieve their digital ambitions."
+        />
 
         {/* Core Strengths */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-32">
