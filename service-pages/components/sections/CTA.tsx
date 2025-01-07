@@ -25,7 +25,13 @@ const customFeatures = [
 
 export function CTA() {
   return (
-    <section className="py-32 relative">
+    <motion.section 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.7 }}
+      className="py-32 relative"
+    >
       <div className="absolute inset-0 bg-dot-pattern opacity-5" />
       
       <div className="container relative px-4">
@@ -37,12 +43,7 @@ export function CTA() {
 
         <div className="grid md:grid-cols-2 gap-8 mt-16 max-w-5xl mx-auto">
           {/* Custom Quote Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-2xl p-8 hover:border-primary/20 transition-all duration-300"
-          >
+          <div className="relative bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-2xl p-8 hover:border-primary/20 transition-all duration-300">
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-primary" />
@@ -71,16 +72,10 @@ export function CTA() {
               Share Your Vision
               <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Button>
-          </motion.div>
+          </div>
 
           {/* Subscription Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="relative bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-2xl p-8 hover:border-primary/40 transition-all duration-300"
-          >
+          <div className="relative bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-2xl p-8 hover:border-primary/40 transition-all duration-300">
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-primary" />
@@ -114,9 +109,9 @@ export function CTA() {
               Let's Work Together
               <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Button>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

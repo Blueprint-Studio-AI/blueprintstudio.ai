@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
 
 export function HeroTwo() {
   const { scrollY } = useScroll();
@@ -13,55 +14,75 @@ export function HeroTwo() {
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
         </div>
 
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[#0f0f0f]/80 backdrop-blur-sm border-b border-white/10">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="/" className="text-sm text-white">blueprint studio</a>
-            <div className="flex gap-4">
-              <a 
-                href="https://calendly.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+        {/* Header with logo, text, and buttons */}
+        <header className="absolute top-0 left-0 right-0 z-10">
+        <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-between">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="flex items-center gap-3" // Added flex container for logo and text
+            >
+                <Image
+                src="/blueprint-logo.svg"
+                alt="Blueprint Studio"
+                width={120}
+                height={120}
+                className="h-6 w-auto"
+                />
+                <span className="text-white text-lg font-medium">Blueprint Studio</span>
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="flex gap-4"
+            >
+                <a 
+                href="/" 
                 className="text-sm px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
-              >
+                >
                 View Work
-              </a>
-              <a 
-                href="https://calendly.com" 
+                </a>
+                <a 
+                href="https://cal.com/blueprint-studio/intro-call" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-sm px-4 py-2 rounded-full bg-white text-[#0f0f0f] hover:bg-white/90 transition-colors"
-              >
+                >
                 Schedule Call
-              </a>
+                </a>
+            </motion.div>
             </div>
-          </div>
+        </div>
         </header>
 
         {/* Main Content */}
         <div className="flex-1 flex items-center justify-center">
-        <motion.div 
+          <motion.div 
             style={{ opacity }}
-            className="container px-4 max-w-3xl mx-auto text-center" // Back to max-w-3xl
-        >
+            className="container px-4 max-w-3xl mx-auto text-center"
+          >
             <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
-            <h1 className="text-3xl md:text-4xl mb-4 text-white font-medium">
+              <h1 className="text-3xl md:text-4xl mb-4 text-white font-medium">
                 Ideas made real. Problems made simple.
-            </h1>
+              </h1>
 
-            <p className="text-xl md:text-2xl text-[#a2a2a2] mb-8">
+              <p className="text-xl md:text-2xl text-[#a2a2a2] mb-8">
                 Your vision, amplified.
-            </p>
+              </p>
 
-            <p className="text-base md:text-lg text-[#a2a2a2]">
+              <p className="text-base md:text-lg text-[#a2a2a2]">
                 Because the best path isn't always obvious.
-            </p>
+              </p>
             </motion.div>
-        </motion.div>
+          </motion.div>
         </div>
 
         {/* Scroll Indicator */}

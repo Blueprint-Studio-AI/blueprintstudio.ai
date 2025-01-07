@@ -3,23 +3,24 @@ import {
     Rocket, LineChart, Sparkles, Users, FlaskConical,
     
     // Create & Launch Icons
-    Box, Globe, Zap, Code2, Wand2, Server,
+    Box, Globe, Zap, Code2, Wand2, Server, Smartphone,
     
     // Grow & Scale Icons
     TrendingUp, Palette, Megaphone, FileText, BarChart2, Share2,
     Image, Video, Bot,
     
     // Elevate & Perfect Icons
-    Crown, Layout, Layers, HeartHandshake, UserCheck, Gauge,
+    Crown, Layout, Layers, HeartHandshake, CheckCircle, Gauge,
     Accessibility, PieChart,
     
     // Enable & Advance Icons
-    UserPlus, PencilRuler, Target, GraduationCap, Workflow,
+    UserPlus, ClipboardList, Target, GraduationCap, Workflow,
     Wrench, FileCode, Settings,
     
     // Innovate & Lead Icons
-    Brain, MessageSquare, Factory, Laptop, TestTube,
-    Database, Compass, Leaf
+    Brain, Network, Factory, Laptop, TestTube,
+    Database, Compass, Glasses,
+    
   } from 'lucide-react';
   import type { ServicePageData } from '../types/service';
   
@@ -32,45 +33,59 @@ import {
         icon: Rocket,
         serviceLines: [
           {
-            slug: 'digital-products',
-            name: 'Digital Products',
-            description: 'Custom digital solutions for modern businesses',
-            icon: Box,
-            features: []
-          },
-          {
-            slug: 'websites',
-            name: 'Websites',
-            description: 'Professional web presence solutions',
-            icon: Globe,
-            features: []
-          },
-          {
-            slug: 'mvp-development',
-            name: 'MVP Development',
-            description: 'Rapid solution deployment',
-            icon: Zap,
-            features: []
-          },
-          {
-            slug: 'development-solutions',
-            name: 'Development Solutions',
-            description: 'Full-stack development expertise',
+            slug: 'custom-software-development',
+            name: 'Custom Software Development',
+            description: 'Enterprise-grade custom software solutions',
             icon: Code2,
             features: []
           },
           {
-            slug: 'no-code-solutions',
-            name: 'No-Code Solutions',
-            description: 'Rapid development without coding',
-            icon: Wand2,
+            slug: 'web-application-development',
+            name: 'Web Application Development',
+            description: 'Scalable web applications and platforms',
+            icon: Globe,
             features: []
           },
           {
-            slug: 'technical-infrastructure',
-            name: 'Technical Infrastructure',
-            description: 'Robust technical foundation',
+            slug: 'mobile-app-development',
+            name: 'Mobile App Development',
+            description: 'Native and cross-platform mobile solutions',
+            icon: Smartphone,  // Need to import this icon
+            features: []
+          },
+          {
+            slug: 'cloud-architecture',
+            name: 'Cloud Architecture & Infrastructure',
+            description: 'Scalable cloud-native solutions',
             icon: Server,
+            features: []
+          },
+          {
+            slug: 'api-development',
+            name: 'API Development & Integration',
+            description: 'Custom API solutions and integrations',
+            icon: Workflow,
+            features: []
+          },
+          {
+            slug: 'devops-solutions',
+            name: 'DevOps & CI/CD Solutions',
+            description: 'Automated deployment and infrastructure',
+            icon: Settings,
+            features: []
+          },
+          {
+            slug: 'enterprise-platforms',
+            name: 'Enterprise Platform Development',
+            description: 'Custom enterprise software platforms',
+            icon: Box,
+            features: []
+          },
+          {
+            slug: 'saas-development',
+            name: 'SaaS Product Development',
+            description: 'Cloud-based software solutions',
+            icon: Zap,
             features: []
           }
         ]
@@ -82,59 +97,80 @@ import {
         icon: TrendingUp,
         serviceLines: [
           {
-            slug: 'brand-strategy-design',
-            name: 'Brand Strategy & Design',
-            description: 'Comprehensive brand development and design',
-            icon: Palette,
-            features: []
-          },
-          {
-            slug: 'digital-marketing',
-            name: 'Digital Marketing',
-            description: 'Strategic digital marketing solutions',
+            slug: 'digital-marketing-strategy',
+            name: 'Digital Marketing Strategy',
+            description: 'Comprehensive digital marketing solutions',
             icon: Megaphone,
             features: []
           },
           {
-            slug: 'content-marketing',
-            name: 'Content Marketing',
-            description: 'Engaging content strategy and creation',
-            icon: FileText,
-            features: []
-          },
-          {
-            slug: 'seo-analytics',
-            name: 'SEO & Analytics',
-            description: 'Data-driven search optimization',
+            slug: 'search-engine-optimization',
+            name: 'Search Engine Optimization (SEO)',
+            description: 'Data-driven search optimization services',
             icon: BarChart2,
             features: []
           },
           {
-            slug: 'social-media',
-            name: 'Social Media',
-            description: 'Strategic social media management',
+            slug: 'paid-media-marketing',
+            name: 'Paid Media Marketing (PPC)',
+            description: 'Strategic paid advertising campaigns',
+            icon: Target,
+            features: []
+          },
+          {
+            slug: 'content-marketing',
+            name: 'Content Marketing Services',
+            description: 'Strategic content creation and distribution',
+            icon: FileText,
+            features: []
+          },
+          {
+            slug: 'brand-design-strategy',
+            name: 'Brand Design & Strategy',
+            description: 'Comprehensive brand identity and strategy',
+            icon: Palette,
+            features: []
+          },
+          {
+            slug: 'content-strategy',
+            name: 'Content Strategy & Planning',
+            description: 'Strategic content planning and direction',
+            icon: FileText,
+            features: []
+          },
+          {
+            slug: 'content-production',
+            name: 'Content Production Services',
+            description: 'Professional content creation and production',
+            icon: Video,  // or could use Image
+            features: []
+          },
+          {
+            slug: 'social-media-marketing',
+            name: 'Social Media Marketing',
+            description: 'Comprehensive social media management',
             icon: Share2,
             features: []
           },
           {
-            slug: 'visual-content',
-            name: 'Visual Content',
-            description: 'Professional photography and design',
-            icon: Image,
-            features: []
-          },
-          {
-            slug: 'video-production',
-            name: 'Video Production',
-            description: 'High-quality video content creation',
-            icon: Video,
-            features: []
-          },
-          {
-            slug: 'marketing-automation',
-            name: 'Marketing Automation',
-            description: 'Automated marketing solutions',
+            slug: 'email-marketing',
+            name: 'Email Marketing Automation',
+            description: 'Automated email marketing solutions',
             icon: Bot,
+            features: []
+          },
+          {
+            slug: 'conversion-optimization',
+            name: 'Conversion Rate Optimization',
+            description: 'Data-driven conversion improvement',
+            icon: LineChart,
+            features: []
+          },
+          {
+            slug: 'marketing-analytics',
+            name: 'Analytics & Performance Marketing',
+            description: 'Marketing performance measurement and optimization',
+            icon: PieChart,
             features: []
           }
         ]
@@ -146,59 +182,59 @@ import {
         icon: Crown,
         serviceLines: [
           {
-            slug: 'user-experience',
-            name: 'User Experience (UX)',
-            description: 'Human-centered design solutions',
-            icon: Users,
-            features: []
-          },
-          {
-            slug: 'user-interface',
-            name: 'User Interface (UI)',
-            description: 'Intuitive interface design',
+            slug: 'ux-ui-design',
+            name: 'UX/UI Design Services',
+            description: 'User-centered design solutions',
             icon: Layout,
             features: []
           },
           {
+            slug: 'product-design-systems',
+            name: 'Product Design Systems',
+            description: 'Scalable design system development',
+            icon: Palette,
+            features: []
+          },
+          {
+            slug: 'web-design-services',
+            name: 'Web Design Services',
+            description: 'Professional website design solutions',
+            icon: Globe,
+            features: []
+          },
+          {
             slug: 'service-design',
-            name: 'Service Design',
-            description: 'End-to-end service optimization',
+            name: 'Service Design & Optimization',
+            description: 'End-to-end service experience design',
             icon: Layers,
             features: []
           },
           {
+            slug: 'digital-product-strategy',
+            name: 'Digital Product Strategy',
+            description: 'Strategic product planning and development',
+            icon: Compass,
+            features: []
+          },
+          {
+            slug: 'quality-assurance',
+            name: 'Quality Assurance Testing',
+            description: 'Comprehensive quality testing services',
+            icon: CheckCircle, // Need to import
+            features: []
+          },
+          {
             slug: 'customer-experience',
-            name: 'Customer Experience (CX)',
-            description: 'Customer journey optimization',
+            name: 'Customer Experience (CX) Design',
+            description: 'End-to-end customer journey optimization',
             icon: HeartHandshake,
             features: []
           },
           {
-            slug: 'employee-experience',
-            name: 'Employee Experience (EX)',
-            description: 'Internal systems and workflows',
-            icon: UserCheck,
-            features: []
-          },
-          {
-            slug: 'performance-optimization',
-            name: 'Performance Optimization',
-            description: 'Technical performance enhancement',
-            icon: Gauge,
-            features: []
-          },
-          {
-            slug: 'accessibility',
-            name: 'Accessibility',
-            description: 'Inclusive design implementation',
+            slug: 'accessibility-services',
+            name: 'Accessibility Implementation',
+            description: 'WCAG compliance and accessibility solutions',
             icon: Accessibility,
-            features: []
-          },
-          {
-            slug: 'analytics-insights',
-            name: 'Analytics & Insights',
-            description: 'Data-driven improvement strategies',
-            icon: PieChart,
             features: []
           }
         ]
@@ -210,59 +246,59 @@ import {
         icon: Sparkles,
         serviceLines: [
           {
-            slug: 'team-augmentation',
-            name: 'Team Augmentation',
+            slug: 'staff-augmentation',
+            name: 'Staff Augmentation Services',
             description: 'Skilled technical team extension',
             icon: UserPlus,
             features: []
           },
           {
-            slug: 'design-teams',
-            name: 'Design Teams',
-            description: 'Expert design team support',
-            icon: PencilRuler,
-            features: []
-          },
-          {
-            slug: 'marketing-teams',
-            name: 'Marketing Teams',
-            description: 'Marketing team enhancement',
-            icon: Target,
-            features: []
-          },
-          {
-            slug: 'workshops-training',
-            name: 'Workshops & Training',
-            description: 'Professional skill development',
-            icon: GraduationCap,
+            slug: 'devops-consulting',
+            name: 'DevOps Consulting Services',
+            description: 'DevOps transformation and optimization',
+            icon: Settings,
             features: []
           },
           {
             slug: 'process-automation',
-            name: 'Process Automation',
-            description: 'Workflow optimization solutions',
+            name: 'Business Process Automation',
+            description: 'Workflow and process optimization',
             icon: Workflow,
             features: []
           },
           {
-            slug: 'technical-consulting',
-            name: 'Technical Consulting',
-            description: 'Expert technical guidance',
+            slug: 'technical-project-management',
+            name: 'Technical Project Management',
+            description: 'Expert project leadership and delivery',
+            icon: ClipboardList, // Need to import
+            features: []
+          },
+          {
+            slug: 'technology-implementation',
+            name: 'Technology Implementation',
+            description: 'Enterprise technology deployment',
             icon: Wrench,
             features: []
           },
           {
-            slug: 'documentation-knowledge',
-            name: 'Documentation & Knowledge',
-            description: 'Comprehensive knowledge management',
+            slug: 'software-training',
+            name: 'Custom Software Training',
+            description: 'Tailored technical training programs',
+            icon: GraduationCap,
+            features: []
+          },
+          {
+            slug: 'it-strategy',
+            name: 'IT Strategy Consulting',
+            description: 'Strategic technology planning',
             icon: FileCode,
             features: []
           },
           {
-            slug: 'tools-infrastructure',
-            name: 'Tools & Infrastructure',
-            description: 'Technical tooling solutions',
-            icon: Settings,
+            slug: 'enterprise-solutions',
+            name: 'Enterprise Technology Solutions',
+            description: 'Complete enterprise system solutions',
+            icon: Database,
             features: []
           }
         ]
@@ -274,51 +310,58 @@ import {
         icon: FlaskConical,
         serviceLines: [
           {
-            slug: 'ai-integration',
-            name: 'AI Integration',
-            description: 'Advanced AI solutions',
+            slug: 'ai-automation',
+            name: 'AI & Automation Solutions',
+            description: 'Advanced artificial intelligence integration',
             icon: Brain,
             features: []
           },
           {
-            slug: 'prompt-engineering',
-            name: 'Prompt Engineering',
-            description: 'AI implementation and optimization',
-            icon: MessageSquare,
+            slug: 'machine-learning',
+            name: 'Machine Learning Services',
+            description: 'Custom machine learning solutions',
+            icon: Network, // Need to import
             features: []
           },
           {
-            slug: 'digital-transformation',
-            name: 'Digital Transformation',
-            description: 'Business evolution strategies',
-            icon: Factory,
-            features: []
-          },
-          {
-            slug: 'emerging-technology',
-            name: 'Emerging Technology',
-            description: 'Future-ready solutions',
-            icon: Laptop,
-            features: []
-          },
-          {
-            slug: 'innovation-labs',
-            name: 'Innovation Labs',
-            description: 'R&D and prototyping',
-            icon: TestTube,
+            slug: 'ai-process-automation',
+            name: 'AI Process Automation',
+            description: 'Intelligent process automation solutions',
+            icon: Bot,
             features: []
           },
           {
             slug: 'data-analytics',
-            name: 'Data Analytics',
-            description: 'Advanced data solutions',
+            name: 'Data Analytics & Business Intelligence',
+            description: 'Advanced data analysis and insights',
+            icon: BarChart2,
+            features: []
+          },
+          {
+            slug: 'web3-development',
+            name: 'Web3 Development Services',
+            description: 'Blockchain and Web3 solutions',
             icon: Database,
             features: []
           },
           {
-            slug: 'future-strategy',
-            name: 'Future Strategy',
-            description: 'Forward-thinking planning',
+            slug: 'extended-reality',
+            name: 'Extended Reality Development',
+            description: 'AR/VR/MR development solutions',
+            icon: Glasses, // Need to import
+            features: []
+          },
+          {
+            slug: 'digital-transformation',
+            name: 'Digital Transformation Services',
+            description: 'Complete business transformation solutions',
+            icon: Factory,
+            features: []
+          },
+          {
+            slug: 'emerging-tech-consulting',
+            name: 'Emerging Technology Consulting',
+            description: 'Future-focused technology guidance',
             icon: Compass,
             features: []
           }
