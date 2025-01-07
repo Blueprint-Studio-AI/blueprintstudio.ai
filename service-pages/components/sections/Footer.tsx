@@ -12,16 +12,14 @@ import {
 const companyLinks = [
   'About',
   'Careers',
-  'Blog',
-  'Contact',
   'Partners',
-  'Press Kit'
+  'Press Kit',
+  'Contact',
 ];
 
 const resourceLinks = [
-  'Documentation',
-  'Help Center',
-  'API Reference',
+  'Tools',
+  'Ideas',
   'Status',
   'Terms of Service',
   'Privacy Policy'
@@ -44,17 +42,18 @@ export function Footer() {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Let's create something
+                Build with us
                 <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
+                {/* <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
                   extraordinary
-                </span>
+                </span> */}
               </h2>
               <p className="text-lg text-white/60 mb-8 max-w-md">
                 Join our newsletter for expert insights on web development, design, and digital innovation.
               </p>
             </motion.div>
 
+            {/* Newsletter Subscribe Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -66,10 +65,10 @@ export function Footer() {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                  className="w-full h-12 bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 />
               </div>
-              <Button size="lg" className="shrink-0 group">
+              <Button size="lg" className="shrink-0 group h-12">
                 Subscribe
                 <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -199,7 +198,7 @@ export function Footer() {
               </a>
             </div>
             <div className="flex items-center gap-2 text-white/40 text-sm">
-              <span>Made with</span>
+              <span>made with</span>
               <motion.div
                 animate={{
                   scale: [1, 1.2, 1],
@@ -212,7 +211,7 @@ export function Footer() {
               >
                 ❤️
               </motion.div>
-              <span>by blueprint team</span>
+              <span> by blueprint</span>
             </div>
           </div>
         </motion.div>

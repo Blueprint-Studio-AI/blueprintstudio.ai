@@ -1,74 +1,121 @@
 import { motion } from 'framer-motion';
-import { Rocket, Sparkles, ArrowUpRight } from 'lucide-react';
+import { Sparkles, ArrowUpRight, Check } from 'lucide-react';
 import { Button } from "@/service-pages/components/ui/button";
 import { SectionTitle } from '../ui/section-title';
 
+const subscriptionFeatures = [
+  "Full access to all service categories",
+  "Create & Launch: Digital products, MVPs, websites",
+  "Grow & Scale: Brand, marketing, content",
+  "Elevate & Perfect: UX/UI, CX optimization",
+  "Enable & Advance: Team augmentation, training",
+  "Innovate & Lead: AI, emerging tech, strategy",
+  "Progress updates every Tuesday & Thursday",
+  "Pause or cancel anytime"
+];
+
+const customFeatures = [
+  "Choose from any service category",
+  "Focused project scope",
+  "Dedicated project team",
+  "Custom timeline and deliverables",
+  "Comprehensive documentation",
+  "Future-ready solutions"
+];
+
 export function CTA() {
   return (
-    <section className="py-32 relative overflow-hidden">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-        <div className="absolute inset-0 bg-dot-pattern opacity-5" />
-      </div>
+    <section className="py-32 relative">
+      <div className="absolute inset-0 bg-dot-pattern opacity-5" />
       
       <div className="container relative px-4">
-        
         <SectionTitle
-          title="Start Now"
-          description="We don't waste time on scope negotiation. We crush bottlenecks with urgency and accelerate your success."
+          title="Pricing"
+          description="Choose between focused project execution or comprehensive ongoing partnership - both backed by our full-spectrum expertise."
+          align='center'
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto"
-        >
-          <div className="relative bg-background/50 backdrop-blur-xl border border-primary/10 rounded-2xl p-12 md:p-16 overflow-hidden">
-            {/* Background Elements */}
-            <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-b from-primary/10 to-transparent opacity-50 blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-t from-primary/10 to-transparent opacity-50 blur-3xl" />
-            
-            <div className="relative">
-              <div className="flex items-center justify-center gap-3 mb-8">
-                <Rocket className="w-6 h-6 text-primary" />
-                <span className="text-sm font-medium bg-primary/10 px-3 py-1 rounded-full">Design & Build Subscription</span>
-                <Sparkles className="w-6 h-6 text-primary" />
+        <div className="grid md:grid-cols-2 gap-8 mt-16 max-w-5xl mx-auto">
+          {/* Custom Quote Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-2xl p-8 hover:border-primary/20 transition-all duration-300"
+          >
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">Project-Based</span>
               </div>
-
-              <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-6xl font-bold mb-6">
-                  Design & Build
-                  <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-                    Without Limits
-                  </span>
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Unlimited design, development, and deployment.
-                  One flat monthly rate. Continuous innovation.
-                </p>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div className="mb-8 text-center">
-                  <div className="text-sm text-muted-foreground mb-2">Starting at</div>
-                  <div className="text-5xl font-bold">$10,000</div>
-                  <div className="text-sm text-muted-foreground mt-2">per month</div>
-                </div>
-
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button size="lg" className="h-14 px-8 text-lg group">
-                    Start Creating Today
-                    <ArrowUpRight className="ml-2 w-5 h-5 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </Button>
-                </motion.div>
-              </div>
+              <h3 className="text-2xl font-bold mb-4">Custom Quote</h3>
+              <p className="text-muted-foreground">
+                Perfect for focused initiatives - from digital products to AI integration, choose exactly what you need.
+              </p>
             </div>
-          </div>
-        </motion.div>
+
+            <div className="space-y-3 mb-8">
+              {customFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button 
+              variant="outline" 
+              className="w-full group"
+              onClick={() => window.open('https://cal.com/adriastudio/custom', '_blank')}
+            >
+              Share Your Vision
+              <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Button>
+          </motion.div>
+
+          {/* Subscription Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="relative bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-2xl p-8 hover:border-primary/40 transition-all duration-300"
+          >
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium bg-primary/10 px-3 py-1 rounded-full">
+                  All-Access
+                </span>
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Design & Build Subscription</h3>
+              <div className="mb-4">
+                <span className="text-3xl font-bold">$10,000</span>
+                <span className="text-muted-foreground">/month</span>
+              </div>
+              <p className="text-muted-foreground">
+                Unlimited access to our full spectrum of services - from creation to innovation, all in one subscription.
+              </p>
+            </div>
+
+            <div className="space-y-3 mb-8">
+              {subscriptionFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button 
+              className="w-full group"
+              onClick={() => window.open('https://cal.com/adriastudio/unlimited', '_blank')}
+            >
+              Let's Work Together
+              <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Button>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

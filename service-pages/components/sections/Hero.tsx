@@ -21,7 +21,7 @@ export function Hero() {
         </div>
 
         {/* Top Content */}
-        <div className="container flex-1 relative z-10 pt-16 flex justify-center items-end">
+        {/* <div className="container flex-1 relative z-10 pt-16 flex justify-center items-end">
         <motion.div
             style={{ opacity, y }}
             className="relative w-full pb-20 sm:pb-0" // Added padding-bottom for mobile devices
@@ -38,7 +38,7 @@ export function Hero() {
             </p>
             </motion.div>
           </motion.div>
-        </div>
+        </div> */}
 
         {/* Bottom Content */}
         <div className="flex-1 flex items-end">
