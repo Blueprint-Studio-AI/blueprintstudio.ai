@@ -16,6 +16,7 @@ export default function GestureHandler({ children }: {children: ReactNode}) {
 
     const triggerSubscribers = useCallback((action: GestureDirection) => {
         const subscribers = subscribersRef.current.get(action);
+        console.log(subscribers, 'subscribers')
         subscribers?.forEach(callback => callback());
       }, []);
 
