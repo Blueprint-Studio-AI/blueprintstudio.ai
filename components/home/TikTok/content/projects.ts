@@ -1,4 +1,4 @@
-import FooterSection from "./FooterSection";
+import HeroSection from "./HeroSection";
 import FirstSection from "./FirstSection";
 import SecondSection from "./SecondSection";
 import ThirdSection from "./ThirdSection";
@@ -8,6 +8,7 @@ import FooterSection from "./FooterSection";
 // but for now we can to manually insert them bc a lot easier
 
 export const PROJECTS = {
+    HeroSection,  
     FirstSection,
     SecondSection,
     ThirdSection,

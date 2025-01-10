@@ -15,6 +15,10 @@ const config: Config = {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      base: "PP Editorial New",
+      small: "Helvetica Neue",
+    },
     extend: {
       colors: {
         border: {
