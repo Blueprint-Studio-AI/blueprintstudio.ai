@@ -1,6 +1,6 @@
 import { ProjectProps } from "../types";
 
-export default function IDScanner({ isActive }: ProjectProps) {
+export default function SecondSection({ isActive }: ProjectProps) {
     return (
         <div style={{zIndex: '10'}}>
             <h1 className="text-black" >ReportGPT</h1>
