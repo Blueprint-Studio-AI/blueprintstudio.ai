@@ -55,15 +55,15 @@
 <use xlink:href="#image0_475_7" transform="scale(0.001)"/>
 </pattern>
 <linearGradient id="paint0_linear_475_7" x1="3.20884" y1="19.8946" x2="23.87" y2="10.3754" gradientUnits="userSpaceOnUse">
-<stop stop-color="#6170F6"/>
-<stop offset="1" stop-color="#80E9FB"/>
+<stop stop-color="#00000021"/>
+<stop offset="1" stop-color="#00000021"/>
 </linearGradient>
 <linearGradient id="paint1_linear_475_7" x1="5.86943" y1="22.1621" x2="25.3385" y2="5.23246" gradientUnits="userSpaceOnUse">
-<stop stop-color="#3F78FF"/>
-<stop offset="1" stop-color="#74CEFF"/>
+<stop stop-color="#00000021"/>
+<stop offset="1" stop-color="#00000021"/>
 </linearGradient>
 <clipPath id="clip0_475_7">
-<rect width="23.9912" height="24" fill="white" transform="translate(1.63281 1)"/>
+<rect width="23.9912" height="24" fill="black" transform="translate(1.63281 1)"/>
 </clipPath>
 </defs>
 </svg>
