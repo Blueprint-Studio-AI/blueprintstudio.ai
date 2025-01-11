@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
+const nextConfig = {
+    // TODO: update your-repository-name
+    basePath: process.env.NODE_ENV === 'production' ? '/your-repository-name' : '',
+    assetPrefix: process.env.NODE_ENV === 'production' ? '/your-repository-name/' : '',
+  };
+  
+  export default nextConfig;
+  
