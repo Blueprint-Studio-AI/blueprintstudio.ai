@@ -10,7 +10,7 @@ export default function Home() {
   usePreventDefaultScroll();
 
   return (
-    <main className="bg-black"> 
+    <main className='bg-white'> 
       <GestureHandler>
         <TikTok/>
       </GestureHandler>

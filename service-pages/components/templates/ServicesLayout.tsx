@@ -12,7 +12,7 @@ export function ServicesLayout() {
       {/* <Hero /> */}
       
       <HeroTwo />
-      {/* TODO: fix bug with window because can`t use npm run build */}
+      {/* TODO: fix bug with window because can`t use npm run */}
       <Services />
       <HowWeWork />
       <WhyUs />

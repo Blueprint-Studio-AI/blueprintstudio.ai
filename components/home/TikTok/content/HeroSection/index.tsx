@@ -1,6 +1,7 @@
 import { ProjectProps } from "../types";
 import Implint from "./images/imprint.svg";
 import Image from "next/image";
+import NavigationButton from "./NavigationButton";
 
 export default function HeroSection({ isActive }: ProjectProps) {
   return (
@@ -14,13 +15,7 @@ export default function HeroSection({ isActive }: ProjectProps) {
           We partner with founders to shape their future.
         </h3>
         </div>
-        <div className="w-full flex justify-center">
-          <button className="text-small bg-[#E1E1E133] border border-[#F4F4F7B2] rounded-[32px] p-[2px] flex items-center space-x-[10px]">
-            <Image priority src={Implint} alt="Follow us on Twitter" className="w-[32px]" />
-            <span className="text-[#000] pr-[10px]">Start</span>
-            <span className="text-[#1D1D1F8C] font-bold pr-[10px]">Learn</span>
-          </button>
-        </div>
+        <NavigationButton />
       </div>
     </div>
   );

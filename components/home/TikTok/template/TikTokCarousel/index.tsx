@@ -13,7 +13,7 @@ export default function TikTokCarousel({ isActive, children }: TikTokCarouselPro
     const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length);
 
     return (
-        <div className="w-full h-full bg-black flex flex-col justify-between">
+        <div className="w-full h-full flex flex-col justify-between">
             <div ref={containerRef} className="tiktok-wrapper relative" >
                 <motion.div 
                     className="absolute h-full flex"
