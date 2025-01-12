@@ -16,8 +16,10 @@ const config: Config = {
       },
     },
     fontFamily: {
-      base: "PP Editorial New",
-      small: "Helvetica Neue",
+      base: "Editorial New Regular",
+      baseItalic: "Editorial New Italic",
+      baseUltralight: "Editorial New Ultralight",
+      small: "Neue Montreal Regular",
     },
     extend: {
       colors: {

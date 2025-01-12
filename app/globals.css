@@ -75,7 +75,7 @@ body {
 
 /* Custom Font */
 @font-face {
-  font-family: 'Editorial New';
+  font-family: 'Editorial New Regular';
   src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
@@ -83,7 +83,43 @@ body {
 }
 
 .font-serif {
-  font-family: 'Editorial New', serif;
+  font-family: 'Editorial New Regular', serif;
+}
+
+@font-face {
+  font-family: 'Editorial New Italic';
+  src: url('/fonts/PPEditorialNew-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Editorial New Italic', serif;
+}
+
+@font-face {
+  font-family: 'Editorial New Ultralight';
+  src: url('/fonts/PPEditorialNew-Ultralight.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Editorial New Ultralight', serif;
+}
+
+@font-face {
+  font-family: 'Neue Montreal Regular';
+  src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Neue Montreal Regular', serif;
 }
 
 
