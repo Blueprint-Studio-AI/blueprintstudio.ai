@@ -64,6 +64,7 @@ const CoreServiceItem = memo(({
     aria-expanded={isExpanded}
     tabIndex={0}
   >
+    {/* TODO fix bug with window */}
     <div 
       className={`p-8 rounded-xl border transition-all duration-200 ${
         isActive && (isExpanded || window.innerWidth >= 1024)
