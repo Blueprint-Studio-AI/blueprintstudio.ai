@@ -50,7 +50,7 @@ export default function NavigationButton() {
           <ul className="space-y-2">
             <NavItem href="/services" text="Services" />
             {/* TODO: update style and toggle logic and position */}
-            <NavItem href="/about" text="About Us" />
+            <NavItem href="/" text="Home" />
           </ul>
         </div>
         <button
