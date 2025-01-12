@@ -21,7 +21,7 @@ export default function TikTokSection({ project, isActive, index }: TikTokSectio
             }}
         >
             <div
-                className={`h-full w-full bg-black`}
+                className={`h-full w-full `}
                 style={{ padding: `${PADDING}px` }}
             >
                 <div className="tiktok-wrapper">

@@ -68,7 +68,8 @@ body {
   }
 
   .tiktok-wrapper {
-    @apply h-full w-full rounded-3xl overflow-hidden;
+    @apply h-full w-full;
+    /* @apply h-full w-full rounded-3xl overflow-hidden; */
   }
 }
 
