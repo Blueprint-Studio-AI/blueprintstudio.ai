@@ -45,7 +45,7 @@ export default function NavigationButton() {
         <div
           className={`${
             isNavbarVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          } transition-all duration-500 ease-in-out bg-[#E1E1E133] bg-white border border-[#F4F4F7B2] rounded-tl-[32px] and rounded-tr-[32px] navbar`}
+          } transition-all shadow-[0px_0px_1px_0px_rgba(0,0,0,0.13)] duration-500 ease-in-out bg-[#E1E1E133] bg-white border border-[#F4F4F7B2] rounded-tl-[32px] and rounded-tr-[32px] navbar`}
         >
           <ul className="space-y-2">
             <NavItem href="/services" text="Services" />
@@ -55,7 +55,7 @@ export default function NavigationButton() {
         </div>
         <button
           onClick={toggleNavbar}
-          className={`text-small bg-white border border-[#F4F4F7B2] p-[5px] flex items-center space-x-[10px] ${isNavbarVisible ? 'rounded-bl-[32px] and rounded-br-[32px]' : ' rounded-[32px]'}`}
+          className={`shadow-[0px_0px_1px_0px_rgba(0,0,0,0.13)] text-small bg-white border border-[#F4F4F7B2] p-[5px] flex items-center space-x-[10px] ${isNavbarVisible ? 'rounded-bl-[32px] and rounded-br-[32px]' : ' rounded-[32px]'}`}
         >
           <Image
             priority
