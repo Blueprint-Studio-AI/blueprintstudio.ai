@@ -1,3 +1,4 @@
+import React from 'react';
 import { Children, ReactNode, useEffect } from "react";
 import { useCarouselLogic } from "../../utils/carouselLogic";
 import { motion } from "framer-motion";

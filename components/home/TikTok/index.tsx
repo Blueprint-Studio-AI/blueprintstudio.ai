@@ -1,5 +1,5 @@
 // @/components/home/TikTok/index.tsx
-
+import React from 'react';
 import TikTokSection from "./template/TikTokSection";
 import { motion } from "framer-motion";
 import { useSectionLogic } from "./utils/sectionLogic";
