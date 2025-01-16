@@ -1,4 +1,5 @@
 // @/components/home/TikTok/template/TikTokSection/index.tsx
+import React from 'react';
 import { motion } from "framer-motion";
 import { PROJECTS } from "../../content/projects";
 import { PADDING, SECTION_HEIGHT } from "../constants";
