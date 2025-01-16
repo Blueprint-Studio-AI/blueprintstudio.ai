@@ -11,8 +11,8 @@ interface TikTokCarouselProps {
  
 export default function TikTokCarousel({ isActive, children }: TikTokCarouselProps) {
     const childArray = Children.toArray(children);
+    console.log(childArray, 'childArray')
     const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length);
-
     return (
         <div className="w-full h-full flex flex-col justify-between">
             <div ref={containerRef} className="tiktok-wrapper relative" >
