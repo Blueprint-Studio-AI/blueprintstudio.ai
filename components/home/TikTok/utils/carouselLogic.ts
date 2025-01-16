@@ -15,7 +15,6 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     const { width: viewportWidth } = useViewport();
     const [cardWidth, setCardWidth] = useState<number | null>(null);
     const { x: gestureX } = useGestureContext();
-    console.log(isCarousel, 'isCarousel', isActive, 'isactive');
     //Update cardWidth when viewport changes
     useEffect(() => {
         // setCardWidth(viewportWidth - (PADDING * 2));
@@ -44,7 +43,6 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
 
     const goToCard = (index: number) => {
         if(isCarousel && !isActive) return false;
-        console.log(isCarousel ,'here isCarousel')
         const newIndex = Math.max(0, Math.min(cardCount - 1, index));
         setActiveCard(newIndex);
 

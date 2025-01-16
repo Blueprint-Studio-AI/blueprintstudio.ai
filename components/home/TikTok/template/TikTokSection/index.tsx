@@ -13,7 +13,6 @@ interface TikTokSectionProps {
 
 export default function TikTokSection({ project, isActive, isCarousel, index }: TikTokSectionProps) {
     const ProjectContent = PROJECTS[project as keyof typeof PROJECTS];
-    console.log(ProjectContent, 'ProjectContent')
     return (
         <motion.div
             className={`absolute w-screen`}

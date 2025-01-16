@@ -9,7 +9,6 @@ export default function TikTok() {
 
     const { activeSection, combinedY, containerRef } = useSectionLogic(PROJECT_NAMES.length);
     // TODO: If footer should be black background
-    console.log(PROJECT_NAMES, 'PROJECT_NAMES')
     return (
         <div ref={containerRef} className="relative h-svh w-screen overflow-hidden" >
             <motion.div style={{ y: combinedY }} className="absolute top-0 left-0 w-full">

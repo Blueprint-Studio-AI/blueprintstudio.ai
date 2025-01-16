@@ -12,8 +12,7 @@ interface TikTokCarouselProps {
  
 export default function TikTokCarousel({ isActive, children, isCarousel }: TikTokCarouselProps) {
     const childArray = Children.toArray(children);
-    console.log(isCarousel, 'isCarousel')
-    // TODO use isActive
+    // TODO update activeCard
     const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length, isActive, isCarousel);
     return (
         <div className="w-full h-full flex flex-col justify-between">
@@ -36,7 +35,8 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                     ))}
                 </motion.div>
             </div>
-            <div className="py-2">
+            {/* TODO: do we need to this block? */}
+            {/* <div className="py-2">
                 <div className="flex justify-center gap-2">
                     {childArray.map((_, index) => (
                         <div 
@@ -47,7 +47,7 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                         />
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }
