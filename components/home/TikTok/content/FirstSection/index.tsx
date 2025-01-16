@@ -28,7 +28,7 @@ const CardContent: React.FC<CardContentProps> = ({ title, subtitle, imageSrc }) 
 
 export default function FirstSection({ isActive }: ProjectProps) {
   return (
-    <TikTokCarousel isActive={isActive}>
+    <TikTokCarousel isActive={isActive} isCarousel={true}>
       <Card>
         <CardContent
           title="Cona Cash1"
@@ -52,4 +52,4 @@ export default function FirstSection({ isActive }: ProjectProps) {
       </Card>
     </TikTokCarousel>
   );
-}
+} 
