@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
+const nextConfig = {
+    // TODO: update process
+    basePath: process.env.NODE_ENV === 'production' ? '/blueprintstudio.ai' : '',
+    assetPrefix: process.env.NODE_ENV === 'production' ? '/blueprintstudio.ai' : '',
+  };
+  
+  export default nextConfig;
+  

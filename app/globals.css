@@ -1,27 +1,65 @@
-/* @tailwind base;
+/* app/globals.css */
+@tailwind base;
 @tailwind components;
-@tailwind utilities; */
+@tailwind utilities;
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
+  /* Dark theme by default (for home page) */
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+    
+    /* Dark theme variables */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+
+  /* Light theme for services pages */
+  .services-theme {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
@@ -30,6 +68,129 @@ body {
   }
 
   .tiktok-wrapper {
-    @apply h-full w-full rounded-3xl overflow-hidden;
+    @apply h-full w-full;
+    /* @apply h-full w-full rounded-3xl overflow-hidden; */
   }
 }
+
+/* Custom Font */
+@font-face {
+  font-family: 'Editorial New Regular';
+  src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Editorial New Regular', serif;
+}
+
+@font-face {
+  font-family: 'Editorial New Italic';
+  src: url('/fonts/PPEditorialNew-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Editorial New Italic', serif;
+}
+
+@font-face {
+  font-family: 'Editorial New Ultralight';
+  src: url('/fonts/PPEditorialNew-Ultralight.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Editorial New Ultralight', serif;
+}
+
+@font-face {
+  font-family: 'Neue Montreal Regular';
+  src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-serif {
+  font-family: 'Neue Montreal Regular', serif;
+}
+
+
+/* Custom Animations */
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+.animate-float {
+  animation: float 20s ease infinite;
+}
+
+.delay-200 {
+  animation-delay: -4s;
+}
+
+.delay-500 {
+  animation-delay: -8s;
+}
+
+/* Custom Patterns */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle at center, currentColor 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+}
+
+/* Custom Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Gradient Text */
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary) / 0.5));
+  }
+}
+
+/* Custom Shadows */
+.shadow-glow {
+  box-shadow: 0 0 30px -10px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Custom Transitions */
+.transition-all-slow {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
