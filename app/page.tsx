@@ -9,6 +9,8 @@ import { usePreventDefaultScroll } from "@/utils/hooks/usePreventDefaultScroll";
 export default function Home() {
   usePreventDefaultScroll();
 
+  console.log('test yo');
+
   return (
     <main>
       <GestureHandler>
