@@ -8,17 +8,18 @@ import { useViewport } from "@/utils/hooks/useViewport";
 
 const TRANSITION_TIME = 0.1; //s
 
-export function useCarouselLogic(cardCount: number) {
+export function useCarouselLogic(cardCount: number, isActive : boolean, isCarousel : boolean) {
     const [activeCard, setActiveCard] = useState(0);
     const x = useMotionValue(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const { width: viewportWidth } = useViewport();
     const [cardWidth, setCardWidth] = useState<number | null>(null);
     const { x: gestureX } = useGestureContext();
-
     //Update cardWidth when viewport changes
     useEffect(() => {
-        setCardWidth(viewportWidth - (PADDING * 2));
+        // setCardWidth(viewportWidth - (PADDING * 2));
+        // TODO update logic for PC
+        setCardWidth(viewportWidth - (50));
     }, [viewportWidth]);
 
     // Update x position when viewport or cardWidth changes
@@ -41,6 +42,7 @@ export function useCarouselLogic(cardCount: number) {
     );
 
     const goToCard = (index: number) => {
+        if(isCarousel && !isActive) return false;
         const newIndex = Math.max(0, Math.min(cardCount - 1, index));
         setActiveCard(newIndex);
 
