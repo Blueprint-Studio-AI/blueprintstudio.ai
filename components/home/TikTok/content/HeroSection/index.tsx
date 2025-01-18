@@ -1,7 +1,4 @@
 import { ProjectProps } from "../types";
-import Implint from "./images/imprint.svg";
-import Image from "next/image";
-import NavigationButton from "./NavigationButton";
 
 export default function HeroSection({ isActive }: ProjectProps) {
   return (
@@ -15,7 +12,6 @@ export default function HeroSection({ isActive }: ProjectProps) {
           We partner with founders to shape their future.
         </h3>
         </div>
-        <NavigationButton />
       </div>
     </div>
   );
