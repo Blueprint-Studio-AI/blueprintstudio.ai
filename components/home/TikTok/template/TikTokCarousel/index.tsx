@@ -7,13 +7,12 @@ import { CAROUSEL_GAP, PADDING } from "../constants";
 interface TikTokCarouselProps {
     isActive: boolean;
     children: ReactNode;
-    isCarousel: boolean;
 }
  
-export default function TikTokCarousel({ isActive, children, isCarousel }: TikTokCarouselProps) {
+export default function TikTokCarousel({ isActive, children }: TikTokCarouselProps) {
     const childArray = Children.toArray(children);
     // TODO update activeCard
-    const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length, isActive, isCarousel);
+    const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length, isActive);
     return (
         <div className="w-full h-full flex flex-col justify-between">
             <div ref={containerRef} className="tiktok-wrapper relative" >
@@ -35,19 +34,6 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                     ))}
                 </motion.div>
             </div>
-            {/* TODO: do we need to this block? */}
-            {/* <div className="py-2">
-                <div className="flex justify-center gap-2">
-                    {childArray.map((_, index) => (
-                        <div 
-                            key={index}
-                            className={`w-2 h-2 rounded-full ${
-                                index === activeCard ? 'bg-white' : 'bg-gray-500'
-                            }`}
-                        />
-                    ))}
-                </div>
-            </div> */}
         </div>
     );
 }

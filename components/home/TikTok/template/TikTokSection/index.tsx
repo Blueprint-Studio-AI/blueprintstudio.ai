@@ -8,11 +8,11 @@ interface TikTokSectionProps {
     project: string;
     isActive: boolean;
     index: number;
-    isCarousel: boolean;
 }
 
-export default function TikTokSection({ project, isActive, isCarousel, index }: TikTokSectionProps) {
+export default function TikTokSection({ project, isActive, index }: TikTokSectionProps) {
     const ProjectContent = PROJECTS[project as keyof typeof PROJECTS];
+
     return (
         <motion.div
             className={`absolute w-screen`}
@@ -27,7 +27,7 @@ export default function TikTokSection({ project, isActive, isCarousel, index }: 
             >
                 <div className="tiktok-wrapper">
                     <div className="h-full w-full bg-white">
-                        <ProjectContent isActive={isActive} isCarousel={isCarousel} />
+                        <ProjectContent isActive={isActive} />
                     </div>
                 </div>
             </div>

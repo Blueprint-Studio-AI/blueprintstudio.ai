@@ -23,22 +23,22 @@ export default function GestureHandler({ children }: {children: ReactNode}) {
     const yAnimation = useRef<AnimationPlaybackControls | null>(null);
 
     const goUp = useCallback(() => {
-      console.log('Go Up');
+      // console.log('Go Up');
       triggerSubscribers('up');
     }, [triggerSubscribers]);
   
     const goLeft = useCallback(() => {
-      console.log('Go Left');
+      // console.log('Go Left');
       triggerSubscribers('left');
     }, [triggerSubscribers]);
   
     const goRight = useCallback(() => {
-      console.log('Go Right');
+      // console.log('Go Right');
       triggerSubscribers('right');
     }, [triggerSubscribers]);
   
     const goDown = useCallback(() => {
-      console.log('Go Down');
+      // console.log('Go Down');
       triggerSubscribers('down');
     }, [triggerSubscribers]);
 

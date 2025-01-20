@@ -8,7 +8,7 @@ import { useViewport } from "@/utils/hooks/useViewport";
 
 const TRANSITION_TIME = 0.1; //s
 
-export function useCarouselLogic(cardCount: number, isActive : boolean, isCarousel : boolean) {
+export function useCarouselLogic(cardCount: number, isActive : boolean) {
     const [activeCard, setActiveCard] = useState(0);
     const x = useMotionValue(0);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,7 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     );
 
     const goToCard = (index: number) => {
-        if(isCarousel && !isActive) return false;
+        if(!isActive) return false;
         const newIndex = Math.max(0, Math.min(cardCount - 1, index));
         setActiveCard(newIndex);
 

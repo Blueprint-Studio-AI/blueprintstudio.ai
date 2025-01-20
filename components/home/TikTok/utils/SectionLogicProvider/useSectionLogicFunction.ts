@@ -1,13 +1,23 @@
 // @/components/home/TikTok/sectionLogic.ts
-
-import { useState, useRef, RefObject } from "react";
+import { useState, useRef, RefObject, Dispatch, SetStateAction } from "react";
 import { animate, MotionValue, useMotionValue, useTransform } from "framer-motion";
 import { useGestureContext } from "@/features/GestureHandler/useGestureContext";
 import { useGestureAction } from "@/features/GestureHandler/useGestureAction";
-import { SECTION_HEIGHT } from "../template/constants";
+import { SECTION_HEIGHT } from "../../template/constants";
 
-export function useSectionLogic(projectsCount: number) {
-    const [activeSection, setActiveSection] = useState(0);
+export interface UseSectionLogicReturn {
+    activeSection: number;
+    combinedY: MotionValue<number>;
+    containerRef: RefObject<HTMLDivElement>;
+    setSnapLock: Dispatch<SetStateAction<SnapLockType>>;
+}
+
+type SnapLockType = 'noUp' | 'noDown' | 'locked' | null;
+
+export function useSectionLogicFunction(projectsCount: number): UseSectionLogicReturn {
+    const [activeSection, setActiveSection] = useState<number>(0);
+    const [snapLock, setSnapLock] = useState<SnapLockType>(null);
+    // const [rubberBandLock, setRubberBandLock] = useState<boolean>(true);
     const y = useMotionValue(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -15,10 +25,18 @@ export function useSectionLogic(projectsCount: number) {
 
     const combinedY = useTransform<number, number>(
         [y, gestureY] as const,
-        ([baseY, gestureYValue]) => baseY + gestureYValue
+        ([baseY, gestureYValue]) => {
+            // if (rubberBandLock) return baseY;
+            if (snapLock) return baseY;
+            return baseY + gestureYValue;
+        }
     );
 
     const goToSection = (index: number) => {
+        if (snapLock === 'locked') return;
+        if (snapLock === 'noUp' && index < activeSection) return;
+        if (snapLock === 'noDown' && index > activeSection) return;
+
         const newIndex = Math.max(0, Math.min(projectsCount - 1, index));
         setActiveSection(newIndex);
         
@@ -42,5 +60,6 @@ export function useSectionLogic(projectsCount: number) {
         activeSection,
         combinedY,
         containerRef,
+        setSnapLock
     };
 }
