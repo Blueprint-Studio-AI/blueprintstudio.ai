@@ -1,78 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import TikTokCarousel from "../../template/TikTokCarousel";
+import TikTokCardContent from "../../template/TikTokCardContent";
 import Card from "../../template/TikTokCarousel/Card";
-import Image, { StaticImageData } from "next/image";
 import FirstImage from "./images/FirstImage.jpg";
 import { ProjectProps } from "../types";
 
-interface CardContentProps {
-  title: string;
-  subtitle: string;
-  mediaSrc: string | StaticImageData;
-  mediaType: "image" | "video";
-}
-
-const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, mediaType }) => {
-  const [isDesktop, setIsDesktop] = useState<boolean>(false);
-
-  useEffect(() => {
-    const checkViewport = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-
-    return () => window.removeEventListener('resize', checkViewport);
-  }, []);
-
-  return (
-    <div className={`card-wrapper text-black my-0 mx-auto ${isDesktop ? 'pt-[60px]' : 'pt-[60px]'}`}>
-      <div
-        style={{
-          // position: "relative",
-          // width: "100%",
-          // aspectRatio: isDesktop ? "1 / 1.618" : "5 / 7", // TODO: think how make it better
-          // overflow: "hidden",
-        }}
-        className="media-container w-full h-full"
-      >
-        {mediaType === "image" ? (
-          <Image
-            priority
-            src={mediaSrc as StaticImageData}
-            alt="Card image"
-            // layout="fill"
-            objectFit="cover"
-            className={`w-full ${isDesktop ? 'h-[70vh]' : 'h-[67vh]'} rounded-[20px]`}
-          />
-        ) : (
-          <video
-            controls
-            className={`w-full ${isDesktop ? 'h-[70vh]' : 'h-[67vh]'} rounded-[20px]`}
-            style={{
-              // position: "absolute",
-              // width: "100%",
-              // height: "100%",
-              // objectFit: "cover",
-            }}
-          >
-            <source src={mediaSrc as string} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        )}
-      </div>
-      <h1 className="font-[600] text-[21px] mt-4">{title}</h1>
-      <h3>{subtitle}</h3>
-    </div>
-  );
-};
 
 const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
   return (
     <TikTokCarousel isActive={isActive} isCarousel={true}>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash1"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -80,7 +18,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash2"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -88,7 +26,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash3"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -96,7 +34,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash4"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -104,7 +42,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash5"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -112,7 +50,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash1"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -120,7 +58,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash2"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -128,7 +66,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash3"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -136,7 +74,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash4"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
@@ -144,7 +82,7 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
         />
       </Card>
       <Card>
-        <CardContent
+        <TikTokCardContent
           title="Cona Cash5"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
