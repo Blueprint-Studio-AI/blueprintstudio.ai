@@ -12,19 +12,19 @@ interface CardContentProps {
 }
 
 const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, mediaType }) => (
-  <div className="card-wrapper text-black w-[90%] my-0 mx-auto">
+  <div className="card-wrapper text-black pt-[60px] my-0 mx-auto">
     <div className="w-full h-full">
       {mediaType === "image" ? (
         <Image
           priority
           src={mediaSrc as StaticImageData}
           alt="Card image"
-          className="w-full h-[75vh] py-[5%]"
+          className="w-full h-[60vh] py-[5%]"
         />
       ) : (
         <video
           controls
-          className="w-full h-[75vh] py-[5%]"
+          className="w-full h-[60vh] py-[5%]"
         >
           <source src={mediaSrc as string} type="video/mp4" />
           Your browser does not support the video tag.

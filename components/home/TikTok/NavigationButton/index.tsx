@@ -55,7 +55,7 @@ export default function NavigationButton() {
         </div>
         <button
           onClick={toggleNavbar}
-          className={`shadow-[0px_0px_1px_0px_rgba(0,0,0,0.13)] text-small bg-white border border-[#F4F4F7B2] p-[5px] flex items-center space-x-[10px] ${isNavbarVisible ? 'rounded-bl-[18px] and rounded-br-[18px]' : ' rounded-[18px]'}`}
+          className={`shadow-[0px_0px_1px_0px_rgba(0,0,0,0.13)] bg-[rgba(225,225,225,0.2)] text-small bg-white border border-[#F4F4F7B2] p-[5px] flex items-center space-x-[10px] ${isNavbarVisible ? 'rounded-bl-[18px] and rounded-br-[18px]' : ' rounded-[18px]'}`}
         >
           <Image
             priority

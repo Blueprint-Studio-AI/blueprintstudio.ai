@@ -19,7 +19,7 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     useEffect(() => {
         // setCardWidth(viewportWidth - (PADDING * 2));
         // TODO update logic for PC
-        setCardWidth(viewportWidth - (50));
+        setCardWidth(viewportWidth - (30));
     }, [viewportWidth]);
 
     // Update x position when viewport or cardWidth changes
