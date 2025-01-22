@@ -16,7 +16,6 @@ const config: Config = {
       },
     },
     fontFamily: {
-      base: "Editorial New Regular",
       baseItalic: "Editorial New Italic",
       baseUltralight: "Editorial New Ultralight",
       small: "Neue Montreal Regular",
