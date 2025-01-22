@@ -2,7 +2,7 @@ import React from 'react';
 import { Children, ReactNode, useEffect } from "react";
 import { useCarouselLogic } from "../../utils/carouselLogic";
 import { motion } from "framer-motion";
-import { CAROUSEL_GAP, PADDING } from "../constants";
+import { CAROUSEL_GAP, PADDING, LEFT_PADDING_CAROUSEL_M, LEFT_PADDING_CAROUSEL_PC  } from "../constants";
 import { useViewport } from "@/utils/hooks/useViewport";
 
 interface TikTokCarouselProps {
@@ -30,7 +30,7 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                                 width: cardWidth ? `${cardWidth}px` : '100vw',
                                 flexShrink: 0,
                                 marginRight: index < childArray.length - 1 ? `${CAROUSEL_GAP}px` : 0,
-                                paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? 120 : 30) : 0
+                                paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M) : 0
                             }}
                         >
                             {child}

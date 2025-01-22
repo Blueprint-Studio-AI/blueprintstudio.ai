@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { animate, useMotionValue, useTransform } from "framer-motion";
 import { useGestureContext } from "@/features/GestureHandler/useGestureContext";
 import { useGestureAction } from "@/features/GestureHandler/useGestureAction";
-import { CAROUSEL_GAP, PADDING } from "../template/constants";
+import { CAROUSEL_GAP, PADDING, LEFT_PADDING_CAROUSEL_M, LEFT_PADDING_CAROUSEL_PC } from "../template/constants";
 import { useViewport } from "@/utils/hooks/useViewport";
 
 const TRANSITION_TIME = 0.1; //s
@@ -18,7 +18,7 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     //Update cardWidth when viewport changes
     useEffect(() => {
         // setCardWidth(viewportWidth - (PADDING * 2));
-        const padding = viewportWidth > 1024 ? 120 : 30;
+        const padding = viewportWidth > 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M;
         setCardWidth(viewportWidth - padding);
     }, [viewportWidth]);
 
