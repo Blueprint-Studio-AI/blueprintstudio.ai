@@ -1,7 +1,7 @@
 import TikTokCarousel from "../../template/TikTokCarousel";
 import Card from "../../template/TikTokCarousel/Card";
 import Image, { StaticImageData } from "next/image";
-import FirstImage from "./images/FirstImage.jpg";
+import FirstImage from "./images/FirstImage.svg";
 import { ProjectProps } from "../types";
 
 interface CardContentProps {
