@@ -3,14 +3,16 @@ import { Children, ReactNode, useEffect } from "react";
 import { useCarouselLogic } from "../../utils/carouselLogic";
 import { motion } from "framer-motion";
 import { CAROUSEL_GAP, PADDING } from "../constants";
+import { useViewport } from "@/utils/hooks/useViewport";
 
 interface TikTokCarouselProps {
     isActive: boolean;
     children: ReactNode;
     isCarousel: boolean;
 }
- 
+
 export default function TikTokCarousel({ isActive, children, isCarousel }: TikTokCarouselProps) {
+    const { width: viewportWidth } = useViewport();
     const childArray = Children.toArray(children);
     // TODO update activeCard
     const { activeCard, combinedX, containerRef, cardWidth } = useCarouselLogic(childArray.length, isActive, isCarousel);
@@ -28,7 +30,7 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                                 width: cardWidth ? `${cardWidth}px` : '100vw',
                                 flexShrink: 0,
                                 marginRight: index < childArray.length - 1 ? `${CAROUSEL_GAP}px` : 0,
-                                paddingLeft: index === activeCard ? 30 : 0
+                                paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? 120 : 30) : 0
                             }}
                         >
                             {child}
