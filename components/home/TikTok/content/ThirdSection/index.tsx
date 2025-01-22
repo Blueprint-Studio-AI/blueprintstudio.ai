@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import TikTokCarousel from "../../template/TikTokCarousel";
 import Card from "../../template/TikTokCarousel/Card";
 import Image, { StaticImageData } from "next/image";
@@ -11,32 +12,63 @@ interface CardContentProps {
   mediaType: "image" | "video";
 }
 
-const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, mediaType }) => (
-  <div className="card-wrapper text-black pt-[60px] my-0 mx-auto">
-    <div className="w-full h-full">
-      {mediaType === "image" ? (
-        <Image
-          priority
-          src={mediaSrc as StaticImageData}
-          alt="Card image"
-          className="w-full h-[60vh] py-[5%]"
-        />
-      ) : (
-        <video
-          controls
-          className="w-full h-[60vh] py-[5%]"
-        >
-          <source src={mediaSrc as string} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      )}
-      <h1 className="font-[600] text-[21px]">{title}</h1>
-      <h3 className="text-small">{subtitle}</h3>
-    </div>
-  </div>
-);
+const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, mediaType }) => {
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
-export default function FirstSection({ isActive }: ProjectProps) {
+  useEffect(() => {
+    const checkViewport = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
+
+  return (
+    <div className={`card-wrapper text-black my-0 mx-auto ${isDesktop ? 'pt-[30px]' : 'pt-[60px]'}`}>
+      <div
+        style={{
+          // position: "relative",
+          // width: "100%",
+          // aspectRatio: isDesktop ? "1 / 1.618" : "5 / 7", // TODO: think how make it better
+          // overflow: "hidden",
+        }}
+        className="media-container w-full h-full"
+      >
+        {mediaType === "image" ? (
+          <Image
+            priority
+            src={mediaSrc as StaticImageData}
+            alt="Card image"
+            // layout="fill"
+            objectFit="cover"
+            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[60vh] py-[5%]'}`}
+          />
+        ) : (
+          <video
+            controls
+            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[60vh] py-[5%]'}`}
+            style={{
+              // position: "absolute",
+              // width: "100%",
+              // height: "100%",
+              // objectFit: "cover",
+            }}
+          >
+            <source src={mediaSrc as string} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        )}
+      </div>
+      <h1 className="font-[600] text-[21px] mt-4">{title}</h1>
+      <h3>{subtitle}</h3>
+    </div>
+  );
+};
+
+const ThirdSection: React.FC<ProjectProps> = ({ isActive }) => {
   return (
     <TikTokCarousel isActive={isActive} isCarousel={true}>
       <Card>
@@ -47,14 +79,6 @@ export default function FirstSection({ isActive }: ProjectProps) {
           mediaType="image"
         />
       </Card>
-      {/* <Card> */}
-        {/* <CardContent
-          title="Cona Cash2"
-          subtitle="Brand built on action for a digital motivation technology."
-          mediaSrc="/videos/sample-video.mp4"
-          mediaType="video"
-        /> */}
-      {/* </Card> */}
       <Card>
         <CardContent
           title="Cona Cash3"
@@ -65,4 +89,6 @@ export default function FirstSection({ isActive }: ProjectProps) {
       </Card>
     </TikTokCarousel>
   );
-}
+};
+
+export default ThirdSection;
