@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from 'tailwindcss-animate';
 
 const config: Config = {
   content: [
@@ -73,7 +74,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
   // Add this safelist to ensure gradient classes are generated
   safelist: [
     'from-primary',
