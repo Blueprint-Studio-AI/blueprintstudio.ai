@@ -3,10 +3,11 @@ import React from 'react';
 import TikTokSection from "./template/TikTokSection";
 import { motion } from "framer-motion";
 import { useSectionLogic } from "./utils/sectionLogic";
-import { PROJECT_NAMES } from './content/projects';
+import { useProjectNames } from './content/projects';
 
 export default function TikTok() {
 
+    const PROJECT_NAMES = useProjectNames();
     const { activeSection, combinedY, containerRef } = useSectionLogic(PROJECT_NAMES.length);
     return (
         <div ref={containerRef} className="relative h-svh w-screen overflow-hidden" >

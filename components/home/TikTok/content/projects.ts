@@ -2,18 +2,24 @@ import HeroSection from "./HeroSection";
 import FirstSection from "./FirstSection";
 import SecondSection from "./SecondSection";
 import ThirdSection from "./ThirdSection";
-// import FooterSection from "./FooterSection";
+import FooterSection from "./FooterSection";
+import { useViewport } from "@/utils/hooks/useViewport";
 
-// This could be generated at build time,
-// but for now we can to manually insert them bc a lot easier
-
-// TODO add posibility carousel identificator
 export const PROJECTS = {
-    HeroSection,  
+    HeroSection,
     FirstSection,
     SecondSection,
     ThirdSection,
-    // FooterSection,
+    FooterSection,
 } as const;
 
-export const PROJECT_NAMES = Object.keys(PROJECTS);
+export const PROJECTS_MOBILE = {
+    HeroSection,
+    FirstSection,
+    ThirdSection, 
+} as const;
+
+export const useProjectNames = () => {
+    const { width: viewportWidth } = useViewport();
+    return viewportWidth < 1024 ? Object.keys(PROJECTS_MOBILE) : Object.keys(PROJECTS);
+};
