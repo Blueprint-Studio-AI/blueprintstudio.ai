@@ -27,7 +27,7 @@ const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, me
   }, []);
 
   return (
-    <div className={`card-wrapper text-black my-0 mx-auto ${isDesktop ? 'pt-[30px]' : 'pt-[60px]'}`}>
+    <div className={`card-wrapper text-black my-0 mx-auto ${isDesktop ? 'pt-[60px]' : 'pt-[60px]'}`}>
       <div
         style={{
           // position: "relative",
@@ -44,12 +44,12 @@ const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, me
             alt="Card image"
             // layout="fill"
             objectFit="cover"
-            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[67vh]'} rounded-[20px]`}
+            className={`w-full ${isDesktop ? 'h-[70vh]' : 'h-[67vh]'} rounded-[20px]`}
           />
         ) : (
           <video
             controls
-            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[67vh]'} rounded-[20px]`}
+            className={`w-full ${isDesktop ? 'h-[70vh]' : 'h-[67vh]'} rounded-[20px]`}
             style={{
               // position: "absolute",
               // width: "100%",
