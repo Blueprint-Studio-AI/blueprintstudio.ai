@@ -5,6 +5,7 @@ import Handlers from './Handlers';
 import { AnimationPlaybackControls, useMotionValue } from "framer-motion";
 import { smoothMotion } from "./utils/smoothMotion";
 import { GestureDirection } from "./types";
+import React from 'react';
 
 export default function GestureHandler({ children }: {children: ReactNode}) {
 

@@ -1,5 +1,6 @@
 import { ProjectProps } from "../types";
 import { Footer } from "@/service-pages/components/sections/Footer";
+import React from 'react';
 
 export default function FooterSection({ isActive }: ProjectProps) {
     return (
