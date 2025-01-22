@@ -81,7 +81,71 @@ const FirstSection: React.FC<ProjectProps> = ({ isActive }) => {
       </Card>
       <Card>
         <CardContent
+          title="Cona Cash2"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
           title="Cona Cash3"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash4"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash5"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash1"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash2"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash3"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash4"
+          subtitle="Brand built on action for a digital motivation technology."
+          mediaSrc={FirstImage}
+          mediaType="image"
+        />
+      </Card>
+      <Card>
+        <CardContent
+          title="Cona Cash5"
           subtitle="Brand built on action for a digital motivation technology."
           mediaSrc={FirstImage}
           mediaType="image"
