@@ -14,7 +14,7 @@ export default function TikTok() {
             <motion.div style={{ y: combinedY }} className="absolute top-0 left-0 w-full">
                 {PROJECT_NAMES.map((project, index) => (
                     <TikTokSection 
-                        isCarousel={true}
+                        isCarousel={false}
                         key={project}
                         project={project}
                         index={index}
