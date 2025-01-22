@@ -44,12 +44,12 @@ const CardContent: React.FC<CardContentProps> = ({ title, subtitle, mediaSrc, me
             alt="Card image"
             // layout="fill"
             objectFit="cover"
-            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[60vh] py-[5%]'}`}
+            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[67vh]'} rounded-[20px]`}
           />
         ) : (
           <video
             controls
-            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[60vh] py-[5%]'}`}
+            className={`w-full ${isDesktop ? 'h-[70vh] pt-[5%]' : 'h-[67vh]'} rounded-[20px]`}
             style={{
               // position: "absolute",
               // width: "100%",

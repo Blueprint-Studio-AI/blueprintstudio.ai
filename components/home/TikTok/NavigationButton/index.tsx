@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Implint from "./images/imprint.svg";
 import Image from "next/image";
 import NavLine from "./images/NavLine.svg";
@@ -40,7 +40,7 @@ export default function NavigationButton() {
     };
   
     return (
-      <div className="flex flex-col w-40 mx-auto text-black fixed z-[1] inset-x-0 bottom-[8%]">
+      <div className="flex flex-col w-40 mx-auto text-black fixed z-[1] inset-x-0 bottom-[4%]">
 
         <div
           className={`${
