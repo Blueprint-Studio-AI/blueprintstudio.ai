@@ -1,0 +1,36 @@
+{
+    "locations": [
+      {
+        "name": "New York",
+        "state": "NY",
+        "slug": "new-york",
+        "description": "Enterprise web development services for NYC's dynamic business landscape",
+        "marketHighlight": [
+          {
+            "label": "Tech Companies",
+            "value": "410+"
+          },
+          {
+            "label": "Market Size",
+            "value": "$14B"
+          }
+        ]
+      },
+      {
+        "name": "Los Angeles", 
+        "state": "CA",
+        "slug": "los-angeles",
+        "description": "Custom web solutions for LA's creative and entertainment industries",
+        "marketHighlight": [
+          {
+            "label": "Digital Agencies",
+            "value": "200+"
+          },
+          {
+            "label": "Growth Rate",
+            "value": "23%"
+          }
+        ]
+      }
+    ]
+   }

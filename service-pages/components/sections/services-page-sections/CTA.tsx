@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowUpRight, Check } from 'lucide-react';
 import { Button } from "@/service-pages/components/ui/button";
-import { SectionTitle } from '../ui/section-title';
+import { SectionTitle } from '../../ui/section-title';
 
 const subscriptionFeatures = [
   "Full access to all service categories",

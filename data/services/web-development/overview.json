@@ -1,0 +1,38 @@
+{
+  "description": "We deliver cutting-edge web development solutions that combine technical excellence with strategic thinking. Our approach focuses on creating scalable, high-performance applications that drive business growth.",
+  "capabilities": [
+    {
+      "title": "Custom Development",
+      "description": "Bespoke web applications tailored to your specific business needs and objectives"
+    },
+    {
+      "title": "Platform Integration",
+      "description": "Seamless integration with existing systems and third-party services"
+    },
+    {
+      "title": "Performance Optimization",
+      "description": "Advanced optimization techniques for maximum speed and efficiency"
+    }
+  ],
+  "techStack": [
+    {
+      "category": "Frontend",
+      "technologies": ["React", "Vue", "Angular", "Next.js", "TypeScript"]
+    },
+    {
+      "category": "Backend",
+      "technologies": ["Node.js", "Python", "Java", "PHP"]
+    },
+    {
+      "category": "Database",
+      "technologies": ["PostgreSQL", "MongoDB", "MySQL"]
+    }
+  ],
+  "standards": [
+    "WCAG 2.1 AA Accessibility Standards",
+    "Modern Security Best Practices",
+    "Performance First Development",
+    "Clean Code Standards",
+    "Mobile-First Design Principles"
+  ]
+}

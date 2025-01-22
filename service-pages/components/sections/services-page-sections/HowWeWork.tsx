@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Activity, Brain, Target, Clock, Palette, Compass, Microscope } from 'lucide-react';
-import { SectionTitle } from '../ui/section-title';
+import { SectionTitle } from '../../ui/section-title';
 
 const processSteps = [
   {

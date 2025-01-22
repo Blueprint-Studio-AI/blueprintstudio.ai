@@ -1,0 +1,59 @@
+{
+    "title": "Why Choose Our Web Development Services",
+    "description": "Partner with a team that delivers excellence at every step",
+    "differentiators": [
+      {
+        "title": "Technical Excellence",
+        "description": "Industry-leading development practices and standards",
+        "icon": "🏆"
+      },
+      {
+        "title": "Proven Track Record",
+        "description": "Successful delivery of complex web projects",
+        "icon": "📈"
+      },
+      {
+        "title": "Client-Focused Approach",
+        "description": "Your success is our priority",
+        "icon": "🤝"
+      }
+    ],
+    "expertise": {
+      "description": "Over a decade of web development excellence",
+      "highlights": [
+        "500+ successful projects delivered",
+        "Expert team of certified developers",
+        "Industry-specific experience",
+        "Modern technology stack"
+      ]
+    },
+    "benefits": [
+      "Faster Time to Market",
+      "Scalable Solutions",
+      "Lower Maintenance Costs",
+      "Enhanced Security",
+      "Better User Experience"
+    ],
+    "metrics": [
+      {
+        "value": "98%",
+        "label": "Client Satisfaction",
+        "description": "Based on post-project surveys"
+      },
+      {
+        "value": "500+",
+        "label": "Projects Completed",
+        "description": "Across various industries"
+      },
+      {
+        "value": "<24h",
+        "label": "Support Response",
+        "description": "Average response time"
+      },
+      {
+        "value": "10+",
+        "label": "Years Experience",
+        "description": "In web development"
+      }
+    ]
+   }

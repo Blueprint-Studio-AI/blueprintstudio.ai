@@ -1,0 +1,21 @@
+{
+  "slug": "web-development",
+  "meta": {
+    "title": "Web Development Services | Blueprint Studio",
+    "description": "Expert web development services that transform your digital presence",
+    "keywords": ["web development", "custom websites", "web applications"],
+    "categoryTag": "Create & Launch",
+    "canonical": "/services/web-development",
+    "openGraph": {
+      "title": "Web Development Services | Blueprint Studio",
+      "description": "Transform your digital presence with modern, scalable web solutions",
+      "image": "/images/services/web-development-og.jpg"
+    },
+    "schema": {
+      "serviceType": "Web Development",
+      "provider": "Blueprint Studio",
+      "areaServed": "Global",
+      "description": "Expert web development services that transform your digital presence"
+    }
+  }
+}

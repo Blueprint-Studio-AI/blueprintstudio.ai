@@ -1,0 +1,21 @@
+{
+    "headline": "Enterprise Web Development",
+    "valueProposition": "Transform your digital presence with modern, scalable web solutions",
+    "description": "We build high-performance web applications that drive business growth and user engagement.",
+    "ctaText": "Start Your Project",
+    "ctaUrl": "/contact",
+    "stats": [
+      {
+        "value": "500+",
+        "label": "Projects Delivered"
+      },
+      {
+        "value": "99.9%",
+        "label": "Uptime Guaranteed"
+      },
+      {
+        "value": "24/7",
+        "label": "Support Coverage"
+      }
+    ]
+  }

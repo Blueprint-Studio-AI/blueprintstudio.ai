@@ -1,7 +1,7 @@
 // app/services/page.tsx
 "use client";
 
-import { ServicesLayout } from "@/service-pages/components/templates/ServicesLayout";
+import { ServicesLayout } from "@/service-components/templates/ServicesLayout";
 
 export default function ServicesPage() {
   return <ServicesLayout />;

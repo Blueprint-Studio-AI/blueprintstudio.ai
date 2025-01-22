@@ -2,8 +2,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { services } from '@/service-pages/data';
 import { useState, useCallback, memo } from 'react';
-import { SectionTitle } from '../ui/section-title';
-import { ServiceLine } from '../ui/service-line';
+import { SectionTitle } from '../../ui/section-title';
+import { ServiceLine } from '../../ui/service-line';
 
 // Types
 interface ServiceLine {

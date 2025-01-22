@@ -1,0 +1,46 @@
+{
+    "industries": [
+      {
+        "name": "Healthcare",
+        "description": "HIPAA-compliant web solutions for healthcare providers",
+        "slug": "healthcare",
+        "benefits": [
+          "Secure patient portals",
+          "EMR system integration", 
+          "HIPAA compliance",
+          "Telehealth capabilities"
+        ],
+        "metrics": [
+          {
+            "label": "Patient Satisfaction",
+            "value": "98%"
+          },
+          {
+            "label": "Implementation Time", 
+            "value": "12wks"
+          }
+        ]
+      },
+      {
+        "name": "Finance",
+        "description": "Secure and scalable solutions for financial institutions",
+        "slug": "finance",
+        "benefits": [
+          "Bank-grade security",
+          "Real-time data processing",
+          "Regulatory compliance",
+          "Integration capabilities"
+        ],
+        "metrics": [
+          {
+            "label": "Uptime",
+            "value": "99.9%"
+          },
+          {
+            "label": "Processing Speed",
+            "value": "<100ms"
+          }
+        ]
+      }
+    ]
+   }

@@ -1,16 +1,14 @@
-import { Hero } from '@/service-pages/components/sections/Hero';
-import { HeroTwo } from '@/service-pages/components/sections/HeroTwo';
-import { Services } from '@/service-pages/components/sections/Services';
-import { HowWeWork } from '@/service-pages/components/sections/HowWeWork';
-import { WhyUs } from '@/service-pages/components/sections/WhyUs';
-import { CTA } from '@/service-pages/components/sections/CTA';
-import { Footer } from '@/service-pages/components/sections/Footer';
+// service-pages/components/templates/ServicesLayout.tsx
+import { HeroTwo } from '@/service-pages/components/sections/services-page-sections/HeroTwo';
+import { Services } from '../sections/services-page-sections/Services';
+import { HowWeWork } from '../sections/services-page-sections/HowWeWork';
+import { WhyUs } from '../sections/services-page-sections/WhyUs';
+import { CTA } from '../sections/services-page-sections/CTA';
+import { Footer } from '@/service-components/sections/Footer';
 
 export function ServicesLayout() {
   return (
     <main className="min-h-screen bg-background text-foreground services-theme">
-      {/* <Hero /> */}
-      
       <HeroTwo />
       <Services />
       <HowWeWork />
