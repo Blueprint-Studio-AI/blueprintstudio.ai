@@ -1,8 +1,8 @@
 import React from 'react';
-import { Children, ReactNode, useEffect } from "react";
+import { Children, ReactNode } from "react";
 import { useCarouselLogic } from "../../utils/carouselLogic";
 import { motion } from "framer-motion";
-import { CAROUSEL_GAP, PADDING, LEFT_PADDING_CAROUSEL_M, LEFT_PADDING_CAROUSEL_PC  } from "../constants";
+import { CAROUSEL_GAP } from "../constants";
 import { useViewport } from "@/utils/hooks/useViewport";
 
 interface TikTokCarouselProps {
