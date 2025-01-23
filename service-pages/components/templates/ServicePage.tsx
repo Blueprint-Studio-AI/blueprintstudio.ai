@@ -31,9 +31,9 @@ interface ServicePageProps {
         title: string;
         description: string;
       }>;
-      technologies: Array<{
+      techStack: Array<{
         category: string;
-        stack: string[];
+        technologies: string[];
       }>;
       standards: string[];
     };
@@ -81,7 +81,7 @@ export function ServicePage({ data }: ServicePageProps) {
         <ServiceOverview
           description={data.overview.description}
           capabilities={data.overview.capabilities}
-          technologies={data.overview.technologies}
+          techStack={data.overview.techStack}
           standards={data.overview.standards}
         />
 
