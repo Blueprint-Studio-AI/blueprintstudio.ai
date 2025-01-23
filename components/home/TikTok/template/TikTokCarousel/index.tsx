@@ -31,8 +31,8 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                                 flexShrink: 0,
                                 // marginRight: index < childArray.length - 1 ? `${CAROUSEL_GAP}px` : 0,
                                 marginLeft: index !==activeCard && index + activeCard -1 < activeCard ? `${CAROUSEL_GAP}px` : 0,
-                                // paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0,
-                                // paddingRight: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0
+                                paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0,
+                                paddingRight: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0
                             }}
                         >
                             {child}
