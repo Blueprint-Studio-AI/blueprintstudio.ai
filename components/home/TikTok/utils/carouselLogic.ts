@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { animate, useMotionValue, useTransform } from "framer-motion";
 import { useGestureContext } from "@/features/GestureHandler/useGestureContext";
 import { useGestureAction } from "@/features/GestureHandler/useGestureAction";
-import { CAROUSEL_GAP, PADDING, LEFT_PADDING_CAROUSEL_M, LEFT_PADDING_CAROUSEL_PC } from "../template/constants";
+import { CAROUSEL_GAP } from "../template/constants";
 import { useViewport } from "@/utils/hooks/useViewport";
 
 const TRANSITION_TIME = 0.1; //s
