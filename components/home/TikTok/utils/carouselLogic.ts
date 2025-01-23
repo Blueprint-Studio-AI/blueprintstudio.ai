@@ -19,15 +19,16 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     useEffect(() => {
         // setCardWidth(viewportWidth - (PADDING * 2));
         const padding = viewportWidth > 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M;
-        setCardWidth(viewportWidth - padding);
+        setCardWidth(viewportWidth - CAROUSEL_GAP*2);
     }, [viewportWidth]);
 
     // Update x position when viewport or cardWidth changes
     useEffect(() => {
         if (cardWidth === null) return;
         
-        const newX = -activeCard * (cardWidth + CAROUSEL_GAP);
-        
+        // const newX = -activeCard * (cardWidth + CAROUSEL_GAP);
+        const newX = -activeCard * (cardWidth );
+
         // Animate to new position smoothly
         animate(x, newX, {
             type: "tween",
@@ -47,7 +48,8 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
         setActiveCard(newIndex);
 
         if (cardWidth === null) return;
-        const newX = -newIndex * (cardWidth + CAROUSEL_GAP);
+        // const newX = -newIndex * (cardWidth + CAROUSEL_GAP);
+        const newX = -newIndex * (cardWidth);
         
         animate(x, newX, {
             type: "tween",

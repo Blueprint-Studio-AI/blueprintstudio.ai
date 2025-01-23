@@ -29,10 +29,10 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                             style={{
                                 width: cardWidth ? `${cardWidth}px` : '100vw',
                                 flexShrink: 0,
-                                marginRight: index < childArray.length - 1 ? `${CAROUSEL_GAP}px` : 0,
-                                // marginLeft: index > 0 ? `${CAROUSEL_GAP}px` : 0,
-                                paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M) : 0,
-                                // paddingRight: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M) : 0
+                                // marginRight: index < childArray.length - 1 ? `${CAROUSEL_GAP}px` : 0,
+                                marginLeft: index !==activeCard && index + activeCard -1 < activeCard ? `${CAROUSEL_GAP}px` : 0,
+                                // paddingLeft: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0,
+                                // paddingRight: index === activeCard ? (viewportWidth >= 1024 ? LEFT_PADDING_CAROUSEL_PC : CAROUSEL_GAP) : 0
                             }}
                         >
                             {child}
@@ -40,19 +40,6 @@ export default function TikTokCarousel({ isActive, children, isCarousel }: TikTo
                     ))}
                 </motion.div>
             </div>
-            {/* TODO: do we need to this block? */}
-            {/* <div className="py-2">
-                <div className="flex justify-center gap-2">
-                    {childArray.map((_, index) => (
-                        <div 
-                            key={index}
-                            className={`w-2 h-2 rounded-full ${
-                                index === activeCard ? 'bg-white' : 'bg-gray-500'
-                            }`}
-                        />
-                    ))}
-                </div>
-            </div> */}
         </div>
     );
 }
