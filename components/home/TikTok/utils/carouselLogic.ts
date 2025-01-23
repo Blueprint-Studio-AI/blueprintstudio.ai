@@ -17,9 +17,8 @@ export function useCarouselLogic(cardCount: number, isActive : boolean, isCarous
     const { x: gestureX } = useGestureContext();
     //Update cardWidth when viewport changes
     useEffect(() => {
-        // setCardWidth(viewportWidth - (PADDING * 2));
-        const padding = viewportWidth > 1024 ? LEFT_PADDING_CAROUSEL_PC : LEFT_PADDING_CAROUSEL_M;
-        setCardWidth(viewportWidth - CAROUSEL_GAP*2);
+        const dynamicCarouselGap = viewportWidth > 1024 ? CAROUSEL_GAP*20 : CAROUSEL_GAP*2;
+        setCardWidth(viewportWidth - dynamicCarouselGap);
     }, [viewportWidth]);
 
     // Update x position when viewport or cardWidth changes
