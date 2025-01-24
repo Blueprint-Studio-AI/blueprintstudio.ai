@@ -5,31 +5,9 @@
 
 @layer base {
   /* Dark theme by default (for home page) */
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
     
-    /* Dark theme variables */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    /* home theme variables */
+
   }
 
   /* Light theme for services pages */
@@ -55,7 +33,7 @@
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
   }
-}
+
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -69,6 +47,25 @@ body {
 
   .tiktok-wrapper {
     @apply h-full w-full rounded-3xl overflow-hidden;
+  }
+  
+  /* New text shadow utilities */
+  .text-shadow-nav {
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.13);
+  }
+  
+  /* New backdrop blur utilities */
+  .backdrop-blur-nav {
+    backdrop-filter: blur(3.5px);
+  }
+  
+  .backdrop-blur-nav-hover {
+    backdrop-filter: blur(2px);
+  }
+  
+  /* New background blend utilities */
+  .bg-blend-nav {
+    background-blend-mode: luminosity;
   }
 }
 
@@ -84,7 +81,6 @@ body {
 .font-serif {
   font-family: 'Editorial New', serif;
 }
-
 
 /* Custom Animations */
 @keyframes spotlight {
@@ -132,11 +128,6 @@ body {
     linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
 }
 
-/* Custom Utilities */
-.text-balance {
-  text-wrap: balance;
-}
-
 /* Gradient Text */
 @layer utilities {
   .text-gradient {
@@ -150,10 +141,11 @@ body {
   box-shadow: 0 0 30px -10px rgba(var(--primary-rgb), 0.3);
 }
 
+.shadow-nav {
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
 /* Custom Transitions */
 .transition-all-slow {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-
-

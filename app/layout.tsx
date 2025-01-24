@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css"; // This now includes all the styles we need
+import { FloatingNav } from "@/components/FloatingNav";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head />
+      <body>
+        <FloatingNav />
+        {children}
+      </body>
     </html>
   );
 }

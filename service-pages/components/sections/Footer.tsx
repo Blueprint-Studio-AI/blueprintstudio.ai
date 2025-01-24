@@ -32,7 +32,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative bg-black text-white overflow-hidden">
+    <footer className="relative bg-black text-white overflow-hidden text-foreground services-theme">
       <div className="absolute inset-0 bg-dot-pattern opacity-5" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black" />
       

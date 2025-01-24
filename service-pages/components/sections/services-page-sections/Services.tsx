@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
-import { services } from '@/service-pages/data';
+import { Bot, Brain, Server, ChevronDown, Compass, Factory, Target, Wand2, Video, Layers, Code2, Globe, Palette, Smartphone, Megaphone, Database, LineChart, BarChart2, Share2, Layout} from 'lucide-react';
+// import { services } from '@/service-pages/data';
 import { useState, useCallback, memo } from 'react';
 import { SectionTitle } from '../../ui/section-title';
 import { ServiceLine } from '../../ui/service-line';
@@ -42,6 +42,170 @@ const itemVariants = {
   }
 };
 
+const services = {
+  coreServices: [
+    {
+      slug: 'design',
+      name: 'Design',
+      description: 'Create exceptional digital experiences that delight users',
+      icon: Palette,
+      serviceLines: [
+        {
+          slug: 'ux-ui-design',
+          name: 'UX/UI Design',
+          description: 'User-centered interface and experience design',
+          icon: Layout,
+          features: []
+        },
+        {
+          slug: 'web-design',
+          name: 'Web Design',
+          description: 'Responsive, modern website design',
+          icon: Globe,
+          features: []
+        },
+        {
+          slug: 'product-design',
+          name: 'Product Design',
+          description: 'End-to-end digital product design',
+          icon: Wand2,
+          features: []
+        },
+        {
+          slug: 'branding',
+          name: 'Brand Design',
+          description: 'Identity design and brand systems',
+          icon: Palette,
+          features: []
+        }
+      ]
+    },
+    {
+      slug: 'development',
+      name: 'Development',
+      description: 'Build scalable, robust digital solutions',
+      icon: Code2,
+      serviceLines: [
+        {
+          slug: 'web-development',
+          name: 'Web Development',
+          description: 'Custom websites and web applications',
+          icon: Globe,
+          features: []
+        },
+        {
+          slug: 'mobile-development',
+          name: 'Mobile Development',
+          description: 'Native and cross-platform mobile apps',
+          icon: Smartphone,
+          features: []
+        },
+        {
+          slug: 'ai-apps',
+          name: 'AI Applications',
+          description: 'Custom AI-powered applications',
+          icon: Brain,
+          features: []
+        },
+        {
+          slug: 'custom-software',
+          name: 'Custom Software',
+          description: 'Bespoke software solutions',
+          icon: Database,
+          features: []
+        },
+        {
+          slug: 'cloud-infrastructure',
+          name: 'Cloud & Infrastructure',
+          description: 'Scalable cloud solutions',
+          icon: Server, 
+          features: []
+        }
+      ]
+    },
+    {
+      slug: 'marketing',
+      name: 'Marketing',
+      description: 'Grow your digital presence and reach',
+      icon: LineChart,
+      serviceLines: [
+        {
+          slug: 'digital-marketing',
+          name: 'Digital Marketing',
+          description: 'Comprehensive marketing strategies',
+          icon: Megaphone,
+          features: []
+        },
+        {
+          slug: 'seo',
+          name: 'SEO',
+          description: 'Search engine optimization',
+          icon: BarChart2,
+          features: []
+        },
+        {
+          slug: 'social-media',
+          name: 'Social Media',
+          description: 'Social media management and strategy',
+          icon: Share2,
+          features: []
+        },
+        {
+          slug: 'paid-advertising',
+          name: 'Paid Advertising',
+          description: 'PPC and performance marketing',
+          icon: Target,
+          features: []
+        },
+        {
+          slug: 'content-creation',
+          name: 'Content Creation',
+          description: 'Photography, video, and written content',
+          icon: Video,
+          features: []
+        }
+      ]
+    },
+    {
+      slug: 'strategy',
+      name: 'Strategy',
+      description: 'Define your digital future and roadmap',
+      icon: Brain,
+      serviceLines: [
+        {
+          slug: 'service-design',
+          name: 'Service Design',
+          description: 'End-to-end service experience design',
+          icon: Layers,
+          features: []
+        },
+        {
+          slug: 'digital-transformation',
+          name: 'Digital Transformation',
+          description: 'Business transformation strategy',
+          icon: Factory,
+          features: []
+        },
+        {
+          slug: 'ai-automation',
+          name: 'AI & Automation',
+          description: 'Process automation and AI integration',
+          icon: Bot,
+          features: []
+        },
+        {
+          slug: 'innovation-consulting',
+          name: 'Innovation Consulting',
+          description: 'Future-focused technology guidance',
+          icon: Compass,
+          features: []
+        }
+      ]
+    }
+  ]
+};
+
+    
 // Memoized CoreService component
 const CoreServiceItem = memo(({ 
   coreService, 
@@ -131,7 +295,6 @@ export function Services() {
       className="py-24 relative"
       aria-label="Our Services"
     >
-      <div className="absolute inset-0 bg-dot-pattern opacity-5" aria-hidden="true" />
       
       <div className="container px-4">
         <SectionTitle

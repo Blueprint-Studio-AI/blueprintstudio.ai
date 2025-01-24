@@ -1,4 +1,4 @@
-import { useToast } from '@/service-pages/hooks/use-toast';
+import { useToast } from '@/scripts/hooks/use-toast';
 import {
   Toast,
   ToastClose,

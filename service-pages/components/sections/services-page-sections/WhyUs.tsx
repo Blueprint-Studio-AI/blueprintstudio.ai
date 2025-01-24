@@ -1,79 +1,96 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Activity, Brain, Target, Clock, Palette, Compass, Microscope } from 'lucide-react';
+import { Compass, Target, Brain, Rocket, Sparkles, Users } from 'lucide-react';
 import { SectionTitle } from '../../ui/section-title';
 
-const allStrengths = [
-    {
-      icon: Compass,
-      title: "Strategic Partner",
-      description: "We're not here to sell you a specific service - we're here to grow your business. Our success is measured by your outcomes."
-    },
-    {
-      icon: Target,
-      title: "Holistic Approach",
-      description: "We examine your entire business ecosystem, not just isolated touchpoints or channels."
-    },
-    {
-      icon: Microscope,
-      title: "Scientific Mindset",
-      description: "Every iteration is hypothesis-driven, tested, and refined based on real-world data."
-    },
-    { 
-      icon: Palette,
-      title: "Design DNA",
-      description: "Experience-obsessed, from backend to brand."
-    },
-    { 
-      icon: Brain,
-      title: "AI-Native",
-      description: "Hybrid intelligence, 10x team efficiency."
-    },
-    { 
-      icon: Clock,
-      title: "Always Available",
-      description: "Blueprint sleeps after your success."
-    }
-  ];
+const strengths = [
+  {
+    title: "Service Design First",
+    description: "We map your entire business ecosystem to identify and solve the root problems, not just symptoms.",
+    icon: Compass,
+  },
+  {
+    title: "AI-Native Approach",
+    description: "Leveraging cutting-edge AI to amplify human creativity and deliver 10x results.",
+    icon: Brain,
+  },
+  {
+    title: "Rapid Innovation",
+    description: "Fast, iterative development with continuous learning and adaptation.",
+    icon: Rocket,
+  },
+  {
+    title: "Full-Stack Team",
+    description: "One team with all the skills needed to bring ambitious ideas to life.",
+    icon: Users,
+  }
+];
 
 export function WhyUs() {
-    return (
-        <>
-        {/* Why Blueprint */}
-            <section className="container px-4 mb-32">
-            <SectionTitle
-                title="Why Blueprint"
-                description="We're not just another agency. We're a strategic partner focused on delivering measurable business outcomes."
-                align='center'
-            />
+  return (
+    <section className="py-32 relative overflow-visible">
+      {/* Background elements span full width */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 mb-32">
-                {allStrengths.map((strength, index) => (
+      <div className="container px-4 relative overflow-visible">
+        {/* Constrain the content width */}
+        <div className="max-w-5xl mx-auto">
+          <SectionTitle
+            title="Why Blueprint"
+            description="A different kind of digital partner"
+            align="center"
+          />
+
+          {/* Main content grid */}
+          <div className="mt-20">
+            {/* Strengths */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              {strengths.map((strength, index) => (
                 <motion.div
-                    key={strength.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group relative p-8 rounded-2xl border border-foreground/10 bg-background/50 backdrop-blur-sm hover:border-primary/20 transition-colors duration-300"
+                  key={strength.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                  className="relative"
                 >
-                    <div className="flex flex-col h-full">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="p-2 rounded-xl bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
-                        <strength.icon className="w-6 h-6 text-primary" />
-                        </div>
-                        <h3 className="text-xl font-bold">{strength.title}</h3>
+
+                {/* Large background number */}
+                <div className="absolute -left-8 -top-8 text-8xl font-bold text-primary/5">
+                  {index + 1}
+                </div>
+
+                <div className="relative z-10 p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-2 rounded-xl bg-primary/5">
+                      <strength.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <p className="text-muted-foreground leading-relaxed">
-                        {strength.description}
-                    </p>
-                    </div>
-                    
-                    {/* Subtle gradient overlay on hover */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    <h3 className="text-2xl font-bold">{strength.title}</h3>
+                  </div>
+                  <p className="text-lg text-muted-foreground">
+                    {strength.description}
+                  </p>
+                </div>
+
+                {/* Decorative elements */}
+                {/* <div className="absolute -z-10 top-1/2 -translate-y-1/2 -left-4 w-2 h-16 bg-gradient-to-b from-primary/20 to-transparent" /> */}
                 </motion.div>
-                ))}
+              ))}
             </div>
-            </section>
-    </>
-);
+
+            {/* Featured Quote */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-24 text-center max-w-3xl mx-auto"
+            >
+              <blockquote className="text-2xl font-serif italic text-muted-foreground">
+                  "We make the complex feel inevitable."              
+              </blockquote>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
