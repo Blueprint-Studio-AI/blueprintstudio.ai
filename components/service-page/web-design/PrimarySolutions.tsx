@@ -43,7 +43,7 @@ const solutions = [
     price: "",
     image: "/images/solutions/mvp.webp",
     className: "col-span-1 row-span-1 md:col-span-1",
-    link: "/web-design/mvp",
+    link: "#solution-finder",
     icon: Search
   }
 ];

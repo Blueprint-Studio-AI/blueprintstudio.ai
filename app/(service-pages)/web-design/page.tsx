@@ -21,8 +21,7 @@ import { WebDesignPricing } from "@/components/service-page/web-design/WebDesign
 // find your solution link should go to the finder section
 // finder should start at 0% and end at 100% (also needs real results + question check)
 // remove text cursor throughout and replace with pointer 
-// read faq + edit
-// real testimonials 
+// real testimonials - commented out for now
 // add link to services page
 // overall struture feels good tho
 
@@ -37,7 +36,9 @@ export default function WebDesignPage() {
           <div className="max-w-4xl mx-auto overflow-visible">
             <WebDesignHero />
             <PrimarySolutions />
-            <SolutionFinder />
+            <div id="solution-finder">
+            <SolutionFinder/>
+            </div>
             <IndustryGrid />
             <TechnologyGrid />
             <Process />
