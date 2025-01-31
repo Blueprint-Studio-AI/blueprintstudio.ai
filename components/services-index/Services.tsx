@@ -57,17 +57,17 @@ const services = {
       icon: Palette,
       serviceLines: [
         {
-          slug: 'ux-ui-design',
-          name: 'UX/UI Design',
-          description: 'User-centered interface and experience design',
-          icon: Layout,
-          features: []
-        },
-        {
           slug: 'web-design',
           name: 'Web Design',
           description: 'Responsive, modern website design',
           icon: Globe,
+          features: []
+        },
+        {
+          slug: 'ux-ui-design',
+          name: 'UX/UI Design',
+          description: 'User-centered interface and experience design',
+          icon: Layout,
           features: []
         },
         {
@@ -269,7 +269,7 @@ const CoreServiceItem = memo(({
             key={serviceLine.slug}
             name={serviceLine.name}
             description={serviceLine.description}
-            href={`/services/${coreService.slug}/${serviceLine.slug}`}
+            href={`/${serviceLine.slug}`}
           />
         ))}
       </div>
@@ -326,7 +326,7 @@ export function Services({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Core Services List */}
           <div className="lg:col-span-5">
-            <div className="space-y-4 lg:pb-96">
+            <div className="space-y-4 lg:pb-48">
               {services.coreServices.map((coreService) => (
                 <CoreServiceItem
                   key={coreService.slug}
@@ -365,7 +365,7 @@ export function Services({
                         <ServiceLine
                           name={serviceLine.name}
                           description={serviceLine.description}
-                          href={`/services/${activeService}/${serviceLine.slug}`}
+                          href={`/${serviceLine.slug}`}
                         />
                       </motion.div>
                     ))}
