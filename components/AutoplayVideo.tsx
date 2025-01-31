@@ -1,7 +1,7 @@
 // components/AutoplayVideo.tsx
 import { useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { cn } from '@/service-pages/lib/utils'
+import { cn } from '@/lib/utils'
 
 interface AutoplayVideoProps {
   src: string;

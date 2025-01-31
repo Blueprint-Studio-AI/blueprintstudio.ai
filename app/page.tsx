@@ -1,12 +1,12 @@
 // app/page.tsx
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import Image from 'next/image';
-import { Footer } from "@/service-pages/components/sections/Footer";
+import { Footer } from "@/components/Footer";
 import { PhoneCall, Calculator, CheckCircle, ChevronDown, ChevronUp, ArrowUpRight } from "lucide-react";
 import { AutoplayVideo } from "@/components/AutoplayVideo";
-import { PricingCalculator } from "@/components/PricingCalculator";
+import { PricingSection } from "@/components/PricingSection";
+import { Services } from "@/components/services-index/Services";
 
 //edit to add fade at end and start of loop
 const workItems = [
@@ -98,8 +98,22 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* Services */}
+      <section className="relative services-theme">
+        <div className="relative">
+          <div className="max-w-4xl mx-auto overflow-visible">
+            <Services 
+              useSimpleTitle={true}
+              customTitle="Our Services"
+              customDescription="Transforming complex challenges into elegant, user-centric solutions for forward-thinking brands."
+            />
+          </div>
+        </div>
+      </section>
+
        {/* Pricing */}
-      <PricingCalculator/>
+      <PricingSection/>
 
       <Footer/>
     </div>

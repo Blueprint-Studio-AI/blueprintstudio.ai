@@ -22,7 +22,7 @@
       "@/*": ["./*"],
       "@/components/*": ["./components/*"],
       "@/service-components/*": ["./service-pages/components/*"],
-      "@/service-types/*": ["./service-pages/types/*"],
+      "@/service-types/*": ["types/*"],
       "@/service-lib/*": ["./service-pages/lib/*"],
       "@/service-data/*": ["./service-pages/data/*"]
     }
