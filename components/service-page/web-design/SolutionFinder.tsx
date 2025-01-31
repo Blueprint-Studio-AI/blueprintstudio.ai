@@ -465,7 +465,7 @@ export function SolutionFinder() {
             <p>
               Not sure what you need? {' '}
               <button
-                onClick={() => window.open('https://cal.com/blueprint/intro', '_blank')}
+                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
                 className="text-primary hover:underline"
               >
                 Schedule a free consultation

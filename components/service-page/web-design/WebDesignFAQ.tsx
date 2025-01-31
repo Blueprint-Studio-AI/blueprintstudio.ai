@@ -10,15 +10,15 @@ import {
 const faqs = [
   {
     question: "How much does professional web design cost?",
-    answer: "Our web design projects typically range from $3,000 to $25,000+ depending on complexity and requirements. Small business websites start at $2,999, while custom web applications or e-commerce solutions may range from $10,000 to $25,000+. We provide detailed quotes after understanding your specific needs and goals."
+    answer: "Our web design projects can range from $899 to $60,000+ depending on complexity and requirements. A simple single page site starts at $899, while custom web applications or seo optomized e-commerce solutions may range are more expensive. We provide detailed quotes after understanding your specific needs and goals."
   },
   {
     question: "How long does it take to design and launch a website?",
-    answer: "Most business websites take 4-8 weeks from kickoff to launch. Simple marketing websites can be completed in 2-4 weeks, while complex e-commerce or custom web applications may take 8-12 weeks. We'll provide a detailed timeline based on your project scope and requirements."
+    answer: "Simple single page sites can be completed in a day. Complex projects with hundreds of pages can take over 8 months. Most business websites take 4-8 weeks from kickoff to launch. We'll provide a detailed timeline based on your project scope and requirements."
   },
   {
     question: "Do you provide ongoing website maintenance?",
-    answer: "Yes, we offer flexible maintenance plans to keep your website secure, updated, and performing optimally. This includes regular updates, security monitoring, performance optimization, content updates, and technical support. We can tailor a maintenance plan to your specific needs."
+    answer: "Yes, we offer flexible maintenance plans to keep your website secure, updated, and performing optimally. This includes regular updates, security monitoring, performance optimization, content updates, and technical support. Maintence plans are not required and we can tailor a maintenance plan to your specific needs if desired."
   },
   {
     question: "Will my website be mobile-friendly and responsive?",
@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     question: "What platforms and technologies do you use?",
-    answer: "We choose the best technology for each project's needs. We work with modern platforms like Next.js, React, and TypeScript for custom development; WordPress and Webflow for content-managed sites; and Shopify for e-commerce. All our solutions prioritize performance, security, and scalability."
+    answer: "We choose the best technology for each project's needs. We work with modern platforms like Next.js, React, and TypeScript for custom development; Framer, WordPress, and Webflow for content-managed sites; and Shopify for e-commerce. All our solutions prioritize performance, security, and scalability."
   }
 ];
 
@@ -87,7 +87,7 @@ export function WebDesignFAQ() {
               Have more questions? We're here to help.
             </p>
             <button
-              onClick={() => window.open('https://cal.com/blueprint/intro', '_blank')}
+              onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full 
                 bg-primary text-white hover:bg-primary/90 transition-colors"
             >
