@@ -5,23 +5,23 @@ import Image from 'next/image';
 
 const testimonials = [
   {
-    quote: "Blueprint completely transformed our online presence. Their design work consistently drives conversions and has helped us scale our business significantly.",
-    author: "Sarah Chen",
-    title: "CEO, TechFlow Solutions",
+    quote: "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft.",
+    author: "Scott Zimmer",
+    title: "Former EVP of Innovation, Truist Bank, Currently Startup Co-Founder",
     image: "/images/testimonials/sarah-chen.jpg",
     logo: "/images/testimonials/techflow-logo.svg"
   },
   {
-    quote: "Working with Blueprint was a game-changer. They didn't just design our website - they created a digital experience that our customers love and our competitors envy. The attention to detail and strategic approach was exactly what we needed.",
-    author: "Michael Rodriguez",
-    title: "Founder, Elevate Digital",
+    quote: "Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
+    author: "Andrew Jenkins",
+    title: "Former VP of Engineering, Credit Karma, Currently Startup Co-Founder",
     image: "/images/testimonials/michael-rodriguez.jpg",
     logo: "/images/testimonials/elevate-logo.svg"
   },
   {
-    quote: "Their attention to detail and strategic approach to web design has helped us increase our conversion rate by 156%. The ROI has been incredible.",
-    author: "Emily Foster",
-    title: "Marketing Director, GrowthWorks",
+    quote: "Blueprints ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
+    author: "Steven Luis Howell",
+    title: "CEO & Co-Founder, Project Metavision",
     image: "/images/testimonials/emily-foster.jpg",
     logo: "/images/testimonials/growthworks-logo.svg"
   }

@@ -44,7 +44,7 @@ export default function WebDesignPage() {
             <FeaturedProjects />
           </div>
           <WebDesignFAQ />
-          <WebDesignTestimonials />
+          {/* <WebDesignTestimonials /> */}
           <WebDesignPricing />
           <Footer />
         </div>
