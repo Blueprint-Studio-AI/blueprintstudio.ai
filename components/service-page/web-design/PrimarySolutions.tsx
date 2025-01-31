@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Building2, Rocket, ShoppingCart, Code, Search } from 'lucide-react';
 
 const solutions = [
   {
@@ -10,35 +11,40 @@ const solutions = [
     price: "Starting from $2,999",
     image: "/images/solutions/small-business.webp",
     className: "col-span-1 row-span-2 md:col-span-2",
-    link: "/web-design/small-business"
+    link: "/web-design/small-business",
+    icon: Building2
   },
   {
     name: "Startup Sites",
     price: "Starting from $3,999",
     image: "/images/solutions/startup.webp",
     className: "col-span-1 row-span-1",
-    link: "/web-design/startup"
+    link: "/web-design/startup",
+    icon: Rocket
   },
   {
     name: "E-commerce",
     price: "Starting from $4,999",
     image: "/images/solutions/ecommerce.webp",
     className: "col-span-1 row-span-1",
-    link: "/web-design/ecommerce"
+    link: "/web-design/ecommerce",
+    icon: ShoppingCart
   },
   {
     name: "MVP Prototype",
     price: "Starting from $10k",
     image: "/images/solutions/mvp.webp",
     className: "col-span-1 row-span-1 md:col-span-2",
-    link: "/web-design/mvp"
+    link: "/web-design/mvp",
+    icon: Code
   },
   {
     name: "Find Your Solution",
     price: "",
     image: "/images/solutions/mvp.webp",
     className: "col-span-1 row-span-1 md:col-span-1",
-    link: "/web-design/mvp"
+    link: "/web-design/mvp",
+    icon: Search
   }
 ];
 
@@ -70,6 +76,8 @@ export function PrimarySolutions() {
 
                   <div className="mt-4 flex justify-between items-end">
                     <div className="relative w-24 h-24">
+                    <solution.icon className="w-6 h-6 text-gray-600 absolute bottom-0 left-0" />
+
                       {/* <Image
                         src={solution.image}
                         alt={solution.name}
