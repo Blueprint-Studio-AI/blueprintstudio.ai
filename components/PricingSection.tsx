@@ -2,7 +2,8 @@
 "use client";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowUpRight } from 'lucide-react';
+import { CheckCircle, ArrowUpRight, ChevronDown } from 'lucide-react';
+import Script from 'next/script';
 
 // For SVGs, we'll use regular img tags instead of Next.js Image component
 const previewImages = {
@@ -78,13 +79,76 @@ const pricingFaqs = [
       answer: "Subscriptions offer ongoing access to our team with predictable monthly pricing, ideal for companies looking for a consistent partner. Custom projects are better for one-off initiatives with defined scopes and timelines."
     }
   ];
-  
 
+  interface FaqItemProps {
+    question: string;
+    answer: string;
+  }
+
+// Add a new FAQ item component
+function FaqItem({ question, answer }: FaqItemProps) {
+    const [isOpen, setIsOpen] = useState(false);
+  
+    return (
+      <div className="border-b border-gray-100 last:border-0">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex justify-between items-start py-6 text-left group"
+          aria-expanded={isOpen}
+        >
+          <h4 className="font-medium text-lg pr-8 group-hover:text-gray-600 transition-colors">
+            {question}
+          </h4>
+          <motion.div 
+            className="shrink-0 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100"
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            >
+            <ChevronDown className="w-5 h-5 text-gray-600" />
+            </motion.div>
+        </button>
+        <div 
+          className={`grid transition-all duration-200 ease-in-out ${
+            isOpen ? 'grid-rows-[1fr] opacity-100 mb-6' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <p className="text-gray-600 leading-relaxed max-w-3xl">
+              {answer}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 export function PricingSection() {
   const [showCalendarPreview, setShowCalendarPreview] = useState(false);
   const [showChatPreview, setShowChatPreview] = useState(false);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": pricingFaqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
   return (
+    <>
+    {/* Add Schema Script */}
+    <Script 
+        id="faq-schema" 
+        type="application/ld+json"
+        strategy="beforeInteractive"
+      >
+        {JSON.stringify(faqSchema)}
+      </Script>
+
     <section id="pricing" className="py-32 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-20">
@@ -236,34 +300,43 @@ export function PricingSection() {
           </motion.div>
         </div>
 
-        {/* FAQ */}
-        <div className="mt-20">
-        <h3 className="text-2xl font-semibold text-center mb-12">Frequently Asked Questions</h3>
-        <div className="max-w-2xl mx-auto space-y-8">
-            {pricingFaqs.map((faq, i) => (
-            <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-            >
-                <h4 className="font-medium mb-2">{faq.question}</h4>
-                <p className="text-gray-600">{faq.answer}</p>
-            </motion.div>
-            ))}
+        {/* Updated FAQ section */}
+        <div className="mt-32">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold mb-4">Frequently Asked Questions</h3>
+            <p className="text-gray-600">Everything you need to know about our pricing and services</p>
+          </div>
+
+          <div className="max-w-2xl mx-auto">
+            <div className="divide-y divide-gray-100 border-t border-b border-gray-100">
+              {pricingFaqs.map((faq, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <FaqItem question={faq.question} answer={faq.answer} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="text-center mt-16">
+            <p className="text-gray-600">
+              Still have questions?{' '}
+              <a 
+                href="mailto:blueprint.dao@gmail.com" 
+                className="text-black font-medium hover:underline"
+              >
+                Email us
+              </a>
+            </p>
+          </div>
         </div>
-        
-        <div className="text-center mt-12">
-        <p className="text-gray-600">
-            Still have questions? Email us at{' '}
-            <a href="mailto:blueprint.dao@gmail.com" className="text-black underline hover:no-underline">
-            blueprint.dao@gmail.com
-            </a>
-        </p>
         </div>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
