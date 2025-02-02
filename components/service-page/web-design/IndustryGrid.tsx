@@ -114,7 +114,7 @@ export function IndustryGrid() {
               Industry-Specific Web Design Solutions
             </h2>
             <p className="text-muted-foreground">
-              Tailored web design for your industry's unique requirements
+              Tailored web design for your industry&apos;s unique requirements
             </p>
           </div>
 

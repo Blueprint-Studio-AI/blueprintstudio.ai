@@ -144,7 +144,6 @@ export function PricingSection() {
     <Script 
         id="faq-schema" 
         type="application/ld+json"
-        strategy="beforeInteractive"
       >
         {JSON.stringify(faqSchema)}
       </Script>

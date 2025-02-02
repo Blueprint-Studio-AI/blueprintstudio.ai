@@ -12,7 +12,7 @@ import { Services } from "@/components/services-index/Services";
 const workItems = [
   {
     type: 'video',
-    src: '/videos/work/idVisorProductPage-Desktop1.mp4',
+    src: '/videos/work/idscanner-spotlight-compressed.mp4',
   },
   {
     type: 'image',

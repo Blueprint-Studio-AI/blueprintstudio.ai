@@ -65,7 +65,7 @@ export function WebDesignTestimonials() {
                 <div className="flex flex-col justify-between h-full">
                   <div className="mb-6">
                     <p className="text-lg leading-relaxed">
-                      "{testimonial.quote}"
+                      &quot;{testimonial.quote}&quot;
                     </p>
                   </div>
 

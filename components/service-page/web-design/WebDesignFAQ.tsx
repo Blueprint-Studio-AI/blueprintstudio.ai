@@ -84,7 +84,7 @@ export function WebDesignFAQ() {
             className="mt-16 text-center"
           >
             <p className="text-muted-foreground mb-4">
-              Have more questions? We're here to help.
+              Have more questions? We&apos;re here to help.
             </p>
             <button
               onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
