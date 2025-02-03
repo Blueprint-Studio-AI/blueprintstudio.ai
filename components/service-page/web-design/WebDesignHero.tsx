@@ -34,7 +34,7 @@ export function WebDesignHero() {
               <Button 
                 size="lg"
                 className="group"
-                onClick={() => window.open('https://cal.com/blueprint/web-design', '_blank')}
+                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               >
                 Get Started
                 <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />

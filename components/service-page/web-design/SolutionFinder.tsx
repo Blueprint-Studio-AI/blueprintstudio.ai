@@ -4,18 +4,30 @@ import { useState } from 'react';
 import { ArrowRight, Check, ChevronLeft, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// -------------------------
 // Types
-type Solution = {
+// -------------------------
+
+// Each module represents a building block of the final solution.
+type Module = {
   id: string;
   name: string;
   description: string;
-  price: string;
-  link: string;
+  basePrice: number;
+  estimatedTime: string;
   features: string[];
-  idealFor: string[];
-  timeline: string;
   techStack?: string[];
-}
+};
+
+// The dynamic solution is built by combining modules.
+type DynamicSolution = {
+  name: string;
+  description: string;
+  price: string;
+  features: string[];
+  timeline: string;
+  modules: Module[];
+};
 
 type Question = {
   id: string;
@@ -27,28 +39,23 @@ type Question = {
   }[];
 };
 
-// Animation variants
+// -------------------------
+// Animations
+// -------------------------
 const pageVariants = {
-    initial: {
-      opacity: 0,
-      y: 20
-    },
-    animate: {
-      opacity: 1,
-      y: 0
-    },
-    exit: {
-      opacity: 0,
-      y: -20
-    }
-  };
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 }
 };
 
-// Questions data
+// -------------------------
+// Questions Data
+// -------------------------
 const questions: Question[] = [
   {
     id: 'purpose',
@@ -120,122 +127,146 @@ const questions: Question[] = [
   }
 ];
 
-// Solutions catalog
-const solutions: Record<string, Solution> = {
-  'small-business': {
-    id: 'small-business',
-    name: 'Small Business Website',
-    description: 'Professional, conversion-focused website perfect for local businesses',
-    price: 'Starting at $2,999',
-    link: '/web-design/small-business',
-    features: [
-      'Mobile-responsive design',
-      'SEO optimization',
-      'Contact forms & maps',
-      'Content management system',
-      'Analytics integration',
-      'Social media integration'
-    ],
-    idealFor: ['Local businesses', 'Professional services', 'Restaurants', 'Retail'],
-    timeline: '2-3 weeks',
-    techStack: ['WordPress', 'Framer', 'Webflow']
+// -------------------------
+// Modules Definitions
+// -------------------------
+const modules: Record<string, Module> = {
+  design: {
+    id: 'design',
+    name: 'Responsive Design',
+    description: 'A modern, mobile-friendly design as the backbone of your site.',
+    basePrice: 1500,
+    estimatedTime: '1-2 weeks',
+    features: ['Mobile-responsive layout', 'UX/UI best practices']
   },
-  'ecommerce': {
+  ecommerce: {
     id: 'ecommerce',
-    name: 'E-commerce Solution',
-    description: 'Fully-featured online store with seamless shopping experience',
-    price: 'Starting at $4,999',
-    link: '/web-design/ecommerce',
-    features: [
-      'Product catalog & inventory',
-      'Secure payments',
-      'Order management',
-      'Customer accounts',
-      'Marketing tools',
-      'Analytics & reporting'
-    ],
-    idealFor: ['Online retailers', 'D2C brands', 'Boutiques'],
-    timeline: '4-6 weeks',
-    techStack: ['Shopify', 'WooCommerce', 'Custom']
+    name: 'E-commerce Module',
+    description:
+      'Fully integrated online store with secure payment and order management.',
+    basePrice: 2500,
+    estimatedTime: '2-3 weeks',
+    features: ['Product catalog', 'Shopping cart', 'Secure checkout'],
+    techStack: ['Shopify', 'WooCommerce']
   },
-  'startup': {
-    id: 'startup',
-    name: 'Startup Launch Kit',
-    description: 'Modern, scalable website designed for rapid growth',
-    price: 'Starting at $3,999',
-    link: '/web-design/startup',
-    features: [
-      'Growth-focused design',
-      'A/B testing ready',
-      'Lead generation',
-      'Marketing automation',
-      'Analytics suite',
-      'API integration ready'
-    ],
-    idealFor: ['Tech startups', 'SaaS companies', 'Digital services'],
-    timeline: '3-4 weeks',
-    techStack: ['Next.js', 'React', 'Tailwind']
+  cms: {
+    id: 'cms',
+    name: 'Content Management System',
+    description:
+      'A flexible CMS that empowers you to easily update and manage content.',
+    basePrice: 2000,
+    estimatedTime: '2-3 weeks',
+    features: ['Easy content editing', 'Customizable templates']
   },
-  'mvp': {
-    id: 'mvp',
+  booking: {
+    id: 'booking',
+    name: 'Booking & Appointments',
+    description:
+      'An integrated booking system to manage appointments and reservations.',
+    basePrice: 1800,
+    estimatedTime: '1-2 weeks',
+    features: ['Calendar integration', 'Automated reminders']
+  },
+  custom: {
+    id: 'custom',
     name: 'Custom Web Application',
-    description: 'Full-featured web application with custom functionality',
-    price: 'Starting at $10,000',
-    link: '/web-design/mvp',
-    features: [
-      'Custom user flows',
-      'Database architecture',
-      'API development',
-      'User authentication',
-      'Admin dashboard',
-      'Scalable infrastructure'
-    ],
-    idealFor: ['Digital products', 'Enterprise solutions', 'Platforms'],
-    timeline: '8-12 weeks',
-    techStack: ['Next.js', 'React', 'Node.js', 'PostgreSQL']
+    description:
+      'Bespoke web application development tailored to your unique requirements.',
+    basePrice: 5000,
+    estimatedTime: '4-6 weeks',
+    features: ['Custom user flows', 'API integrations', 'Database setup']
+  },
+  portfolio: {
+    id: 'portfolio',
+    name: 'Portfolio Module',
+    description:
+      'A sleek, minimalist design ideal for showcasing your work and projects.',
+    basePrice: 1200,
+    estimatedTime: '1-2 weeks',
+    features: ['Image galleries', 'Project showcases', 'Blog integration']
   }
 };
 
-// Solution recommendation logic
-const recommendSolution = (answers: Record<string, string>): Solution => {
-  const purposeMap: Record<string, string> = {
-    'business': 'small-business',
-    'sell': 'ecommerce',
-    'startup': 'startup',
-    'custom': 'mvp'
-  };
+// -------------------------
+// Dynamic Solution Generator
+// -------------------------
 
-  const budgetMap: Record<string, string[]> = {
-    'starter': ['small-business'],
-    'basic': ['small-business', 'startup'],
-    'professional': ['ecommerce', 'startup'],
-    'premium': ['mvp'],
-    'enterprise': ['mvp']
+const timelineMapping: Record<string, string> = {
+    asap: "1-2 weeks",
+    soon: "2-4 weeks",
+    month: "1-2 months",
+    flexible: "Flexible / Not urgent"
   };
-
-  const timelineMap: Record<string, string[]> = {
-    'asap': ['small-business'],
-    'soon': ['small-business', 'startup', 'ecommerce'],
-    'month': ['startup', 'ecommerce', 'mvp'],
-    'flexible': ['mvp']
-  };
-
-  let recommendedSolution = purposeMap[answers.purpose] || 'small-business';
   
-  if (budgetMap[answers.budget]?.includes(recommendedSolution)) {
-    return solutions[recommendedSolution];
-  }
+const generateDynamicSolution = (
+    answers: Record<string, string>
+  ): DynamicSolution => {
+    const selectedModules: Module[] = [];
+    let totalPrice = 0;
+  
+    // Always include the design module
+    selectedModules.push(modules.design);
+    totalPrice += modules.design.basePrice;
+  
+    // E-commerce: if the purpose is selling or the user selects e-commerce features.
+    if (answers.purpose === 'sell' || answers.features === 'ecommerce') {
+      selectedModules.push(modules.ecommerce);
+      totalPrice += modules.ecommerce.basePrice;
+    }
+  
+    // CMS: if the user chooses CMS as a feature.
+    if (answers.features === 'cms') {
+      selectedModules.push(modules.cms);
+      totalPrice += modules.cms.basePrice;
+    }
+  
+    // Booking: if the user needs appointment booking.
+    if (answers.features === 'booking') {
+      selectedModules.push(modules.booking);
+      totalPrice += modules.booking.basePrice;
+    }
+  
+    // Custom: if the user wants a custom web application or is launching a startup.
+    if (answers.purpose === 'custom' || answers.purpose === 'startup') {
+      selectedModules.push(modules.custom);
+      totalPrice += modules.custom.basePrice;
+    }
+  
+    // Portfolio: if the purpose is a portfolio/personal site.
+    if (answers.purpose === 'portfolio') {
+      selectedModules.push(modules.portfolio);
+      totalPrice += modules.portfolio.basePrice;
+    }
+  
+    // Use the timeline answer directly.
+    const timeline = timelineMapping[answers.timeline] || "TBD";
+    const solutionName = 'Custom Web Design Solution';
+    const description = `Based on your responses, we've crafted a solution that includes: ${selectedModules
+      .map((mod) => mod.name)
+      .join(', ')}.`;
+  
+    return {
+      name: solutionName,
+      description,
+      price: `Starting at $${totalPrice}`,
+      features: selectedModules.flatMap((mod) => mod.features),
+      timeline,
+      modules: selectedModules
+    };
+  };
+  
 
-  return solutions[budgetMap[answers.budget]?.[0] || 'small-business'];
-};
+// -------------------------
+// Components
+// -------------------------
 
-// QuestionStep component
-function QuestionStep({ 
-  question, 
-  onAnswer, 
-  onBack, 
-  showBack 
-}: { 
+// Renders each question with its options.
+function QuestionStep({
+  question,
+  onAnswer,
+  onBack,
+  showBack
+}: {
   question: Question;
   onAnswer: (questionId: string, answerId: string) => void;
   onBack: () => void;
@@ -247,10 +278,7 @@ function QuestionStep({
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      transition={{ 
-        duration: 0.3,
-        ease: "easeOut"
-      }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       <div className="mb-8">
         {showBack && (
@@ -264,21 +292,18 @@ function QuestionStep({
         )}
         <h3 className="text-xl font-semibold mb-2">{question.text}</h3>
       </div>
-
       <div className="grid gap-4">
         {question.options.map((option) => (
           <motion.button
             key={option.id}
             onClick={() => onAnswer(question.id, option.id)}
-            className="group relative p-4 border rounded-xl text-left hover:border-primary 
-              transition-all duration-200 hover:bg-primary/5"
+            className="group relative p-4 border rounded-xl text-left hover:border-primary transition-all duration-200 hover:bg-primary/5"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <div className="flex items-center justify-between">
               <span className="font-medium">{option.text}</span>
-              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 
-                transition-opacity" />
+              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </motion.button>
         ))}
@@ -287,41 +312,41 @@ function QuestionStep({
   );
 }
 
-// SolutionResult component
-function SolutionResult({ 
-    solution, 
-    onRestart 
-  }: { 
-    solution: Solution;
-    onRestart: () => void;
-  }) {
-    return (
-      <motion.div
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageVariants}
-        transition={{ 
-          duration: 0.3,
-          ease: "easeOut"
-        }}
-        className="space-y-8"
-      >
+// Renders the dynamic solution result.
+function SolutionResult({
+  solution,
+  onRestart
+}: {
+  solution: DynamicSolution;
+  onRestart: () => void;
+}) {
+  return (
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="space-y-8"
+    >
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 mb-6">
           <Settings2 className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium">Recommended Solution</span>
+          <span className="text-sm font-medium">Your Custom Solution</span>
         </div>
         <h3 className="text-2xl font-bold mb-2">{solution.name}</h3>
         <p className="text-muted-foreground mb-4">{solution.description}</p>
         <div className="text-xl font-semibold text-primary">{solution.price}</div>
+        <div className="mt-2 text-sm text-muted-foreground">
+          Estimated Timeline: {solution.timeline}
+        </div>
       </div>
 
       <div className="space-y-4">
         <h4 className="font-medium">Included Features</h4>
         <div className="grid gap-3">
-          {solution.features.map((feature) => (
-            <div key={feature} className="flex items-start gap-3">
+          {solution.features.map((feature, index) => (
+            <div key={index} className="flex items-start gap-3">
               <Check className="w-5 h-5 text-primary mt-0.5" />
               <span>{feature}</span>
             </div>
@@ -329,35 +354,15 @@ function SolutionResult({
         </div>
       </div>
 
-      {solution.techStack && (
-        <div className="space-y-4">
-          <h4 className="font-medium">Technology Stack</h4>
-          <div className="flex flex-wrap gap-2">
-            {solution.techStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1 rounded-full bg-gray-100 text-sm"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col sm:flex-row gap-4 pt-4">
-        <Button 
+        <Button
           className="flex-1"
-          onClick={() => window.location.href = solution.link}
+          onClick={() => (window.location.href = 'https://cal.com/blueprint-studio/intro-call')}
         >
-          Learn More
+          Get Started
           <ArrowRight className="ml-2 w-4 h-4" />
         </Button>
-        <Button 
-          variant="outline"
-          className="flex-1"
-          onClick={onRestart}
-        >
+        <Button variant="outline" className="flex-1" onClick={onRestart}>
           Start Over
         </Button>
       </div>
@@ -365,34 +370,37 @@ function SolutionResult({
   );
 }
 
-// Main SolutionFinder component
+// -------------------------
+// Main Component
+// -------------------------
 export function SolutionFinder() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [recommendedSolution, setRecommendedSolution] = useState<Solution | null>(null);
+  const [generatedSolution, setGeneratedSolution] = useState<DynamicSolution | null>(null);
 
   const handleAnswer = (questionId: string, answerId: string) => {
     const newAnswers = { ...answers, [questionId]: answerId };
     setAnswers(newAnswers);
 
     if (currentStep < questions.length - 1) {
-      setCurrentStep(current => current + 1);
+      setCurrentStep((current) => current + 1);
     } else {
-      const solution = recommendSolution(newAnswers);
-      setRecommendedSolution(solution);
+      // When all questions have been answered, dynamically generate the solution.
+      const solution = generateDynamicSolution(newAnswers);
+      setGeneratedSolution(solution);
     }
   };
 
   const goBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(current => current - 1);
+      setCurrentStep((current) => current - 1);
     }
   };
 
   const restart = () => {
     setCurrentStep(0);
     setAnswers({});
-    setRecommendedSolution(null);
+    setGeneratedSolution(null);
   };
 
   return (
@@ -406,38 +414,37 @@ export function SolutionFinder() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl font-bold mb-4">
-              Find Your Perfect Web Design Solution
+              Build Your Custom Web Design Solution
             </h2>
             <p className="text-muted-foreground">
-              Answer a few questions to get a customized recommendation
+              Answer a few questions and see a tailored solution built just for you.
             </p>
           </motion.div>
 
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8">
-            {!recommendedSolution && (
+            {!generatedSolution && (
               <div className="mb-8">
                 <div className="flex justify-between text-sm text-muted-foreground mb-2">
                   <span>Progress</span>
-                  <span>{Math.round(((currentStep + 1) / questions.length) * 100)}%</span>
+                  <span>
+                    {Math.round(((currentStep + 1) / questions.length) * 100)}%
+                  </span>
                 </div>
                 <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div
-                className="h-full bg-primary"
-                initial={{ width: 0 }}
-                animate={{ 
-                    width: `${((currentStep + 1) / questions.length) * 100}%` 
-                }}
-                transition={{ 
-                    duration: 0.4,
-                    ease: "easeInOut"
-                }}
-                />
+                  <motion.div
+                    className="h-full bg-primary"
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${((currentStep + 1) / questions.length) * 100}%`
+                    }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  />
                 </div>
               </div>
             )}
 
             <AnimatePresence mode="wait">
-              {!recommendedSolution ? (
+              {!generatedSolution ? (
                 <QuestionStep
                   key={currentStep}
                   question={questions[currentStep]}
@@ -446,16 +453,11 @@ export function SolutionFinder() {
                   showBack={currentStep > 0}
                 />
               ) : (
-                <SolutionResult
-                  key="result"
-                  solution={recommendedSolution}
-                  onRestart={restart}
-                />
+                <SolutionResult solution={generatedSolution} onRestart={restart} />
               )}
             </AnimatePresence>
           </div>
 
-          {/* Additional context */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -463,9 +465,11 @@ export function SolutionFinder() {
             className="mt-12 text-center text-sm text-muted-foreground"
           >
             <p>
-              Not sure what you need? {' '}
+              Not sure what you need?{' '}
               <button
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                onClick={() =>
+                  window.open('https://cal.com/blueprint-studio/intro-call', '_blank')
+                }
                 className="text-primary hover:underline"
               >
                 Schedule a free consultation

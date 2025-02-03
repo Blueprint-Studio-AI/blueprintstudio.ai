@@ -28,7 +28,6 @@ const featuredProjects: Project[] = [
       "25% increase in average daily orders"
     ],
     technologies: ["Next.js", "TypeScript", "WordPress"],
-    link: "/case-studies/idscanner.com"
   },
   {
     title: "Manchester Energy Committee",
@@ -41,7 +40,6 @@ const featuredProjects: Project[] = [
       "Award-winning municipal design"
     ],
     technologies: ["Framer", "Figma"],
-    link: "/case-studies/manchester-energy"
   },
   {
     title: "Juris Genius",
@@ -54,7 +52,6 @@ const featuredProjects: Project[] = [
       "Personalized feedback and study algorithms"
     ],
     technologies: ["React", "Node.js", "OpenAI"],
-    link: "/case-studies/juris"
   }
 ];
 
@@ -158,9 +155,9 @@ export function FeaturedProjects() {
 
           {/* Bottom CTA */}
           <div className="mt-16 text-center">
-            <Link href="/work" className="inline-flex items-center gap-2">
+            <Link href="/" className="inline-flex items-center gap-2">
               <Button size="lg">
-                View All Projects
+                View More Projects
                 <ExternalLink className="ml-2 w-4 h-4" />
               </Button>
             </Link>

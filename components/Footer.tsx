@@ -11,16 +11,16 @@ import {
 
 const companyLinks = [
   { name: 'About', href: 'https://read.cv/teams/blueprint' },
-  { name: 'Careers', href: '/careers' },
+  // { name: 'Careers', href: '/careers' },
   // { name: 'Partners', href: '/partners' },
   // { name: 'Press Kit', href: '/press' },
-  { name: 'Contact', href: '/contact' }
+  { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' }
 ];
 
 const resourceLinks = [
-  { name: 'Tools', href: '/resources/tools' },
-  { name: 'Ideas', href: '/resources/blog' },
-  { name: 'Testimonials', href: '/testimonials' },
+  // { name: 'Tools', href: '/resources/tools' },
+  // { name: 'Ideas', href: '/resources/blog' },
+  // { name: 'Testimonials', href: '/testimonials' },
 ];
 
 const socialLinks = [
@@ -61,7 +61,7 @@ export function Footer() {
           </motion.div>
 
           {/* Newsletter Subscribe Section */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -85,7 +85,7 @@ export function Footer() {
             >
               Subscribe
             </Button>
-          </motion.div>
+          </motion.div> */}
 
             <motion.div
               initial={{ opacity: 0 }}
@@ -120,16 +120,16 @@ export function Footer() {
                 Services
               </h4>
               <div className="space-y-4">
-                <Link href="/design" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
                   Design
                 </Link>
-                <Link href="/development/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
                   Development
                 </Link>
-                <Link href="/marketing/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
                   Marketing
                 </Link>
-                <Link href="/strategy/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
                   Strategy
                 </Link>
               </div>
@@ -161,7 +161,7 @@ export function Footer() {
             </motion.div>
             
             {/* Resources Links */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -183,7 +183,7 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </motion.div> */}
           </div>
         </div>
 
@@ -199,10 +199,10 @@ export function Footer() {
               <span className="text-white/40 text-sm">
                 © 2024 blueprint. All rights reserved.
               </span>
-              <Link href="/legal/privacy" className="text-white/60 hover:text-white text-sm transition-colors">
+              <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/legal/terms" className="text-white/60 hover:text-white text-sm transition-colors">
+              <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
                 Terms of Service
               </Link>
             </div>

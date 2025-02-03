@@ -41,7 +41,7 @@ export function Hero() {
               <Button 
                 size="lg"
                 className="group"
-                onClick={() => window.open('https://cal.com/blueprint/intro', '_blank')}
+                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               >
                 Schedule Consultation
                 <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />

@@ -123,7 +123,7 @@ export function IndustryGrid() {
         {featuredIndustries.map((industry) => (
             <Link
             key={industry.slug}
-            href={`/web-design/industries/${industry.slug}`}
+            href="https://cal.com/blueprint-studio/intro-call"
             className="group relative overflow-hidden rounded-2xl border bg-background hover:bg-primary/5 
                 hover:border-primary/20 transition-all duration-300"
             >
@@ -192,7 +192,7 @@ export function IndustryGrid() {
                         {category.industries.map((industry) => (
                           <Link
                             key={industry.slug}
-                            href={`/web-design/industries/${industry.slug}`}
+                            href="https://cal.com/blueprint-studio/intro-call"
                             className="p-4 rounded-xl border hover:bg-primary/5 
                               hover:border-primary/20 transition-all group"
                           >
