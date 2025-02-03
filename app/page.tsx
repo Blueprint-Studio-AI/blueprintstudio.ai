@@ -15,23 +15,27 @@ const workItems = [
     src: '/videos/work/idscanner-spotlight-compressed.mp4',
   },
   {
+    type: 'video',  
+    src: '/videos/work/next-gen-conference-compressed.mp4',
+  },
+  {
+    type: 'video',
+    src: '/videos/work/mvt-energy-committee-compressed.mp4',
+    link: 'https://www.google.com'
+  },
+  {
     type: 'image',
     src: '/images/work/ProjectMetaVison-Desktop1.png',
     alt: 'Project Metavision',
   },
   {
-    type: 'video',
-    src: '/videos/work/ManchesterEngeryCommitee-Desktop1.mp4',
-    link: 'https://www.google.com'
-  },
-  {
-    type: 'video',  
-    src: '/videos/work/SDNYTB-Desktop1.mp4',
-  },
-  {
     type: 'image',
     src: '/images/work/LivingPersona-Desktop1.png',
     alt: 'Living Persona Web App',
+  },
+  {
+    type: 'video',
+    src: '/videos/work/workshopai-compressed.mp4',
   },
 ];
 
