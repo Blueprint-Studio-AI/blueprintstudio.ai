@@ -43,7 +43,7 @@ export default function ComingSoonPage({
                 </h1>
 
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  We're working on something exciting. Check back soon.
+                  We&apos;re working on something exciting. Check back soon.
                 </p>
 
                 {/* Progress Indicator */}
