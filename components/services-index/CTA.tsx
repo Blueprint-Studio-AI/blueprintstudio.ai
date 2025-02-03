@@ -106,7 +106,7 @@ export function CTA() {
               className="w-full group"
               onClick={() => window.open('https://cal.com/adriastudio/unlimited', '_blank')}
             >
-              Let's Work Together
+              Let&apos;s Work Together
               <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Button>
           </div>

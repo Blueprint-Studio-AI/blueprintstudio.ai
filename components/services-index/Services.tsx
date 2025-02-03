@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Brain, Server, ChevronDown, Compass, Factory, Target, Wand2, Video, Layers, Code2, Globe, Palette, Smartphone, Megaphone, Database, LineChart, BarChart2, Share2, Layout} from 'lucide-react';
 // import { services } from '@/service-pages/data';
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect } from 'react';
 import { SectionTitle } from '../ui/section-title';
 import { ServiceLine } from '../ui/service-line';
 
@@ -217,12 +217,14 @@ const CoreServiceItem = memo(({
   coreService, 
   isActive, 
   isExpanded, 
-  onClick 
+  onClick,
+  isBrowser
 }: {
   coreService: CoreService;
   isActive: boolean;
   isExpanded: boolean;
   onClick: () => void;
+  isBrowser: boolean;
 }) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
@@ -236,7 +238,7 @@ const CoreServiceItem = memo(({
   >
     <div 
       className={`p-8 rounded-xl border transition-all duration-200 ${
-        isActive && (isExpanded || window.innerWidth >= 1024)
+        isActive && (isExpanded || (isBrowser && window.innerWidth >= 1024))
           ? 'bg-primary/5 border-primary/20 scale-[1.02]' 
           : 'border-transparent hover:bg-primary/5 hover:border-primary/10'
       }`}
@@ -286,6 +288,7 @@ export function Services({
 }: ServicesProps) {
   const [activeService, setActiveService] = useState(services.coreServices[0].slug);
   const [expandedService, setExpandedService] = useState<string | null>(null);
+  const [isBrowser, setIsBrowser] = useState(false);
 
   const handleServiceClick = useCallback((slug: string) => {
     if (window.innerWidth < 1024) {
@@ -298,6 +301,10 @@ export function Services({
     if (window.innerWidth >= 1024) {
       setActiveService(slug);
     }
+  }, []);
+
+  useEffect(() => {
+    setIsBrowser(true);
   }, []);
 
   return (
@@ -334,6 +341,7 @@ export function Services({
                   isActive={activeService === coreService.slug}
                   isExpanded={expandedService === coreService.slug}
                   onClick={() => handleServiceClick(coreService.slug)}
+                  isBrowser={isBrowser} 
                 />
               ))}
             </div>

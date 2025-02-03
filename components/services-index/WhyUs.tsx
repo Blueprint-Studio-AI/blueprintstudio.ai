@@ -85,7 +85,7 @@ export function WhyUs() {
               className="mt-24 text-center max-w-3xl mx-auto"
             >
             <blockquote className="text-2xl font-serif text-muted-foreground">
-                "We make the complex feel inevitable."              
+              &ldquo;We make the complex feel inevitable.&rdquo;          
             </blockquote>
           </motion.div>
           </div>
