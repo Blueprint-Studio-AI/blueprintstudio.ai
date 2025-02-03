@@ -143,6 +143,7 @@ const pricingFaqs = [
                 className="w-full bg-white text-black rounded-full py-4 font-medium flex items-center justify-center group-hover:bg-gray-100 transition-colors"
                 onMouseEnter={() => setShowCalendarPreview(true)}
                 onMouseLeave={() => setShowCalendarPreview(false)}
+                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               >
                 <span>Book a Call</span>
                 <ArrowUpRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
