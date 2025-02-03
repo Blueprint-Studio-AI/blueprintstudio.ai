@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, ArrowUpRight, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
+import Head from 'next/head';
 
 // For SVGs, we'll use regular img tags instead of Next.js Image component
 const previewImages = {
@@ -141,12 +142,14 @@ export function PricingSection() {
   return (
     <>
     {/* Add Schema Script */}
-    <Script 
-        id="faq-schema" 
-        type="application/ld+json"
-      >
-        {JSON.stringify(faqSchema)}
-      </Script>
+    <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqSchema)
+          }}
+        />
+      </Head>
 
     <section id="pricing" className="py-32 px-4">
       <div className="max-w-4xl mx-auto">
