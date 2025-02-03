@@ -1,7 +1,10 @@
+"use client";
+
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Brain, Server, ChevronDown, Compass, Factory, Target, Wand2, Video, Layers, Code2, Globe, Palette, Smartphone, Megaphone, Database, LineChart, BarChart2, Share2, Layout} from 'lucide-react';
 // import { services } from '@/service-pages/data';
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect } from 'react';
 import { SectionTitle } from '../ui/section-title';
 import { ServiceLine } from '../ui/service-line';
 
@@ -222,7 +225,7 @@ const CoreServiceItem = memo(({
   >
     <div 
       className={`p-8 rounded-xl border transition-all duration-200 ${
-        isActive && (isExpanded || window.innerWidth >= 1024)
+        isActive 
           ? 'bg-primary/5 border-primary/20 scale-[1.02]' 
           : 'border-transparent hover:bg-primary/5 hover:border-primary/10'
       }`}
@@ -255,7 +258,7 @@ const CoreServiceItem = memo(({
             key={serviceLine.name}
             name={serviceLine.name}
             description={serviceLine.description}
-            href={`/${serviceLine.slug}`}
+            href={serviceLine.slug ? `/${serviceLine.slug}` : undefined}
           />
         ))}
       </div>
@@ -265,6 +268,8 @@ const CoreServiceItem = memo(({
 
 CoreServiceItem.displayName = 'CoreServiceItem';
 
+const isBrowser = typeof window !== 'undefined';
+
 export function Services({ 
   customTitle,
   customDescription,
@@ -272,19 +277,36 @@ export function Services({
 }: ServicesProps) {
   const [activeService, setActiveService] = useState(services.coreServices[0].slug);
   const [expandedService, setExpandedService] = useState<string | null>(null);
+  // Add isDesktop state
+  const [isDesktop, setIsDesktop] = useState(false);
 
+  // Add useEffect to handle viewport width
+  useEffect(() => {
+    // Set initial value
+    setIsDesktop(window.innerWidth >= 1024);
+    
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Update handleServiceClick to use isDesktop
   const handleServiceClick = useCallback((slug: string) => {
-    if (window.innerWidth < 1024) {
+    if (!isDesktop) {
       setExpandedService(prev => prev === slug ? null : slug);
     }
     setActiveService(slug);
-  }, []);
+  }, [isDesktop]);
 
+  // Update handleMouseEnter to use isDesktop
   const handleMouseEnter = useCallback((slug: string) => {
-    if (window.innerWidth >= 1024) {
+    if (isDesktop) {
       setActiveService(slug);
     }
-  }, []);
+  }, [isDesktop]);
 
   return (
     <section 
