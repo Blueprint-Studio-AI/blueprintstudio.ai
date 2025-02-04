@@ -23,21 +23,21 @@ const featuredProjects: Project[] = [
     image: "/images/work/idscanner.png",
     category: "e-commerce",
     results: [
-      "Custom code, design, assets & copy",
-      "Average order volume doubled",
-      "25% increase in average daily orders"
+      "Custom platform built for growth",
+      "Improved branding and product showcase",
+      "Custom code, design, assets & copy"
     ],
     technologies: ["Next.js", "TypeScript", "WordPress"],
   },
   {
     title: "Manchester Energy Committee",
-    description: "A modern, accessible website for public energy initiatives, featuring interactive data visualizations and community engagement tools.",
+    description: "A modern, accessible website for public energy initiatives.",
     image: "/images/work/manchester-energy.png",
     category: "Public Sector",
     results: [
-      "300% increase in community engagement",
-      "45% improvement in information accessibility",
-      "Award-winning municipal design"
+      "Scalable community engagement platform",
+      "Easy content publishing for non-technical staff",
+      "Compliant with federal and state government standards"
     ],
     technologies: ["Framer", "Figma"],
   },
@@ -47,9 +47,9 @@ const featuredProjects: Project[] = [
     image: "/images/work/juris.png",
     category: "AI Web App",
     results: [
-      "60% increase in bar exam pass rate",
-      "First in class test UX",
-      "Personalized feedback and study algorithms"
+      "Adaptive learning platform for law students",
+      "Real-time feedback on practice questions",
+      "Comprehensive UBE practice environment",
     ],
     technologies: ["React", "Node.js", "OpenAI"],
   }

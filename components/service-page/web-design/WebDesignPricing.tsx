@@ -207,7 +207,7 @@ const pricingFaqs = [
 
               <button 
                 className="w-full border-2 border-black rounded-full py-4 font-medium flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                onClick={() => window.open('https://cal.com/blueprint/web-design', '_blank')}
+                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
                 onMouseEnter={() => setShowChatPreview(true)}
                 onMouseLeave={() => setShowChatPreview(false)}
               >

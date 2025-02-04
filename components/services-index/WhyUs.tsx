@@ -78,16 +78,16 @@ export function WhyUs() {
             </div>
 
             {/* Featured Quote */}
-            <motion.div 
+            {/* <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="mt-24 text-center max-w-3xl mx-auto"
             >
-            <blockquote className="text-2xl font-serif text-muted-foreground">
-              &ldquo;We make the complex feel inevitable.&rdquo;          
-            </blockquote>
-          </motion.div>
+              <blockquote className="text-2xl font-serif text-muted-foreground">
+                &ldquo;We make the complex feel inevitable.&rdquo;          
+              </blockquote>
+            </motion.div> */}
           </div>
         </div>
       </div>
