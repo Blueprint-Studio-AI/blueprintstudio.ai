@@ -20,7 +20,7 @@ const featuredProjects: Project[] = [
   {
     title: "TokenWorks idScanner.com",
     description: "Complete redesign and development of a headless wordpress ecommerce site for the industry leading ID Scanning company.",
-    image: "/images/work/ProjectMetaVison-Desktop1.png",
+    image: "/images/work/idscanner.png",
     category: "e-commerce",
     results: [
       "Custom code, design, assets & copy",
@@ -32,7 +32,7 @@ const featuredProjects: Project[] = [
   {
     title: "Manchester Energy Committee",
     description: "A modern, accessible website for public energy initiatives, featuring interactive data visualizations and community engagement tools.",
-    image: "/images/work/ProjectMetaVison-Desktop1.png",
+    image: "/images/work/manchester-energy.png",
     category: "Public Sector",
     results: [
       "300% increase in community engagement",
@@ -44,7 +44,7 @@ const featuredProjects: Project[] = [
   {
     title: "Juris Genius",
     description: "The AI Bar Tutor. Pass the Bar In Half the Time With JurisGenius: Your AI tutor & data-driven UBE practice platform.",
-    image: "/images/work/ProjectMetaVison-Desktop1.png",
+    image: "/images/work/juris.png",
     category: "AI Web App",
     results: [
       "60% increase in bar exam pass rate",
