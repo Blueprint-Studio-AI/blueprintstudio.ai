@@ -1,6 +1,6 @@
 // app/page.tsx
 "use client";
-import { motion } from "framer-motion";
+import { LazyMotion, motion, domAnimation } from "framer-motion";
 import Image from 'next/image';
 import { Footer } from "@/components/Footer";
 import { PhoneCall, Calculator, CheckCircle, ChevronDown, ChevronUp, ArrowUpRight } from "lucide-react";
@@ -70,49 +70,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work Grid */}
-      <section className="py-20 pt-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 gap-8">
-          {workItems.map((item, index) => (
-            <motion.a 
-              key={index}
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer" 
-              className="rounded-3xl border overflow-hidden transition-all duration-200 bg-white shadow"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                duration: 0.7,
-                delay: index * 0.1,
-                ease: [0.21, 0.45, 0.32, 0.9]
-              }}
-              style={{ willChange: 'opacity' }} // Add this for better performance
-            >
-              <div className="relative aspect-video">
-                {item.type === 'image' ? (
-                  <Image
-                    src={item.src}
-                    alt={item.alt || 'Blueprint Studio Image'}
-                    fill
-                    className="object-cover"
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4dHRsdHR4dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/2wBDAR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                  />
-                ) : (
-                  <AutoplayVideo
-                    src={item.src}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </motion.a>
-          ))}
+        {/* Work Grid */}
+        <section className="py-20 pt-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 gap-8">
+            {workItems.map((item, index) => (
+              <a 
+                key={index}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer" 
+                className="rounded-3xl border overflow-hidden transition-all duration-200 bg-gray-100/80 backdrop-blur-sm shadow"
+              >
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <div className="absolute inset-0">
+                    {item.type === 'image' ? (
+                      <Image
+                        src={item.src}
+                        alt={item.alt || 'Blueprint Studio Image'}
+                        fill
+                        className="object-cover transition-opacity duration-500"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4dHRsdHR4dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/2wBDAR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                      />
+                    ) : (
+                      <AutoplayVideo
+                        src={item.src}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+              </a>
+            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
 
       {/* Services */}

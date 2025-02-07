@@ -32,6 +32,7 @@ const animateVideoReset = (
   requestAnimationFrame(animate);
 };
 
+// Update AutoplayVideo component:
 export function AutoplayVideo({ src, className }: AutoplayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fadeRef = useRef<HTMLDivElement>(null);
@@ -80,20 +81,17 @@ export function AutoplayVideo({ src, className }: AutoplayVideoProps) {
 
   return (
     <div ref={containerRef} className="relative">
-      {isLoading && (
-        <motion.div
-          initial={{ opacity: 1 }} 
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0 bg-primary/5"
-        />
-      )}
+      <div 
+        className={cn(
+          "absolute inset-0 bg-gray-100/80 backdrop-blur-sm transition-opacity duration-500",
+          isLoading ? "opacity-100" : "opacity-0"
+        )}
+      />
       <video
         ref={videoRef}
         className={cn(
-          "w-full h-full object-cover",
-          isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500",
+          "w-full h-full object-cover transition-opacity duration-500",
+          isLoading ? "opacity-0" : "opacity-100",
           className
         )}
         src={src}
