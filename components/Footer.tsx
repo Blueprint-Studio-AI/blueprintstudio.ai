@@ -55,9 +55,9 @@ export function Footer() {
               <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </h2>
-          <p className="text-lg text-white/60 mb-8 max-w-md">
+          {/* <p className="text-lg text-white/60 mb-8 max-w-md">
             Join our newsletter for expert insights on web development, design, and digital innovation.
-          </p>
+          </p> */}
           </motion.div>
 
           {/* Newsletter Subscribe Section */}
@@ -120,16 +120,16 @@ export function Footer() {
                 Services
               </h4>
               <div className="space-y-4">
-                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services-index" className="block text-white/60 hover:text-white transition-colors">
                   Design
                 </Link>
-                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services-index" className="block text-white/60 hover:text-white transition-colors">
                   Development
                 </Link>
-                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services-index" className="block text-white/60 hover:text-white transition-colors">
                   Marketing
                 </Link>
-                <Link href="/services" className="block text-white/60 hover:text-white transition-colors">
+                <Link href="/services-index" className="block text-white/60 hover:text-white transition-colors">
                   Strategy
                 </Link>
               </div>
@@ -197,7 +197,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-8">
               <span className="text-white/40 text-sm">
-                © 2024 blueprint. All rights reserved.
+                © 2024 Blueprint Studio. All rights reserved.
               </span>
               <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
                 Privacy Policy
@@ -220,7 +220,7 @@ export function Footer() {
               >
                 ❤️
               </motion.div>
-              <span> by blueprint</span>
+              <span> by Blueprint</span>
             </div>
           </div>
         </motion.div>

@@ -75,29 +75,40 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 gap-8">
             {workItems.map((item, index) => (
-              <a 
+              <motion.a 
                 key={index}
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer" 
                 className="rounded-3xl border overflow-hidden transition-all duration-200 bg-white shadow"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.7,
+                  delay: index * 0.1,
+                  ease: [0.21, 0.45, 0.32, 0.9]
+                }}
               >
+              <div className="relative aspect-video">
                 {item.type === 'image' ? (
                   <Image
                     src={item.src}
                     alt={item.alt || 'Blueprint Studio Image'}
-                    width={800}
-                    height={600}
-                    className="w-full h-auto"
+                    fill
+                    className="object-cover"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4dHRsdHR4dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/2wBDAR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
                 ) : (
                   <AutoplayVideo
                     src={item.src}
-                    className="w-full h-auto"
+                    className="w-full h-full object-cover"
                   />
                 )}
-              </a>
-            ))}
+              </div>
+            </motion.a>
+          ))}
           </div>
         </div>
       </section>

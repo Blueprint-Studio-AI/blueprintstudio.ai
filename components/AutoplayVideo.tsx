@@ -1,5 +1,6 @@
 // components/AutoplayVideo.tsx
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { motion } from "framer-motion";
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { cn } from '@/lib/utils'
 
@@ -8,7 +9,6 @@ interface AutoplayVideoProps {
   className?: string;
 }
 
-// Move animation function outside and make it reusable
 const animateVideoReset = (
   videoElement: HTMLVideoElement, 
   startTime: number,
@@ -35,34 +35,63 @@ const animateVideoReset = (
 export function AutoplayVideo({ src, className }: AutoplayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fadeRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [containerRef, isIntersecting] = useIntersectionObserver({
     threshold: 0.5,
   });
 
   useEffect(() => {
-    const videoElement = videoRef.current;
+    const video = videoRef.current;
     const fadeElement = fadeRef.current;
-    if (!videoElement || !fadeElement) return;
+    if (!video || !fadeElement) return;
 
     if (isIntersecting) {
       fadeElement.style.opacity = '0';
-      videoElement.play().catch(error => {
+      video.play().catch(error => {
         console.log('Autoplay failed:', error);
       });
     } else {
       fadeElement.style.opacity = '1';
-      videoElement.pause();
-      
-      // Call animation function with current video time
-      animateVideoReset(videoElement, videoElement.currentTime);
+      video.pause();
+      animateVideoReset(video, video.currentTime);
     }
   }, [isIntersecting]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleReady = () => setIsLoading(false);
+
+    video.addEventListener('loadeddata', handleReady);
+    video.addEventListener('canplay', handleReady);
+    video.addEventListener('playing', handleReady);
+
+    if (video.readyState >= 3) {
+      handleReady();
+    }
+
+    return () => {
+      video.removeEventListener('loadeddata', handleReady);
+      video.removeEventListener('canplay', handleReady);
+      video.removeEventListener('playing', handleReady);
+    };
+  }, []);
+
   return (
     <div ref={containerRef} className="relative">
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 bg-primary/5"
+        />
+      )}
       <video
         ref={videoRef}
-        className={cn("w-full h-auto", className)}
+        className={cn("w-full h-full object-cover", className)}
         src={src}
         playsInline
         muted

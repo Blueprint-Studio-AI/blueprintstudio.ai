@@ -34,15 +34,40 @@ const SubNavLink = ({ href, children }: { href: string; children: string }) => (
     </Link>
   );
 
-const NavLink = ({ href, children, darker = false, onHover }: { 
-    href: string; 
+  const NavLink = ({ 
+    href, 
+    children, 
+    darker = false, 
+    onHover,
+    onClick 
+}: { 
+    href?: string;
     children: React.ReactNode;
     darker?: boolean;
     onHover?: () => void;
-  }) => {
+    onClick?: () => void;
+}) => {
+    if (href) {
+      return (
+        <Link 
+          href={href}
+          onMouseEnter={onHover}
+          className={`
+            flex items-center justify-center
+            min-w-[48px] px-1.5 py-1 rounded-nav h-[28px]
+            hover:bg-black/5 hover:backdrop-blur-nav-hover transition-all
+            ${darker ? 'text-[rgba(29,29,31,0.88)]' : 'text-[rgba(29,29,31,0.66)]'}
+            text-base font-medium leading-[70%]
+          `}
+        >
+          {children}
+        </Link>
+      );
+    }
+
     return (
-      <Link 
-        href={href}
+      <button
+        onClick={onClick}
         onMouseEnter={onHover}
         className={`
           flex items-center justify-center
@@ -53,25 +78,31 @@ const NavLink = ({ href, children, darker = false, onHover }: {
         `}
       >
         {children}
-      </Link>
+      </button>
     );
 };
-  
-// ... SubNavLink and NavLink components stay the same ...
 
 export const FloatingNav = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-  
-    const handleClose = () => {
-      setIsClosing(true);
-      setIsOpen(false);
-      setTimeout(() => {
-        setIsClosing(false);
-      }, 300);
-    };
-  
+  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setIsClosing(false);
+    }, 300);
+  };
+
+  const toggleNav = () => {
+    if (isOpen) {
+      handleClose();
+    } else {
+      setIsOpen(true);
+    }
+  };
+
     return (
       <nav 
         className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50"
@@ -123,7 +154,7 @@ export const FloatingNav = () => {
                 transition={{ delay: 0.2, duration: 0.1 }}
                 className="absolute top-0 left-0 w-full p-1.5 space-y-1.5"
               >
-                <SubNavLink href="/services">Services</SubNavLink>
+                <SubNavLink href="/services-index">Services</SubNavLink>
                 <SubNavLink href="/ideas">Ideas</SubNavLink>
                 <SubNavLink href="/tools">Tools</SubNavLink>
               </motion.div>
@@ -154,17 +185,17 @@ export const FloatingNav = () => {
               />
             </Link>
 
-            <div className="flex items-center gap-1.5">
-              <NavLink href="/start" darker>
-                Start
-              </NavLink>
-              <NavLink 
-                href="/learn"
-                onHover={() => setIsOpen(true)}
-              >
-                Learn
-              </NavLink>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <NavLink href="https://cal.com/blueprint-studio/intro-call" darker>
+              Start
+            </NavLink>
+            <NavLink 
+              onClick={toggleNav} 
+              onHover={() => setIsOpen(true)}
+            >
+              Learn
+            </NavLink>
+          </div>
           </div>
         </motion.div>
       </nav>

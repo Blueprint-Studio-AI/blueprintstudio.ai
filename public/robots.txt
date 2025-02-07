@@ -1,0 +1,22 @@
+# robots.txt for blueprintstudio.ai
+
+# Allow all crawlers
+User-agent: *
+
+# Allow all paths by default
+Allow: /
+
+# Block any potential sensitive paths 
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+
+# Crawl delay for heavy crawlers
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Link to sitemap
+Sitemap: https://blueprintstudio.ai/sitemap.xml
