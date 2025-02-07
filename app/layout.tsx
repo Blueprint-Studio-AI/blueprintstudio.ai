@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Blueprint Studio"
   },
   description: "Blueprint Studio is a premier web design company & digital agency specializing in modern web solutions and AI integration.",
-  keywords: ["web design", "AI solutions", "digital agency", "web development", "UI/UX design"],
+  keywords: ["web design company", "AI automation", "digital agency", "web design", "service design"],
   
   // Basic icons we have
   icons: {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     url: 'https://blueprintstudio.ai',
     siteName: 'Blueprint Studio',
     title: 'Blueprint Studio · Web & AI Solutions',
-    description: 'Professional web design and AI solutions for modern businesses.',
+    description: 'Professional web design & complex AI automation for modern businesses.',
     /* TODO: Add when OG image is ready
     images: [{
       url: '/og-image.jpg',

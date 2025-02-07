@@ -10,11 +10,11 @@ export const metadata: Metadata = {
     url: 'https://blueprintstudio.ai/small-business-web-design',
     siteName: 'Blueprint Studio',
     type: 'website',
-    images: [{
-      url: '/images/og/small-business-web-design.jpg',
-      width: 1200,
-      height: 630,
-    }],
+    // images: [{
+    //   url: '/images/og/small-business-web-design.jpg',
+    //   width: 1200,
+    //   height: 630,
+    // }],
   },
   alternates: {
     canonical: 'https://blueprintstudio.ai/small-business-web-design'

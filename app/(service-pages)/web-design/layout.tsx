@@ -2,11 +2,11 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Professional Web Design Services | Blueprint Studio',
-  description: 'Custom web design services that drive growth and engage users. Modern, responsive websites built for results.',
+  title: 'Professional Web Design Company | Blueprint Studio',
+  description: 'Custom web design comapany that drives growth and engages users. Modern, responsive websites built for results.',
   openGraph: {
-    title: 'Professional Web Design Services | Blueprint Studio',
-    description: 'Custom web design services that drive growth and engage users. Modern, responsive websites built for results.',
+    title: 'Professional Web Design Company | Blueprint Studio',
+    description: 'Custom web design company that drives growth and engages users. Modern, responsive websites built for results.',
     url: 'https://blueprintstudio.ai/web-design',
     siteName: 'Blueprint Studio',
     type: 'website',
@@ -26,12 +26,12 @@ export const metadata: Metadata = {
 const webDesignSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  "name": "Web Design Services",
+  "name": "Web Design Company",
   "provider": {
     "@type": "Organization",
     "name": "Blueprint Studio"
   },
-  "description": "Professional web design services for modern businesses",
+  "description": "Professional web design company serving industry-leading businesses",
   "offers": {
     "@type": "Offer",
     "price": "800",
