@@ -74,22 +74,23 @@ export default function Home() {
       <section className="py-20 pt-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 gap-8">
-            {workItems.map((item, index) => (
-              <motion.a 
-                key={index}
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer" 
-                className="rounded-3xl border overflow-hidden transition-all duration-200 bg-white shadow"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.7,
-                  delay: index * 0.1,
-                  ease: [0.21, 0.45, 0.32, 0.9]
-                }}
-              >
+          {workItems.map((item, index) => (
+            <motion.a 
+              key={index}
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer" 
+              className="rounded-3xl border overflow-hidden transition-all duration-200 bg-white shadow"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ 
+                duration: 0.7,
+                delay: index * 0.1,
+                ease: [0.21, 0.45, 0.32, 0.9]
+              }}
+              style={{ willChange: 'opacity' }} // Add this for better performance
+            >
               <div className="relative aspect-video">
                 {item.type === 'image' ? (
                   <Image

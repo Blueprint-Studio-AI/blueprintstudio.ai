@@ -82,7 +82,7 @@ export function AutoplayVideo({ src, className }: AutoplayVideoProps) {
     <div ref={containerRef} className="relative">
       {isLoading && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }} 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
@@ -91,7 +91,11 @@ export function AutoplayVideo({ src, className }: AutoplayVideoProps) {
       )}
       <video
         ref={videoRef}
-        className={cn("w-full h-full object-cover", className)}
+        className={cn(
+          "w-full h-full object-cover",
+          isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500",
+          className
+        )}
         src={src}
         playsInline
         muted
