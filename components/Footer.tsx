@@ -196,19 +196,21 @@ export function Footer() {
           viewport={{ once: true }}
           className="pt-8 mt-16 border-t border-white/10"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-8">
-              <span className="text-white/40 text-sm">
-                © 2024 Blueprint Studio. All rights reserved.
-              </span>
-              <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
-                Terms of Service
-              </Link>
+          <div className="flex flex-col md:flex-row justify-between gap-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-8 whitespace-nowrap">
+                <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
+                  Terms of Service
+                </Link>
+                <span className="text-white/40 text-sm">
+                  © 2024 Blueprint Studio
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-white/40 text-sm">
+            <div className="flex items-center gap-2 text-white/40 text-sm mt-4 md:mt-0 whitespace-nowrap">
               <span>made with</span>
               <motion.div
                 animate={{
