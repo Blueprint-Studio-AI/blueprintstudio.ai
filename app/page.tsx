@@ -82,7 +82,7 @@ export default function Home() {
                 rel="noopener noreferrer" 
                 className="rounded-3xl border overflow-hidden transition-all duration-200 bg-gray-100/80 backdrop-blur-sm shadow"
               >
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <div className="relative w-full" style={{ paddingBottom: '66.67%' }}>
                   <div className="absolute inset-0">
                     {item.type === 'image' ? (
                       <Image
