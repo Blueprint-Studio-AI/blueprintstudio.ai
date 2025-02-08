@@ -46,14 +46,16 @@ export function Footer() {
             viewport={{ once: true }}
           >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Build with us
-            <Button 
-              className="group ml-4 align-middle text-base bg-white text-black hover:bg-white/90"
-              onClick={() => window.location.href = 'https://cal.com/blueprint-studio/intro-call'}
-            >
-              Start
-              <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Button>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              Build with us
+              <Button 
+                className="group text-base bg-white text-black hover:bg-white/90 w-fit"
+                onClick={() => window.location.href = 'https://cal.com/blueprint-studio/intro-call'}
+              >
+                Start
+                <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
           </h2>
           {/* <p className="text-lg text-white/60 mb-8 max-w-md">
             Join our newsletter for expert insights on web development, design, and digital innovation.
