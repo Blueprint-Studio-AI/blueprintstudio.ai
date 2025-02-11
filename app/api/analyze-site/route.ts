@@ -99,7 +99,8 @@ async function fetchWebsiteData(url: string) {
         hasStructuredData: html.includes('application/ld+json'),
         structuredDataTypes: $('.application/ld+json').map((_, el) => {
           try {
-            return JSON.parse($(el).html())['@type'];
+            const htmlContent = $(el).html() || '{}'; // Provide an empty object as a default
+            return JSON.parse(htmlContent)['@type'];
           } catch (e) {
             return null;
           }

@@ -147,3 +147,31 @@ body {
 .transition-all-slow {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Roast Loading Animations */
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-progress {
+  animation: progress 2s infinite linear;
+}
+
+/* Additional Roast UI Utilities */
+@layer utilities {
+  .roast-gradient {
+    @apply bg-gradient-to-r from-orange-500 to-red-500;
+  }
+  
+  .technical-gradient {
+    @apply bg-gradient-to-r from-blue-500 to-green-500;
+  }
+}
