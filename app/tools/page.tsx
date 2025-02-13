@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap, Flame, Pen, FileCode, Users, ExternalLink, Bot, Scale } from 'lucide-react';
 import Link from 'next/link';
+import { Footer } from '@/components/Footer';
+import { Spacer } from '@/components/ui/spacer';
 
 type ToolStatus = 'live' | 'coming-soon' | 'external' | 'deprecated';
 
@@ -200,6 +202,8 @@ export default function ToolsPage() {
           </section>
         </div>
       </div>
+      <Spacer size="4xl" />
+      <Footer />
     </main>
   );
 }

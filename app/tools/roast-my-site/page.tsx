@@ -12,9 +12,10 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Cookies from 'js-cookie';
 import { EmailCaptureModal } from '@/components/EmailCaptureModal';
+import { Footer } from '@/components/Footer';
+import { Spacer } from '@/components/ui/spacer';
 
 //TODO: 
-// Fix type error on analyze site route
 // add pagenation to pdf export (and ideally branding and stuff)
 // remove image save for debuging before pushing live
 
@@ -547,6 +548,8 @@ const exportToPDF = async () => {
           )}
         </motion.div>
       </div>
+      <Spacer size="4xl" />
+      <Footer />
     </main>
   );
 }
