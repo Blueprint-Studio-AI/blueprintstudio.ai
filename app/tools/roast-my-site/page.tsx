@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Flame, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Cookies from 'js-cookie';
+import { EmailCaptureModal } from '@/components/EmailCaptureModal';
 
 //TODO: 
 // Fix type error on analyze site route
@@ -51,7 +53,7 @@ const loadingMessages = {
   ]
 };
 
-
+const COOKIE_NAME = 'blueprint_email_access';
 
 export default function RoastMySite() {
   const [url, setUrl] = useState('');
@@ -62,7 +64,9 @@ export default function RoastMySite() {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [messageIndex, setMessageIndex] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
-
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [hasEmailAccess, setHasEmailAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true); // New state for initial load
   // Get brand colors based on current mode
   const getBrandColors = () => ({
     primary: '#1E1E1E',
@@ -183,10 +187,48 @@ const exportToPDF = async () => {
   }
 };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) return;
+  // Check for email access on component mount
+  useEffect(() => {
+    const checkEmailAccess = () => {
+      const emailAccessToken = Cookies.get(COOKIE_NAME);
+      setHasEmailAccess(!!emailAccessToken);
+      setIsCheckingAccess(false);
+    };
 
+    checkEmailAccess();
+  }, []);
+
+  // Enhanced email submission handler
+  const handleEmailSubmit = async (email: string) => {
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to subscribe');
+      }
+
+      setHasEmailAccess(true);
+      setShowEmailModal(false);
+
+      // If there was a pending URL analysis, trigger it
+      if (url) {
+        handleAnalysis();
+      }
+    } catch (error) {
+      console.error('Email submission error:', error);
+      throw error;
+    }
+  };
+
+  // Separate analysis logic for reuse
+  const handleAnalysis = async () => {
+    if (!url) return;
+    
     resetAnalysis();
     setIsAnalyzing(true);
     
@@ -202,7 +244,7 @@ const exportToPDF = async () => {
         }
         return prev;
       });
-    }, 3000); // Increased to 3 seconds per message
+    }, 3000);
 
     try {
       const endpoint = roastMode === 'vibes' ? '/api/vibes-roast' : '/api/analyze-site';
@@ -226,10 +268,31 @@ const exportToPDF = async () => {
     }
   };
 
+  // Updated form submission handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url) return;
+
+    if (!hasEmailAccess) {
+      setShowEmailModal(true);
+      return;
+    }
+
+    await handleAnalysis();
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground services-theme">
       <div className="fixed inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
       
+      {/* Email capture modal */}
+      <EmailCaptureModal 
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        onSubmit={handleEmailSubmit}
+      />
+
+      {/* Main content */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
       <motion.div
           initial={{ opacity: 0, y: 20 }}

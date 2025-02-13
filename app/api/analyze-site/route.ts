@@ -128,9 +128,15 @@ async function fetchWebsiteData(url: string) {
       seoData,
       fullHtml: html // Including full HTML
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Error fetching website:', error);
-    throw new Error(`Failed to fetch website data: ${error.message}`);
+    
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    
+    throw new Error(`Failed to fetch website data: ${errorMessage}`);
   }
 }
 
@@ -152,7 +158,7 @@ export async function POST(request: Request) {
     const websiteData = await fetchWebsiteData(url);
     console.log('✅ Website data fetched successfully');
 
-    console.log('🤖 Sending to GPT-4 for analysis...');
+    console.log('🤖 Sending to o-3-mini for analysis...');
     const completion = await openai.chat.completions.create({
       model: "o3-mini",
       messages: [
