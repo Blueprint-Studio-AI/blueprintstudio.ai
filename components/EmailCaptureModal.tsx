@@ -151,7 +151,7 @@ export function EmailCaptureModal({ isOpen, onClose, onSubmit }: EmailCaptureMod
                     />
                   </svg>
                 </motion.div>
-                <h3 className="text-xl font-semibold mb-2">You're All Set!</h3>
+                <h3 className="text-xl font-semibold mb-2">You&apos;re All Set!</h3>
                 <p className="text-gray-600">Redirecting you to the roasting tool...</p>
               </div>
             )}
