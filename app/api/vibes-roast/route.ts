@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
 import puppeteer from 'puppeteer';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+// import { writeFile, mkdir } from 'fs/promises';
+// import path from 'path';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
+/* 
 async function saveDebugScreenshot(base64Image: string, url: string) {
   try {
     const debugDir = path.join(process.cwd(), 'debug-screenshots');
@@ -30,6 +31,7 @@ async function saveDebugScreenshot(base64Image: string, url: string) {
     return null;
   }
 }
+*/
 
 async function captureScreenshot(url: string): Promise<string> {
     const browser = await puppeteer.launch({
@@ -56,7 +58,6 @@ async function captureScreenshot(url: string): Promise<string> {
       // Wait for common content indicators
       await Promise.all([
         page.waitForSelector('img', { timeout: 5000 }).catch(() => {}),
-        // Fixed type error by using Array.from()
         page.waitForFunction(() => {
           const elements = Array.from(document.getElementsByTagName('*'));
           return elements.some(element => {
@@ -122,7 +123,7 @@ export async function POST(request: Request) {
     }
 
     const screenshot = await captureScreenshot(url);
-    const debugFilename = await saveDebugScreenshot(screenshot, url);
+    // const debugFilename = await saveDebugScreenshot(screenshot, url);
 
     const response = await anthropic.messages.create({
       model: "claude-3-5-sonnet-20241022",
@@ -160,7 +161,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       roast: roastContent || 'Failed to generate roast',
-      debugScreenshot: debugFilename
+      // debugScreenshot: debugFilename
     });
 
   } catch (error) {
