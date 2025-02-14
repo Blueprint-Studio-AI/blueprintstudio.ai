@@ -35,9 +35,17 @@ async function saveDebugScreenshot(base64Image: string, url: string) {
 
 async function captureScreenshot(url: string): Promise<string> {
     const browser = await puppeteer.launch({
-      headless: true,
-    });
-    
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--disable-gpu',
+          '--window-size=1280,800'
+        ]
+      });
+      
     try {
       const page = await browser.newPage();
       
