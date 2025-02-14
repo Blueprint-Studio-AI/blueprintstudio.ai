@@ -14,7 +14,6 @@ const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     : '/usr/bin/google-chrome';
 
-// Helper function to extract roast content
 function extractRoastContent(text: string): string {
   const roastRegex = /<roast>([\s\S]*?)<\/roast>/;
   const match = text.match(roastRegex);
@@ -24,9 +23,9 @@ function extractRoastContent(text: string): string {
 async function captureScreenshot(url: string): Promise<string> {
     const isDev = process.env.NODE_ENV === 'development';
     
-    let browser;
-    try {
-        if (isDev) {
+    if (isDev) {
+        let browser;
+        try {
             browser = await puppeteer.launch({
                 executablePath: LOCAL_CHROME_EXECUTABLE,
                 headless: true,
@@ -34,93 +33,78 @@ async function captureScreenshot(url: string): Promise<string> {
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
                     '--disable-dev-shm-usage',
-                    '--disable-accelerated-2d-canvas',
                     '--disable-gpu',
                     '--window-size=1280,800'
                 ]
             });
-        } else {
-            // Use Browserless.io with optimized connection settings
-            browser = await puppeteer.connect({
-                browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_API_KEY}&timeout=30000`,
-                defaultViewport: {
-                    width: 1280,
-                    height: 800,
-                    deviceScaleFactor: 1,
-                }
+
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1280, height: 800 });
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            
+            const screenshot = await page.screenshot({
+                type: 'jpeg',
+                quality: 80,
+                encoding: 'base64',
+                fullPage: false
             });
+            
+            return screenshot as string;
+        } finally {
+            if (browser) await browser.close().catch(console.error);
         }
+    } else {
+        // Use Browserless.io REST API in production
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        const page = await browser.newPage();
-        
-        // Set shorter timeouts for individual operations
-        await page.setDefaultNavigationTimeout(20000);
-        await page.setDefaultTimeout(20000);
-        
-        // Optimize page load
-        await page.setRequestInterception(true);
-        page.on('request', (request) => {
-            const resourceType = request.resourceType();
-            if (resourceType === 'image' || resourceType === 'stylesheet' || resourceType === 'font') {
-                request.continue();
-            } else if (resourceType === 'script') {
-                request.continue();
-            } else {
-                request.continue();
-            }
-        });
-
-        // Set viewport before navigation
-        await page.setViewport({ width: 1280, height: 800 });
-        
-        // Navigate with optimized settings
-        await page.goto(url, {
-            waitUntil: 'domcontentloaded', // Changed from multiple conditions to just domcontentloaded
-            timeout: 20000,
-        });
-
-        // Simplified content wait
         try {
-            await Promise.race([
-                page.waitForSelector('img', { timeout: 3000 }),
-                page.waitForSelector('div', { timeout: 3000 }),
-                new Promise(resolve => setTimeout(resolve, 3000))
-            ]);
-        } catch (e) {
-            console.log('Timeout waiting for content, continuing anyway');
-        }
+            const response = await fetch('https://chrome.browserless.io/screenshot', {
+                method: 'POST',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.BROWSERLESS_API_KEY}`
+                },
+                body: JSON.stringify({
+                    url: url,
+                    options: {
+                        type: 'jpeg',
+                        quality: 80,
+                        fullPage: false,
+                        viewport: {
+                            width: 1280,
+                            height: 800,
+                            deviceScaleFactor: 1
+                        },
+                        waitFor: 1000,
+                        geolocation: { latitude: 40.7128, longitude: -74.0060 },
+                        stealth: true,
+                        timeout: 8000,
+                    }
+                }),
+                signal: controller.signal
+            });
 
-        // Quick scroll
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-        await new Promise(resolve => setTimeout(resolve, 500));
-        await page.evaluate(() => window.scrollTo(0, 0));
-        
-        // Take screenshot immediately
-        const screenshot = await page.screenshot({
-            type: 'jpeg',
-            quality: 80, // Reduced quality for faster processing
-            encoding: 'base64',
-            fullPage: false,
-            captureBeyondViewport: false,
-        });
-        
-        return screenshot as string;
-    } catch (error) {
-        console.error('Screenshot capture error:', error);
-        throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-        if (browser) {
-            await browser.close().catch(console.error);
+            if (!response.ok) {
+                throw new Error(`Screenshot API returned ${response.status}`);
+            }
+
+            const buffer = await response.arrayBuffer();
+            return Buffer.from(buffer).toString('base64');
+        } catch (error) {
+            console.error('Screenshot API error:', error);
+            if (error instanceof Error && error.name === 'AbortError') {
+                throw new Error('Screenshot capture timed out');
+            }
+            throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 }
 
 export async function POST(request: Request) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => {
-        controller.abort();
-    }, 50000); // Set to slightly less than Netlify's timeout
-
     try {
         const { url } = await request.json();
         
@@ -131,11 +115,15 @@ export async function POST(request: Request) {
             );
         }
 
+        // Set a timeout for the entire operation
+        const screenshotPromise = captureScreenshot(url);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Operation timed out')), 8000)
+        );
+
         const screenshot = await Promise.race([
-            captureScreenshot(url),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Screenshot timeout')), 45000)
-            )
+            screenshotPromise,
+            timeoutPromise
         ]) as string;
 
         const response = await anthropic.messages.create({
@@ -172,13 +160,11 @@ export async function POST(request: Request) {
 
         const roastContent = extractRoastContent(fullContent);
 
-        clearTimeout(timeout);
         return NextResponse.json({
             roast: roastContent || 'Failed to generate roast',
         });
 
     } catch (error) {
-        clearTimeout(timeout);
         console.error('Error in vibes-roast:', error);
         
         if (error instanceof Anthropic.APIError) {
