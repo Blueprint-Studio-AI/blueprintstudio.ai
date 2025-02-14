@@ -23,6 +23,17 @@ function extractRoastContent(text: string): string {
 async function captureScreenshot(url: string): Promise<string> {
     const isDev = process.env.NODE_ENV === 'development';
     
+    // Normalize and validate URL
+    let normalizedUrl = url;
+    try {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            normalizedUrl = `https://${url}`;
+        }
+        new URL(normalizedUrl); // Validate URL format
+    } catch (error) {
+        throw new Error('Invalid URL provided');
+    }
+    
     if (isDev) {
         let browser;
         try {
@@ -40,7 +51,7 @@ async function captureScreenshot(url: string): Promise<string> {
 
             const page = await browser.newPage();
             await page.setViewport({ width: 1280, height: 800 });
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.goto(normalizedUrl, { waitUntil: 'domcontentloaded' });
             
             const screenshot = await page.screenshot({
                 type: 'jpeg',
@@ -67,7 +78,7 @@ async function captureScreenshot(url: string): Promise<string> {
                     'Authorization': `Bearer ${process.env.BROWSERLESS_API_KEY}`
                 },
                 body: JSON.stringify({
-                    url: url,
+                    url: normalizedUrl,
                     options: {
                         type: 'jpeg',
                         quality: 80,
@@ -78,24 +89,43 @@ async function captureScreenshot(url: string): Promise<string> {
                             deviceScaleFactor: 1
                         },
                         waitFor: 1000,
-                        geolocation: { latitude: 40.7128, longitude: -74.0060 },
                         stealth: true,
-                        timeout: 8000,
+                        gotoOptions: {
+                            waitUntil: 'domcontentloaded',
+                            timeout: 7000
+                        },
+                        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
                     }
                 }),
                 signal: controller.signal
             });
 
             if (!response.ok) {
-                throw new Error(`Screenshot API returned ${response.status}`);
+                const errorText = await response.text().catch(() => 'No error details available');
+                console.error('Browserless API Error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    errorText
+                });
+                throw new Error(`Screenshot API returned ${response.status}: ${errorText}`);
             }
 
             const buffer = await response.arrayBuffer();
+            if (!buffer || buffer.byteLength === 0) {
+                throw new Error('Empty screenshot received');
+            }
+            
             return Buffer.from(buffer).toString('base64');
         } catch (error) {
             console.error('Screenshot API error:', error);
-            if (error instanceof Error && error.name === 'AbortError') {
-                throw new Error('Screenshot capture timed out');
+            if (error instanceof Error) {
+                if (error.name === 'AbortError') {
+                    throw new Error('Screenshot capture timed out');
+                }
+                // Check if it's a CORS or network error
+                if (error.message.includes('CORS') || error.message.includes('network')) {
+                    throw new Error(`Failed to access ${normalizedUrl}. Please check if the URL is accessible.`);
+                }
             }
             throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
