@@ -17,6 +17,7 @@ export interface EmailSubscriber {
     last_activity: string;
     unsubscribed_at: string | null;
     created_at: string;
+    updated_at: string;
     ip_address: string | null;
     user_agent: string | null;
   }
