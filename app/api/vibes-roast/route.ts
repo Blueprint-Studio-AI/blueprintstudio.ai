@@ -2,7 +2,8 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
-import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 // import { writeFile, mkdir } from 'fs/promises';
 // import path from 'path';
 
@@ -33,19 +34,37 @@ async function saveDebugScreenshot(base64Image: string, url: string) {
 }
 */
 
-async function captureScreenshot(url: string): Promise<string> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--disable-gpu',
-          '--window-size=1280,800'
-        ]
-      });
-      
+const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
+  ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+  : process.platform === 'darwin'
+    ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    : '/usr/bin/google-chrome';
+
+    async function captureScreenshot(url: string): Promise<string> {
+        const isDev = process.env.NODE_ENV === 'development';
+        
+        const options = isDev ? {
+          // Local development options
+          executablePath: LOCAL_CHROME_EXECUTABLE,
+          headless: true,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu',
+            '--window-size=1280,800'
+          ]
+        } : {
+          // Production/serverless options
+          executablePath: await chromium.executablePath,
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          headless: chromium.headless,
+        };
+    
+        const browser = await puppeteer.launch(options);
+    
     try {
       const page = await browser.newPage();
       
@@ -112,6 +131,7 @@ async function captureScreenshot(url: string): Promise<string> {
       await browser.close();
     }
 }
+
 
 function extractRoastContent(text: string): string {
   const roastRegex = /<roast>([\s\S]*?)<\/roast>/;
