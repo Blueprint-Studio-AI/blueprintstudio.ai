@@ -12,5 +12,5 @@
   NODE_VERSION = "18"
 
 [functions."*"]
-  timeout = 30
-  memory = 1024
+  timeout = 60  # Increased to 60 seconds
+  memory = 2048  # Increased to 2GB
