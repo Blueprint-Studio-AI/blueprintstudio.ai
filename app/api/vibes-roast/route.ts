@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
-import chromium from '@sparticuz/chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
 
 const anthropic = new Anthropic({
@@ -34,17 +33,9 @@ async function captureScreenshot(url: string): Promise<string> {
                 ]
             });
         } else {
-            // Configure chrome-aws-lambda for serverless environment
-            browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: {
-                    width: 1280,
-                    height: 800,
-                    deviceScaleFactor: 1,
-                },
-                executablePath: await chromium.executablePath,
-                headless: true,
-                ignoreHTTPSErrors: true,
+            // Use Browserless.io in production
+            browser = await puppeteer.connect({
+                browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_API_KEY}`,
             });
         }
 
