@@ -4,37 +4,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
 import chromium from '@sparticuz/chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
-// import { writeFile, mkdir } from 'fs/promises';
-// import path from 'path';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
-
-/* 
-async function saveDebugScreenshot(base64Image: string, url: string) {
-  try {
-    const debugDir = path.join(process.cwd(), 'debug-screenshots');
-    await mkdir(debugDir, { recursive: true });
-    
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const sanitizedUrl = url.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 30);
-    const filename = `screenshot-${sanitizedUrl}-${timestamp}.jpg`;
-    const filepath = path.join(debugDir, filename);
-    
-    const imageBuffer = Buffer.from(base64Image, 'base64');
-    await writeFile(filepath, imageBuffer);
-    
-    console.log(`Debug screenshot saved: ${filepath}`);
-    return filename;
-  } catch (error) {
-    console.error('Failed to save debug screenshot:', error);
-    return null;
-  }
-}
-*/
-
-
 
 const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
   ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
@@ -42,34 +15,38 @@ const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     : '/usr/bin/google-chrome';
 
-    async function captureScreenshot(url: string): Promise<string> {
-        const isDev = process.env.NODE_ENV === 'development';
-        
-        let browser;
-        try {
-            if (isDev) {
-                browser = await puppeteer.launch({
-                    executablePath: LOCAL_CHROME_EXECUTABLE,
-                    headless: true,
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--disable-accelerated-2d-canvas',
-                        '--disable-gpu',
-                        '--window-size=1280,800'
-                    ]
-                });
-            } else {
-                await chromium.font(); // Ensure fonts are available
-                browser = await chromium.puppeteer.launch({
-                    args: chromium.args,
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
-                    headless: chromium.headless,
-                    ignoreHTTPSErrors: true,
-                });
-            }
+async function captureScreenshot(url: string): Promise<string> {
+    const isDev = process.env.NODE_ENV === 'development';
+    
+    let browser;
+    try {
+        if (isDev) {
+            browser = await puppeteer.launch({
+                executablePath: LOCAL_CHROME_EXECUTABLE,
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-accelerated-2d-canvas',
+                    '--disable-gpu',
+                    '--window-size=1280,800'
+                ]
+            });
+        } else {
+            // Configure chrome-aws-lambda for serverless environment
+            browser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: {
+                    width: 1280,
+                    height: 800,
+                    deviceScaleFactor: 1,
+                },
+                executablePath: await chromium.executablePath,
+                headless: true,
+                ignoreHTTPSErrors: true,
+            });
+        }
 
         const page = await browser.newPage();
         
@@ -138,7 +115,6 @@ const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
         }
     }
 }
-
 
 function extractRoastContent(text: string): string {
   const roastRegex = /<roast>([\s\S]*?)<\/roast>/;

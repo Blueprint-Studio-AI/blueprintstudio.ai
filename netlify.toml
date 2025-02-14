@@ -7,10 +7,10 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@sparticuz/chrome-aws-lambda"]
 
 [build.environment]
   NODE_VERSION = "18"
-  CHROME_EXECUTABLE_PATH = "/var/task/node_modules/@sparticuz/chrome-aws-lambda/bin/chromium"
 
 [functions."*"]
   timeout = 30
