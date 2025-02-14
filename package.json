@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm install puppeteer-core@17.1.3 && next build",
+    "build": "next build",
+    "postinstall": "node node_modules/@sparticuz/chrome-aws-lambda/install.js",
     "start": "next start",
     "lint": "next lint"
   },

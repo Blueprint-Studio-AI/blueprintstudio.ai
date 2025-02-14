@@ -34,6 +34,8 @@ async function saveDebugScreenshot(base64Image: string, url: string) {
 }
 */
 
+
+
 const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
   ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
   : process.platform === 'darwin'
@@ -43,92 +45,97 @@ const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
     async function captureScreenshot(url: string): Promise<string> {
         const isDev = process.env.NODE_ENV === 'development';
         
-        const options = isDev ? {
-          // Local development options
-          executablePath: LOCAL_CHROME_EXECUTABLE,
-          headless: true,
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--disable-gpu',
-            '--window-size=1280,800'
-          ]
-        } : {
-          // Production/serverless options
-          executablePath: await chromium.executablePath,
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          headless: chromium.headless,
-        };
-    
-        const browser = await puppeteer.launch(options);
-    
-    try {
-      const page = await browser.newPage();
-      
-      await page.setViewport({ width: 1280, height: 800 });
-      await page.setDefaultNavigationTimeout(30000);
-      await page.setDefaultTimeout(30000);
-      
-      await page.setExtraHTTPHeaders({
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-      });
-      
-      await page.goto(url, {
-        waitUntil: ['networkidle0', 'domcontentloaded', 'load'],
-        timeout: 30000,
-      });
-
-      // Wait for common content indicators
-      await Promise.all([
-        page.waitForSelector('img', { timeout: 5000 }).catch(() => {}),
-        page.waitForFunction(() => {
-          const elements = Array.from(document.getElementsByTagName('*'));
-          return elements.some(element => {
-            const style = window.getComputedStyle(element);
-            return style.backgroundImage !== 'none';
-          });
-        }, { timeout: 5000 }).catch(() => {}),
-        new Promise(resolve => setTimeout(resolve, 2000))
-      ]);
-
-      await page.evaluate(async () => {
-        await new Promise<void>((resolve) => {
-          let totalHeight = 0;
-          const distance = 100;
-          const timer = setInterval(() => {
-            const scrollHeight = document.body.scrollHeight;
-            window.scrollBy(0, distance);
-            totalHeight += distance;
-
-            if(totalHeight >= scrollHeight){
-              clearInterval(timer);
-              window.scrollTo(0, 0);
-              resolve();
+        let browser;
+        try {
+            if (isDev) {
+                browser = await puppeteer.launch({
+                    executablePath: LOCAL_CHROME_EXECUTABLE,
+                    headless: true,
+                    args: [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                        '--window-size=1280,800'
+                    ]
+                });
+            } else {
+                await chromium.font(); // Ensure fonts are available
+                browser = await chromium.puppeteer.launch({
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
+                    headless: chromium.headless,
+                    ignoreHTTPSErrors: true,
+                });
             }
-          }, 100);
-        });
-      });
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const screenshot = await page.screenshot({
-        type: 'jpeg',
-        quality: 100,
-        encoding: 'base64',
-        fullPage: false,
-        captureBeyondViewport: false,
-      });
-      
-      return screenshot as string;
+        const page = await browser.newPage();
+        
+        await page.setViewport({ width: 1280, height: 800 });
+        await page.setDefaultNavigationTimeout(30000);
+        await page.setDefaultTimeout(30000);
+        
+        await page.setExtraHTTPHeaders({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+        });
+        
+        await page.goto(url, {
+            waitUntil: ['networkidle0', 'domcontentloaded', 'load'],
+            timeout: 30000,
+        });
+
+        // Wait for common content indicators
+        await Promise.all([
+            page.waitForSelector('img', { timeout: 5000 }).catch(() => {}),
+            page.waitForFunction(() => {
+                const elements = Array.from(document.getElementsByTagName('*'));
+                return elements.some(element => {
+                    const style = window.getComputedStyle(element);
+                    return style.backgroundImage !== 'none';
+                });
+            }, { timeout: 5000 }).catch(() => {}),
+            new Promise(resolve => setTimeout(resolve, 2000))
+        ]);
+
+        await page.evaluate(async () => {
+            await new Promise<void>((resolve) => {
+                let totalHeight = 0;
+                const distance = 100;
+                const timer = setInterval(() => {
+                    const scrollHeight = document.body.scrollHeight;
+                    window.scrollBy(0, distance);
+                    totalHeight += distance;
+
+                    if(totalHeight >= scrollHeight){
+                        clearInterval(timer);
+                        window.scrollTo(0, 0);
+                        resolve();
+                    }
+                }, 100);
+            });
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const screenshot = await page.screenshot({
+            type: 'jpeg',
+            quality: 100,
+            encoding: 'base64',
+            fullPage: false,
+            captureBeyondViewport: false,
+        });
+        
+        return screenshot as string;
     } catch (error) {
-      console.error('Screenshot capture error:', error);
-      throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('Screenshot capture error:', error);
+        throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      await browser.close();
+        if (browser) {
+            await browser.close();
+        }
     }
 }
 

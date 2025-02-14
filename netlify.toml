@@ -4,3 +4,14 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "18"
+  CHROME_EXECUTABLE_PATH = "/var/task/node_modules/@sparticuz/chrome-aws-lambda/bin/chromium"
+
+[functions."*"]
+  timeout = 30
+  memory = 1024
