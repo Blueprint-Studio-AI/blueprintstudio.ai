@@ -8,13 +8,15 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Type for email subscribers
 export interface EmailSubscriber {
-  id: string;
-  email: string;
-  subscribed_at: string;
-  source: string;
-  roast_mode: boolean;
-  referrer: string | null;
-  last_activity: string;
-  unsubscribed_at: string | null;
-  created_at: string;
-}
+    id: string;
+    email: string;
+    subscribed_at: string;
+    source: string;
+    roast_mode: boolean;
+    referrer: string | null;
+    last_activity: string;
+    unsubscribed_at: string | null;
+    created_at: string;
+    ip_address: string | null;
+    user_agent: string | null;
+  }
