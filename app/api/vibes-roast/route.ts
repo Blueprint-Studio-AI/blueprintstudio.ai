@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
 import puppeteer from 'puppeteer-core';
 
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,

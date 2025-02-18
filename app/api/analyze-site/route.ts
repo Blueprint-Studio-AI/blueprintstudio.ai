@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
