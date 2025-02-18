@@ -82,16 +82,17 @@ async function captureScreenshot(url: string): Promise<string> {
                         type: 'jpeg',
                         quality: 80,
                         fullPage: false,
-                        width: 1280,           
-                        height: 800,           
-                        deviceScaleFactor: 1,  
                         waitFor: 1000,
                         stealth: true,
                         gotoOptions: {
                             waitUntil: 'domcontentloaded',
                             timeout: 7000
-                        },
-                        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+                        }
+                    },
+                    viewport: {  // Moved outside of options
+                        width: 1280,
+                        height: 800,
+                        deviceScaleFactor: 1
                     }
                 }),
                 signal: controller.signal
