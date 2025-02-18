@@ -69,7 +69,7 @@ async function captureScreenshot(url: string): Promise<string> {
     } else {
         // Use Browserless.io REST API in production
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
     
         try {
             const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, {
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
         // Set a timeout for the entire operation
         const screenshotPromise = captureScreenshot(url);
         const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Operation timed out')), 8000)
+            setTimeout(() => reject(new Error('Operation timed out')), 10000)
         );
 
         const screenshot = await Promise.race([

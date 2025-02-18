@@ -157,79 +157,99 @@ export async function POST(request: Request) {
       );
     }
 
-    const websiteData = await fetchWebsiteData(url);
-    console.log('✅ Website data fetched successfully');
+    // Wrap the entire operation in a Promise.race with timeout
+    const analysisPromise = async () => {
+      const websiteData = await fetchWebsiteData(url);
+      console.log('✅ Website data fetched successfully');
 
-    console.log('🤖 Sending to o-3-mini for analysis...');
-    const completion = await openai.chat.completions.create({
-      model: "o3-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a witty but professional website critic and SEO expert. 
-          Analyze websites and provide constructive feedback in a fun, slightly roasty way. 
-          You'll receive both structured SEO data and the full HTML of the page.
-          Focus on providing actionable insights while maintaining a humorous tone.
-          Structure your response in markdown with emojis for each section.`
-        },
-        {
-          role: "user",
-          content: `Analyze this website:
-          
-          URL: ${websiteData.url}
-          
-          Detailed SEO Analysis:
-          ${JSON.stringify(websiteData.seoData, null, 2)}
-          
-          Full HTML Context:
-          \`\`\`html
-          ${websiteData.fullHtml}
-          \`\`\`
-          
-          Provide a comprehensive roast/analysis focusing on:
-          1. First Impressions & Design 🎨
-          - Visual hierarchy
-          - Brand consistency
-          - Modern design practices
-          
-          2. User Experience 🚀
-          - Navigation structure
-          - Mobile responsiveness
-          - Load time indicators
-          - Call-to-action effectiveness
-          
-          3. Technical Health 🔧
-          - Code quality
-          - Performance optimizations
-          - Technical SEO implementation
-          - Security indicators
-          
-          4. Content & SEO Deep Dive 📝
-          - Content quality and structure
-          - SEO best practices
-          - Meta tag optimization
-          - Content hierarchy
-          
-          5. Key Recommendations 🎯
-          - High-priority fixes
-          - Quick wins
-          - Strategic improvements
-          
-          Be specific, actionable, and maintain a balance between technical accuracy and entertaining roasts.`
-        }
-      ]
-    });
 
-    console.log('✅ o-3-mini analysis complete');
+      console.log('🤖 Sending to o-3-mini for analysis...');
+      const completion = await openai.chat.completions.create({
+        model: "o3-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a witty but professional website critic and SEO expert. 
+            Analyze websites and provide constructive feedback in a fun, slightly roasty way. 
+            You'll receive both structured SEO data and the full HTML of the page.
+            Focus on providing actionable insights while maintaining a humorous tone.
+            Structure your response in markdown with emojis for each section.`
+          },
+          {
+            role: "user",
+            content: `Analyze this website:
+            
+            URL: ${websiteData.url}
+            
+            Detailed SEO Analysis:
+            ${JSON.stringify(websiteData.seoData, null, 2)}
+            
+            Full HTML Context:
+            \`\`\`html
+            ${websiteData.fullHtml}
+            \`\`\`
+            
+            Provide a comprehensive roast/analysis focusing on:
+            1. First Impressions & Design 🎨
+            - Visual hierarchy
+            - Brand consistency
+            - Modern design practices
+            
+            2. User Experience 🚀
+            - Navigation structure
+            - Mobile responsiveness
+            - Load time indicators
+            - Call-to-action effectiveness
+            
+            3. Technical Health 🔧
+            - Code quality
+            - Performance optimizations
+            - Technical SEO implementation
+            - Security indicators
+            
+            4. Content & SEO Deep Dive 📝
+            - Content quality and structure
+            - SEO best practices
+            - Meta tag optimization
+            - Content hierarchy
+            
+            5. Key Recommendations 🎯
+            - High-priority fixes
+            - Quick wins
+            - Strategic improvements
+            
+            Be specific, actionable, and maintain a balance between technical accuracy and entertaining roasts.`
+          }
+        ]
+      });
 
-    return NextResponse.json({
-      analysis: completion.choices[0].message.content,
-      metadata: websiteData.seoData // Sending back the detailed SEO data
-    });
+      console.log('✅ o-3-mini analysis complete');
+
+      return {
+        analysis: completion.choices[0].message.content,
+        metadata: websiteData.seoData
+      };
+    };
+
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Operation timed out')), 25000)
+    );
+
+    // Race between the analysis and the timeout
+    const result = await Promise.race([
+      analysisPromise(),
+      timeoutPromise
+    ]);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('❌ Error in analyze-site:', error);
     return NextResponse.json(
-      { error: 'Failed to analyze website' },
+      { 
+        error: 'Failed to analyze website',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
