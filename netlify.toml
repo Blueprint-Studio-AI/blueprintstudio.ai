@@ -8,9 +8,13 @@
 [functions]
   node_bundler = "esbuild"
 
+[functions."*"]
+  timeout = 60
+  memory = 2048
+
 [build.environment]
   NODE_VERSION = "18"
 
-[functions."*"]
-  timeout = 30
-  memory = 1024
+[functions.vibes-roast]
+  timeout = 60
+  memory = 2048
