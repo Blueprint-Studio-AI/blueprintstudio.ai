@@ -68,13 +68,13 @@ async function captureScreenshot(url: string): Promise<string> {
         // Use Browserless.io REST API in production
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
-
+    
         try {
-            const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, { // Changed this line
+            const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Cache-Control': 'no-cache',
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     url: normalizedUrl,
@@ -82,11 +82,9 @@ async function captureScreenshot(url: string): Promise<string> {
                         type: 'jpeg',
                         quality: 80,
                         fullPage: false,
-                        viewport: {
-                            width: 1280,
-                            height: 800,
-                            deviceScaleFactor: 1
-                        },
+                        width: 1280,           
+                        height: 800,           
+                        deviceScaleFactor: 1,  
                         waitFor: 1000,
                         stealth: true,
                         gotoOptions: {
@@ -98,6 +96,7 @@ async function captureScreenshot(url: string): Promise<string> {
                 }),
                 signal: controller.signal
             });
+    
 
             if (!response.ok) {
                 const errorText = await response.text().catch(() => 'No error details available');
