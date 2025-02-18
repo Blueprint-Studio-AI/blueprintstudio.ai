@@ -70,12 +70,11 @@ async function captureScreenshot(url: string): Promise<string> {
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         try {
-            const response = await fetch('https://chrome.browserless.io/screenshot', {
+            const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, { // Changed this line
                 method: 'POST',
                 headers: {
                     'Cache-Control': 'no-cache',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.BROWSERLESS_API_KEY}`
                 },
                 body: JSON.stringify({
                     url: normalizedUrl,
