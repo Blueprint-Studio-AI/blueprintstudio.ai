@@ -10,10 +10,6 @@
 
 [functions."*"]
   timeout = 60
-  memory = 2048
 
 [build.environment]
   NODE_VERSION = "18"
-
-[functions."*"]
-   maxDuration = 60
