@@ -81,18 +81,7 @@ async function captureScreenshot(url: string): Promise<string> {
                     options: {
                         type: 'jpeg',
                         quality: 80,
-                        fullPage: false,
-                        waitFor: 1000,
-                        stealth: true,
-                        gotoOptions: {
-                            waitUntil: 'domcontentloaded',
-                            timeout: 7000
-                        }
-                    },
-                    viewport: {  // Moved outside of options
-                        width: 1280,
-                        height: 800,
-                        deviceScaleFactor: 1
+                        fullPage: false
                     }
                 }),
                 signal: controller.signal
