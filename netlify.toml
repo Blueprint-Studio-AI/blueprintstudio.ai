@@ -15,6 +15,5 @@
 [build.environment]
   NODE_VERSION = "18"
 
-[functions.vibes-roast]
-  timeout = 60
-  memory = 2048
+[functions."*"]
+   maxDuration = 60
