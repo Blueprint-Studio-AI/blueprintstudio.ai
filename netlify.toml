@@ -8,8 +8,10 @@
 [functions]
   node_bundler = "esbuild"
 
-[functions."*"]
-  timeout = 30
+# Target the Next.js server handler specifically
+[functions.Next_js_Server_Handler]
+  timeout = "30s"
 
-[build.environment]
-  NODE_VERSION = "18"
+# Backup catch-all
+[functions."*"]
+  timeout = "30s"
