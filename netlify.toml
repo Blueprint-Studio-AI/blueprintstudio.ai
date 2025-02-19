@@ -8,7 +8,6 @@
 [functions]
   node_bundler = "esbuild"
 
-# Add edge function configuration
 [[edge_functions]]
   path = "/api/*"
   function = "api"
