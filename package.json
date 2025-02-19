@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "netlify dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "deploy": "netlify deploy --build",
+    "start": "next start"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",

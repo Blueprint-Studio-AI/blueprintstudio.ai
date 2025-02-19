@@ -1,5 +1,5 @@
 [build]
-  command = "next build"
+  command = "next build && netlify deploy --build"
   publish = ".next"
 
 [[redirects]]
@@ -20,3 +20,4 @@
 [[edge_functions]]
   function = "analyze-site"
   path = "/api/analyze-site"
+
