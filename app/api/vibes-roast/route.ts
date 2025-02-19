@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
 
-export const runtime = "edge"
+export const runtime = 'edge';
+export const preferredRegion = 'auto';
+export const dynamic = 'force-dynamic';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,

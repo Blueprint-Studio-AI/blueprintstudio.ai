@@ -6,21 +6,22 @@
   package = "@netlify/plugin-nextjs"
 
 [[edge_functions]]
-  function = "vibes-roast"
+  function = "app/api/vibes-roast/route"
   path = "/api/vibes-roast"
 
 [[edge_functions]]
-  function = "analyze-site"
+  function = "app/api/analyze-site/route"
   path = "/api/analyze-site"
 
 # Edge function settings
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "true"
+  NEXT_FORCE_EDGE_RUNTIME = "true"
 
-# Optional: Configure function settings
 [functions]
   node_bundler = "esbuild"
   included_files = []
+  external_node_modules = ["@anthropic-ai/sdk", "openai", "cheerio"]
 
 [functions."*"]
   timeout = "30s"
