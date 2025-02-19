@@ -8,10 +8,15 @@
 [functions]
   node_bundler = "esbuild"
 
-# Target the Next.js server handler specifically
-[functions.Next_js_Server_Handler]
+# Add these specific function configurations
+[functions.analyze-site]
+  included_files = []
   timeout = "30s"
 
-# Backup catch-all
+[functions.vibes-roast]
+  included_files = []
+  timeout = "30s"
+
+# This is a catch-all for other functions
 [functions."*"]
   timeout = "30s"
