@@ -11,6 +11,7 @@ const openai = new OpenAI({
 
 async function fetchWebsiteData(url: string) {
   console.log(`🌐 Starting website fetch for: ${url}`);
+  let response = null;
   
   try {
     if (!url.startsWith('http')) {
@@ -19,12 +20,11 @@ async function fetchWebsiteData(url: string) {
     }
 
     console.log('🔄 Fetching website HTML...');
-    // Add timeout to fetch
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     try {
-      const response = await fetch(url, { 
+      response = await fetch(url, { 
         signal: controller.signal 
       });
       const html = await response.text();
@@ -138,7 +138,15 @@ async function fetchWebsiteData(url: string) {
       fullHtml: html
     };
   } finally {
-    clearTimeout(timeoutId); // Clear the timeout here
+    clearTimeout(timeoutId);
+    // Explicitly close the response
+    if (response && response.body) {
+      try {
+        response.body.cancel();
+      } catch (e) {
+        console.error('Error closing response:', e);
+      }
+    }
   }
 } catch (error: unknown) {
   console.error('❌ Error fetching website:', error);
