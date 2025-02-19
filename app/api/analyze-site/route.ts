@@ -19,11 +19,18 @@ async function fetchWebsiteData(url: string) {
     }
 
     console.log('🔄 Fetching website HTML...');
-    const response = await fetch(url);
-    const html = await response.text();
-    console.log(`✅ Fetched HTML successfully (${html.length} characters)`);
+    // Add timeout to fetch
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const $ = cheerio.load(html);
+    try {
+      const response = await fetch(url, { 
+        signal: controller.signal 
+      });
+      const html = await response.text();
+      console.log(`✅ Fetched HTML successfully (${html.length} characters)`);
+
+      const $ = cheerio.load(html);
 
     // Enhanced SEO Analysis
     const seoData = {
@@ -128,18 +135,21 @@ async function fetchWebsiteData(url: string) {
     return {
       url,
       seoData,
-      fullHtml: html // Including full HTML
+      fullHtml: html
     };
-  } catch (error: unknown) {
-    console.error('❌ Error fetching website:', error);
-    
-    let errorMessage = 'Unknown error';
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    
-    throw new Error(`Failed to fetch website data: ${errorMessage}`);
+  } finally {
+    clearTimeout(timeoutId); // Clear the timeout here
   }
+} catch (error: unknown) {
+  console.error('❌ Error fetching website:', error);
+  
+  let errorMessage = 'Unknown error';
+  if (error instanceof Error) {
+      errorMessage = error.message;
+  }
+  
+  throw new Error(`Failed to fetch website data: ${errorMessage}`);
+}
 }
 
 export async function POST(request: Request) {
