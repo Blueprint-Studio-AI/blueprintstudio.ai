@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { headers } from 'next/headers';
 import { validateEmail } from '@/lib/validation'; // Import the validation function
 
+export const runtime = 'edge';
 
 // Simple in-memory rate limiting
 const RATE_LIMIT_WINDOW = 3600000; // 1 hour
