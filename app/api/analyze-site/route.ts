@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 
-export const maxDuration = 30;
+export const runtime = 'edge'; 
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -25,7 +25,10 @@ async function fetchWebsiteData(url: string) {
 
     try {
       response = await fetch(url, { 
-        signal: controller.signal 
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; Netlify Edge Function)'
+        }
       });
       const html = await response.text();
       console.log(`✅ Fetched HTML successfully (${html.length} characters)`);

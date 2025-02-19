@@ -8,15 +8,7 @@
 [functions]
   node_bundler = "esbuild"
 
-# Add these specific function configurations
-[functions.analyze-site]
-  included_files = []
-  timeout = "30s"
-
-[functions.vibes-roast]
-  included_files = []
-  timeout = "30s"
-
-# This is a catch-all for other functions
-[functions."*"]
-  timeout = "30s"
+# Add edge function configuration
+[[edge_functions]]
+  path = "/api/*"
+  function = "api"
