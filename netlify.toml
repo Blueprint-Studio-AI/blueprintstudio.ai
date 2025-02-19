@@ -13,15 +13,18 @@
   function = "app/api/analyze-site/route"
   path = "/api/analyze-site"
 
-# Edge function settings
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "true"
   NEXT_FORCE_EDGE_RUNTIME = "true"
+  NODE_VERSION = "18"
 
 [functions]
   node_bundler = "esbuild"
-  included_files = []
   external_node_modules = ["@anthropic-ai/sdk", "openai", "cheerio"]
 
 [functions."*"]
+  included_files = []
   timeout = "30s"
+
+[build.processing]
+  skip_processing = false

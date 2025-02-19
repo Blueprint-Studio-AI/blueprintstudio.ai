@@ -3,7 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   experimental: {
-    runtime: 'edge',
     serverActions: {
       bodySizeLimit: '2mb',
     },
@@ -78,11 +77,6 @@ const nextConfig = {
   // Redirect configuration if needed
   async redirects() {
     return []
-  },
-  // Environment configuration
-  env: {
-    NEXT_PUBLIC_ENVIRONMENT: process.env.NODE_ENV,
-    NEXT_RUNTIME: 'edge',
   },
   // Optimize output
   output: 'standalone',
