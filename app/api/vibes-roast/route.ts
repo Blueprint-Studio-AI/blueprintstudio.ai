@@ -2,19 +2,12 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { APIError } from '@anthropic-ai/sdk';
-import puppeteer from 'puppeteer-core';
 
 export const runtime = 'edge'; 
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
-
-const LOCAL_CHROME_EXECUTABLE = process.platform === 'win32'
-  ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-  : process.platform === 'darwin'
-    ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : '/usr/bin/google-chrome';
 
 function extractRoastContent(text: string): string {
   const roastRegex = /<roast>([\s\S]*?)<\/roast>/;
@@ -23,8 +16,6 @@ function extractRoastContent(text: string): string {
 }
 
 async function captureScreenshot(url: string): Promise<string> {
-    const isDev = process.env.NODE_ENV === 'development';
-    
     // Normalize and validate URL
     let normalizedUrl = url;
     try {
@@ -35,92 +26,58 @@ async function captureScreenshot(url: string): Promise<string> {
     } catch (error) {
         throw new Error('Invalid URL provided');
     }
-    
-    if (isDev) {
-        let browser;
-        try {
-            browser = await puppeteer.launch({
-                executablePath: LOCAL_CHROME_EXECUTABLE,
-                headless: true,
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu',
-                    '--window-size=1280,800'
-                ]
-            });
 
-            const page = await browser.newPage();
-            await page.setViewport({ width: 1280, height: 800 });
-            await page.goto(normalizedUrl, { waitUntil: 'domcontentloaded' });
-            
-            const screenshot = await page.screenshot({
-                type: 'jpeg',
-                quality: 80,
-                encoding: 'base64',
-                fullPage: false
-            });
-            
-            return screenshot as string;
-        } finally {
-            if (browser) await browser.close().catch(console.error);
-        }
-    } else {
-        // Use Browserless.io REST API in production
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-    
-        try {
-            const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Cache-Control': 'no-cache',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: normalizedUrl,
-                    options: {
-                        type: 'jpeg',
-                        quality: 80,
-                        fullPage: false
-                    }
-                }),
-                signal: controller.signal
-            });
-    
+    // Use Browserless.io REST API
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => 'No error details available');
-                console.error('Browserless API Error:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    errorText
-                });
-                throw new Error(`Screenshot API returned ${response.status}: ${errorText}`);
-            }
-
-            const buffer = await response.arrayBuffer();
-            if (!buffer || buffer.byteLength === 0) {
-                throw new Error('Empty screenshot received');
-            }
-            
-            return Buffer.from(buffer).toString('base64');
-        } catch (error) {
-            console.error('Screenshot API error:', error);
-            if (error instanceof Error) {
-                if (error.name === 'AbortError') {
-                    throw new Error('Screenshot capture timed out');
+    try {
+        const response = await fetch(`https://chrome.browserless.io/screenshot?token=${process.env.BROWSERLESS_API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: normalizedUrl,
+                options: {
+                    type: 'jpeg',
+                    quality: 80,
+                    fullPage: false
                 }
-                // Check if it's a CORS or network error
-                if (error.message.includes('CORS') || error.message.includes('network')) {
-                    throw new Error(`Failed to access ${normalizedUrl}. Please check if the URL is accessible.`);
-                }
-            }
-            throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        } finally {
-            clearTimeout(timeoutId);
+            }),
+            signal: controller.signal
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => 'No error details available');
+            console.error('Browserless API Error:', {
+                status: response.status,
+                statusText: response.statusText,
+                errorText
+            });
+            throw new Error(`Screenshot API returned ${response.status}: ${errorText}`);
         }
+
+        const buffer = await response.arrayBuffer();
+        if (!buffer || buffer.byteLength === 0) {
+            throw new Error('Empty screenshot received');
+        }
+        
+        return Buffer.from(buffer).toString('base64');
+    } catch (error) {
+        console.error('Screenshot API error:', error);
+        if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Screenshot capture timed out');
+            }
+            if (error.message.includes('CORS') || error.message.includes('network')) {
+                throw new Error(`Failed to access ${normalizedUrl}. Please check if the URL is accessible.`);
+            }
+        }
+        throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+        clearTimeout(timeoutId);
     }
 }
 
