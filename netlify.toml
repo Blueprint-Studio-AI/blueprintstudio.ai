@@ -9,13 +9,14 @@
   status = 200
   force = true
 
-
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[functions]
-  node_bundler = "esbuild"
 
 [[edge_functions]]
-  path = "/api/*"
-  function = "api"
+  function = "vibes-roast"
+  path = "/api/vibes-roast"
+
+[[edge_functions]]
+  function = "analyze-site"
+  path = "/api/analyze-site"

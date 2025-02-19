@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 
-export const runtime = 'edge'; 
+export const config = {
+  runtime: 'edge'
+};
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
