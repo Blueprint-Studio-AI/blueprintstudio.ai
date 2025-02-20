@@ -316,7 +316,7 @@ export function Footer() {
                   Terms of Service
                 </Link>
                 <span className="text-white/40 text-sm">
-                  © 2024 Blueprint Studio
+                  © 2025 Blueprint Studio
                 </span>
               </div>
             </div>
