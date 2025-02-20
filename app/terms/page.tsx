@@ -18,7 +18,7 @@ const Terms: React.FC = () => {
               <p>Last updated: {currentDate}&nbsp;</p>
 
               <h2>1. Agreement to Terms</h2>
-              <p>By accessing or using Blueprint Studio's services, you agree to be bound by these terms. If you disagree with any part of the terms, you do not have permission to access our services.&nbsp;</p>
+              <p>By accessing or using Blueprint Studio&aposs services, you agree to be bound by these terms. If you disagree with any part of the terms, you do not have permission to access our services.&nbsp;</p>
 
               <h2>2. Service Description</h2>
               <p>Blueprint Studio provides comprehensive digital services including:&nbsp;</p>
@@ -35,7 +35,7 @@ const Terms: React.FC = () => {
               <ul>
                 <li>You retain rights to your content and custom implementations&nbsp;</li>
                 <li>We retain rights to our proprietary tools, frameworks, and systems&nbsp;</li>
-                <li>For AI-generated content, outputs are provided "as-is" without guarantee of originality&nbsp;</li>
+                <li>For AI-generated content, outputs are provided &ldquo;as-is&rdquo; without guarantee of originality&nbsp;</li>
                 <li>You are responsible for validating and testing all deliverables&nbsp;</li>
                 <li>We maintain rights to generic solutions that may benefit other clients&nbsp;</li>
               </ul>
@@ -64,15 +64,15 @@ const Terms: React.FC = () => {
               <ul>
                 <li>Services may be unavailable or modified without notice&nbsp;</li>
                 <li>AI outputs require human validation and testing&nbsp;</li>
-                <li>We don't guarantee specific performance metrics&nbsp;</li>
+                <li>We don&apost guarantee specific performance metrics&nbsp;</li>
                 <li>Service quality may vary based on factors outside our control&nbsp;</li>
               </ul>
 
               <h2>7. Liability Limitations</h2>
               <p>To the maximum extent permitted by law:&nbsp;</p>
               <ul>
-                <li>We provide services "as is" without warranties&nbsp;</li>
-                <li>We're not liable for any damages from service use&nbsp;</li>
+                <li>We provide services &rdquo;as is&ldquo; without warranties&nbsp;</li>
+                <li>We&aposre not liable for any damages from service use&nbsp;</li>
                 <li>Our total liability is limited to fees paid in the last 12 months&nbsp;</li>
                 <li>You agree to indemnify us against third-party claims&nbsp;</li>
               </ul>
