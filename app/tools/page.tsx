@@ -28,15 +28,6 @@ const tools: Tool[] = [
     gradient: 'from-orange-500 to-red-500'
   },
   {
-    slug: 'juris-genius',
-    name: 'Juris Genius',
-    description: 'AI-powered bar exam tutor. Pass the bar in half the time with personalized study plans and adaptive learning.',
-    icon: Scale,
-    status: 'external',
-    gradient: 'from-amber-700 to-yellow-700', // More paper/parchment like colors
-    externalUrl: 'https://juris.aibartutor.com'
-  },
-  {
     slug: 'ai-blog-writer',
     name: 'AI Blog Wizard',
     description: 'Transform rough ideas into polished blog posts. AI-powered writing assistant that maintains your brand voice.',

@@ -635,18 +635,20 @@ const exportToPDF = async () => {
 
           {/* Trust indicators */}
           {!analysis && (
-            <div className="mt-8 flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                100% Free
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                No Account Required
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Instant Results
+            <div className="mt-8">
+              <div className="grid grid-cols-1 gap-4 sm:flex sm:items-center sm:gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 shrink-0 rounded-full bg-green-500" />
+                  <span>100% Free</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 shrink-0 rounded-full bg-green-500" />
+                  <span>No Account Required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 shrink-0 rounded-full bg-green-500" />
+                  <span>Instant Results</span>
+                </div>
               </div>
             </div>
           )}
