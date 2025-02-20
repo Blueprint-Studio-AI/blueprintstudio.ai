@@ -309,10 +309,10 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between gap-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
               <div className="flex flex-col md:flex-row gap-4 md:gap-8 whitespace-nowrap">
-                <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
+                <Link href="/privacy-policy" className="text-white/60 hover:text-white text-sm transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="/" className="text-white/60 hover:text-white text-sm transition-colors">
+                <Link href="/terms" className="text-white/60 hover:text-white text-sm transition-colors">
                   Terms of Service
                 </Link>
                 <span className="text-white/40 text-sm">
