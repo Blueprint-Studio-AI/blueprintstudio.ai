@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "netlify dev",
+    "dev": "next dev",
     "build": "next build",
-    "deploy": "netlify deploy --build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
+
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
