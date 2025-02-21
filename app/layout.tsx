@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: 'Blueprint Studio · Web & AI Solutions',
     description: 'Professional web design & complex AI automation for modern businesses.',
     images: [{
-      url: '/og-image.jpg',
+      url: '/og-image-1.jpg',
       width: 1200,
       height: 630,
       alt: 'Blueprint Studio',
