@@ -48,14 +48,12 @@ export const metadata: Metadata = {
     siteName: 'Blueprint Studio',
     title: 'Blueprint Studio · Web & AI Solutions',
     description: 'Professional web design & complex AI automation for modern businesses.',
-    /* TODO: Add when OG image is ready
     images: [{
       url: '/og-image.jpg',
       width: 1200,
       height: 630,
       alt: 'Blueprint Studio',
     }],
-    */
   },
   
   /* TODO: Add when Twitter when we have the images
