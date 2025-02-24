@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { FloatingNav } from "@/components/FloatingNav";
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Toaster } from "@/components/ui/toaster"
 
 // Configure font
 const inter = Inter({
@@ -136,6 +137,7 @@ export default function RootLayout({
         <FloatingNav />
         <main>
           {children}
+          <Toaster />
         </main>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>
