@@ -285,3 +285,52 @@ body {
   @apply bg-gray-50;
 }
 
+/* Add to your globals.css file - Shimmer Button Animations */
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%, 35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%, 85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide var(--speed, 3s) ease-in-out infinite alternate;
+}
+
+.animate-spin-around {
+  animation: spin-around calc(var(--speed, 3s) * 2) infinite linear;
+}
+
+/* Rhythmic pulse animation - slow expand, quick contract */
+@keyframes pulse-rhythmic {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  85% {
+    transform: scale(1.6);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+}
+
+.animate-pulse-rhythmic {
+  animation: pulse-rhythmic 3s cubic-bezier(0.4, 0, 0.1, 1) infinite;
+}

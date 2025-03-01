@@ -7,6 +7,7 @@ import { PhoneCall, Calculator, CheckCircle, ChevronDown, ChevronUp, ArrowUpRigh
 import { AutoplayVideo } from "@/components/AutoplayVideo";
 import { PricingSection } from "@/components/PricingSection";
 import { Services } from "@/components/services-index/Services";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 
 //edit to add fade at end and start of loop
 const workItems = [
@@ -44,29 +45,58 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#fafaf9]">
-      {/* Hero Section */}
-      <section className="py-20 pb-12 px-4">
+      {/* Hero Section with updated buttons */}
+      <section className="py-20 pb-12 px-4 bg-[#fafaf9]">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <span className="inline-flex items-center bg-white rounded-full px-4 py-2 text-sm shadow">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                Start Today
+              <span className="relative flex h-2 w-2 mr-2">
+                <span className="animate-pulse-rhythmic absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
               </span>
+              Start Today
+            </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-8">
-            Design & Build with Blueprint Studio
+          <h1 className="mb-8">
+            <span className="block text-5xl md:text-7xl font-serif italic font-medium mb-2">Design & Build</span>
+            <span className="block text-4xl md:text-6xl font-sans font-bold tracking-tight">with Blueprint Studio</span>
           </h1>
-          <button 
-            onClick={() => {
-              document.getElementById('pricing')?.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-              });
-            }}
-            className="bg-black text-white px-8 py-4 rounded-full text-lg hover:bg-gray-800 transition-colors"
-          >
-            See Pricing
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <ShimmerButton
+              onClick={() => {
+                document.getElementById('pricing')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start'
+                });
+              }}
+              className="text-lg"
+            >
+              See Pricing <Calculator className="ml-2 h-5 w-5" />
+            </ShimmerButton>
+            
+            <button 
+              onClick={() => {
+                // Scroll to the center of the first work item
+                const firstWorkItem = document.querySelector('.grid-cols-1 > a:first-child');
+                if (firstWorkItem) {
+                  const rect = firstWorkItem.getBoundingClientRect();
+                  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                  const targetY = scrollTop + rect.top + (rect.height / 2) - (window.innerHeight / 2);
+                  
+                  window.scrollTo({
+                    top: targetY,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-medium 
+              border-2 border-black bg-white text-black
+              hover:bg-black hover:text-white active:scale-[0.98] transition-all duration-200
+              shadow-md hover:shadow-lg active:shadow-sm"
+            >
+              View Our Work
+            </button>
+          </div>
         </div>
       </section>
 
