@@ -13,34 +13,38 @@ const workItems = [
   {
     type: 'video',
     src: '/videos/work/idscanner-spotlight-compressed.mp4',
+    alt: 'Ecommerce Platform for ID Verification Company',
     description: 'Ecommerce Platform for ID Verification Company'
   },
   {
     type: 'video',  
     src: '/videos/work/next-gen-conference-compressed.mp4',
+    alt: 'International Design Conference Website',
     description: 'International Design Conference Website'
   },
   {
     type: 'video',
     src: '/videos/work/mvt-energy-committee-compressed.mp4',
     link: 'https://manchestervtenergycommittee.org',
+    alt: 'Website for Energy Committee',
     description: 'Website for Energy Committee'
   },
   {
     type: 'image',
     src: '/images/work/ProjectMetaVison-Desktop1.png',
-    alt: 'Project Metavision',
+    alt: 'Branding & Service Design for Crypto Startup',
     description: 'Branding & Service Design for Crypto Startup'
   },
   {
     type: 'image',
     src: '/images/work/LivingPersona-Desktop1.png',
-    alt: 'Living Persona Web App',
+    alt: 'Living Persona AI Persona Web App',
     description: 'AI Persona Web App'
   },
   {
     type: 'video',
     src: '/videos/work/workshopai-compressed.mp4',
+    alt: 'Workshop AI for Design Consultancy',
     description: 'Workshop AI for Design Consultancy'
   },
 ];
