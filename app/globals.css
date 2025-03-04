@@ -91,10 +91,26 @@ body {
 
 /* Custom Font */
 @font-face {
-  font-family: 'Editorial New';
+  font-family: 'PP Editorial New';
   src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorialNew-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Editorial New';
+  src: url('/fonts/PPEditorialNew-UltralightItalic.woff2') format('woff2');
+  font-weight: 200;
+  font-style: italic;
   font-display: swap;
 }
 

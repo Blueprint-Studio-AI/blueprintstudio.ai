@@ -204,14 +204,14 @@ export function PricingSection() {
               </ul>
 
               <button 
-                className="w-full bg-white text-black rounded-full py-4 font-medium flex items-center justify-center group-hover:bg-gray-100 transition-colors"
-                onMouseEnter={() => setShowCalendarPreview(true)}
-                onMouseLeave={() => setShowCalendarPreview(false)}
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
-              >
-                <span>Book a Call</span>
-                <ArrowUpRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
+              className="w-full bg-white text-black rounded-full py-4 font-medium flex items-center justify-center group-hover:bg-gray-100 transition-colors"
+              onMouseEnter={() => setShowCalendarPreview(true)}
+              onMouseLeave={() => setShowCalendarPreview(false)}
+              onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+            >
+              <span>Book a Call</span>
+              <ArrowUpRight className="w-5 h-5 ml-2 text-gray-300 group-hover:text-black transition-colors" />
+            </button>
 
               {/* Calendar Preview */}
               <motion.div
@@ -270,13 +270,13 @@ export function PricingSection() {
               </ul>
 
               <button 
-                className="w-full border-2 border-black rounded-full py-4 font-medium flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                className="w-full border-2 border-black rounded-full py-4 font-medium flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors"
                 onMouseEnter={() => setShowChatPreview(true)}
                 onMouseLeave={() => setShowChatPreview(false)}
                 onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               >
                 <span>Get Quote</span>
-                <ArrowUpRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="w-5 h-5 ml-2 text-gray-300 group-hover:text-white transition-colors" />
               </button>
 
               {/* Chat Preview */}
