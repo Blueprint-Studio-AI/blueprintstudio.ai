@@ -23,7 +23,7 @@ const workItems = [
   {
     type: 'video',
     src: '/videos/work/mvt-energy-committee-compressed.mp4',
-    link: 'https://www.google.com',
+    link: 'https://manchestervtenergycommittee.org',
     description: 'Website for Energy Committee'
   },
   {
@@ -270,49 +270,48 @@ export default function Home() {
       </section>
 
       {/* Work Grid - Original Implementation */}
-
       <section className="py-20 pt-12 px-4">
-  <div className="max-w-4xl mx-auto">
-    <div className="grid grid-cols-1 gap-10">
-    {workItems.map((item, index) => (
-      <div key={index} className="flex flex-col">
-        <a 
-          href={item.link}
-          target="_blank"
-          rel="noopener noreferrer" 
-          className="rounded-3xl border overflow-hidden transition-all duration-200 bg-gray-100/80 backdrop-blur-sm shadow group"
-        >
-          <div className="relative w-full" style={{ paddingBottom: '66.67%' }}>
-            <div className="absolute inset-0">
-              {item.type === 'image' ? (
-                <Image
-                  src={item.src}
-                  alt={item.alt || 'Blueprint Studio Image'}
-                  fill
-                  className="object-cover transition-opacity duration-500"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4dHRsdHR4dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/2wBDAR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                />
-              ) : (
-                <AutoplayVideo
-                  src={item.src}
-                  className="w-full h-full object-cover"
-                />
-              )}
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 gap-10">
+        {workItems.map((item, index) => (
+          <div key={index} className="flex flex-col">
+            <a 
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer" 
+              className="rounded-3xl border overflow-hidden transition-all duration-200 bg-gray-100/80 backdrop-blur-sm shadow group"
+            >
+              <div className="relative w-full" style={{ paddingBottom: '66.67%' }}>
+                <div className="absolute inset-0">
+                  {item.type === 'image' ? (
+                    <Image
+                      src={item.src}
+                      alt={item.alt || 'Blueprint Studio Image'}
+                      fill
+                      className="object-cover transition-opacity duration-500"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4dHRsdHR4dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/2wBDAR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR3/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    />
+                  ) : (
+                    <AutoplayVideo
+                      src={item.src}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+            </a>
+            {/* Description below the image/video with lighter gray text */}
+            <div className="mt-3 pl-2">
+              <p className="text-sm md:text-base text-gray-400 font-medium">
+                {item.description}
+              </p>
             </div>
           </div>
-        </a>
-        {/* Description below the image/video with lighter gray text */}
-        <div className="mt-3 pl-2">
-          <p className="text-sm md:text-base text-gray-400 font-medium">
-            {item.description}
-          </p>
+        ))}
         </div>
       </div>
-    ))}
-    </div>
-  </div>
-</section>
+    </section>
 
       {/* Services - Original Implementation */}
       <section className="relative services-theme">
