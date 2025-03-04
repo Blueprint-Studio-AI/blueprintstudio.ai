@@ -158,7 +158,7 @@ export function PricingSection() {
             Simple, transparent pricing
           </h2>
           <p className="text-gray-600">
-            Choose the engagement model that works best for you
+            Choose the engagement model that works&nbsp;best&nbsp;for&nbsp;you
           </p>
         </div>
 
@@ -308,7 +308,7 @@ export function PricingSection() {
         <div className="mt-32">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold mb-4">Frequently Asked Questions</h3>
-            <p className="text-gray-600">Everything you need to know about our pricing and services</p>
+            <p className="text-gray-600">Everything you need to know about our&nbsp;pricing&nbsp;and&nbsp;services</p>
           </div>
 
           <div className="max-w-2xl mx-auto">
