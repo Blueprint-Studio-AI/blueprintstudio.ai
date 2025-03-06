@@ -9,6 +9,8 @@ import { PricingSection } from "@/components/PricingSection";
 import { Services } from "@/components/services-index/Services";
 import { useEffect, useState, useRef } from "react";
 
+//  use vh % to space hero elements instead of fixed px 
+
 const workItems = [
   {
     type: 'video',
@@ -154,7 +156,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#fafaf9] flex flex-col">
       {/* Hero Section - Enhanced with Premium Animation */}
       <section className="flex-1 flex flex-col px-4" ref={heroRef}>
-        <div className="max-w-4xl mx-auto w-full pt-10">
+        <div className="max-w-4xl mx-auto w-full pt-4 md:pt-10">
           {/* Logo with refined subtle animation */}
           <LazyMotion features={domAnimation}>
             <motion.div
@@ -169,14 +171,14 @@ export default function Home() {
                 <Image 
                   src='/blueprint-logo.svg' 
                   alt='Blueprint Logo' 
-                  width='35' 
-                  height='35' 
-                  className="w-[32px] h-[32px] md:w-[35px] md:h-[35px]"
+                  width='30' 
+                  height='30' 
+                  className="w-[26px] h-[26px] md:w-[30px] md:h-[30px]"
                   priority
                   quality={100}
                 />
                 <span className="ml-2.5 font-medium tracking-[-0.3px]" style={{
-                  fontSize: 'clamp(23px, 4vw, 30px)'
+                  fontSize: 'clamp(20px, 4vw, 24px)'
                 }}>
                   blueprint
                   <span className="text-gray-500"> studio</span>
@@ -187,7 +189,7 @@ export default function Home() {
         </div>
         
         {/* Center Content with premium animation flow */}
-        <div className="flex-1 flex items-center justify-center mt-16 mb-8">
+        <div className="flex-1 flex items-center justify-center mt-28 mb-8 md:mt-30"> 
           <LazyMotion features={domAnimation}>
             <motion.div 
               className="flex flex-col items-center max-w-full"
@@ -260,7 +262,7 @@ export default function Home() {
               
               <motion.p 
                 variants={subtitleReveal}
-                className="text-xl md:text-2xl text-center font-medium mt-2 max-w-2xl"
+                className="text-xl md:text-2xl text-center font-medium mt-2 mb-2 max-w-2xl"
                 style={{
                   willChange: "opacity, transform"
                 }}
@@ -274,7 +276,7 @@ export default function Home() {
       </section>
 
       {/* Work Grid - Original Implementation */}
-      <section className="py-20 pt-12 px-4">
+      <section className="py-20 pt-16 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 gap-10">
         {workItems.map((item, index) => (
