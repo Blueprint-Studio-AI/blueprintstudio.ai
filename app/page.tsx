@@ -9,7 +9,7 @@ import { PricingSection } from "@/components/PricingSection";
 import { Services } from "@/components/services-index/Services";
 import { useEffect, useState, useRef } from "react";
 
-//  use vh % to space hero elements instead of fixed px 
+//  perhaps use vh % to space hero elements instead of fixed px 
 
 const workItems = [
   {
@@ -262,7 +262,7 @@ export default function Home() {
               
               <motion.p 
                 variants={subtitleReveal}
-                className="text-xl md:text-2xl text-center font-medium mt-2 mb-2 max-w-2xl"
+                className="text-xl md:text-2xl text-center font-medium mt-2 mb-2 max-w-2xl text-gray-500"
                 style={{
                   willChange: "opacity, transform"
                 }}
