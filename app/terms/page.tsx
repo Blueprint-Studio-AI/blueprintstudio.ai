@@ -18,7 +18,7 @@ const Terms: React.FC = () => {
               <p>Last updated: {currentDate}&nbsp;</p>
 
               <h2>1. Agreement to Terms</h2>
-              <p>By accessing or using Blueprint Studio&aposs services, you agree to be bound by these terms. If you disagree with any part of the terms, you do not have permission to access our services.&nbsp;</p>
+              <p>By accessing or using Blueprint Studio&apos;s services, you agree to be bound by these terms. If you disagree with any part of the terms, you do not have permission to access our services.&nbsp;</p>
 
               <h2>2. Service Description</h2>
               <p>Blueprint Studio provides comprehensive digital services including:&nbsp;</p>
@@ -64,7 +64,7 @@ const Terms: React.FC = () => {
               <ul>
                 <li>Services may be unavailable or modified without notice&nbsp;</li>
                 <li>AI outputs require human validation and testing&nbsp;</li>
-                <li>We don&apost guarantee specific performance metrics&nbsp;</li>
+                <li>We don&apos;t guarantee specific performance metrics&nbsp;</li>
                 <li>Service quality may vary based on factors outside our control&nbsp;</li>
               </ul>
 
@@ -72,7 +72,7 @@ const Terms: React.FC = () => {
               <p>To the maximum extent permitted by law:&nbsp;</p>
               <ul>
                 <li>We provide services &rdquo;as is&ldquo; without warranties&nbsp;</li>
-                <li>We&aposre not liable for any damages from service use&nbsp;</li>
+                <li>We&apos;re not liable for any damages from service use&nbsp;</li>
                 <li>Our total liability is limited to fees paid in the last 12 months&nbsp;</li>
                 <li>You agree to indemnify us against third-party claims&nbsp;</li>
               </ul>
@@ -102,7 +102,7 @@ const Terms: React.FC = () => {
               <p>These terms are governed by United States law. Any disputes shall be resolved in the appropriate United States courts. You agree to submit to the personal jurisdiction of the United States courts for the purpose of litigating all such claims.&nbsp;</p>
 
               <h2>12. Contact</h2>
-              <p>For legal inquiries, please contact us at <a href="mailto:blueprint.dao@gmail.com" className="text-blue-500 hover:text-blue-600">blueprint.dao@gmail.com</a> or use our <a href="/contact" className="text-blue-500 hover:text-blue-600">contact form</a>.&nbsp;</p>
+              <p>For legal inquiries, please contact us at <a href="mailto:blueprint.dao@gmail.com" className="text-blue-500 hover:text-blue-600">blueprint.dao@gmail.com</a>.</p>
 
               <p className="mt-8 text-sm text-gray-500">Note: These terms are designed to be clear and direct. They protect both parties while acknowledging the realities of modern digital services.&nbsp;</p>
             </div>
