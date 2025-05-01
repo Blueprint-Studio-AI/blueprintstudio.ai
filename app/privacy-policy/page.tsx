@@ -17,7 +17,7 @@ const PrivacyPolicy: React.FC = () => {
               <p>Last updated: {currentDate}&nbsp;</p>
 
               <h2>1. The Reality of Internet Privacy</h2>
-              <p>Let&apos's be direct: true privacy on the internet doesn&apos;t exist. This document explains how we handle your data while acknowledging this fundamental truth. By using our services, you&apos;re participating in the modern digital ecosystem with all its inherent data collection realities.&nbsp;</p>
+              <p>Let&apos;s be direct: true privacy on the internet doesn&apos;t exist. This document explains how we handle your data while acknowledging this fundamental truth. By using our services, you&apos;re participating in the modern digital ecosystem with all its inherent data collection realities.&nbsp;</p>
 
               <h2>2. What We Actually Track</h2>
               <p>Our systems automatically collect:&nbsp;</p>
