@@ -180,7 +180,7 @@ export function PricingSection() {
 
               <h3 className="text-2xl font-semibold mb-2">Design & Build Subscription</h3>
               <div className="text-3xl font-bold mb-4">
-                $5k - $20k<span className="text-lg font-normal">/month</span>
+                $10k - $20k<span className="text-lg font-normal">/month</span>
               </div>
               <p className="text-gray-400 mb-6">All-inclusive service with dedicated team</p>
               
