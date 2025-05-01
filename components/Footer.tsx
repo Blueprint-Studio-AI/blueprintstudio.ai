@@ -30,7 +30,7 @@ const resourceLinks = [
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/Blueprint-Studio-AI', label: 'GitHub' },
-  { icon: Twitter, href: 'https://x.com/blueprint_dao', label: 'X' },
+  { icon: Twitter, href: 'https://x.com/bpstu', label: 'X' },
   { icon: Linkedin, href: 'https://www.linkedin.com/company/blueprint-studio-ai', label: 'LinkedIn' }
 ];
 
