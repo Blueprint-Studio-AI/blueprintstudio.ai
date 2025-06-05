@@ -19,18 +19,24 @@ const workItems = [
     description: 'Ecommerce Platform for ID Verification Company'
   },
   {
+    type: 'video',
+    src: '/videos/work/btc-all-in-compressed.mp4',
+    alt: 'Branding & Immersive Media for Bitcoin Conference',
+    description: 'Branding & Immersive Media for Bitcoin Conference'
+  },
+  {
     type: 'video',  
     src: '/videos/work/next-gen-conference-compressed.mp4',
     alt: 'International Design Conference Website',
     description: 'International Design Conference Website'
   },
-  {
-    type: 'video',
-    src: '/videos/work/mvt-energy-committee-compressed.mp4',
-    link: 'https://manchestervtenergycommittee.org',
-    alt: 'Website for Energy Committee',
-    description: 'Website for Energy Committee'
-  },
+  // {
+  //   type: 'video',
+  //   src: '/videos/work/mvt-energy-committee-compressed.mp4',
+  //   link: 'https://manchestervtenergycommittee.org',
+  //   alt: 'Website for Energy Committee',
+  //   description: 'Website for Energy Committee'
+  // },
   {
     type: 'image',
     src: '/images/work/ProjectMetaVison-Desktop1.png',
