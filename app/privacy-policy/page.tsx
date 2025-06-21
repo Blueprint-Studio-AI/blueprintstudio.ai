@@ -21,7 +21,7 @@ const PrivacyPolicy: React.FC = () => {
 
               <br/>
               <h1>SelfSci App Privacy Policy</h1>
-              <p>SelfSci is a decentralized science (DeSci) platform that empowers individuals to conduct rigorous self-experimentation using their own health data. Our application integrates diverse biometric data sources—including fitness tracker wearable devices &#40;potentially from Garmin&#41;, Motiv EPIC X EEG sensors, and comprehensive dietary tracking—to provide users with unprecedented insights into their personal health patterns. SelfSci enables users to perform controlled experiments on themselves, analyze correlations in their biometric data, and optimize their health through data-driven self-discovery.&nbsp;&nbsp;</p>
+              <p>SelfSci is a decentralized science &#40;DeSci&#41; platform that empowers individuals to conduct rigorous self-experimentation using their own health data. Our application integrates diverse biometric data sources—including fitness tracker wearable devices &#40;potentially from Garmin&#41;, Motiv EPIC X EEG sensors, and comprehensive dietary tracking—to provide users with unprecedented insights into their personal health patterns. SelfSci enables users to perform controlled experiments on themselves, analyze correlations in their biometric data, and optimize their health through data-driven self-discovery.&nbsp;&nbsp;</p>
 
               <h2>Garmin Health Data Collection and Usage</h2>
               <p>This section specifically addresses our collection, use, and handling of health and fitness data obtained through Garmin's platform and API services.&nbsp;</p>
@@ -29,20 +29,20 @@ const PrivacyPolicy: React.FC = () => {
               <h3>Data We Collect from Garmin</h3>
               <p>With your explicit consent, we collect the following health and biometric data from your Garmin account:&nbsp;</p>
               <ul>
-                <li>Heart rate variability (HRV) measurements&nbsp;</li>
+                <li>Heart rate variability &#40;HRV&#41; measurements&nbsp;</li>
                 <li>Sleep quality metrics and sleep stages&nbsp;</li>
-                <li>Activity and exercise data (steps, calories, workout sessions)&nbsp;</li>
+                <li>Activity and exercise data &#40;steps, calories, workout sessions&#41;&nbsp;</li>
                 <li>Stress level measurements&nbsp;</li>
                 <li>Body battery energy monitoring data&nbsp;</li>
                 <li>Recovery and training readiness metrics&nbsp;</li>
-                <li>Environmental and contextual data (time, date, location if enabled)&nbsp;</li>
+                <li>Environmental and contextual data &#40;time, date, location if enabled&#41;&nbsp;</li>
               </ul>
 
               <h3>Purpose and Use of Garmin Data</h3>
               <p>We use your Garmin health data exclusively for the following research and application purposes:&nbsp;</p>
               <ul>
                 <li><strong>Personal Self-Experimentation:</strong> Your data enables you to conduct controlled experiments on yourself to understand how different variables affect your health and performance&nbsp;</li>
-                <li><strong>Multi-Modal Health Analysis:</strong> Combining Garmin data with other biometric signals (EEG from Motiv EPIC X devices, dietary tracking) to provide comprehensive personal health insights&nbsp;</li>
+                <li><strong>Multi-Modal Health Analysis:</strong> Combining Garmin data with other biometric signals &#40;EEG from Motiv EPIC X devices, dietary tracking&#41; to provide comprehensive personal health insights&nbsp;</li>
                 <li><strong>Personalized Health Recommendations:</strong> Generating data-driven suggestions for sleep, recovery, and performance optimization based on your individual patterns&nbsp;</li>
                 <li><strong>Longitudinal Health Tracking:</strong> Monitoring trends and correlations in your health metrics over time to identify patterns and potential personal health optimization opportunities&nbsp;</li>
               </ul>
@@ -82,7 +82,7 @@ const PrivacyPolicy: React.FC = () => {
                 <li>SOC 2 Type 2 compliance with annual audits for security, availability, processing integrity, confidentiality, and privacy &nbsp;</li>
                 <li>AES-256 encryption at rest and TLS encryption in transit &nbsp;</li>
                 <li>Regular penetration testing by industry experts &nbsp;</li>
-                <li>Row-Level Security (RLS) with PostgreSQL-native access controls for granular data protection &nbsp;</li>
+                <li>Row-Level Security &#40;RLS&#41; with PostgreSQL-native access controls for granular data protection &nbsp;</li>
                 <li>Cloudflare CDN protection and fail2ban implementation for DDoS mitigation &nbsp;</li>
                 <li>Weekly security advisories with automated monitoring and one-click issue resolution &nbsp;</li>
               </ul>
@@ -110,7 +110,7 @@ const PrivacyPolicy: React.FC = () => {
               <h2>Information We Collect</h2>
               <h3>Information You Provide</h3>
               <ul>
-                <li>Contact information when you reach out to us (name, email, phone number)&nbsp;</li>
+                <li>Contact information when you reach out to us &#40;name, email, phone number&#41;&nbsp;</li>
                 <li>Project details and requirements when you inquire about our services&nbsp;</li>
                 <li>Feedback and communications you send to us&nbsp;</li>
                 <li>Information provided during our design consultation process&nbsp;</li>
@@ -130,7 +130,7 @@ const PrivacyPolicy: React.FC = () => {
                 <li>Provide exceptional design services tailored to your needs&nbsp;</li>
                 <li>Communicate with you about projects, updates, and inquiries&nbsp;</li>
                 <li>Improve our website functionality and user experience&nbsp;</li>
-                <li>Send relevant updates about our services (with your consent)&nbsp;</li>
+                <li>Send relevant updates about our services &#40;with your consent&#41;&nbsp;</li>
                 <li>Protect against fraudulent or unauthorized activity&nbsp;</li>
                 <li>Comply with legal obligations and industry standards&nbsp;</li>
               </ul>
@@ -139,9 +139,9 @@ const PrivacyPolicy: React.FC = () => {
               <p>We respect your privacy and do not sell, rent, or trade your personal information to third parties. We may share your information only in the following circumstances:&nbsp;</p>
               <ul>
                 <li><strong>With your consent:</strong> When you explicitly authorize us to share information&nbsp;</li>
-                <li><strong>Service providers:</strong> With trusted partners who help us operate our business (hosting, analytics, communication tools)&nbsp;</li>
+                <li><strong>Service providers:</strong> With trusted partners who help us operate our business &#40;hosting, analytics, communication tools&#41;&nbsp;</li>
                 <li><strong>Legal requirements:</strong> When required by law or to protect our rights and safety&nbsp;</li>
-                <li><strong>Business transfers:</strong> In the event of a merger or acquisition (with continued privacy protection)&nbsp;</li>
+                <li><strong>Business transfers:</strong> In the event of a merger or acquisition &#40;with continued privacy protection&#41;&nbsp;</li>
               </ul>
 
               <h2>Data Security</h2>
@@ -169,7 +169,7 @@ const PrivacyPolicy: React.FC = () => {
               <ul>
                 <li><strong>Access:</strong> Request information about what personal data we hold about you&nbsp;</li>
                 <li><strong>Correction:</strong> Ask us to update or correct inaccurate information&nbsp;</li>
-                <li><strong>Deletion:</strong> Request deletion of your personal data (subject to legal obligations)&nbsp;</li>
+                <li><strong>Deletion:</strong> Request deletion of your personal data &#40;subject to legal obligations&#41;&nbsp;</li>
                 <li><strong>Opt-out:</strong> Unsubscribe from marketing communications at any time&nbsp;</li>
                 <li><strong>Objection:</strong> Object to certain types of data processing&nbsp;</li>
               </ul>
