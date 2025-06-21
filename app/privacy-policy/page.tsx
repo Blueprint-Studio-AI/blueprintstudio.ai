@@ -24,7 +24,7 @@ const PrivacyPolicy: React.FC = () => {
               <p>SelfSci is a decentralized science &#40;DeSci&#41; platform that empowers individuals to conduct rigorous self-experimentation using their own health data. Our application integrates diverse biometric data sources—including fitness tracker wearable devices &#40;potentially from Garmin&#41;, Motiv EPIC X EEG sensors, and comprehensive dietary tracking—to provide users with unprecedented insights into their personal health patterns. SelfSci enables users to perform controlled experiments on themselves, analyze correlations in their biometric data, and optimize their health through data-driven self-discovery.&nbsp;&nbsp;</p>
 
               <h2>Garmin Health Data Collection and Usage</h2>
-              <p>This section specifically addresses our collection, use, and handling of health and fitness data obtained through Garmin's platform and API services.&nbsp;</p>
+              <p>This section specifically addresses our collection, use, and handling of health and fitness data obtained through Garmin&apos;s platform and API services.&nbsp;</p>
 
               <h3>Data We Collect from Garmin</h3>
               <p>With your explicit consent, we collect the following health and biometric data from your Garmin account:&nbsp;</p>
@@ -183,11 +183,11 @@ const PrivacyPolicy: React.FC = () => {
               <h2>International Data Transfers</h2>
               <p>If you are located outside the United States, please note that we may transfer and process your information in the US or other countries. We ensure appropriate safeguards are in place to protect your information in accordance with applicable privacy laws.&nbsp;</p>
 
-              <h2>Children's Privacy</h2>
+              <h2>Children&apos;s Privacy</h2>
               <p>Our services are not directed to children under 13, and we do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will take steps to delete it promptly.&nbsp;</p>
 
               <h2>Changes to This Policy</h2>
-              <p>We may update this privacy policy periodically to reflect changes in our practices or applicable laws. We will notify you of significant changes by posting the updated policy on our website and updating the "Last updated" date. Your continued use of our services after such changes constitutes acceptance of the updated policy.&nbsp;</p>
+              <p>We may update this privacy policy periodically to reflect changes in our practices or applicable laws. We will notify you of significant changes by posting the updated policy on our website and updating the &quot;Last updated&quot; date. Your continued use of our services after such changes constitutes acceptance of the updated policy.&nbsp;</p>
 
               <h2>Contact Us</h2>
               <p>If you have any questions, concerns, or requests regarding this privacy policy or our data practices, please reach out to your account manager, or use our contact us form.&nbsp;</p>
