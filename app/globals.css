@@ -5,6 +5,7 @@
 
 @layer base {
 
+  /* React day picker - idk if we even use this */
   .rdp {
     --rdp-cell-size: 40px;
     --rdp-accent-color: hsl(var(--primary));
@@ -54,11 +55,10 @@
     --radius: 0.5rem;
   }
 
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
-}
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-start-rgb));
+  }
 
 @layer utilities {
   .text-balance {
