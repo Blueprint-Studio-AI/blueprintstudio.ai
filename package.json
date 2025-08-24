@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -37,7 +37,7 @@
     "jspdf": "^2.5.2",
     "lethargy-ts": "^0.1.0",
     "lucide-react": "^0.460.0",
-    "next": "14.2.5",
+    "next": "^15.5.0",
     "openai": "^4.82.0",
     "react": "^18",
     "react-day-picker": "^9.5.1",

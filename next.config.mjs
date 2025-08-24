@@ -1,11 +1,19 @@
 // next.config.mjs
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+  },
+  turbopack: {
+    root: __dirname,
   },
   images: {
     domains: [
@@ -18,39 +26,6 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-  },
-  webpack: (config, { isServer }) => {
-    // Optimize bundle size
-    config.optimization = {
-      ...config.optimization,
-      moduleIds: 'deterministic',
-      chunkIds: 'deterministic',
-    }
-
-    // Handle browser-specific polyfills
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        dns: false,
-        child_process: false,
-        async_hooks: false,
-      }
-    }
-
-    // Exclude specific packages from the server bundle
-    if (isServer) {
-      config.externals = [...(config.externals || []), 
-        'canvas', 
-        'jsdom',
-        'html2canvas',
-        'jspdf'
-      ]
-    }
-
-    return config
   },
   // Handle specific headers for edge functions
   async headers() {
