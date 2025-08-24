@@ -6,7 +6,6 @@ export default function Home() {
     return (
         <Section>
             <OuterContainer>
-                    <h1>Hello world</h1>
                 <InnerContainer>
                     <h1>Hello world</h1>
                     <h1>Hello world</h1>
@@ -14,6 +13,7 @@ export default function Home() {
                     <h1>Hello world</h1>
                 </InnerContainer>
             </OuterContainer>
+            <div className="line-dash-x"/>
         </Section>
     )
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import { FloatingNav } from "@/components/FloatingNav";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Toaster } from "@/components/ui/toaster"
+import Background from "@/components/ui/Background";
 
 // Configure font
 const inter = Inter({
@@ -133,7 +134,8 @@ export default function RootLayout({
         <link rel="canonical" href="https://blueprintstudio.ai" />
         <meta name="robots" content="index, follow" />
       </head>
-      <body className={inter.className}>
+      <body className={`relative min-h-screen overflow-x-hidden ${inter.className}`}>
+        <Background />
         <FloatingNav />
         <main>
           {children}

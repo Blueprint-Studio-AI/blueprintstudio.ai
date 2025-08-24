@@ -3,6 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design color tokens */
+:root {
+  --neutral-50: 0 0% 96%; /* #F6F6F6 */
+  --neutral-100: 0 0% 94%; /* #F0F0F0 */
+  --neutral-200: 0 0% 90%; /* #E6E6E6 */
+  --neutral-300: 240 4% 86%; /* #D9D9DC */
+  --neutral-400: 220 8% 78%; /* #C3C6CC */
+  --neutral-500: 218 7% 58%; /* #8C929C */
+  --neutral-800: 0 0% 15%; /* #252525 */
+  --neutral-900: 0 0% 11%; /* #1C1C1C */
+}
+
 @layer base {
 
   /* React day picker - idk if we even use this */
@@ -57,10 +69,39 @@
 
   body {
     color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-start-rgb));
+    background: hsl(var(--neutral-50));
   }
 
 @layer utilities {
+
+  /* Lines */
+  .line--t { border-top: 1px solid hsl(var(--neutral-300)); }
+  .line--r { border-right: 1px solid hsl(var(--neutral-300)); }
+  .line--b { border-bottom: 1px solid hsl(var(--neutral-300)); }
+  .line--l { border-left: 1px solid hsl(var(--neutral-300)); }
+
+  .line-dash-x {
+    background-image: repeating-linear-gradient(
+      to right,
+      hsl(var(--neutral-300)) 0 6px,
+      transparent 6px 12px
+    );
+    height: 1px;
+    width: 100%;
+  }
+
+  .line-dash-y {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      hsl(var(--neutral-300)) 0 6px,
+      transparent 6px 12px
+    );
+    width: 1px;
+    height: 100%;
+  }
+
+
+  
   .text-balance {
     text-wrap: balance;
   }
