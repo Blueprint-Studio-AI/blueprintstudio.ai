@@ -11,6 +11,7 @@
   --neutral-300: 240 4% 86%; /* #D9D9DC */
   --neutral-400: 220 8% 78%; /* #C3C6CC */
   --neutral-500: 218 7% 58%; /* #8C929C */
+  --neutral-700: 0 0% 20%; /* #323232 */
   --neutral-800: 0 0% 15%; /* #252525 */
   --neutral-900: 0 0% 11%; /* #1C1C1C */
 }
@@ -98,6 +99,22 @@
     );
     width: 1px;
     height: 100%;
+  }
+
+  .line-dash-y.border-neutral-700 {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      hsl(var(--neutral-700)) 0 6px,
+      transparent 6px 12px
+    );
+  }
+  
+  .line-dash-x.border-neutral-700 {
+    background-image: repeating-linear-gradient(
+      to right,
+      hsl(var(--neutral-700)) 0 6px,
+      transparent 6px 12px
+    );
   }
 
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
     "@hookform/resolvers": "^4.1.1",
+    "@iconify/react": "^6.0.0",
     "@linear/sdk": "^38.0.0",
     "@netlify/functions": "^3.0.0",
     "@next/third-parties": "^15.1.6",
