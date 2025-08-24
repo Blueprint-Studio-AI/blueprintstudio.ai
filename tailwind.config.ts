@@ -23,6 +23,7 @@ const config: Config = {
       'xl': '1280px',
       '2xl': '1536px',
       'custom': '1124px',
+      'wide': '1387px',
     },
     extend: {
       fontFamily: {

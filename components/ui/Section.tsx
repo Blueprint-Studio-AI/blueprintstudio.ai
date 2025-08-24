@@ -8,7 +8,7 @@ export default function Section({ children, className, ...props } : SectionProps
   return (
     <section className={
       `flex-1 flex justify-center items-center flex-col
-      px-6
+      px-2.5
       sm:px-[60px]
       ${className ?? ""}
       `

@@ -9,10 +9,10 @@ export default function Hero() {
             {/* Header */}
             <OuterContainer>
                 <div className="flex w-full justify-between items-center pt-4 pb-2 px-3 sm:pt-6 sm:pb-3 sm:px-6 lg:pt-8">
-                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC]" style={{ letterSpacing: '-0.24px' }}>
+                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC] custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
                         Design & Build
                     </div>
-                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC] text-right" style={{ letterSpacing: '-0.24px' }}>
+                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC] text-right custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
                         {new Date().toLocaleDateString('en-US', { 
                             month: '2-digit', 
                             day: '2-digit', 
@@ -26,7 +26,7 @@ export default function Hero() {
             
             {/* Main Content */}
             <OuterContainer className="flex-1 flex items-center">
-                <InnerContainer className="text-center pt-8 sm:pt-12 lg:pt-16 px-3 sm:px-6">
+                <InnerContainer className="text-center pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6">
                     {/* Main Heading */}
                     <h1 className="font-medium text-black mb-6 sm:mb-8 lg:mb-10" 
                         style={{ 
@@ -38,7 +38,7 @@ export default function Hero() {
                     </h1>
                     
                     {/* Description */}
-                    <p className="text-center font-normal max-w-sm sm:max-w-md lg:max-w-lg mx-auto mb-12 sm:mb-14 lg:mb-16 text-[#9A9A9A]" 
+                    <p className="text-center font-normal max-w-sm sm:max-w-md md:max-w-lg lg:max-w-lg mx-auto mb-12 sm:mb-14 lg:mb-16 text-[#9A9A9A]" 
                        style={{ 
                          fontSize: 'clamp(20px, 4vw, 28px)', 
                          lineHeight: '110%', 
