@@ -5,7 +5,19 @@ import Image from "next/image";
 
 export default function Hero() {
     return (
-        <Section className="flex flex-col">
+        <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+            {/* Artificial vertical lines to match the background */}
+            <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+                <div className="w-full flex-1 flex justify-center relative">
+                    {/* Left dashed vertical line (mobile) / solid line (desktop) */}
+                    <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
+                    <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
+                    
+                    {/* Right dashed vertical line (mobile) / solid line (desktop) */}
+                    <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
+                    <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
+                </div>
+            </div>
             {/* Header */}
             <OuterContainer>
                 <div className="flex w-full justify-between items-center pt-4 pb-2 px-3 sm:pt-6 sm:pb-3 sm:px-6 lg:pt-8">
@@ -26,7 +38,10 @@ export default function Hero() {
             
             {/* Main Content */}
             <OuterContainer className="flex-1 flex items-center">
-                <InnerContainer className="text-center pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6">
+                <InnerContainer className="text-center pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6 relative">
+                    {/* Inner dashed vertical lines on desktop */}
+                    <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+                    <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                     {/* Main Heading */}
                     <h1 className="font-medium text-black mb-6 sm:mb-8 lg:mb-10" 
                         style={{ 
@@ -91,7 +106,10 @@ export default function Hero() {
             
             {/* Video Section */}
             <OuterContainer>
-                <InnerContainer className="pt-8 pb-12 sm:py-12">
+                <InnerContainer className="pt-8 pb-12 sm:py-12 relative">
+                    {/* Inner dashed vertical lines on desktop */}
+                    <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+                    <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
                     
                     {/* Video Placeholder */}
