@@ -52,7 +52,7 @@ export default function Hero() {
                     </p>
                     
                     {/* Current Partners */}
-                    <div className="mb-10 sm:mb-12 lg:mb-14">
+                    <div className="mb-0 sm:mb-6 lg:mb-8">
                         <p className="text-center font-normal mb-4 text-[#B0B0B0]" 
                            style={{ 
                              fontSize: 'clamp(16px, 3vw, 20px)', 
@@ -87,15 +87,15 @@ export default function Hero() {
                 </InnerContainer>
             </OuterContainer>
             
-            <div className="line-dash-x"/>
+            <div className="line-dash-x hidden sm:block"/>
             
             {/* Video Section */}
             <OuterContainer>
-                <InnerContainer className="py-12">
+                <InnerContainer className="pt-8 pb-12 sm:py-12">
 
                     
                     {/* Video Placeholder */}
-                    <div className="w-full max-w-4xl mx-auto aspect-video bg-neutral-200 rounded-lg shadow-lg flex items-center justify-center">
+                    <div className="w-full max-w-4xl mx-auto aspect-square sm:aspect-video bg-neutral-200 rounded sm:rounded-lg shadow-lg flex items-center justify-center">
                         <div className="text-center text-neutral-500">
                             <div className="w-16 h-16 mx-auto mb-4 bg-neutral-300 rounded-full flex items-center justify-center">
                                 <div className="w-0 h-0 border-l-6 border-l-neutral-500 border-t-4 border-t-transparent border-b-4 border-b-transparent ml-1"></div>
@@ -106,7 +106,7 @@ export default function Hero() {
                 </InnerContainer>
             </OuterContainer>
             
-            <div className="line-dash-x"/>
+            <div className="line-dash-x hidden sm:block"/>
         </Section>
 
     )
