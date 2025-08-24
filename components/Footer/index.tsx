@@ -27,11 +27,6 @@ export function Footer() {
   // const isClient = typeof window !== "undefined";
   // const isLargeScreen = isClient ? window.matchMedia("(min-width: 1024px)").matches : false;
 
-  // const BackgroundShader = dynamic(() => import("./BackgroundShader"), {
-  //   ssr: false,
-  //   loading: () => null,
-  // });
-
   const iconStyle = "text-neutral-600 hover:text-neutral-500 transition-colors duration-200"
 
   return (

@@ -4,7 +4,7 @@ import OuterContainer from "./OuterContainer";
 export default function Background() {
     return (
         <div className="
-            absolute inset-x-0 -top-[200px] -bottom-[200px] -z-10 pointer-events-none
+            absolute inset-x-0 top-[0px] bottom-[0px] -z-10 pointer-events-none
             flex-1 flex justify-center items-center flex-col
             px-2.5
             sm:px-[60px]
