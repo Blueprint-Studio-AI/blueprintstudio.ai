@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useEffect } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber'
 import { shaderMaterial, useTrailTexture } from '@react-three/drei'
 import { useTheme } from 'next-themes' // lub twój provider
 import * as THREE from 'three'
+import { extend } from "@react-three/fiber";
+import type { ReactThreeFiber } from "@react-three/fiber";
 
 const DotMaterial = shaderMaterial(
   {
@@ -15,8 +17,10 @@ const DotMaterial = shaderMaterial(
     mouseTrail: null,
     render: 0,
     rotation: 0,
-    gridSize: 50,
-    dotOpacity: 0.05
+    gridSize: 70,
+    dotOpacity: 0.05,
+    dotScale: 0.2,
+    dotCap: 0.2
   },
   /* glsl */ `
     void main() {
@@ -33,6 +37,8 @@ const DotMaterial = shaderMaterial(
     uniform float rotation;
     uniform float gridSize;
     uniform float dotOpacity;
+    uniform float dotScale;
+    uniform float dotCap;
 
     vec2 rotate(vec2 uv, float angle) {
         float s = sin(angle);
@@ -64,33 +70,27 @@ const DotMaterial = shaderMaterial(
       // Calculate distance from the center of each cell
       float baseDot = sdfCircle(gridUv, 0.25);
 
-      // Screen mask
-      float screenMask = smoothstep(0.0, 1.0, 1.0 - uv.y); // 0 at the top, 1 at the bottom
+      // Keep center distance for size shaping only (no opacity fade)
       vec2 centerDisplace = vec2(0.7, 1.1);
       float circleMaskCenter = length(uv - centerDisplace);
-      float circleMaskFromCenter = smoothstep(0.5, 1.0, circleMaskCenter);
-      
-      float combinedMask = screenMask * circleMaskFromCenter;
-      float circleAnimatedMask = sin(time * 2.0 + circleMaskCenter * 10.0);
 
-      // Mouse trail effect
-      float mouseInfluence = texture2D(mouseTrail, gridUvCenterInScreenCoords).r;
-      
-      float scaleInfluence = max(mouseInfluence * 0.5, circleAnimatedMask * 0.3);
+      // Mouse trail effect — sharper curve and higher gain
+      float mouseInfluence = texture2D(mouseTrail, gridUvCenterInScreenCoords).r; // 0..1
+      float m = pow(mouseInfluence, 0.6); // brighten the mid range
+      float scaleInfluence = m * 1.75; // stronger size reaction
 
       // Create dots with animated scale, influenced by mouse
-      float dotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
+      float dotSize = min(pow(circleMaskCenter, 2.0) * dotScale, dotCap);
 
-      float sdfDot = sdfCircle(gridUv, dotSize * (1.0 + scaleInfluence * 0.5));
+      float sdfDot = sdfCircle(gridUv, dotSize * (1.0 + scaleInfluence));
 
-      float smoothDot = smoothstep(0.05, 0.0, sdfDot);
+      float smoothDot = smoothstep(0.03, 0.0, sdfDot);
 
-      float opacityInfluence = max(mouseInfluence * 50.0, circleAnimatedMask * 0.5);
+      float dotAlpha = smoothDot * dotOpacity * (m * 4.0); // no opacity if no mouse influence
+      vec3 dotCol = mix(dotColor, vec3(1.0), m * 1.2); // brighten toward white under cursor
+      vec3 composition = mix(bgColor, dotCol, dotAlpha);
 
-      // Mix background color with dot color, using animated opacity to increase visibility
-      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity * (1.0 + opacityInfluence));
-
-      gl_FragColor = vec4(composition, 1.0);
+      gl_FragColor = vec4(composition, dotAlpha);
 
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
@@ -98,13 +98,22 @@ const DotMaterial = shaderMaterial(
   `
 )
 
+extend({ DotMaterial });
+
+declare module "@react-three/fiber" {
+  interface ThreeElements {
+    dotMaterial: any;
+  }
+}
+
 function Scene() {
   const size = useThree((s) => s.size)
   const viewport = useThree((s) => s.viewport)
   const { theme } = useTheme()
-  
+  const matRef = useRef<any>(null);
+
   const rotation = 0
-  const gridSize = 100
+  const gridSize = 160
 
   const getThemeColors = () => {
     switch (theme) {
@@ -134,26 +143,24 @@ function Scene() {
   const [trail, onMove] = useTrailTexture({
     size: 512,
     radius: 0.1,
-    maxAge: 400,
+    maxAge: 200,
     interpolate: 1,
     ease: function easeInOutCirc(x) {
       return x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
     }
   })
 
-  const dotMaterial = useMemo(() => {
-    return new DotMaterial()
-  }, [])
-
   useEffect(() => {
-    dotMaterial.uniforms.dotColor.value.setHex(themeColors.dotColor.replace('#', '0x'))
-    dotMaterial.uniforms.bgColor.value.setHex(themeColors.bgColor.replace('#', '0x'))
-    dotMaterial.uniforms.dotOpacity.value = themeColors.dotOpacity
-  }, [theme, dotMaterial, themeColors])
+    if (!matRef.current) return;
+    matRef.current.uniforms.dotColor.value = new THREE.Color(themeColors.dotColor);
+    matRef.current.uniforms.bgColor.value = new THREE.Color(themeColors.bgColor);
+    matRef.current.uniforms.dotOpacity.value = themeColors.dotOpacity;
+  }, [themeColors]);
 
   useFrame((state) => {
-    dotMaterial.uniforms.time.value = state.clock.elapsedTime
-  })
+    if (!matRef.current) return;
+    matRef.current.uniforms.time.value = state.clock.elapsedTime;
+  });
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
     onMove(e)
@@ -164,9 +171,15 @@ function Scene() {
   return (
     <mesh scale={[scale, scale, 1]} onPointerMove={handlePointerMove}>
       <planeGeometry args={[2, 2]} />
-      <primitive
-        object={dotMaterial}
+      <dotMaterial
+        ref={matRef}
+        time={0}
         resolution={[size.width * viewport.dpr, size.height * viewport.dpr]}
+        dotColor={new THREE.Color(themeColors.dotColor)}
+        bgColor={new THREE.Color(themeColors.bgColor)}
+        dotOpacity={themeColors.dotOpacity}
+        dotScale={0.15}
+        dotCap={0.2}
         rotation={rotation}
         gridSize={gridSize}
         mouseTrail={trail}
@@ -176,15 +189,21 @@ function Scene() {
   )
 }
 
-const DotScreenShader = () => {
+const DotScreenShader = ({ zoneRef } : { zoneRef: MutableRefObject<HTMLDivElement | null> }) => {
   return (
     <Canvas
+      eventSource={zoneRef.current ?? undefined}
+      // eventSource={typeof window !== "undefined" ? document.body : undefined}
+      eventPrefix="client"
       gl={{
         antialias: true,
-        powerPreference: 'high-performance',
+        powerPreference: "high-performance",
         outputColorSpace: THREE.SRGBColorSpace,
-        toneMapping: THREE.NoToneMapping
-      }}>
+        toneMapping: THREE.NoToneMapping,
+        alpha: true,
+      }}
+      style={{ width: "100%", height: "100%", background: "transparent" }}
+    >
       <Scene />
     </Canvas>
   )

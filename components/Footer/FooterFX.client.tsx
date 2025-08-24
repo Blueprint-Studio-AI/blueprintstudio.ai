@@ -2,7 +2,7 @@
 
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const BackgroundShader = dynamic(() => import("./BackgroundShader"), {
   ssr: false,
@@ -12,6 +12,7 @@ const BackgroundShader = dynamic(() => import("./BackgroundShader"), {
 export default function FooterFX() {
   const reduced = usePrefersReducedMotion();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const shaderZoneRef = useRef<HTMLDivElement | null >(null)
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -31,8 +32,8 @@ export default function FooterFX() {
   if (reduced || !isLargeScreen) return null;
 
   return (
-    <div className="absolute inset-0 -z-10 pointer-events-none">
-      <BackgroundShader />
+    <div className="absolute inset-0 pointer-events-auto" ref={shaderZoneRef} >
+      <BackgroundShader zoneRef={shaderZoneRef} />
     </div>
   );
 }
