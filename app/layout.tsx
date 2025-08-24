@@ -134,7 +134,7 @@ export default function RootLayout({
         <link rel="canonical" href="https://blueprintstudio.ai" />
         <meta name="robots" content="index, follow" />
       </head>
-      <body className={`relative min-h-screen overflow-x-hidden ${inter.className}`}>
+      <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
         <Background />
         <FloatingNav />
         <main>

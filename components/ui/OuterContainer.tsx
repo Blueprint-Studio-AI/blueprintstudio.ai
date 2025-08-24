@@ -8,7 +8,8 @@ type ContainerProps = {
 export default function OuterContainer({ children, className, direction = "col", ...props } : ContainerProps) {
     return (
         <div className={`
-            flex-1 w-full max-w-[1392px] flex flex-${direction} items-center justify-center
+            flex-1 w-full flex flex-${direction} items-center justify-center
+
             ${className}
         `}>
             {children}
