@@ -27,17 +27,17 @@ export function Footer() {
 
   return (
     <footer className="relative h-screen w-full flex flex-col">
-      <div className="absolute inset-0 pointer-events-auto bg-neutral-900">
-        {/* <Section className="h-full" semantic="div" >
+      <div className="absolute inset-0 -z-[10] pointer-events-auto bg-neutral-900">
+        <Section className="h-full" semantic="div" >
           <OuterContainer className="border-r border-l border-neutral-700" direction="row">
             <InnerContainer className="border-r border-neutral-700" />
             <div className="line-dash-y border-neutral-700" />
           </OuterContainer>
-        </Section> */}
-        <FooterFX/>
+        </Section>
+        {/* <FooterFX/> ENABLE ME FOR ANIMATIONS */}
       </div>
 
-      {/* <Section semantic="div" className="flex-1">
+      <Section semantic="div" className="flex-1">
         <OuterContainer>
           <div className="w-full h-full pt-28 pl-11">
             <Image
@@ -86,7 +86,7 @@ export function Footer() {
             <h1 className="text-neutral-600 text-[12px] tracking-[-0.02em]" >33°59&apos;19.0&quot;N 118°28&apos;33.8&quot;W</h1>
           </div>
         </OuterContainer>
-      </Section> */}
+      </Section>
 
     </footer>
   );

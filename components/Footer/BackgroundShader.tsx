@@ -192,8 +192,8 @@ function Scene() {
 const DotScreenShader = ({ zoneRef } : { zoneRef: MutableRefObject<HTMLDivElement | null> }) => {
   return (
     <Canvas
-      eventSource={zoneRef.current ?? undefined}
-      // eventSource={typeof window !== "undefined" ? document.body : undefined}
+      // eventSource={zoneRef.current ?? undefined}
+      eventSource={typeof window !== "undefined" ? document.body : undefined}
       eventPrefix="client"
       gl={{
         antialias: true,
