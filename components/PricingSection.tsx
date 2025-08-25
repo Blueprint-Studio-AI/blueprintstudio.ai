@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, ArrowUpRight, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
 import Head from 'next/head';
+import Image from 'next/image';
 
 // For SVGs, we'll use regular img tags instead of Next.js Image component
 const previewImages = {
@@ -226,9 +227,11 @@ export function PricingSection() {
                   <div className="absolute top-0.5 right-0.5 w-6 h-6 bg-black rounded-full flex items-center justify-center -mt-3 -mr-3 z-20">
                     <ArrowUpRight className="w-4 h-4 text-white" />
                   </div>
-                  <img 
+                  <Image 
                     src={previewImages.calendar}
                     alt="Calendar Interface"
+                    width={200}
+                    height={150}
                     className="w-full h-auto rounded-lg mb-2"
                   />
                   <p className="text-xs text-gray-600 text-center mt-4">Select a time</p>
@@ -292,9 +295,11 @@ export function PricingSection() {
                   <div className="absolute top-0.5 right-0.5 w-6 h-6 bg-black rounded-full flex items-center justify-center -mt-3 -mr-3 z-20">
                     <ArrowUpRight className="w-4 h-4 text-white" />
                   </div>
-                  <img 
+                  <Image 
                     src={previewImages.chat}
                     alt="Chat Interface"
+                    width={200}
+                    height={150}
                     className="w-full h-auto rounded-lg mb-2"
                   />
                   <p className="text-xs text-gray-600 text-center mt-4">Chat right now</p>

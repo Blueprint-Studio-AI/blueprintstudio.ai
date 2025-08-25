@@ -25,7 +25,7 @@ export default function QuoteSection() {
                                 transition={{ duration: 0.8, delay: 0.2 }}
                                 viewport={{ once: true, amount: 0.3 }}
                             >
-                                "We believe the future belongs to those who build it."
+                                &quot;We believe the future belongs to those who build it.&quot;
                             </motion.p>
                             <motion.cite 
                                 className="text-lg text-neutral-500 font-normal not-italic"

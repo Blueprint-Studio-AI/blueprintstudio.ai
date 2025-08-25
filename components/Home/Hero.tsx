@@ -1,7 +1,8 @@
 import Section from "@/components/ui/Section";
-import OuterContainer from "@/components//ui/OuterContainer";
+import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import Image from "next/image";
+import SectionHeader from "../ui/SectionHeader";
 
 export default function Hero() {
     return (
@@ -18,23 +19,14 @@ export default function Hero() {
                     <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
                 </div>
             </div>
-            {/* Header */}
-            <OuterContainer>
-                <div className="flex w-full justify-between items-center pt-4 pb-2 px-3 sm:pt-6 sm:pb-3 sm:px-6 lg:pt-8">
-                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC] custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
-                        Design & Build
-                    </div>
-                    <div className="text-xs uppercase font-medium leading-[136%] text-[#C3C6CC] text-right custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
-                        {new Date().toLocaleDateString('en-US', { 
-                            month: '2-digit', 
-                            day: '2-digit', 
-                            year: 'numeric' 
-                        }).replace(/\//g, '.')}
-                    </div>
-                </div>
-            </OuterContainer>
-            
-            <div className="w-screen line-dash-x"/>
+            <SectionHeader 
+                leftText="Design & Build" 
+                rightText={new Date().toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric'
+                }).replace(/\//g, '.')}
+            />
             
             {/* Main Content */}
             <OuterContainer className="flex-1 flex items-center">

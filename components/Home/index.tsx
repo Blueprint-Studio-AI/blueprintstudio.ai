@@ -4,6 +4,8 @@ import OuterContainer from "../ui/OuterContainer";
 import Section from "../ui/Section";
 import Hero from "./Hero";
 import QuoteSection from "./QuoteSection";
+import Achievements from "./Achievements";
+import Portfolio from "./Portfolio";
 
 export default function Home() {
     return (
@@ -13,6 +15,8 @@ export default function Home() {
             {/* Spacer to create scroll space for revealing quote */}
             <div className="h-screen" />
             <div className="relative z-30">
+            <Achievements/>
+            <Portfolio/>
                 <Footer />
             </div>
         </div>

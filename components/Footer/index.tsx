@@ -87,7 +87,7 @@ export function Footer() {
         <OuterContainer>
           <div className="w-full flex justify-between px-6 pb-7 pt-20">
             <h1 className="text-neutral-600 text-sm tracking-[-0.02em]" >Copyright © Blueprint Studio 2025</h1>
-            <h1 className="text-neutral-600 text-[12px] tracking-[-0.02em]" >33°59'19.0"N 118°28'33.8"W</h1>
+            <h1 className="text-neutral-600 text-[12px] tracking-[-0.02em]" >33°59&apos;19.0&quot;N 118°28&apos;33.8&quot;W</h1>
           </div>
         </OuterContainer>
       </Section>
