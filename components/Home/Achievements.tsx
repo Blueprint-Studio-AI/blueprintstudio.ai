@@ -56,7 +56,7 @@ export default function Achievements() {
                     lineHeight: 'clamp(97%, 1vw, 100%)',
                     letterSpacing: '-2.04px' 
                   }}>
-                Our Achievements
+                Text
               </h1>
             </div>
             <div className="flex-1">
