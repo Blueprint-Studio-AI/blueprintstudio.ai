@@ -27,7 +27,7 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-1',
-      title: 'Blueprint Studio Platform',
+      title: 'Project One',
       description: 'Our flagship design and development platform revolutionizing how teams collaborate.',
       type: 'featured' as const,
       media: {
@@ -479,13 +479,13 @@ export default function PortfolioBento() {
       <SectionHeader leftText="PORTFOLIO BENTO" rightText="/ hybrid layout" />
 
       <OuterContainer className="flex-1">
-        <InnerContainer className="py-8 sm:py-12 lg:py-16 px-2.5 sm:px-6 relative">
+        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6 relative">
           {/* Inner dashed vertical lines on desktop - matching Achievements section */}
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
           <h1 
-            className="font-medium text-black text-center mb-12 sm:mb-16 lg:mb-20"
+            className="font-medium text-black text-center mb:0"
             style={{
               fontSize: 'clamp(36px, 6vw, 56px)',
               lineHeight: 'clamp(97%, 1vw, 100%)',
@@ -555,6 +555,7 @@ export default function PortfolioBento() {
           ))}
         </div>
       </OuterContainer>
+      <div className="w-full line-dash-x" />
     </Section>
   );
 }

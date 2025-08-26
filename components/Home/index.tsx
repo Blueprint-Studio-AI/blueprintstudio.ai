@@ -6,6 +6,9 @@ import Hero from "./Hero";
 import QuoteSection from "./QuoteSection";
 import Achievements from "./Achievements";
 import PortfolioBento from "./PortfolioBento";
+import PricingSection from "./PricingSection";
+import TestimonialSection from "./TestimonialSection";
+import FAQSection from "./FAQSection";
 
 export default function Home() {
     return (
@@ -17,6 +20,9 @@ export default function Home() {
             <div className="relative z-30">
             <Achievements/>
             <PortfolioBento/>
+            <PricingSection/>
+            <TestimonialSection/>
+            <FAQSection/>
                 <Footer />
             </div>
         </div>

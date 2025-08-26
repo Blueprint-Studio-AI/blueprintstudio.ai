@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { Footer } from "@/components/Footer";
 import { PhoneCall, Calculator, CheckCircle, ChevronDown, ChevronUp, ArrowUpRight } from "lucide-react";
 import { AutoplayVideo } from "@/components/AutoplayVideo";
-import { PricingSection } from "@/components/PricingSection";
+import PricingSection from "@/components/Home/PricingSection";
+import TestimonialSection from "@/components/Home/TestimonialSection";
 import { Services } from "@/components/services-index/Services";
 import { useEffect, useState, useRef } from "react";
 
@@ -338,7 +339,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing - Original Implementation */}
+      {/* Pricing Section - New Three Column Design */}
       <PricingSection/>
 
       <Footer/>

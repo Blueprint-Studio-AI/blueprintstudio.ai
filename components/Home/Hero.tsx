@@ -51,11 +51,10 @@ export default function Hero() {
                          lineHeight: '110%', 
                          letterSpacing: '-0.96px' 
                        }}>
-                        We partner with founders to build the future. We partner with founders
+                        High-agency generalists with great taste, practiced craft, and prolific output.
                         <br />
                         <br />
-                        to build the future. We partner with founders to build the future. We partner 
-                        with founders to build the future.
+                        We design and develop products for founders that care.
                     </p>
                     
                     {/* Current Partners */}
