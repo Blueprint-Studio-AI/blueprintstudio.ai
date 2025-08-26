@@ -24,7 +24,7 @@ const achievements = [
 
 export default function Achievements() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -56,7 +56,7 @@ export default function Achievements() {
                     lineHeight: 'clamp(97%, 1vw, 100%)',
                     letterSpacing: '-2.04px' 
                   }}>
-                Text
+                Craft
               </h1>
             </div>
             <div className="flex-1">

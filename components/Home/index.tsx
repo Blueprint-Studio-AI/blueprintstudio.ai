@@ -5,7 +5,7 @@ import Section from "../ui/Section";
 import Hero from "./Hero";
 import QuoteSection from "./QuoteSection";
 import Achievements from "./Achievements";
-import Portfolio from "./Portfolio";
+import PortfolioBento from "./PortfolioBento";
 
 export default function Home() {
     return (
@@ -16,7 +16,7 @@ export default function Home() {
             <div className="h-screen" />
             <div className="relative z-30">
             <Achievements/>
-            <Portfolio/>
+            <PortfolioBento/>
                 <Footer />
             </div>
         </div>

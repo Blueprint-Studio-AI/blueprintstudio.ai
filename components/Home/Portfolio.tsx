@@ -85,7 +85,7 @@ export default function Portfolio() {
                     dragConstraints={{ left: 0, right: 0 }}
                     onDragEnd={onDragEnd}
                   >
-                    <div className="w-full h-full bg-neutral-200 rounded-[20px] border border-neutral-300 shadow-[0_-30px_102.178px_0_rgba(97,112,246,0.10)]" />
+                    <div className="w-full h-full bg-neutral-200 rounded-[20px] border border-neutral-300" />
                   </motion.div>
                 );
               })}
