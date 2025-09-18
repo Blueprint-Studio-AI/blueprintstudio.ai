@@ -515,9 +515,9 @@ export default function PortfolioBento() {
                     {/* Featured item - sticky positioned on desktop */}
                     <div className="lg:col-span-3 mb-6 lg:mb-0">
                       <div className="lg:sticky lg:top-24">
-                        {/* Mobile version - 4:5 aspect ratio */}
+                        {/* Mobile version - 9:16 aspect ratio */}
                         <div className="block lg:hidden px-4">
-                          <MediaCard item={section.featured} aspectRatio="4/5" featured />
+                          <MediaCard item={section.featured} aspectRatio="9/16" featured />
                           
                           {/* Mobile: Show sidebar images in a grid below */}
                           <div className="grid grid-cols-3 gap-2 mt-4">

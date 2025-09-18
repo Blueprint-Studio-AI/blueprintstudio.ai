@@ -51,9 +51,6 @@ export default function Hero() {
                          lineHeight: '110%', 
                          letterSpacing: '-0.96px' 
                        }}>
-                        High-agency generalists with great taste, practiced craft, and prolific output.
-                        <br />
-                        <br />
                         We design and develop products for founders that care.
                     </p>
                     
@@ -61,8 +58,8 @@ export default function Hero() {
                     <div className="mb-0 sm:mb-6 lg:mb-8">
                         <p className="text-center font-normal mb-4 text-[#B0B0B0]" 
                            style={{ 
-                             fontSize: 'clamp(16px, 3vw, 20px)', 
-                             lineHeight: '110%' 
+                             fontSize: 'clamp(16px, 3vw, 18px)', 
+                             lineHeight: '100%' 
                            }}>
                            Current Partners:
                         </p>
@@ -104,7 +101,7 @@ export default function Hero() {
 
                     
                     {/* Video Placeholder */}
-                    <div className="w-full max-w-4xl mx-auto aspect-square sm:aspect-video bg-neutral-200 rounded sm:rounded-lg shadow-lg flex items-center justify-center">
+                    <div className="w-full max-w-4xl mx-auto aspect-[9/16] sm:aspect-video bg-neutral-200 rounded sm:rounded-lg shadow-lg flex items-center justify-center">
                         <div className="text-center text-neutral-500">
                             <div className="w-16 h-16 mx-auto mb-4 bg-neutral-300 rounded-full flex items-center justify-center">
                                 <div className="w-0 h-0 border-l-6 border-l-neutral-500 border-t-4 border-t-transparent border-b-4 border-b-transparent ml-1"></div>

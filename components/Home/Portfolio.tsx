@@ -64,14 +64,14 @@ export default function Portfolio() {
             Featured Projects
           </h1>
 
-          <div className="relative h-[536px] flex items-center justify-center">
+          <div className="relative flex items-center justify-center w-full h-[444px] sm:h-[480px]">
             <AnimatePresence initial={false}>
               {[-1, 0, 1].map((offset) => {
                 const index = (activeIndex + offset + projects.length) % projects.length;
                 return (
                   <motion.div
                     key={index}
-                    className="absolute w-full max-w-[953px] h-full"
+                    className="absolute flex items-center justify-center"
                     initial={{ opacity: 0, x: `${offset * 100}%` }}
                     animate={{ 
                       opacity: offset === 0 ? 1 : 0.3,
@@ -85,7 +85,7 @@ export default function Portfolio() {
                     dragConstraints={{ left: 0, right: 0 }}
                     onDragEnd={onDragEnd}
                   >
-                    <div className="w-full h-full bg-neutral-200 rounded-[20px] border border-neutral-300" />
+                    <div className="w-[250px] h-[444px] sm:w-[853px] sm:h-[480px] bg-neutral-200 rounded-[20px] border border-neutral-300" />
                   </motion.div>
                 );
               })}

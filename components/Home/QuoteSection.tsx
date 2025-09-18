@@ -25,7 +25,7 @@ export default function QuoteSection() {
                                 transition={{ duration: 0.8, delay: 0.2 }}
                                 viewport={{ once: true, amount: 0.3 }}
                             >
-                                &quot;We believe the future belongs to those who build it.&quot;
+                                &quot;The best ideas start as conversations.&quot;
                             </motion.p>
                             <motion.cite 
                                 className="text-lg text-neutral-500 font-normal not-italic"
@@ -34,7 +34,7 @@ export default function QuoteSection() {
                                 transition={{ duration: 0.6, delay: 0.6 }}
                                 viewport={{ once: true, amount: 0.3 }}
                             >
-                                — Blueprint Studio
+                                &ndash; Jony Ive
                             </motion.cite>
                         </blockquote>
                     </InnerContainer>
