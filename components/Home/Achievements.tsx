@@ -50,14 +50,14 @@ export default function Achievements() {
           {/* Heading and Description Row */}
           <div className="flex flex-col lg:flex-row items-start lg:self-end gap-8 lg:gap-16 mb-12 sm:mb-16 lg:mb-20">
             <div className="flex-1">
-              <h1 className="font-medium text-black" 
-                  style={{ 
+              <h2 className="font-medium text-black"
+                  style={{
                     fontSize: 'clamp(41px, 8vw, 68px)', 
                     lineHeight: 'clamp(97%, 1vw, 100%)',
                     letterSpacing: '-2.04px' 
                   }}>
                 Our Edge
-              </h1>
+              </h2>
             </div>
             <div className="lg:self-end">
               <p className="font-normal text-neutral-500 mb-1" 

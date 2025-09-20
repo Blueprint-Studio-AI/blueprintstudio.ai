@@ -32,14 +32,14 @@ export default function PricingSection() {
           
           {/* Heading and Description Row */}
           <div className="flex flex-col items-center text-center gap-4 mb-8 sm:mb-12">
-            <h1 className="font-medium text-black" 
-                style={{ 
-                  fontSize: 'clamp(48px, 10vw, 88px)', 
+            <h2 className="font-medium text-black"
+                style={{
+                  fontSize: 'clamp(41px, 8vw, 68px)', 
                   lineHeight: 'clamp(97%, 1vw, 100%)',
                   letterSpacing: '-2.04px' 
                 }}>
               Pricing
-            </h1>
+            </h2>
             <p className="font-normal text-neutral-500 max-w-lg" 
                style={{ 
                  fontSize: 'clamp(18px, 3.5vw, 24px)', 

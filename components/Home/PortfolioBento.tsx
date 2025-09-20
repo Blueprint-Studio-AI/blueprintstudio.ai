@@ -484,16 +484,16 @@ export default function PortfolioBento() {
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
-          <h1 
+          <h2
             className="font-medium text-black text-center mb:0"
             style={{
-              fontSize: 'clamp(36px, 6vw, 56px)',
+              fontSize: 'clamp(41px, 8vw, 68px)',
               lineHeight: 'clamp(97%, 1vw, 100%)',
               letterSpacing: '-1.5px'
             }}
           >
             Featured Work
-          </h1>
+          </h2>
         </InnerContainer>
 
         {/* Render all 5 sections sequentially */}
