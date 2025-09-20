@@ -91,32 +91,39 @@ export default function TestimonialSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="TESTIMONIALS" rightText="⋯ trusted / proven" />
+      <SectionHeader leftText="TESTIMONIALS" rightText="trusted + proven" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-0 sm:px-0 relative">
+        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 py-8 sm:pb-12 lg:pb-16 px-0 sm:px-0 relative">
           {/* Inner dashed vertical lines on desktop */}
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block z-20" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block z-20" />
           
           {/* Testimonials Container with Scroll Indicators */}
-          <div className="flex gap-8 items-center">
-            {/* Scrollable Cards Container */}
-            <div 
-              ref={scrollContainerRef}
-              onScroll={handleScroll}
-              className="flex-1 flex flex-col gap-6 overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar px-6"
-              style={{ 
-                scrollbarWidth: 'none', 
-                msOverflowStyle: 'none',
-                height: '280px'
-              }}
-            >
+          <div className="flex gap-0 justify-center items-center">
+            {/* Scrollable Cards Container with Gradient Overlays */}
+            <div className="flex-1 relative">
+              {/* Top fade gradient */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-neutral-100 to-transparent z-10 pointer-events-none" />
+
+              {/* Bottom fade gradient */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-neutral-100 to-transparent z-10 pointer-events-none" />
+
+              <div
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="flex flex-col gap-6 overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar px-2.5 md:px-6 py-8"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  height: '340px'
+                }}
+              >
               {testimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
-                  className="inline-flex flex-col items-start gap-2 p-8 rounded-3xl border border-neutral-300/50 bg-neutral-50 flex-shrink-0 snap-start"
+                  className="inline-flex flex-col items-start gap-2 p-6 md:p-8 rounded-3xl border border-neutral-300/50 bg-neutral-50 flex-shrink-0 snap-center"
                   style={{ 
                     minHeight: '256px'
                   }}
@@ -131,10 +138,11 @@ export default function TestimonialSection() {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
 
             {/* Scroll Indicators */}
-            <div className="flex flex-col gap-2 px-6">
+            <div className="flex flex-col gap-2 px-2.5 md:px-6">
               {testimonials.map((_, index) => (
                 <button
                   key={index}

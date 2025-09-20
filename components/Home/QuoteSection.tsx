@@ -17,25 +17,34 @@ export default function QuoteSection() {
                 <OuterContainer>
                     <InnerContainer className="py-32 lg:py-40 text-center">
                         <blockquote className="max-w-4xl mx-auto">
-                            <motion.p 
+                            {/* <motion.p 
                                 className="text-4xl lg:text-6xl font-medium text-neutral-800 leading-tight mb-8" 
                                 style={{ letterSpacing: '-1.2px' }}
                                 initial={{ opacity: 0, y: 50 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
                                 viewport={{ once: true, amount: 0.3 }}
+                            > */}
+                            <p
+                                className="text-4xl lg:text-6xl font-medium text-neutral-800 leading-tight mb-8" 
                             >
                                 &quot;The best ideas start as conversations.&quot;
-                            </motion.p>
-                            <motion.cite 
+                            </p>
+                            {/* </motion.p> */}
+                            {/* <motion.cite 
                                 className="text-lg text-neutral-500 font-normal not-italic"
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
                                 transition={{ duration: 0.6, delay: 0.6 }}
                                 viewport={{ once: true, amount: 0.3 }}
+                            > */}
+                            <p
+                                className="text-lg text-neutral-500 font-normal not-italic" 
                             >
-                                &ndash; Jony Ive
-                            </motion.cite>
+                                 &ndash; Jony Ive
+                            </p>
+                               
+                            {/* </motion.cite> */}
                         </blockquote>
                     </InnerContainer>
                 </OuterContainer>

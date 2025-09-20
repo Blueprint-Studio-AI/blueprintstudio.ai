@@ -101,7 +101,7 @@ export default function Hero() {
 
                     
                     {/* Video Placeholder */}
-                    <div className="w-full max-w-4xl mx-auto aspect-[9/16] sm:aspect-video bg-neutral-200 rounded sm:rounded-lg shadow-lg flex items-center justify-center">
+                    <div className="w-full max-w-4xl mx-auto aspect-[2/3] sm:aspect-video bg-neutral-200 rounded sm:rounded-lg shadow-lg flex items-center justify-center">
                         <div className="text-center text-neutral-500">
                             <div className="w-16 h-16 mx-auto mb-4 bg-neutral-300 rounded-full flex items-center justify-center">
                                 <div className="w-0 h-0 border-l-6 border-l-neutral-500 border-t-4 border-t-transparent border-b-4 border-b-transparent ml-1"></div>

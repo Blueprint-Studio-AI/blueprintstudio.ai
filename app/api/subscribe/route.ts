@@ -41,8 +41,8 @@ export async function POST(request: Request) {
         );
       }
   
-      const { email } = await request.json();
-  
+      const { email, source = 'newsletter' } = await request.json();
+
       if (!email) {
         return NextResponse.json(
           { error: 'Email is required' },
@@ -98,8 +98,8 @@ export async function POST(request: Request) {
       // Prepare metadata for new subscriber
       const metadata = {
         email: email.toLowerCase(),
-        source: 'roast_tool',
-        roast_mode: true,
+        source: source,
+        roast_mode: source === 'roast_tool',
         referrer: request.headers.get('referer') || 'direct',
         ip_address: ip,
         user_agent: request.headers.get('user-agent'),

@@ -106,13 +106,13 @@ export default function FAQSection() {
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-6 relative">
+        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 md:px-6 relative">
           {/* Inner dashed vertical lines on desktop */}
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
           {/* FAQ Container */}
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl px-2 md:mx-auto">
             {/* Title */}
             <div className="text-center mb-12">
               <h2 className="font-medium text-black mb-4" 

@@ -21,7 +21,7 @@ export default function PricingSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="PRICING" rightText="⋯ secure / synced" />
+      <SectionHeader leftText="PRICING" rightText="synced ⋯ secure" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">

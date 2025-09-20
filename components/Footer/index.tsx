@@ -54,30 +54,22 @@ export function Footer() {
 
   return (
     <footer className="relative w-full flex flex-col">
+
        {/* Background */}
-
-
-
       <div className="absolute inset-0 -z-[10] pointer-events-auto bg-neutral-900">
-        <Section className="" semantic="div" >
-          {/* <OuterContainer className="border-r border-l border-neutral-700" direction="row">
-            <InnerContainer className="border-r border-neutral-700" />
-          </OuterContainer> */}
-
-                {/* Artificial vertical lines to match the background */}
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-          <div className="w-full flex-1 flex justify-center relative">
-              {/* Left dashed vertical line (mobile) / solid line (desktop) */}
-              <div className="absolute left-0 top-0 bottom-0 line-dash-y border-neutral-700 custom:hidden" />
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-700 hidden custom:block" />
-              
-              {/* Right dashed vertical line (mobile) / solid line (desktop) */}
-              <div className="absolute right-0 top-0 bottom-0 line-dash-y border-neutral-700 custom:hidden" />
-              <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-700 hidden custom:block" />
-          </div>
-      </div>
-
-
+        <Section semantic="div" >
+        {/* Artificial vertical lines to match the background */}
+        <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+            <div className="w-full flex-1 flex justify-center relative">
+                {/* Left dashed vertical line (mobile) / solid line (desktop) */}
+                <div className="absolute left-0 top-0 bottom-0 line-dash-y border-neutral-700 custom:hidden" />
+                <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-700 hidden custom:block" />
+                
+                {/* Right dashed vertical line (mobile) / solid line (desktop) */}
+                <div className="absolute right-0 top-0 bottom-0 line-dash-y border-neutral-700 custom:hidden" />
+                <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-700 hidden custom:block" />
+            </div>
+        </div>
         </Section>
         {/* <FooterFX/>  */}
       </div>
@@ -85,7 +77,7 @@ export function Footer() {
        {/* Logo */}
       <Section semantic="div" className="flex-1">
         <OuterContainer>
-          <div className="w-full pt-16 md:pt-28 px-6">
+          <div className="w-full pt-16 md:pt-28 px-2.5 md:px-6">
             <Image
               src="logo-blueprint.svg"
               alt="Blueprint Logo"
@@ -98,12 +90,12 @@ export function Footer() {
 
       {/* Footer Links Section */}
       <Section semantic="div" className="flex-1">
-        <div className="w-full px-6 py-20 md:py-28 md:px-0 ">
+        <div className="w-full px-2.5 py-16 md:py-28 md:px-0 ">
           <div className="flex flex-col md:flex-row gap-10 md:gap-12 w-full md:px-6">
             {Object.entries(footerLinks).map(([key, section]) => (
               <div key={key} className="flex flex-col min-w-0">
                 <h3 className="text-neutral-400 text-sm font-medium mb-4 md:mb-6">{section.title}</h3>
-                <ul className="flex flex-col gap-2 md:gap-4">
+                <ul className="flex flex-col gap-4 md:gap-4">
                   {section.links.map((link) => (
                     <li key={link.name}>
                       {link.external ? (
@@ -147,7 +139,7 @@ export function Footer() {
           </div>
 
           {/* Mobile Social Links */}
-          <div className="w-full pl-0 pr-6 pb-0 pt-16 md:hidden">
+          <div className="w-full pl-0 pb-0 pt-16 md:hidden">
             <ul className="flex flex-row gap-4">
               <li>
                 <Link href="https://github.com/Blueprint-Studio-AI" aria-label="GitHub" >
@@ -197,7 +189,7 @@ export function Footer() {
         </OuterContainer>
       </Section>
 
-      <div className="border-b border-neutral-700" />
+      <div className="line-dash-x border-neutral-700" />
       
       {/* Bottom */}
       <Section semantic="div" className="flex-none">

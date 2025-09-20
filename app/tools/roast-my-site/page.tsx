@@ -261,7 +261,7 @@ const exportToPDF = async () => {
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, source: 'roast_tool' })
       });
 
       if (!response.ok) {

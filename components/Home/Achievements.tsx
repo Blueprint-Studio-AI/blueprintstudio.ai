@@ -7,18 +7,18 @@ import SectionHeader from "../ui/SectionHeader";
 const achievements = [
   {
     id: 1,
-    title: "Industry Leadership",
-    description: "Recognized as a top design studio by leading industry publications and awards."
+    title: "Taste",
+    description: "Seasoned eyes strip noise into clarity until there's a single, intuitive idea."
   },
   {
     id: 2,
-    title: "Client Success",
-    description: "100% client satisfaction rate with projects delivered on time and within budget."
+    title: "Partnership",
+    description: "Flat monthly, one queue; we earn the next month by moving the needle."
   },
   {
     id: 3,
-    title: "Innovation Focus",
-    description: "Pioneering new approaches to design and development for emerging technologies."
+    title: "Embedded",
+    description: "US-based, in your tools and time zone; same-day decisions, no lag."
   }
 ];
 
@@ -38,7 +38,7 @@ export default function Achievements() {
         </div>
       </div>
 
-      <SectionHeader leftText="ACHIEVEMENTS" rightText="/ item 1 ⋯ 3" />
+      <SectionHeader leftText="The Blueprint" rightText="Items 1 ⋯ 3" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
@@ -48,7 +48,7 @@ export default function Achievements() {
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
           {/* Heading and Description Row */}
-          <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-16 mb-12 sm:mb-16 lg:mb-20">
+          <div className="flex flex-col lg:flex-row items-start lg:self-end gap-8 lg:gap-16 mb-12 sm:mb-16 lg:mb-20">
             <div className="flex-1">
               <h1 className="font-medium text-black" 
                   style={{ 
@@ -56,17 +56,17 @@ export default function Achievements() {
                     lineHeight: 'clamp(97%, 1vw, 100%)',
                     letterSpacing: '-2.04px' 
                   }}>
-                Craft
+                Our Edge
               </h1>
             </div>
-            <div className="flex-1">
-              <p className="font-normal text-neutral-500" 
+            <div className="lg:self-end">
+              <p className="font-normal text-neutral-500 mb-1" 
                  style={{ 
                    fontSize: 'clamp(20px, 4vw, 28px)', 
                    lineHeight: '110%', 
                    letterSpacing: '-0.96px' 
                  }}>
-                Building exceptional digital experiences and establishing lasting partnerships with innovative founders worldwide.
+                We&apos;re really f*cking good at what we do.
               </p>
             </div>
           </div>

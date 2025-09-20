@@ -1,20 +1,27 @@
 
 import OuterContainer from "@/components/ui/OuterContainer";
+import { ReactNode } from "react";
 
 interface SectionHeaderProps {
-  leftText: string;
-  rightText: string;
+  leftText: string | ReactNode;
+  rightText: string | ReactNode;
+  centerContent?: ReactNode;
 }
 
-export default function SectionHeader({ leftText, rightText }: SectionHeaderProps) {
+export default function SectionHeader({ leftText, rightText, centerContent }: SectionHeaderProps) {
   return (
     <div className="w-full">
       <OuterContainer>
-        <div className="flex w-full justify-between items-center pt-4 pb-2 px-3 sm:pt-6 sm:pb-3 sm:px-6 lg:pt-8">
-          <div className="text-xs uppercase font-medium leading-[136%] text-neutral-300 custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
+        <div className="flex w-full justify-between items-center pt-4 pb-2 px-2.5 sm:pt-6 sm:pb-3 sm:px-6 lg:pt-8 relative">
+          <div className="text-xs uppercase font-medium leading-[136%] text-neutral-500 custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
             {leftText}
           </div>
-          <div className="text-xs uppercase font-medium leading-[136%] text-neutral-300 text-right custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
+          {centerContent && (
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              {centerContent}
+            </div>
+          )}
+          <div className="text-xs uppercase font-medium leading-[136%] text-neutral-500 text-right custom:invisible wide:visible" style={{ letterSpacing: '-0.24px' }}>
             {rightText}
           </div>
         </div>

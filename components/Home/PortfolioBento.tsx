@@ -476,7 +476,7 @@ export default function PortfolioBento() {
         </div>
       </div>
 
-      <SectionHeader leftText="PORTFOLIO BENTO" rightText="/ hybrid layout" />
+      <SectionHeader leftText="PORTFOLIO" rightText="// SEPT 25" />
 
       <OuterContainer className="flex-1">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6 relative">
@@ -504,7 +504,7 @@ export default function PortfolioBento() {
                 <div className="w-full line-dash-x" />
               )}
               
-              <InnerContainer className="py-12 sm:py-16 lg:py-20 px-2.5 sm:px-6 relative">
+              <InnerContainer className="py-10 sm:py-16 lg:py-20 px-2.5 sm:px-6 relative">
                 {/* Inner dashed vertical lines for each section */}
                 <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                 <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
@@ -513,11 +513,11 @@ export default function PortfolioBento() {
                 <a href={section.featured.link} className="block cursor-pointer group/section transition-all duration-300 hover:opacity-90">
                   <div className="lg:grid lg:grid-cols-4 lg:gap-6">
                     {/* Featured item - sticky positioned on desktop */}
-                    <div className="lg:col-span-3 mb-6 lg:mb-0">
+                    <div className="lg:col-span-3 mb-0">
                       <div className="lg:sticky lg:top-24">
                         {/* Mobile version - 9:16 aspect ratio */}
-                        <div className="block lg:hidden px-4">
-                          <MediaCard item={section.featured} aspectRatio="9/16" featured />
+                        <div className="block lg:hidden ">
+                          <MediaCard item={section.featured} aspectRatio="2/3" featured />
                           
                           {/* Mobile: Show sidebar images in a grid below */}
                           <div className="grid grid-cols-3 gap-2 mt-4">

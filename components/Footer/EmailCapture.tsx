@@ -43,7 +43,7 @@ export default function EmailCapture() {
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, source: 'footer_newsletter' }),
             });
 
             const data = await response.json();
@@ -82,7 +82,7 @@ export default function EmailCapture() {
     }
 
     return (
-        <div className="bg-neutral-800 rounded-xl border border-neutral-700 p-4 flex flex-col justify-center gap-3 w-[400px] h-36">
+        <div className="bg-neutral-800 rounded-xl border border-neutral-700 p-4 flex flex-col justify-between w-[400px] h-36">
             <p className="text-neutral-300">Join our newsletter for expert insights on web development, design, and digital innovation.</p>
             <form onSubmit={handleSubscribe} className="flex gap-2" noValidate >
                 <div className="relative w-full">
