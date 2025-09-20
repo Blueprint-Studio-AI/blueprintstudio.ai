@@ -27,64 +27,64 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-1',
-      title: 'Project One',
-      description: 'Our flagship design and development platform revolutionizing how teams collaborate.',
+      title: 'LivingIP — On-Chain AI Agents',
+      description: 'UI/UX and product design for on-chain AI agents. Clarified vision. Simplified flows.',
       type: 'featured' as const,
       media: {
         type: 'video' as const,
         src: '/videos/portfolio-featured.mp4',
-        alt: 'Blueprint Studio Platform Preview'
+        alt: 'LivingIP Project Reel'
       },
-      link: '/portfolio/blueprint-platform',
+      link: '/portfolio/livingip',
       metadata: {
-        category: 'Platform',
+        category: 'Product Design',
         readTime: '5 min read'
       }
     },
     sidebar: [
       {
         id: 'project-1-1',
-        title: 'E-commerce Revolution',
-        description: 'Complete digital transformation for retail excellence.',
+        title: 'LivingIP — On-Chain AI Agents',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-ecommerce.jpg',
-          alt: 'E-commerce Project Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/ecommerce-revolution',
+        link: '/portfolio/x',
         metadata: {
-          category: 'E-commerce'
+          category: 'x'
         }
       },
       {
         id: 'project-1-2',
-        title: 'Mobile Banking App',
-        description: 'Secure and intuitive financial services platform.',
-        type: 'standard' as const,
+        title: 'LivingIP — On-Chain AI Agents',
+        description: 'x',
+        type: 'x' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-banking.mp4',
-          alt: 'Mobile Banking App Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/banking-app',
+        link: '/portfolio/x',
         metadata: {
-          category: 'FinTech'
+          category: 'x'
         }
       },
       {
         id: 'project-1-3',
-        title: 'Healthcare Dashboard',
-        description: 'Advanced analytics for healthcare professionals.',
+        title: 'LivingIP — On-Chain AI Agents',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-healthcare.jpg',
-          alt: 'Healthcare Dashboard Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/healthcare-dashboard',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Healthcare'
+          category: 'x'
         }
       }
     ]
@@ -92,64 +92,64 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-2',
-      title: 'AI-Powered Analytics Suite',
-      description: 'Next-generation business intelligence with machine learning insights.',
+      title: 'Arch Network — BTC All-In Summit',
+      description: 'Las Vegas event motion media and graphic design for the BTC All-In Summit; ongoing design & build partner.',
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/portfolio-ai.mp4',
-        alt: 'AI Analytics Preview'
+        src: '/videos/arch-network-btc-all-in-summit.mp4',
+        alt: 'Arch Network BTC All-In Summit Project Reel'
       },
       link: '/portfolio/ai-analytics',
       metadata: {
-        category: 'AI/ML',
+        category: 'Motion Media, Graphic Design, IRL Event',
         readTime: '7 min read'
       }
     },
     sidebar: [
       {
         id: 'project-2-1',
-        title: 'Social Media Dashboard',
-        description: 'Real-time social analytics and engagement tracking.',
+        title: 'Arch Network — BTC All-In Summit',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-social.jpg',
-          alt: 'Social Dashboard Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/social-dashboard',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Social'
+          category: 'x'
         }
       },
       {
         id: 'project-2-2',
-        title: 'Supply Chain Manager',
-        description: 'End-to-end logistics and inventory optimization.',
+        title: 'Arch Network — BTC All-In Summit',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-supply.mp4',
-          alt: 'Supply Chain Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/supply-chain',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Logistics'
+          category: 'x'
         }
       },
       {
         id: 'project-2-3',
-        title: 'Education Platform',
-        description: 'Interactive learning management system.',
+        title: 'Arch Network — BTC All-In Summit',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-education.jpg',
-          alt: 'Education Platform Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/education',
+        link: '/portfolio/x',
         metadata: {
-          category: 'EdTech'
+          category: 'x'
         }
       }
     ]
@@ -157,64 +157,64 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-3',
-      title: 'Cloud Infrastructure Portal',
-      description: 'Enterprise-grade cloud management and deployment solutions.',
+      title: 'Autara — Brand Identity & Web Design',
+      description: 'Brand identity and Framer landing page for Autara: logo system, type & palette, social kit, brand deck.',
       type: 'featured' as const,
       media: {
-        type: 'image' as const,
-        src: '/images/portfolio-cloud.jpg',
-        alt: 'Cloud Portal Preview'
+        type: 'video' as const,
+        src: '/videos/autara.mp4',
+        alt: 'Autara on Arch Network Project Reel'
       },
-      link: '/portfolio/cloud-portal',
+      link: '/portfolio/autara',
       metadata: {
-        category: 'Infrastructure',
+        category: 'Logo, Brand, Framer Landing Page, Social Assets',
         readTime: '6 min read'
       }
     },
     sidebar: [
       {
         id: 'project-3-1',
-        title: 'CRM System',
-        description: 'Customer relationship management reimagined.',
+        title: 'Autara — Brand Identity & Web Design',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-crm.mp4',
-          alt: 'CRM System Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/crm',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Business'
+          category: 'x'
         }
       },
       {
         id: 'project-3-2',
-        title: 'Real Estate Portal',
-        description: 'Property management and listing platform.',
+        title: 'Autara — Brand Identity & Web Design',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-realestate.jpg',
-          alt: 'Real Estate Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/real-estate',
+        link: '/portfolio/x',
         metadata: {
-          category: 'PropTech'
+          category: 'x'
         }
       },
       {
         id: 'project-3-3',
-        title: 'Gaming Dashboard',
-        description: 'Esports analytics and tournament management.',
+        title: 'Autara — Brand Identity & Web Design',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-gaming.mp4',
-          alt: 'Gaming Dashboard Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/gaming',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Gaming'
+          category: 'x'
         }
       }
     ]
@@ -222,64 +222,64 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-4',
-      title: 'Blockchain Exchange',
-      description: 'Secure cryptocurrency trading platform with advanced features.',
+      title: 'TokenWorks — Design & Build',
+      description: 'Ongoing multi-disiplinary end-to-end design, engineering, and growth: headless ecommerce, apps, media, brand, and strategy.',
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/portfolio-blockchain.mp4',
-        alt: 'Blockchain Exchange Preview'
+        src: '/videos/tokenworks-design-and-build.mp4',
+        alt: 'TokenWorks Design & Build Reel'
       },
-      link: '/portfolio/blockchain',
+      link: '/portfolio/tokenworks-design-and-build',
       metadata: {
-        category: 'Crypto',
+        category: 'Design & Build',
         readTime: '8 min read'
       }
     },
     sidebar: [
       {
         id: 'project-4-1',
-        title: 'Food Delivery App',
-        description: 'On-demand food ordering and tracking.',
+        title: 'TokenWorks — Design & Build',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-food.jpg',
-          alt: 'Food Delivery Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/food-delivery',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Food & Beverage'
+          category: 'x'
         }
       },
       {
         id: 'project-4-2',
-        title: 'Travel Booking Platform',
-        description: 'Comprehensive travel planning and booking.',
+        title: 'TokenWorks — Design & Build',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-travel.mp4',
-          alt: 'Travel Platform Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/travel',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Travel'
+          category: 'x'
         }
       },
       {
         id: 'project-4-3',
-        title: 'HR Management System',
-        description: 'Employee management and payroll solution.',
+        title: 'TokenWorks — Design & Build',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-hr.jpg',
-          alt: 'HR System Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/hr-system',
+        link: '/portfolio/x',
         metadata: {
-          category: 'HR Tech'
+          category: 'x'
         }
       }
     ]
@@ -287,64 +287,64 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-5',
-      title: 'IoT Control Center',
-      description: 'Smart device management and automation platform.',
+      title: 'Breeze — Brand Identity & Site',
+      description: 'Brand identity and Framer site: logo system, type & palette, social kit, brand deck.',
       type: 'featured' as const,
       media: {
         type: 'image' as const,
-        src: '/images/portfolio-iot.jpg',
-        alt: 'IoT Control Center Preview'
+        src: '/images/breeze-arch-netowork.jpg',
+        alt: 'Breeze on Arch Network Reel'
       },
       link: '/portfolio/iot-center',
       metadata: {
-        category: 'IoT',
+        category: 'Logo, Brand, Framer Landing Page, Social Assets',
         readTime: '4 min read'
       }
     },
     sidebar: [
       {
         id: 'project-5-1',
-        title: 'Music Streaming Service',
-        description: 'High-quality audio streaming platform.',
+        title: 'x',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-music.mp4',
-          alt: 'Music Streaming Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/music-streaming',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Entertainment'
+          category: 'x'
         }
       },
       {
         id: 'project-5-2',
-        title: 'Fitness Tracker App',
-        description: 'Health monitoring and workout planning.',
+        title: 'x',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/portfolio-fitness.jpg',
-          alt: 'Fitness Tracker Preview'
+          src: '/images/x.jpg',
+          alt: 'x'
         },
-        link: '/portfolio/fitness',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Health & Fitness'
+          category: 'x'
         }
       },
       {
         id: 'project-5-3',
-        title: 'News Aggregator',
-        description: 'Personalized news and content curation.',
+        title: 'x',
+        description: 'x',
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/portfolio-news.mp4',
-          alt: 'News Aggregator Preview'
+          src: '/videos/x.mp4',
+          alt: 'x'
         },
-        link: '/portfolio/news',
+        link: '/portfolio/x',
         metadata: {
-          category: 'Media'
+          category: 'x'
         }
       }
     ]

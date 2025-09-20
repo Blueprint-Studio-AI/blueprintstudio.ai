@@ -56,11 +56,11 @@ export default function PricingSection() {
             <div className="flex flex-col justify-center items-start gap-1 p-1 rounded-[20px] border border-neutral-300 bg-neutral-200">
               {/* Card 1 - Subscribe */}
               <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
-                <div className="flex justify-between items-start w-full mb-3">
+                <div className="flex justify-between items-center w-full mb-3">
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <CheckCircle className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-lg font-medium text-neutral-700">[1]</span>
+                  <span className="text-sm font-medium text-neutral-700">[1]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black">Subscribe</h4>
@@ -70,11 +70,11 @@ export default function PricingSection() {
 
               {/* Card 2 - Request */}
               <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
-                <div className="flex justify-between items-start w-full mb-3">
+                <div className="flex justify-between items-center w-full mb-3">
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <MessageCircle className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-lg font-medium text-neutral-700">[2]</span>
+                  <span className="text-sm font-medium text-neutral-700">[2]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black">Request</h4>
@@ -84,11 +84,11 @@ export default function PricingSection() {
 
               {/* Card 3 - Receive results */}
               <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
-                <div className="flex justify-between items-start w-full mb-3">
+                <div className="flex justify-between items-center w-full mb-3">
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <Package className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-lg font-medium text-neutral-700">[3]</span>
+                  <span className="text-sm font-medium text-neutral-700">[3]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black">Receive results</h4>
@@ -98,7 +98,7 @@ export default function PricingSection() {
             </div>
 
             {/* Middle Column - Design & Build Subscription */}
-            <div className="flex flex-col items-start gap-6 p-6 rounded-[20px] border border-neutral-300 bg-white">
+            <div className="flex flex-col items-start gap-6 p-5 rounded-[20px] border border-neutral-300 bg-white">
               {/* Icon */}
               <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-300 bg-neutral-100">
                 <Package className="w-4 h-4 text-neutral-600" />
@@ -155,7 +155,7 @@ export default function PricingSection() {
             </div>
 
             {/* Third Column - Project Based */}
-            <div className="flex flex-col items-start gap-6 p-6 rounded-[20px] border border-neutral-300 bg-neutral-100">
+            <div className="flex flex-col items-start gap-6 p-5 rounded-[20px] border border-neutral-300 bg-neutral-100">
               {/* Icon */}
               <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-300 bg-neutral-200">
                 <BarChart3 className="w-4 h-4 text-neutral-600" />
