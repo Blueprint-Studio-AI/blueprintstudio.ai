@@ -32,7 +32,7 @@ const portfolioSections = [
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/portfolio-featured.mp4',
+        src: '/videos/work/living-ip-horizontal.mp4',
         alt: 'LivingIP Project Reel'
       },
       link: '/portfolio/livingip',
