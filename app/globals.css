@@ -191,7 +191,59 @@
   .text-shadow-nav {
     text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.13);
   }
-  
+
+  /* Logo loading animations */
+  @keyframes logo-entrance {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes logo-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+  }
+
+  .logo-entrance {
+    opacity: 0;
+    animation: logo-entrance 250ms cubic-bezier(.165, .84, .44, 1) forwards;
+  }
+
+  .logo-breathing {
+    animation: logo-pulse 1.5s cubic-bezier(.455, .03, .515, .955) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    @keyframes logo-entrance {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes logo-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .logo-entrance {
+      animation: logo-entrance 250ms ease-out forwards;
+    }
+
+    .logo-breathing {
+      animation: logo-pulse 1.5s ease-in-out infinite;
+    }
+  }
+
   /* New backdrop blur utilities */
   .backdrop-blur-nav {
     backdrop-filter: blur(3.5px);

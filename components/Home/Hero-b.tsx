@@ -14,8 +14,24 @@ export default function HeroB() {
     const [isAnimating, setIsAnimating] = useState(false);
     const [showOverlay, setShowOverlay] = useState(true);
     const [videoRevealed, setVideoRevealed] = useState(false);
+    const [logoEntered, setLogoEntered] = useState(false);
+    const [logoBreathing, setLogoBreathing] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const videoContainerRef = useRef<HTMLDivElement>(null);
+
+    // Start logo entrance animation immediately
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLogoEntered(true);
+
+            // Start breathing after entrance completes
+            setTimeout(() => {
+                setLogoBreathing(true);
+            }, 250); // Match entrance duration
+        }, 20); // Very short delay for black screen
+
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         // Lock scroll when overlay is visible
@@ -101,63 +117,6 @@ export default function HeroB() {
 
     return (
         <>
-            {/* CSS for animations */}
-            <style jsx>{`
-                @keyframes logo-entrance {
-                    0% {
-                        opacity: 0;
-                        transform: scale(0.8);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                }
-
-                @keyframes pulse-subtle {
-                    0%, 100% {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                    50% {
-                        opacity: 0.5;
-                        transform: scale(0.95);
-                    }
-                }
-
-                .logo-animate {
-                    animation:
-                        logo-entrance 300ms cubic-bezier(.165, .84, .44, 1) forwards,
-                        pulse-subtle 1.5s cubic-bezier(.455, .03, .515, .955) 300ms infinite;
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                    @keyframes logo-entrance {
-                        0% {
-                            opacity: 0;
-                        }
-                        100% {
-                            opacity: 1;
-                        }
-                    }
-
-                    @keyframes pulse-subtle {
-                        0%, 100% {
-                            opacity: 1;
-                        }
-                        50% {
-                            opacity: 0.6;
-                        }
-                    }
-
-                    .logo-animate {
-                        animation:
-                            logo-entrance 300ms ease-out forwards,
-                            pulse-subtle 1.5s ease-in-out 300ms infinite;
-                    }
-                }
-            `}</style>
-
             {/* Loading Overlay - Outside of section for full screen coverage */}
             {showOverlay && (
                 <div
@@ -187,15 +146,17 @@ export default function HeroB() {
                         })
                     }}
                 >
-                    {/* Logo - enters with scale animation then breathes */}
+                    {/* Logo - starts hidden, enters with scale, then breathes */}
                     <div
                         className={`
-                            ${!isAnimating ? 'logo-animate' : ''}
+                            ${logoEntered ? 'logo-entrance' : ''}
+                            ${logoBreathing && !isAnimating ? 'logo-breathing' : ''}
                             transition-opacity duration-200
                             ${isAnimating ? 'opacity-0' : ''}
                         `}
                         style={{
                             transitionTimingFunction: 'cubic-bezier(.25, .46, .45, .94)', // ease-out-quad for exit
+                            opacity: !logoEntered ? 0 : undefined, // Start at opacity 0
                         }}
                     >
                         <Image
