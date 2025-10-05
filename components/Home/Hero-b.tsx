@@ -15,22 +15,50 @@ export default function HeroB() {
     const [showOverlay, setShowOverlay] = useState(true);
     const [videoRevealed, setVideoRevealed] = useState(false);
     const [logoEntered, setLogoEntered] = useState(false);
-    const [logoBreathing, setLogoBreathing] = useState(false);
+    const [containerEntered, setContainerEntered] = useState(false);
+    const [textAnimated, setTextAnimated] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const videoContainerRef = useRef<HTMLDivElement>(null);
+    const loadStartTime = useRef<number>(Date.now());
 
-    // Start logo entrance animation immediately
+    // Check if mobile on mount
     useEffect(() => {
-        const timer = setTimeout(() => {
+        setIsMobile(window.innerWidth < 640);
+        const handleResize = () => setIsMobile(window.innerWidth < 640);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Start entrance animations immediately
+    useEffect(() => {
+        // Container entrance with scale
+        const containerTimer = setTimeout(() => {
+            setContainerEntered(true);
+        }, 100);
+
+        // Logo fade in
+        const logoTimer = setTimeout(() => {
             setLogoEntered(true);
+        }, 300);
 
-            // Start breathing after entrance completes
-            setTimeout(() => {
-                setLogoBreathing(true);
-            }, 250); // Match entrance duration
-        }, 20); // Very short delay for black screen
+        // Text stagger animation - more delay after logo
+        const textTimer = setTimeout(() => {
+            setTextAnimated(true);
+        }, 600);
 
-        return () => clearTimeout(timer);
+        // Set minimum display time (e.g., 2.5 seconds to read the text)
+        const minimumTimer = setTimeout(() => {
+            setMinimumTimeElapsed(true);
+        }, 2500);
+
+        return () => {
+            clearTimeout(containerTimer);
+            clearTimeout(logoTimer);
+            clearTimeout(textTimer);
+            clearTimeout(minimumTimer);
+        };
     }, []);
 
     useEffect(() => {
@@ -55,21 +83,6 @@ export default function HeroB() {
             if (isVideoLoaded) return; // Prevent duplicate calls
 
             setIsVideoLoaded(true);
-
-            // Start the animation sequence
-            setTimeout(() => {
-                setIsAnimating(true);
-
-                // Start video reveal animation
-                setTimeout(() => {
-                    setVideoRevealed(true);
-                }, 200); // Slight delay for smoother transition
-
-                // Remove overlay
-                setTimeout(() => {
-                    setShowOverlay(false);
-                }, 450); // Faster, snappier animation
-            }, 400); // Shorter pause to show logo
         };
 
         // Listen for multiple events to catch first load
@@ -115,58 +128,136 @@ export default function HeroB() {
         };
     }, []); // Remove isVideoLoaded dependency to prevent re-runs
 
+    // Start animation only when both video is loaded AND minimum time has elapsed
+    useEffect(() => {
+        if (isVideoLoaded && minimumTimeElapsed) {
+            // Start the animation sequence
+            setTimeout(() => {
+                setIsAnimating(true);
+
+                // Start video playback earlier in the animation
+                setTimeout(() => {
+                    if (videoRef.current) {
+                        videoRef.current.play();
+                    }
+                }, 0); // Start video earlier
+
+                // Start video reveal animation AFTER loader completes transform
+                setTimeout(() => {
+                    setVideoRevealed(true);
+                }, 700); // Match loader animation duration
+
+                // Remove overlay
+                setTimeout(() => {
+                    setShowOverlay(false);
+                }, 1400); // Give time for everything to complete
+            }, 300); // Reduced delay before starting animation
+        }
+    }, [isVideoLoaded, minimumTimeElapsed]);
+
     return (
         <>
-            {/* Loading Overlay - Outside of section for full screen coverage */}
+            {/* Loading Overlay - Site background that fades away */}
             {showOverlay && (
                 <div
-                    className="fixed inset-0 bg-black z-[100] flex items-center justify-center"
+                    className="fixed inset-0 bg-neutral-50 z-[100] flex items-center justify-center"
                     style={{
-                        transformOrigin: 'center center',
-                        willChange: 'transform, opacity',
                         transition: isAnimating
-                            ? 'all 400ms cubic-bezier(.23, 1, .32, 1)' // ease-out-quint - very smooth deceleration
+                            ? 'opacity 800ms cubic-bezier(.23, 1, .32, 1)'
                             : 'none',
-                        ...(isAnimating && videoContainerRef.current ? (() => {
-                            const rect = videoContainerRef.current.getBoundingClientRect();
-                            const scaleX = rect.width / window.innerWidth;
-                            const scaleY = rect.height / window.innerHeight;
-                            const translateX = rect.left + rect.width / 2 - window.innerWidth / 2;
-                            const translateY = rect.top + rect.height / 2 - window.innerHeight / 2;
-
-                            return {
-                                transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-                                borderRadius: '0.75rem', // Match video border radius
-                                opacity: 0,
-                                pointerEvents: 'none' as const,
-                            };
-                        })() : {
-                            transform: 'translate(0, 0) scale(1, 1)',
-                            opacity: 1,
-                        })
+                        opacity: isAnimating ? 0 : 1,
+                        pointerEvents: isAnimating ? 'none' : 'auto',
                     }}
                 >
-                    {/* Logo - starts hidden, enters with scale, then breathes */}
+                    {/* Loader Container - Large, centered with subtle border */}
                     <div
-                        className={`
-                            ${logoEntered ? 'logo-entrance' : ''}
-                            ${logoBreathing && !isAnimating ? 'logo-breathing' : ''}
-                            transition-opacity duration-200
-                            ${isAnimating ? 'opacity-0' : ''}
-                        `}
+                        className="loader-container relative bg-white border border-neutral-200 rounded-2xl flex items-center justify-center overflow-hidden"
                         style={{
-                            transitionTimingFunction: 'cubic-bezier(.25, .46, .45, .94)', // ease-out-quad for exit
-                            opacity: !logoEntered ? 0 : undefined, // Start at opacity 0
+                            width: 'calc(100vw - 80px)',
+                            maxWidth: '1200px',
+                            aspectRatio: isMobile ? '2/3' : '16/9',
+                            transformOrigin: 'center center',
+                            willChange: 'transform, opacity',
+                            opacity: containerEntered && !isAnimating ? 1 : 0,
+                            transform: containerEntered && !isAnimating
+                                ? 'scale(1)'
+                                : 'scale(0.9)',
+                            transition: isAnimating
+                                ? 'all 700ms cubic-bezier(.23, 1, .32, 1)'
+                                : 'all 600ms cubic-bezier(.34, 1.56, .64, 1)', // bounce effect
+                            ...(isAnimating && videoContainerRef.current ? (() => {
+                                const videoRect = videoContainerRef.current.getBoundingClientRect();
+                                const loaderEl = document.querySelector('.loader-container');
+                                if (!loaderEl) return {};
+                                const loaderRect = loaderEl.getBoundingClientRect();
+
+                                const scaleX = videoRect.width / loaderRect.width;
+                                const scaleY = videoRect.height / loaderRect.height;
+                                const translateX = (videoRect.left + videoRect.width / 2) - (loaderRect.left + loaderRect.width / 2);
+                                const translateY = (videoRect.top + videoRect.height / 2) - (loaderRect.top + loaderRect.height / 2);
+
+                                return {
+                                    transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+                                    opacity: 0,
+                                };
+                            })() : {})
                         }}
                     >
-                        <Image
-                            src="/blueprint-logo.svg"
-                            alt="Blueprint Studio"
-                            width={200}
-                            height={50}
-                            className="h-12 sm:h-16 w-auto"
-                            priority
-                        />
+                            {/* Logo and text content */}
+                            <div
+                                className={`flex flex-col items-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : ''}`}
+                            >
+                                {/* Blueprint Logo */}
+                                <Image
+                                    src="/blueprint-logo-dark.svg"
+                                    alt="Blueprint Studio"
+                                    width={30}
+                                    height={30}
+                                    className="h-5 w-auto mb-8 transition-opacity duration-700"
+                                    style={{
+                                        opacity: logoEntered ? 1 : 0,
+                                    }}
+                                    priority
+                                />
+
+                                {/* Two-line text with animation */}
+                                <div className="text-center">
+                                    <p className="text-neutral-700 text-2xl sm:text-4xl font-medium leading-relaxed">
+                                        <span className="block mb-1">
+                                            {"We partner with founders".split(' ').map((word, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="inline-block transition-all duration-500 mr-2"
+                                                    style={{
+                                                        opacity: textAnimated ? 1 : 0,
+                                                        filter: textAnimated ? 'blur(0px)' : 'blur(10px)',
+                                                        transform: textAnimated ? 'translateY(0)' : 'translateY(10px)',
+                                                        transitionDelay: `${i * 60}ms`,
+                                                    }}
+                                                >
+                                                    {word}
+                                                </span>
+                                            ))}
+                                        </span>
+                                        <span className="block">
+                                            {"to build their future".split(' ').map((word, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="inline-block transition-all duration-500 mr-2"
+                                                    style={{
+                                                        opacity: textAnimated ? 1 : 0,
+                                                        filter: textAnimated ? 'blur(0px)' : 'blur(10px)',
+                                                        transform: textAnimated ? 'translateY(0)' : 'translateY(10px)',
+                                                        transitionDelay: `${240 + (i * 60)}ms`, // Start second line after first
+                                                    }}
+                                                >
+                                                    {word}
+                                                </span>
+                                            ))}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
                     </div>
                 </div>
             )}
@@ -205,15 +296,11 @@ export default function HeroB() {
                         <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                         <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-                        {/* Video Container with subtle scale animation */}
+                        {/* Video Container - visible from start */}
                         <div
                             ref={videoContainerRef}
                             className="relative w-full max-w-5xl mx-auto aspect-[2/3] sm:aspect-video overflow-hidden"
                             style={{
-                                transform: videoRevealed ? 'scale(1)' : 'scale(0.98)',
-                                opacity: videoRevealed ? 1 : 0.8,
-                                transition: 'all 300ms cubic-bezier(.165, .84, .44, 1)', // ease-out-quart
-                                willChange: 'transform, opacity',
                                 borderRadius: '0.75rem', // Use inline style for better control
                                 backgroundColor: 'transparent', // Remove any background
                             }}
@@ -227,7 +314,6 @@ export default function HeroB() {
                                     borderRadius: '0.75rem', // Match container exactly
                                     WebkitMaskImage: '-webkit-radial-gradient(white, black)', // Force GPU rendering
                                 }}
-                                autoPlay
                                 loop
                                 muted
                                 playsInline
