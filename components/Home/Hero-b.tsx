@@ -59,7 +59,7 @@ export default function HeroB() {
         // Header logo fade in with slight delay after text
         const headerLogoTimer = setTimeout(() => {
             setHeaderLogoVisible(true);
-        }, 2750);
+        }, 2850);
 
         // Set minimum display time (e.g., 2.5 seconds to read the text)
         const minimumTimer = setTimeout(() => {
@@ -241,7 +241,7 @@ export default function HeroB() {
 
                             {/* Logo and text content - positioned higher */}
                             <div
-                                className={`relative flex flex-col items-center pt-[20%]`}
+                                className={`relative flex flex-col items-center pt-[50%] sm:pt-[20%]`}
                                 style={{
                                     opacity: containerAtVideo ? 0 : 1,
                                     transition: 'opacity 100ms ease-out',
@@ -253,7 +253,7 @@ export default function HeroB() {
                                     alt="Blueprint Studio"
                                     width={30}
                                     height={30}
-                                    className="h-5 w-auto mb-8 transition-opacity duration-700"
+                                    className="h-4 sm:h-5 w-auto mb-6 sm:mb-8 transition-opacity duration-700"
                                     style={{
                                         opacity: logoEntered ? 1 : 0,
                                     }}
@@ -267,7 +267,7 @@ export default function HeroB() {
                                             {"We partner with founders".split(' ').map((word, i) => (
                                                 <span
                                                     key={i}
-                                                    className="inline-block transition-all duration-500 mr-2"
+                                                    className="inline-block transition-all duration-500 mr-1"
                                                     style={{
                                                         opacity: textAnimated ? 1 : 0,
                                                         filter: textAnimated ? 'blur(0px)' : 'blur(10px)',
@@ -283,7 +283,7 @@ export default function HeroB() {
                                             {"to build their future".split(' ').map((word, i) => (
                                                 <span
                                                     key={i}
-                                                    className="inline-block transition-all duration-500 mr-2"
+                                                    className="inline-block transition-all duration-500 mr-1"
                                                     style={{
                                                         opacity: textAnimated ? 1 : 0,
                                                         filter: textAnimated ? 'blur(0px)' : 'blur(10px)',
@@ -316,10 +316,10 @@ export default function HeroB() {
                     </div>
                 </div>
                 <SectionHeader
-                    leftText={<AnimatedCitySwitcher startDelay={2500} />}
+                    leftText={<AnimatedCitySwitcher startDelay={2850} />}
                     centerContent={
                         <div
-                            className="transition-opacity duration-700"
+                            className="transition-opacity duration-7000"
                             style={{
                                 opacity: headerLogoVisible ? 1 : 0,
                             }}
@@ -329,11 +329,11 @@ export default function HeroB() {
                                 alt="Blueprint Studio"
                                 width={80}
                                 height={20}
-                                className="h-4 w-auto"
+                                className="h-3 sm:h-4 w-auto"
                             />
                         </div>
                     }
-                    rightText={<AnimatedDate startDelay={2500} />}
+                    rightText={<AnimatedDate startDelay={2850} />}
                 />
 
                 {/* Video Section */}
