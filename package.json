@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
+    "@calcom/atoms": "^1.10.0",
+    "@calcom/embed-react": "^1.5.3",
     "@hookform/resolvers": "^4.1.1",
     "@iconify/react": "^6.0.0",
     "@linear/sdk": "^38.0.0",

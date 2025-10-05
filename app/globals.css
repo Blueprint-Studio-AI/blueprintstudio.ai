@@ -29,7 +29,7 @@
     --rdp-outline-selected: 2px solid var(--rdp-accent-color);
     margin: 0;
   }
-  
+
   .rdp-day_selected:not([disabled]),
   .rdp-day_selected:focus:not([disabled]),
   .rdp-day_selected:active:not([disabled]),
@@ -37,11 +37,26 @@
     background-color: var(--rdp-accent-color);
     color: white;
   }
-  
+
   .rdp-day_selected:focus:not([disabled]) {
     border-color: var(--rdp-accent-color-dark);
   }
-  
+
+  /* Hide Cal.com branding globally */
+  a[href*="cal.com"],
+  a[href*="go.cal.com"],
+  img[src*="cal.com/api/logo"],
+  img[alt="Cal.com Logo"],
+  span.mb-6.mt-auto.pt-6,
+  .text-subtle:has(a[href*="cal.com"]),
+  div:has(> a[href*="go.cal.com/booking"]) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
   }
 
   /* Light theme for services pages */

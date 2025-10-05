@@ -11,6 +11,7 @@ import PortfolioBento from "./PortfolioBento";
 import PricingSection from "./PricingSection";
 import TestimonialSection from "./TestimonialSection";
 import FAQSection from "./FAQSection";
+import ScheduleCallSection from "./ScheduleCallSection";
 
 export default function Home() {
     return (
@@ -25,6 +26,7 @@ export default function Home() {
             <PricingSection/>
             <TestimonialSection/>
             <FAQSection/>
+            <ScheduleCallSection/>
                 <Footer />
             </div>
         </div>
