@@ -12,6 +12,7 @@ import AnimatedDate from "@/components/ui/AnimatedDate";
 export default function HeroB() {
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [containerAtVideo, setContainerAtVideo] = useState(false);
     const [showOverlay, setShowOverlay] = useState(true);
     const [videoRevealed, setVideoRevealed] = useState(false);
     const [logoEntered, setLogoEntered] = useState(false);
@@ -53,12 +54,12 @@ export default function HeroB() {
         // White background appears after text animation
         const backgroundTimer = setTimeout(() => {
             setBackgroundVisible(true);
-        }, 1800); // A moment after text has animated in
+        }, 1600); // A moment after text has animated in
 
         // Header logo fade in with slight delay after text
         const headerLogoTimer = setTimeout(() => {
             setHeaderLogoVisible(true);
-        }, 2900);
+        }, 2750);
 
         // Set minimum display time (e.g., 2.5 seconds to read the text)
         const minimumTimer = setTimeout(() => {
@@ -156,6 +157,11 @@ export default function HeroB() {
                     }
                 }, 0); // Start video earlier
 
+                // Container reaches video position
+                setTimeout(() => {
+                    setContainerAtVideo(true);
+                }, 650); // Just before animation completes
+
                 // Start video reveal animation AFTER loader completes transform
                 setTimeout(() => {
                     setVideoRevealed(true);
@@ -164,7 +170,7 @@ export default function HeroB() {
                 // Remove overlay
                 setTimeout(() => {
                     setShowOverlay(false);
-                }, 1400); // Give time for everything to complete
+                }, 750); // Quick fade after reaching position
             }, 300); // Reduced delay before starting animation
         }
     }, [isVideoLoaded, minimumTimeElapsed]);
@@ -177,7 +183,7 @@ export default function HeroB() {
                     className="fixed inset-0 bg-neutral-50 z-[100] flex items-center justify-center"
                     style={{
                         transition: isAnimating
-                            ? 'opacity 800ms cubic-bezier(.23, 1, .32, 1)'
+                            ? 'opacity 300ms cubic-bezier(.25, .46, .45, .94)' // ease-out-quad, much quicker
                             : 'none',
                         opacity: isAnimating ? 0 : 1,
                         pointerEvents: isAnimating ? 'none' : 'auto',
@@ -191,13 +197,15 @@ export default function HeroB() {
                             maxWidth: '1200px',
                             aspectRatio: isMobile ? '2/3' : '16/9',
                             transformOrigin: 'center center',
-                            willChange: 'transform, opacity',
-                            opacity: containerEntered && !isAnimating ? 1 : 0,
+                            willChange: 'transform, opacity, filter',
+                            opacity: containerEntered && !containerAtVideo ? 1 : containerEntered && containerAtVideo ? 0 : 0,
                             transform: containerEntered && !isAnimating
                                 ? 'scale(1)'
                                 : 'scale(0.9)',
                             transition: isAnimating
-                                ? 'all 700ms cubic-bezier(.23, 1, .32, 1)'
+                                ? containerAtVideo
+                                    ? 'opacity 100ms ease-out, transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
+                                    : 'transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
                                 : 'all 600ms cubic-bezier(.34, 1.56, .64, 1)', // bounce effect
                             ...(isAnimating && videoContainerRef.current ? (() => {
                                 const videoRect = videoContainerRef.current.getBoundingClientRect();
@@ -212,7 +220,7 @@ export default function HeroB() {
 
                                 return {
                                     transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-                                    opacity: 0,
+                                    filter: 'blur(2px)',
                                 };
                             })() : {})
                         }}
@@ -222,16 +230,22 @@ export default function HeroB() {
                                 className="absolute inset-0 rounded-2xl"
                                 style={{
                                     backgroundColor: '#FBFBFB',
-                                    transform: backgroundVisible ? 'scale(1)' : 'scale(0.98)',
-                                    opacity: backgroundVisible ? 1 : 0,
-                                    transition: 'all 800ms cubic-bezier(.165, .84, .44, 1)', // ease-out-quart
+                                    transform: backgroundVisible && !containerAtVideo ? 'scale(1)' : 'scale(0.98)',
+                                    opacity: backgroundVisible && !containerAtVideo ? 1 : 0,
+                                    transition: containerAtVideo
+                                        ? 'all 100ms ease-out' // Quick fade with container
+                                        : 'all 1600ms cubic-bezier(.165, .84, .44, 1)', // Slow fade in
                                     transformOrigin: 'center center',
                                 }}
                             />
 
                             {/* Logo and text content - positioned higher */}
                             <div
-                                className={`relative flex flex-col items-center transition-opacity duration-300 pt-[20%] ${isAnimating ? 'opacity-0' : ''}`}
+                                className={`relative flex flex-col items-center pt-[20%]`}
+                                style={{
+                                    opacity: containerAtVideo ? 0 : 1,
+                                    transition: 'opacity 100ms ease-out',
+                                }}
                             >
                                 {/* Blueprint Logo */}
                                 <Image
