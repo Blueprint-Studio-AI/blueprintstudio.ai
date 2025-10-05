@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { breakpoints } from "./lib/breakpoints";
 
 const config: Config = {
   content: [
@@ -16,14 +17,14 @@ const config: Config = {
       },
     },
     screens: {
-      'xs': '475px',
-      'sm': '640px',
-      'md': '768px',
-      'lg': '1024px',
-      'xl': '1280px',
-      '2xl': '1536px',
-      'custom': '1124px',
-      'wide': '1387px',
+      'xs': breakpoints.xs,
+      'sm': breakpoints.sm,
+      'md': breakpoints.md,
+      'lg': breakpoints.lg,
+      'xl': breakpoints.xl,
+      '2xl': breakpoints['2xl'],
+      'custom': breakpoints.custom,
+      'wide': breakpoints.wide,
     },
     extend: {
       fontFamily: {
