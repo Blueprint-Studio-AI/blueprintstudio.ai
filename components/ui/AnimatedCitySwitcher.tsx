@@ -51,11 +51,16 @@ const TRANSITION_DURATION = 300;
 const SCRAMBLE_DURATION = 500;
 const CYCLE_INTERVAL = 6000;
 
-export default function AnimatedCitySwitcher() {
+interface AnimatedCitySwitcherProps {
+  startDelay?: number;
+}
+
+export default function AnimatedCitySwitcher({ startDelay = 0 }: AnimatedCitySwitcherProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isHovering, setIsHovering] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const scrambleIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -142,18 +147,21 @@ export default function AnimatedCitySwitcher() {
     };
   }, [isHovering]);
 
-  // Initialize with scramble animation
+  // Initialize with scramble animation after delay
   useEffect(() => {
     const initialText = `${cities[0].name}, ${cities[0].state}`;
     const scrambledStart = initialText.split('').map(() =>
       SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
     ).join('');
 
-    setDisplayText(scrambledStart);
     setTimeout(() => {
-      scrambleText(scrambledStart, initialText, SCRAMBLE_DURATION);
-    }, 100);
-  }, []);
+      setIsVisible(true);
+      setDisplayText(scrambledStart);
+      setTimeout(() => {
+        scrambleText(scrambledStart, initialText, SCRAMBLE_DURATION);
+      }, 100);
+    }, startDelay);
+  }, [startDelay]);
 
   // Cleanup
   useEffect(() => {
@@ -178,8 +186,8 @@ export default function AnimatedCitySwitcher() {
 
       {/* Visible animated text */}
       <span
-        className={`inline-block cursor-pointer transition-opacity ${
-          isTransitioning ? 'opacity-90' : 'opacity-100'
+        className={`inline-block cursor-pointer transition-opacity duration-500 ${
+          isVisible ? (isTransitioning ? 'opacity-90' : 'opacity-100') : 'opacity-0'
         }`}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}

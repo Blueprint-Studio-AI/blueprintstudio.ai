@@ -5,8 +5,13 @@ import { useState, useEffect, useRef } from 'react';
 const SCRAMBLE_CHARS = '0123456789./-';
 const SCRAMBLE_DURATION = 600;
 
-export default function AnimatedDate() {
+interface AnimatedDateProps {
+  startDelay?: number;
+}
+
+export default function AnimatedDate({ startDelay = 0 }: AnimatedDateProps) {
   const [displayText, setDisplayText] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
   const scrambleIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const targetDate = new Date().toLocaleDateString('en-US', {
@@ -65,17 +70,20 @@ export default function AnimatedDate() {
     }, 25);
   };
 
-  // Initialize with scramble animation
+  // Initialize with scramble animation after delay
   useEffect(() => {
     const scrambledStart = targetDate.split('').map(() =>
       SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
     ).join('');
 
-    setDisplayText(scrambledStart);
     setTimeout(() => {
-      scrambleText(scrambledStart, targetDate, SCRAMBLE_DURATION);
-    }, 150); // Slight delay after city animation starts
-  }, []);
+      setIsVisible(true);
+      setDisplayText(scrambledStart);
+      setTimeout(() => {
+        scrambleText(scrambledStart, targetDate, SCRAMBLE_DURATION);
+      }, 150); // Slight delay after city animation starts
+    }, startDelay);
+  }, [startDelay, targetDate]);
 
   // Cleanup
   useEffect(() => {
@@ -88,6 +96,7 @@ export default function AnimatedDate() {
 
   return (
     <span
+      className={`transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{
         fontFeatureSettings: '"tnum"'
       }}

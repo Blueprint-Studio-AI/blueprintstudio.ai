@@ -15,7 +15,9 @@ export default function HeroB() {
     const [showOverlay, setShowOverlay] = useState(true);
     const [videoRevealed, setVideoRevealed] = useState(false);
     const [logoEntered, setLogoEntered] = useState(false);
+    const [headerLogoVisible, setHeaderLogoVisible] = useState(false);
     const [containerEntered, setContainerEntered] = useState(false);
+    const [backgroundVisible, setBackgroundVisible] = useState(false);
     const [textAnimated, setTextAnimated] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
@@ -48,6 +50,16 @@ export default function HeroB() {
             setTextAnimated(true);
         }, 600);
 
+        // White background appears after text animation
+        const backgroundTimer = setTimeout(() => {
+            setBackgroundVisible(true);
+        }, 1800); // A moment after text has animated in
+
+        // Header logo fade in with slight delay after text
+        const headerLogoTimer = setTimeout(() => {
+            setHeaderLogoVisible(true);
+        }, 2900);
+
         // Set minimum display time (e.g., 2.5 seconds to read the text)
         const minimumTimer = setTimeout(() => {
             setMinimumTimeElapsed(true);
@@ -57,6 +69,8 @@ export default function HeroB() {
             clearTimeout(containerTimer);
             clearTimeout(logoTimer);
             clearTimeout(textTimer);
+            clearTimeout(backgroundTimer);
+            clearTimeout(headerLogoTimer);
             clearTimeout(minimumTimer);
         };
     }, []);
@@ -169,9 +183,9 @@ export default function HeroB() {
                         pointerEvents: isAnimating ? 'none' : 'auto',
                     }}
                 >
-                    {/* Loader Container - Large, centered with subtle border */}
+                    {/* Loader Container - Large, centered */}
                     <div
-                        className="loader-container relative bg-white border border-neutral-200 rounded-2xl flex items-center justify-center overflow-hidden"
+                        className="loader-container relative rounded-2xl flex items-start justify-center overflow-hidden"
                         style={{
                             width: 'calc(100vw - 80px)',
                             maxWidth: '1200px',
@@ -203,9 +217,21 @@ export default function HeroB() {
                             })() : {})
                         }}
                     >
-                            {/* Logo and text content */}
+                            {/* White background with subtle scale animation */}
                             <div
-                                className={`flex flex-col items-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : ''}`}
+                                className="absolute inset-0 rounded-2xl"
+                                style={{
+                                    backgroundColor: '#FBFBFB',
+                                    transform: backgroundVisible ? 'scale(1)' : 'scale(0.98)',
+                                    opacity: backgroundVisible ? 1 : 0,
+                                    transition: 'all 800ms cubic-bezier(.165, .84, .44, 1)', // ease-out-quart
+                                    transformOrigin: 'center center',
+                                }}
+                            />
+
+                            {/* Logo and text content - positioned higher */}
+                            <div
+                                className={`relative flex flex-col items-center transition-opacity duration-300 pt-[20%] ${isAnimating ? 'opacity-0' : ''}`}
                             >
                                 {/* Blueprint Logo */}
                                 <Image
@@ -276,17 +302,24 @@ export default function HeroB() {
                     </div>
                 </div>
                 <SectionHeader
-                    leftText={<AnimatedCitySwitcher />}
+                    leftText={<AnimatedCitySwitcher startDelay={2500} />}
                     centerContent={
-                        <Image
-                            src="/blueprint-logo-dark.svg"
-                            alt="Blueprint Studio"
-                            width={100}
-                            height={25}
-                            className="h-5 w-auto"
-                        />
+                        <div
+                            className="transition-opacity duration-700"
+                            style={{
+                                opacity: headerLogoVisible ? 1 : 0,
+                            }}
+                        >
+                            <Image
+                                src="/blueprint-logo-dark.svg"
+                                alt="Blueprint Studio"
+                                width={80}
+                                height={20}
+                                className="h-4 w-auto"
+                            />
+                        </div>
                     }
-                    rightText={<AnimatedDate />}
+                    rightText={<AnimatedDate startDelay={2500} />}
                 />
 
                 {/* Video Section */}
