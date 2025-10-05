@@ -162,7 +162,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#fafaf9] flex flex-col">
       {/* Hero Section - Enhanced with Premium Animation */}
-      <section className="flex-1 flex flex-col px-4" ref={heroRef}>
+      <section id="hero" className="flex-1 flex flex-col px-4" ref={heroRef}>
         <div className="max-w-4xl mx-auto w-full pt-4 md:pt-10">
           {/* Logo with refined subtle animation */}
           <LazyMotion features={domAnimation}>
@@ -282,8 +282,20 @@ export default function Home() {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-20 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-medium mb-6">About Blueprint Studio</h2>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            We're a design and development studio that partners with ambitious founders and companies
+            to build exceptional digital products. Our approach combines strategic thinking,
+            beautiful design, and robust engineering to deliver results that drive business growth.
+          </p>
+        </div>
+      </section>
+
       {/* Work Grid - Original Implementation */}
-      <section className="py-20 pt-16 px-4">
+      <section id="work" className="py-20 pt-16 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 gap-10">
         {workItems.map((item, index) => (
@@ -327,7 +339,7 @@ export default function Home() {
     </section>
 
       {/* Services - Original Implementation */}
-      <section className="relative services-theme">
+      <section id="services" className="relative services-theme">
         <div className="relative">
           <div className="max-w-4xl mx-auto overflow-visible">
             <Services 
@@ -340,7 +352,33 @@ export default function Home() {
       </section>
 
       {/* Pricing Section - New Three Column Design */}
-      <PricingSection/>
+      <section id="pricing">
+        <PricingSection/>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials">
+        <TestimonialSection/>
+      </section>
+
+      {/* Contact/Book Call Section */}
+      <section id="contact" className="py-20 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-medium mb-6">Ready to Get Started?</h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Let's discuss how we can help bring your vision to life.
+          </p>
+          <a
+            href="https://cal.com/blueprint-studio/intro-call"
+            className="inline-flex items-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Book a Call
+            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </section>
 
       <Footer/>
     </div>

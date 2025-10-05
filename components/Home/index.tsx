@@ -16,17 +16,31 @@ import ScheduleCallSection from "./ScheduleCallSection";
 export default function Home() {
     return (
         <div>
-            <QuoteSection/>
-            <HeroB/>
+            <div id="hero">
+                <HeroB/>
+            </div>
+            <div id="about">
+                <QuoteSection/>
+            </div>
             {/* Spacer to create scroll space for revealing quote */}
             <div className="h-screen" />
             <div className="relative z-30">
-            <Achievements/>
-            <PortfolioBento/>
-            <PricingSection/>
-            <TestimonialSection/>
-            <FAQSection/>
-            <ScheduleCallSection/>
+                <Achievements/>
+                <div id="work">
+                    <PortfolioBento/>
+                </div>
+                <div id="pricing">
+                    <PricingSection/>
+                </div>
+                <div id="testimonials">
+                    <TestimonialSection/>
+                </div>
+                <div id="faq">
+                    <FAQSection/>
+                </div>
+                <div id="contact">
+                    <ScheduleCallSection/>
+                </div>
                 <Footer />
             </div>
         </div>

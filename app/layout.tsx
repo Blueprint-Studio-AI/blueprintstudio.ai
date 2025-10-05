@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { FloatingNav } from "@/components/FloatingNav";
+import { FloatingNavNew } from "@/components/FloatingNavNew";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Toaster } from "@/components/ui/toaster"
 import Background from "@/components/ui/Background";
@@ -136,7 +136,7 @@ export default function RootLayout({
       </head>
       <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
         <Background />
-        <FloatingNav />
+        <FloatingNavNew />
         <main>
           {children}
           <Toaster />
