@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function QuoteSection() {
     return (
-        <div 
+        <div
             className="fixed inset-0 bg-neutral-200 flex items-center justify-center z-10"
             style={{
                 backgroundImage: 'radial-gradient(circle, #C3C6CC 1px, transparent 1px)',
@@ -26,12 +26,18 @@ export default function QuoteSection() {
                                 viewport={{ once: true, amount: 0.3 }}
                             > */}
                             <p
-                                className="text-4xl lg:text-6xl font-medium text-neutral-800 leading-tight mb-8" 
+                                className="text-3xl lg:text-5xl font-medium text-neutral-800 mb-8"
+                                style={{
+                                    letterSpacing: '-1.5px',
+                                    lineHeight: '1.3'
+                                }}
                             >
-                                &quot;The best ideas start as conversations.&quot;
+                                Blueprint Studio partners with<br />
+                                founders to build their future.
                             </p>
                             {/* </motion.p> */}
-                            {/* <motion.cite 
+
+                            {/* <motion.cite
                                 className="text-lg text-neutral-500 font-normal not-italic"
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
@@ -39,9 +45,14 @@ export default function QuoteSection() {
                                 viewport={{ once: true, amount: 0.3 }}
                             > */}
                             <p
-                                className="text-lg text-neutral-500 font-normal not-italic" 
+                                className="text-xl lg:text-2xl text-neutral-600 font-normal not-italic"
+                                style={{
+                                    letterSpacing: '-0.4px',
+                                    lineHeight: '1.5'
+                                }}
                             >
-                                 &ndash; Jony Ive
+                                You see the future. We design and build it —<br />
+                                products, brands, websites, apps, and media.
                             </p>
                                
                             {/* </motion.cite> */}

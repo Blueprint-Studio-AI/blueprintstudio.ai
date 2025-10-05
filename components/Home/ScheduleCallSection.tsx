@@ -24,15 +24,28 @@ export default function ScheduleCallSection() {
 
   return (
     <Section className="relative bg-[#fafaf9] overflow-hidden">
-      {/* Dotted background pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.15]"
-        style={{
-          backgroundImage: `radial-gradient(circle, #000 1px, transparent 1px)`,
-          backgroundSize: '20px 20px',
-          backgroundPosition: '0 0, 10px 10px'
-        }}
-      />
+      {/* Solid vertical lines */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+        <div className="w-full flex-1 flex justify-center relative">
+          {/* Solid vertical lines */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300" />
+          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300" />
+        </div>
+      </div>
+
+      {/* Dotted background pattern only in center area */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+        <div className="w-full flex-1 flex justify-center relative">
+          <div
+            className="absolute left-0 top-0 bottom-0 right-0 opacity-[0.15]"
+            style={{
+              backgroundImage: `radial-gradient(circle, #000 1px, transparent 1px)`,
+              backgroundSize: '20px 20px',
+              backgroundPosition: '0 0, 10px 10px'
+            }}
+          />
+        </div>
+      </div>
 
       <OuterContainer>
         <InnerContainer className="relative z-10">
@@ -68,6 +81,8 @@ export default function ScheduleCallSection() {
           </div>
         </InnerContainer>
       </OuterContainer>
+
+      <div className="line-dash-x" />
     </Section>
   );
 }

@@ -3,6 +3,8 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "../ui/SectionHeader";
+import CompassMark from "@/components/ui/CompassMark";
+import ChatBubbles from "@/components/ui/ChatBubbles";
 
 const achievements = [
   {
@@ -74,7 +76,7 @@ export default function Achievements() {
           {/* Achievement Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {achievements.map((achievement) => (
-              <div 
+              <div
                 key={achievement.id}
                 className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px]"
               >
@@ -86,9 +88,15 @@ export default function Achievements() {
                     backgroundSize: '16px 16px',
                   }}
                 >
-                  {/* Visual placeholder - ready for motion animation */}
+                  {/* Visual components for each card */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-neutral-400 rounded-full opacity-60" />
+                    {achievement.id === 1 ? (
+                      <CompassMark />
+                    ) : achievement.id === 3 ? (
+                      <ChatBubbles />
+                    ) : (
+                      <div className="w-16 h-16 bg-neutral-400 rounded-full opacity-60" />
+                    )}
                   </div>
                 </div>
 
