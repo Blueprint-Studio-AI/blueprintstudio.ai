@@ -32,7 +32,7 @@ const portfolioSections = [
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/work/living-ip-horizontal.mp4',
+        src: '/media/projects/living-ip/living-ip-horizontal-compressed.mp4',
         alt: 'LivingIP Project Reel'
       },
       link: '/portfolio/livingip',
@@ -49,7 +49,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/living-ip/square-votes.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -63,8 +63,8 @@ const portfolioSections = [
         description: 'x',
         type: 'x' as const,
         media: {
-          type: 'video' as const,
-          src: '/videos/x.mp4',
+          type: 'image' as const,
+          src: '/media/projects/living-ip/square-analytics.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -79,7 +79,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/living-ip/square-badges.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -97,7 +97,7 @@ const portfolioSections = [
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/arch-network-btc-all-in-summit.mp4',
+        src: '/media/projects/arch-vegas/arch-vegas-horizontal-compressed.mp4',
         alt: 'Arch Network BTC All-In Summit Project Reel'
       },
       link: '/portfolio/ai-analytics',
@@ -113,23 +113,8 @@ const portfolioSections = [
         description: 'x',
         type: 'standard' as const,
         media: {
-          type: 'image' as const,
-          src: '/images/x.jpg',
-          alt: 'x'
-        },
-        link: '/portfolio/x',
-        metadata: {
-          category: 'x'
-        }
-      },
-      {
-        id: 'project-2-2',
-        title: 'Arch Network — BTC All-In Summit',
-        description: 'x',
-        type: 'standard' as const,
-        media: {
           type: 'video' as const,
-          src: '/videos/x.mp4',
+          src: '/media/projects/arch-vegas/square-screens.mov',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -144,7 +129,22 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/arch-vegas/square-docs-graphic.png',
+          alt: 'x'
+        },
+        link: '/portfolio/x',
+        metadata: {
+          category: 'x'
+        }
+      },
+      {
+        id: 'project-2-2',
+        title: 'Arch Network — BTC All-In Summit',
+        description: 'x',
+        type: 'standard' as const,
+        media: {
+          type: 'image' as const,
+          src: '/media/projects/arch-vegas/square-logos.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -162,7 +162,7 @@ const portfolioSections = [
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/autara.mp4',
+        src: '/media/projects/autara/autara-quick-edit-compressed.mp4',
         alt: 'Autara on Arch Network Project Reel'
       },
       link: '/portfolio/autara',
@@ -178,8 +178,8 @@ const portfolioSections = [
         description: 'x',
         type: 'standard' as const,
         media: {
-          type: 'video' as const,
-          src: '/videos/x.mp4',
+          type: 'image' as const,
+          src: '/media/projects/autara/square-logo.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -194,7 +194,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/autara/square-pie-chart.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -208,8 +208,8 @@ const portfolioSections = [
         description: 'x',
         type: 'standard' as const,
         media: {
-          type: 'video' as const,
-          src: '/videos/x.mp4',
+          type: 'image' as const,
+          src: '/media/projects/autara/square-table.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -222,15 +222,15 @@ const portfolioSections = [
   {
     featured: {
       id: 'featured-4',
-      title: 'TokenWorks — Design & Build',
+      title: 'TokenWorks — Marketing Videos',
       description: 'Ongoing multi-disiplinary end-to-end design, engineering, and growth: headless ecommerce, apps, media, brand, and strategy.',
       type: 'featured' as const,
       media: {
         type: 'video' as const,
-        src: '/videos/tokenworks-design-and-build.mp4',
+        src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
         alt: 'TokenWorks Design & Build Reel'
       },
-      link: '/portfolio/tokenworks-design-and-build',
+      link: '/portfolio/x',
       metadata: {
         category: 'Design & Build',
         readTime: '8 min read'
@@ -244,7 +244,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/tokenworks-videos/square-idvs+.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -258,8 +258,8 @@ const portfolioSections = [
         description: 'x',
         type: 'standard' as const,
         media: {
-          type: 'video' as const,
-          src: '/videos/x.mp4',
+          type: 'image' as const,
+          src: '/media/projects/tokenworks-videos/square-youtube.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -274,7 +274,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/tokenworks-videos/square-av3.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -292,7 +292,7 @@ const portfolioSections = [
       type: 'featured' as const,
       media: {
         type: 'image' as const,
-        src: '/images/breeze-arch-netowork.jpg',
+        src: '/media/projects/breeze/hero-breeze.png',
         alt: 'Breeze on Arch Network Reel'
       },
       link: '/portfolio/iot-center',
@@ -309,7 +309,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'video' as const,
-          src: '/videos/x.mp4',
+          src: '/media/projects/breeze/square-b.mp4',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -324,7 +324,7 @@ const portfolioSections = [
         type: 'standard' as const,
         media: {
           type: 'image' as const,
-          src: '/images/x.jpg',
+          src: '/media/projects/breeze/square-phone.png',
           alt: 'x'
         },
         link: '/portfolio/x',
@@ -338,8 +338,8 @@ const portfolioSections = [
         description: 'x',
         type: 'standard' as const,
         media: {
-          type: 'video' as const,
-          src: '/videos/x.mp4',
+          type: 'image' as const,
+          src: '/media/projects/breeze/square-hill.png',
           alt: 'x'
         },
         link: '/portfolio/x',

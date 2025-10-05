@@ -366,7 +366,7 @@ export default function HeroB() {
                                 playsInline
                                 preload="auto"
                             >
-                                <source src="/videos/highlight-reel-horizontal-001-1.mp4" type="video/mp4" />
+                                <source src="/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4" type="video/mp4" />
                                 {/* Fallback test video */}
                                 {/* <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" /> */}
                             </video>
