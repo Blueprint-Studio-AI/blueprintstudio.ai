@@ -8,6 +8,7 @@ import Image from "next/image";
 import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
+import { useBreakpoint } from "@/lib/breakpoints";
 
 export default function HeroB() {
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -22,12 +23,45 @@ export default function HeroB() {
     const [textAnimated, setTextAnimated] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
+    const [isClient, setIsClient] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const videoContainerRef = useRef<HTMLDivElement>(null);
     const loadStartTime = useRef<number>(Date.now());
+    const breakpoint = useBreakpoint();
 
-    // Check if mobile on mount
+    // Determine video source based on breakpoint (only after client-side hydration)
+    const videoSource = !isClient ? "/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4" : // Default to horizontal during SSR
+        (breakpoint === 'base' || breakpoint === 'xs')
+        ? "/media/highlight-reel/highlight-reel-vertical-001-compressed.mp4"
+        : "/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4";
+
     useEffect(() => {
+        console.log('breakpoint:', breakpoint);
+        console.log('videoSource:', videoSource);
+        console.log('window.innerWidth:', typeof window !== 'undefined' ? window.innerWidth : 'undefined');
+    }, [breakpoint, videoSource])
+
+    // Handle video source changes without recreating the element
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || !isClient) return;
+
+        const wasPlaying = !video.paused;
+        const currentTime = video.currentTime;
+        
+        video.src = videoSource;
+        video.load(); // Reload the video with new source
+        
+        // Restore playback state if it was playing
+        if (wasPlaying) {
+            video.currentTime = 0; // Start from beginning with new video
+            video.play().catch(console.error);
+        }
+    }, [videoSource, isClient])
+
+    // Check if mobile on mount and set client flag
+    useEffect(() => {
+        setIsClient(true);
         setIsMobile(window.innerWidth < 640);
         const handleResize = () => setIsMobile(window.innerWidth < 640);
         window.addEventListener('resize', handleResize);
@@ -365,11 +399,7 @@ export default function HeroB() {
                                 muted
                                 playsInline
                                 preload="auto"
-                            >
-                                <source src="/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4" type="video/mp4" />
-                                {/* Fallback test video */}
-                                {/* <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" /> */}
-                            </video>
+                            />
                         </div>
                     </InnerContainer>
                 </OuterContainer>
