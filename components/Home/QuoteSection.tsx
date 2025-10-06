@@ -2,9 +2,27 @@
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function QuoteSection() {
+    const [shouldAnimate, setShouldAnimate] = useState(false);
+    const { scrollY } = useScroll();
+
+    useEffect(() => {
+        const unsubscribe = scrollY.on("change", (latest) => {
+            // Trigger animation as soon as the heading would be visible
+            // The hero section is roughly at the viewport height, so we trigger slightly before
+            const triggerPoint = window.innerHeight * 0.5; // Trigger when scrolled ~50% of viewport height
+
+            if (latest > triggerPoint && !shouldAnimate) {
+                setShouldAnimate(true);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [scrollY, shouldAnimate]);
+
     return (
         <div
             className="fixed inset-0 bg-neutral-200 flex items-center justify-center z-10"
@@ -16,15 +34,7 @@ export default function QuoteSection() {
             <Section className="w-full">
                 <div className="py-32 lg:py-40 text-center px-4">
                     <blockquote>
-                            {/* <motion.p 
-                                className="text-4xl lg:text-6xl font-medium text-neutral-800 leading-tight mb-8" 
-                                style={{ letterSpacing: '-1.2px' }}
-                                initial={{ opacity: 0, y: 50 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.2 }}
-                                viewport={{ once: true, amount: 0.3 }}
-                            > */}
-                            <h1
+                            <motion.h1
                                 className="font-medium text-neutral-800 mb-8"
                                 style={{
                                     fontSize: 'clamp(48px, 9vw, 80px)',
@@ -33,18 +43,25 @@ export default function QuoteSection() {
                                     textWrap: 'balance'
                                 }}
                             >
-                                Blueprint Studio partners with founders to build their&nbsp;future.
-                            </h1>
-                            {/* </motion.p> */}
+                                {["Blueprint Studio", "partners with", "founders to", "build their\u00A0future."].map((phrase, i) => (
+                                    <motion.span
+                                        key={i}
+                                        className="inline-block"
+                                        style={{ marginRight: i < 3 ? '0.3em' : 0 }}
+                                        initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+                                        animate={shouldAnimate ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 30, filter: 'blur(10px)' }}
+                                        transition={{
+                                            duration: 0.6,
+                                            ease: [0.16, 1, 0.3, 1],
+                                            delay: i * 0.05 // Stagger each phrase
+                                        }}
+                                    >
+                                        {phrase}
+                                    </motion.span>
+                                ))}
+                            </motion.h1>
 
-                            {/* <motion.cite
-                                className="text-lg text-neutral-500 font-normal not-italic"
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                transition={{ duration: 0.6, delay: 0.6 }}
-                                viewport={{ once: true, amount: 0.3 }}
-                            > */}
-                            <p
+                            <motion.p
                                 className="text-neutral-600 font-normal not-italic"
                                 style={{
                                     fontSize: 'clamp(20px, 4vw, 28px)',
@@ -53,10 +70,23 @@ export default function QuoteSection() {
                                     textWrap: 'balance'
                                 }}
                             >
-                                You see the&nbsp;future. We design and&nbsp;build&nbsp;it — products, brands, websites, apps, and&nbsp;media.
-                            </p>
-                               
-                            {/* </motion.cite> */}
+                                {["You see the\u00A0future.", "We design and\u00A0build\u00A0it —", "products, brands, websites,", "apps, and\u00A0media."].map((phrase, i) => (
+                                    <motion.span
+                                        key={i}
+                                        className="inline-block"
+                                        style={{ marginRight: i < 3 ? '0.3em' : 0 }}
+                                        initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+                                        animate={shouldAnimate ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 30, filter: 'blur(10px)' }}
+                                        transition={{
+                                            duration: 0.6,
+                                            ease: [0.16, 1, 0.3, 1],
+                                            delay: 0.5 + (i * 0.05) // Start after heading with pause and stagger
+                                        }}
+                                    >
+                                        {phrase}
+                                    </motion.span>
+                                ))}
+                            </motion.p>
                         </blockquote>
                 </div>
             </Section>

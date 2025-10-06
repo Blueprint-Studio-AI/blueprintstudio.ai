@@ -55,13 +55,17 @@ export default function ScheduleCallSection() {
                 style={{
                   fontSize: 'clamp(32px, 6vw, 48px)',
                   lineHeight: '110%',
-                  letterSpacing: '-1px'
+                  letterSpacing: '-1px',
+                  textWrap: 'balance'
                 }}>
               Let's see if Blueprint Studio is a fit
             </h2>
 
             {/* Subtitle */}
-            <p className="text-neutral-600 text-lg text-center mb-16 max-w-2xl mx-auto">
+            <p className="text-neutral-600 text-lg text-center mb-16 max-w-2xl mx-auto"
+               style={{
+                 textWrap: 'balance'
+               }}>
               Schedule a free consultation to discuss your project and explore how we can help bring your vision to life
             </p>
 

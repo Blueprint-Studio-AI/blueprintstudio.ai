@@ -58,7 +58,8 @@ function FaqItem({ question, answer, isLast = false }: FaqItemProps) {
         className="w-full flex justify-between items-start py-6 text-left group"
         aria-expanded={isOpen}
       >
-        <h4 className="font-medium text-lg pr-8 text-black group-hover:text-neutral-600 transition-colors">
+        <h4 className="font-medium text-lg pr-8 text-black group-hover:text-neutral-600 transition-colors"
+            style={{ textWrap: 'balance' }}>
           {question}
         </h4>
         <motion.div 
@@ -78,7 +79,8 @@ function FaqItem({ question, answer, isLast = false }: FaqItemProps) {
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        <p className="text-neutral-600 leading-relaxed pb-6">
+        <p className="text-neutral-600 leading-relaxed pb-6"
+           style={{ textWrap: 'balance' }}>
           {answer}
         </p>
       </motion.div>
@@ -115,15 +117,17 @@ export default function FAQSection() {
           <div className="max-w-3xl px-2 md:mx-auto">
             {/* Title */}
             <div className="text-center mb-12">
-              <h2 className="font-medium text-black mb-4" 
-                  style={{ 
-                    fontSize: 'clamp(32px, 6vw, 48px)', 
+              <h2 className="font-medium text-black mb-4"
+                  style={{
+                    fontSize: 'clamp(32px, 6vw, 48px)',
                     lineHeight: '110%',
-                    letterSpacing: '-1px' 
+                    letterSpacing: '-1px',
+                    textWrap: 'balance'
                   }}>
                 Frequently Asked Questions
               </h2>
-              <p className="text-neutral-600 text-lg">
+              <p className="text-neutral-600 text-lg"
+                 style={{ textWrap: 'balance' }}>
                 Everything you need to know about working with Blueprint Studio
               </p>
             </div>
@@ -142,7 +146,8 @@ export default function FAQSection() {
 
             {/* Contact CTA */}
             <div className="text-center mt-12 pt-8">
-              <p className="text-neutral-600 mb-4">
+              <p className="text-neutral-600 mb-4"
+                 style={{ textWrap: 'balance' }}>
                 Still have questions?
               </p>
               <a 
