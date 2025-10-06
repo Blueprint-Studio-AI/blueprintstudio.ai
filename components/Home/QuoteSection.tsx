@@ -14,9 +14,8 @@ export default function QuoteSection() {
                 backgroundColor: '#E6E6E6'
             }}>
             <Section className="w-full">
-                <OuterContainer>
-                    <InnerContainer className="py-32 lg:py-40 text-center">
-                        <blockquote className="max-w-4xl mx-auto">
+                <div className="py-32 lg:py-40 text-center px-4">
+                    <blockquote>
                             {/* <motion.p 
                                 className="text-4xl lg:text-6xl font-medium text-neutral-800 leading-tight mb-8" 
                                 style={{ letterSpacing: '-1.2px' }}
@@ -25,16 +24,17 @@ export default function QuoteSection() {
                                 transition={{ duration: 0.8, delay: 0.2 }}
                                 viewport={{ once: true, amount: 0.3 }}
                             > */}
-                            <p
-                                className="text-3xl lg:text-5xl font-medium text-neutral-800 mb-8"
+                            <h1
+                                className="font-medium text-neutral-800 mb-8"
                                 style={{
-                                    letterSpacing: '-1.5px',
-                                    lineHeight: '1.3'
+                                    fontSize: 'clamp(48px, 9vw, 80px)',
+                                    lineHeight: 'clamp(110%, 1.2vw, 120%)',
+                                    letterSpacing: '-2.2px',
+                                    textWrap: 'balance'
                                 }}
                             >
-                                Blueprint Studio partners with<br />
-                                founders to build their future.
-                            </p>
+                                Blueprint Studio partners with founders to build their&nbsp;future.
+                            </h1>
                             {/* </motion.p> */}
 
                             {/* <motion.cite
@@ -45,20 +45,20 @@ export default function QuoteSection() {
                                 viewport={{ once: true, amount: 0.3 }}
                             > */}
                             <p
-                                className="text-xl lg:text-2xl text-neutral-600 font-normal not-italic"
+                                className="text-neutral-600 font-normal not-italic"
                                 style={{
-                                    letterSpacing: '-0.4px',
-                                    lineHeight: '1.5'
+                                    fontSize: 'clamp(20px, 4vw, 28px)',
+                                    lineHeight: '130%',
+                                    letterSpacing: '-0.96px',
+                                    textWrap: 'balance'
                                 }}
                             >
-                                You see the future. We design and build it —<br />
-                                products, brands, websites, apps, and media.
+                                You see the&nbsp;future. We design and&nbsp;build&nbsp;it — products, brands, websites, apps, and&nbsp;media.
                             </p>
                                
                             {/* </motion.cite> */}
                         </blockquote>
-                    </InnerContainer>
-                </OuterContainer>
+                </div>
             </Section>
         </div>
     )

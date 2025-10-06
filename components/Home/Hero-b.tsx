@@ -404,7 +404,7 @@ export default function HeroB() {
                     </InnerContainer>
                 </OuterContainer>
 
-                <div className="line-dash-x hidden sm:block"/>
+                {/* <div className="line-dash-x hidden sm:block"/> */}
             </Section>
         </>
     )

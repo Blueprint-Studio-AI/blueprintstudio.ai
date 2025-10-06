@@ -9,38 +9,38 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    quote: "Blueprint Studio transformed our online presence completely. The team's attention to detail and understanding of our brand was exceptional.",
-    author: "Sarah Chen",
-    role: "CEO",
-    company: "TechStart Inc."
+    quote: "Blueprint's design subscription gave us an affordable way to bring our digital vision to life. Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
+    author: "Andrew Jenkins",
+    role: "Former VP of Engineering, Credit Karma",
+    company: "Currently Startup Co-Founder"
   },
   {
     id: 2,
-    quote: "Working with Blueprint has been a game-changer for our business. They deliver quality work consistently and always meet deadlines.",
-    author: "Michael Rodriguez",
-    role: "Marketing Director",
-    company: "GrowthCo"
+    quote: "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft. We've been working with them the last two months and continue to do so.",
+    author: "Scott Zimmer",
+    role: "Former EVP of Innovation, Truist Bank",
+    company: "Currently Startup Co-Founder"
   },
   {
     id: 3,
-    quote: "The subscription model works perfectly for us. We get top-tier design and development without the overhead of a full-time team.",
-    author: "Emily Watson",
-    role: "Founder",
-    company: "Innovate Labs"
+    quote: "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
+    author: "Steven Luis Howell",
+    role: "CEO & Co-Founder",
+    company: "Project Metavision"
   },
   {
     id: 4,
-    quote: "Blueprint's team feels like an extension of our own. They understand our vision and consistently exceed expectations.",
-    author: "David Park",
-    role: "Product Manager",
-    company: "Digital Ventures"
+    quote: "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
+    author: "Mauricio Manhaes",
+    role: "President",
+    company: "SDN Academic Task Force"
   },
   {
     id: 5,
-    quote: "The quality of work and speed of delivery is unmatched. Blueprint has become our go-to partner for all digital projects.",
-    author: "Lisa Johnson",
-    role: "COO",
-    company: "Scale Systems"
+    quote: "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
+    author: "Alex Escudero",
+    role: "Co-Founder",
+    company: "Project Metavision"
   }
 ];
 
@@ -128,7 +128,7 @@ export default function TestimonialSection() {
                     minHeight: '256px'
                   }}
                 >
-                  <Quote className="w-8 h-8 text-neutral-400 mb-4" />
+                  <Quote className="w-8 h-8 text-neutral-400 mb-4 hidden md:block" />
                   <p className="text-lg text-neutral-700 mb-6 leading-relaxed">
                     "{testimonial.quote}"
                   </p>

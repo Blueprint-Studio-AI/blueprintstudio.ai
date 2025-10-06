@@ -35,14 +35,14 @@ export default function Hero() {
                     <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                     <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                     {/* Main Heading */}
-                    <h1 className="font-medium text-black mb-6 sm:mb-8 lg:mb-10" 
-                        style={{ 
-                          fontSize: 'clamp(41px, 8vw, 68px)', 
+                    <h2 className="font-medium text-black mb-6 sm:mb-8 lg:mb-10"
+                        style={{
+                          fontSize: 'clamp(41px, 8vw, 68px)',
                           lineHeight: 'clamp(97%, 1vw, 100%)',
-                          letterSpacing: '-2.04px' 
+                          letterSpacing: '-2.04px'
                         }}>
                         Blueprint Studio
-                    </h1>
+                    </h2>
                     
                     {/* Description */}
                     <p className="text-center font-normal max-w-sm sm:max-w-md md:max-w-lg lg:max-w-lg mx-auto mb-12 sm:mb-14 lg:mb-16 text-[#9A9A9A]" 

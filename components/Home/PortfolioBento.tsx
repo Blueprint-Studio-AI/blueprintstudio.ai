@@ -376,7 +376,8 @@ function MediaCard({ item, aspectRatio, featured = false, imageOnly = false }: M
     }
   };
 
-  const scaleClass = featured ? 'group-hover:scale-[1.0125]' : 'group-hover:scale-[1.025]';
+  // const scaleClass = featured ? 'group-hover:scale-[1.0125]' : 'group-hover:scale-[1.025]';
+  const scaleClass = ''; // Hover effect disabled
 
   return (
     <div className="relative">
@@ -484,7 +485,7 @@ export default function PortfolioBento() {
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
-          <h1 
+          <h2
             className="font-medium text-black text-center mb:0"
             style={{
               fontSize: 'clamp(36px, 6vw, 56px)',
@@ -493,7 +494,7 @@ export default function PortfolioBento() {
             }}
           >
             Featured Work
-          </h1>
+          </h2>
         </InnerContainer>
 
         {/* Render all 5 sections sequentially */}
@@ -509,8 +510,9 @@ export default function PortfolioBento() {
                 <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                 <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
                 
-                {/* Wrap entire section in clickable link */}
-                <a href={section.featured.link} className="block cursor-pointer group/section transition-all duration-300 hover:opacity-90">
+                {/* Wrap entire section in clickable link - DISABLED */}
+                {/* <a href={section.featured.link} className="block cursor-pointer group/section transition-all duration-300 hover:opacity-90"> */}
+                <div className="block">
                   <div className="lg:grid lg:grid-cols-4 lg:gap-6">
                     {/* Featured item - sticky positioned on desktop */}
                     <div className="lg:col-span-3 mb-0">
@@ -549,7 +551,8 @@ export default function PortfolioBento() {
                       </div>
                     </div>
                   </div>
-                </a>
+                {/* </a> */}
+                </div>
               </InnerContainer>
             </div>
           ))}
