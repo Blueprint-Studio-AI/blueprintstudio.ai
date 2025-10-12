@@ -35,12 +35,6 @@ export default function HeroB() {
         ? "/media/highlight-reel/highlight-reel-vertical-001-compressed.mp4"
         : "/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4";
 
-    useEffect(() => {
-        console.log('breakpoint:', breakpoint);
-        console.log('videoSource:', videoSource);
-        console.log('window.innerWidth:', typeof window !== 'undefined' ? window.innerWidth : 'undefined');
-    }, [breakpoint, videoSource])
-
     // Handle video source changes without recreating the element
     useEffect(() => {
         const video = videoRef.current;

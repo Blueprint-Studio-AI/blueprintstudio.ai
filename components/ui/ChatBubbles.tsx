@@ -8,6 +8,10 @@ interface Message {
   timestamp?: string;
 }
 
+interface ChatBubblesProps {
+  isHovered?: boolean;
+}
+
 const initialMessages: Message[] = [
   {
     id: "1",
@@ -29,14 +33,15 @@ const initialMessages: Message[] = [
   }
 ];
 
-export default function ChatBubbles() {
+export default function ChatBubbles({ isHovered = false }: ChatBubblesProps) {
   const [messages, setMessages] = React.useState<Message[]>(initialMessages);
   const [showTyping, setShowTyping] = React.useState(false);
   const [hasShownHoverMessage, setHasShownHoverMessage] = React.useState(false);
   const timeoutRef = React.useRef<NodeJS.Timeout>();
 
-  const handleMouseEnter = () => {
-    if (!hasShownHoverMessage) {
+  // Handle hover state changes from parent
+  React.useEffect(() => {
+    if (isHovered && !hasShownHoverMessage) {
       setShowTyping(true);
 
       // Show typing indicator for 800ms, then add message
@@ -51,22 +56,20 @@ export default function ChatBubbles() {
         setMessages(prev => [...prev, newMessage]);
         setHasShownHoverMessage(true);
       }, 800);
-    }
-  };
+    } else if (!isHovered) {
+      // Clear any pending timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-  const handleMouseLeave = () => {
-    // Clear any pending timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      // Reset to allow re-hover after leaving
+      setTimeout(() => {
+        setMessages(initialMessages);
+        setShowTyping(false);
+        setHasShownHoverMessage(false);
+      }, 500);
     }
-
-    // Reset to allow re-hover after leaving
-    setTimeout(() => {
-      setMessages(initialMessages);
-      setShowTyping(false);
-      setHasShownHoverMessage(false);
-    }, 500);
-  };
+  }, [isHovered, hasShownHoverMessage]);
 
   // Round coordinates to avoid hydration issues
   const round = (num: number) => Math.round(num * 1000) / 1000;
@@ -74,8 +77,6 @@ export default function ChatBubbles() {
   return (
     <div
       className="absolute inset-0 flex flex-col justify-end p-3"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       <div className="space-y-2 max-h-full overflow-hidden">
         <AnimatePresence mode="popLayout">

@@ -1,9 +1,10 @@
 "use client";
+import { useState } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "../ui/SectionHeader";
-import CompassMark from "@/components/ui/CompassMark";
+import CompassSVG from "@/components/ui/CompassSVG";
 import ChatBubbles from "@/components/ui/ChatBubbles";
 
 const achievements = [
@@ -25,6 +26,7 @@ const achievements = [
 ];
 
 export default function Achievements() {
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
@@ -79,6 +81,8 @@ export default function Achievements() {
               <div
                 key={achievement.id}
                 className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px] cursor-default"
+                onMouseEnter={() => setHoveredCard(achievement.id)}
+                onMouseLeave={() => setHoveredCard(null)}
               >
                 {/* Top section with dot background and visual placeholder */}
                 <div 
@@ -91,9 +95,9 @@ export default function Achievements() {
                   {/* Visual components for each card */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     {achievement.id === 1 ? (
-                      <CompassMark />
+                      <CompassSVG isHovered={hoveredCard === 1} />
                     ) : achievement.id === 3 ? (
-                      <ChatBubbles />
+                      <ChatBubbles isHovered={hoveredCard === 3} />
                     ) : (
                       <div className="w-16 h-16 bg-neutral-400 rounded-full opacity-60" />
                     )}
