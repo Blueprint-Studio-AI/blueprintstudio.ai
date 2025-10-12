@@ -79,7 +79,7 @@ function FaqItem({ question, answer, isLast = false }: FaqItemProps) {
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        <p className="text-neutral-600 leading-relaxed pb-6"
+        <p className="text-neutral-600 leading-relaxed pb-6 cursor-default"
            style={{ textWrap: 'balance' }}>
           {answer}
         </p>
@@ -117,7 +117,7 @@ export default function FAQSection() {
           <div className="max-w-3xl px-2 md:mx-auto">
             {/* Title */}
             <div className="text-center mb-12">
-              <h2 className="font-medium text-black mb-4"
+              <h2 className="font-medium text-black mb-4 cursor-default"
                   style={{
                     fontSize: 'clamp(32px, 6vw, 48px)',
                     lineHeight: '110%',
@@ -126,7 +126,7 @@ export default function FAQSection() {
                   }}>
                 Frequently Asked Questions
               </h2>
-              <p className="text-neutral-600 text-lg"
+              <p className="text-neutral-600 text-lg cursor-default"
                  style={{ textWrap: 'balance' }}>
                 Everything you need to know about working with Blueprint Studio
               </p>
@@ -146,7 +146,7 @@ export default function FAQSection() {
 
             {/* Contact CTA */}
             <div className="text-center mt-12 pt-8">
-              <p className="text-neutral-600 mb-4"
+              <p className="text-neutral-600 mb-4 cursor-default"
                  style={{ textWrap: 'balance' }}>
                 Still have questions?
               </p>

@@ -32,7 +32,7 @@ const NavLink = ({
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
     if (element) {
-      const yOffset = -80; // Offset for better positioning
+      const yOffset = -80; // Consistent offset for all sections
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
@@ -217,7 +217,7 @@ export const FloatingNavNew = () => {
                   // Smooth scroll to section
                   const element = document.getElementById(section.id);
                   if (element) {
-                    const yOffset = -80;
+                    const yOffset = -80; // Consistent offset for all sections
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }

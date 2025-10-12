@@ -380,7 +380,7 @@ function MediaCard({ item, aspectRatio, featured = false, imageOnly = false }: M
   const scaleClass = ''; // Hover effect disabled
 
   return (
-    <div className="relative">
+    <div className="relative cursor-default">
       <div className="group relative">
         <div 
           className="bg-neutral-200 absolute left-0 top-0 w-full rounded-md"
@@ -410,7 +410,7 @@ function MediaCard({ item, aspectRatio, featured = false, imageOnly = false }: M
                   <button
                     type="button"
                     onClick={togglePlayPause}
-                    className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition duration-200 hover:bg-black/60 ${
+                    className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition duration-200 hover:bg-black/60 cursor-pointer ${
                       showControls ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                     }`}
                     aria-label={isPlaying ? "Pause video" : "Play video"}
@@ -451,10 +451,10 @@ function MediaCard({ item, aspectRatio, featured = false, imageOnly = false }: M
         {/* Only show text for featured items, not for image-only sidebar items */}
         {featured && !imageOnly && (
           <div className="text-black relative w-full pt-4">
-            <div className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-2">
+            <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
               {item.title}
             </div>
-            <p className="text-neutral-600 text-base">
+            <p className="text-neutral-600 text-base cursor-default">
               {item.description}
             </p>
           </div>
@@ -486,9 +486,9 @@ export default function PortfolioBento() {
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           
           <h2
-            className="font-medium text-black text-center mb:0"
+            className="font-medium text-black text-center mb:0 cursor-default"
             style={{
-              fontSize: 'clamp(36px, 6vw, 56px)',
+              fontSize: 'clamp(32px, 6vw, 48px)',
               lineHeight: 'clamp(97%, 1vw, 100%)',
               letterSpacing: '-1.5px'
             }}

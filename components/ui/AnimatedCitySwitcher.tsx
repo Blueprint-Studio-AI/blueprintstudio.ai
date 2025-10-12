@@ -186,7 +186,7 @@ export default function AnimatedCitySwitcher({ startDelay = 0 }: AnimatedCitySwi
 
       {/* Visible animated text */}
       <span
-        className={`inline-block cursor-pointer transition-opacity duration-500 ${
+        className={`inline-block cursor-default transition-opacity duration-500 ${
           isVisible ? (isTransitioning ? 'opacity-90' : 'opacity-100') : 'opacity-0'
         }`}
         onMouseEnter={() => setIsHovering(true)}

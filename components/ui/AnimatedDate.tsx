@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const SCRAMBLE_CHARS = '0123456789./-';
 const SCRAMBLE_DURATION = 600;
+const HOVER_SCRAMBLE_DURATION = 400;
 
 interface AnimatedDateProps {
   startDelay?: number;
@@ -12,13 +13,19 @@ interface AnimatedDateProps {
 export default function AnimatedDate({ startDelay = 0 }: AnimatedDateProps) {
   const [displayText, setDisplayText] = useState('');
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const scrambleIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const targetDate = new Date().toLocaleDateString('en-US', {
+  const now = new Date();
+  const targetDate = now.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
     year: 'numeric'
   }).replace(/\//g, '.');
+
+  // Show Unix timestamp on hover
+  const hoverText = Math.floor(now.getTime() / 1000).toString();
 
   // Scramble animation function
   const scrambleText = (from: string, to: string, duration: number) => {
@@ -40,6 +47,7 @@ export default function AnimatedDate({ startDelay = 0 }: AnimatedDateProps) {
         if (scrambleIntervalRef.current) {
           clearInterval(scrambleIntervalRef.current);
         }
+        setIsTransitioning(false);
         return;
       }
 
@@ -70,6 +78,17 @@ export default function AnimatedDate({ startDelay = 0 }: AnimatedDateProps) {
     }, 25);
   };
 
+  // Handle hover state change
+  useEffect(() => {
+    if (!isVisible) return; // Don't animate if not yet visible
+
+    const newText = isHovering ? hoverText : targetDate;
+    const from = displayText || targetDate;
+
+    setIsTransitioning(true);
+    scrambleText(from, newText, HOVER_SCRAMBLE_DURATION);
+  }, [isHovering]);
+
   // Initialize with scramble animation after delay
   useEffect(() => {
     const scrambledStart = targetDate.split('').map(() =>
@@ -96,9 +115,15 @@ export default function AnimatedDate({ startDelay = 0 }: AnimatedDateProps) {
 
   return (
     <span
-      className={`transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className={`cursor-default transition-opacity duration-500 ${
+        isVisible ? (isTransitioning ? 'opacity-90' : 'opacity-100') : 'opacity-0'
+      }`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       style={{
-        fontFeatureSettings: '"tnum"'
+        fontFeatureSettings: '"tnum"',
+        letterSpacing: isHovering ? '-0.32px' : '-0.24px',
+        minWidth: '120px'
       }}
     >
       {displayText}

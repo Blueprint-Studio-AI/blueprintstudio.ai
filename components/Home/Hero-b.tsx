@@ -240,7 +240,7 @@ export default function HeroB() {
                                 ? containerAtVideo
                                     ? 'opacity 100ms ease-out, transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
                                     : 'transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
-                                : 'all 600ms cubic-bezier(.34, 1.56, .64, 1)', // bounce effect
+                                : 'transform 600ms cubic-bezier(.34, 1.56, .64, 1), opacity 600ms cubic-bezier(.34, 1.56, .64, 1)', // bounce effect
                             ...(isAnimating && videoContainerRef.current ? (() => {
                                 const videoRect = videoContainerRef.current.getBoundingClientRect();
                                 const loaderEl = document.querySelector('.loader-container');
@@ -268,8 +268,9 @@ export default function HeroB() {
                                     opacity: backgroundVisible && !containerAtVideo ? 1 : 0,
                                     transition: containerAtVideo
                                         ? 'all 100ms ease-out' // Quick fade with container
-                                        : 'all 1600ms cubic-bezier(.165, .84, .44, 1)', // Slow fade in
+                                        : 'all 1600ms cubic-bezier(.165, .84, .44, 1), box-shadow 1600ms cubic-bezier(.165, .84, .44, 1) 800ms', // Slow fade in with shadow
                                     transformOrigin: 'center center',
+                                    boxShadow: backgroundVisible && !containerAtVideo ? '0 8px 32px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.015)' : 'none',
                                 }}
                             />
 
@@ -296,7 +297,7 @@ export default function HeroB() {
 
                                 {/* Two-line text with animation */}
                                 <div className="text-center">
-                                    <p className="text-neutral-700 text-2xl sm:text-4xl font-medium leading-relaxed">
+                                    <p className="text-neutral-700 text-2xl sm:text-4xl font-medium leading-relaxed cursor-default">
                                         <span className="block mb-1">
                                             {"We partner with founders".split(' ').map((word, i) => (
                                                 <span

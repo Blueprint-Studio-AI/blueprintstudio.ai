@@ -129,12 +129,12 @@ export default function TestimonialSection() {
                   }}
                 >
                   <Quote className="w-8 h-8 text-neutral-400 mb-4 hidden md:block" />
-                  <p className="text-base md:text-lg text-neutral-700 mb-6 leading-relaxed">
+                  <p className="text-base md:text-lg text-neutral-700 mb-6 leading-relaxed cursor-default">
                     "{testimonial.quote}"
                   </p>
                   <div className="mt-auto">
-                    <p className="font-medium text-black text-base">{testimonial.author}</p>
-                    <p className="text-sm text-neutral-500">{testimonial.role}, {testimonial.company}</p>
+                    <p className="font-medium text-black text-base cursor-default">{testimonial.author}</p>
+                    <p className="text-sm text-neutral-500 cursor-default">{testimonial.role}, {testimonial.company}</p>
                   </div>
                 </div>
               ))}

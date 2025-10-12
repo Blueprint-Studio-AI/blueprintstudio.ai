@@ -51,22 +51,22 @@ export default function ScheduleCallSection() {
         <InnerContainer className="relative z-10">
           <div className="py-24 md:py-32">
             {/* Title */}
-            <h2 className="font-medium text-black text-center mb-4"
+            <h2 className="font-medium text-black text-center mb-4 cursor-default"
                 style={{
                   fontSize: 'clamp(32px, 6vw, 48px)',
                   lineHeight: '110%',
                   letterSpacing: '-1px',
                   textWrap: 'balance'
                 }}>
-              Let's see if Blueprint Studio is a fit
+              Get In Touch
             </h2>
 
             {/* Subtitle */}
-            <p className="text-neutral-600 text-lg text-center mb-16 max-w-2xl mx-auto"
+            <p className="text-neutral-600 text-lg text-center mb-16 max-w-2xl mx-auto cursor-default"
                style={{
                  textWrap: 'balance'
                }}>
-              Schedule a free consultation to discuss your project and explore how we can help bring your vision to life
+              See if we're a fit for you
             </p>
 
             {/* Calendar embed container */}

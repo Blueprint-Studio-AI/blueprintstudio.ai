@@ -52,21 +52,21 @@ export default function Achievements() {
           {/* Heading and Description Row */}
           <div className="flex flex-col lg:flex-row items-start lg:self-end gap-8 lg:gap-16 mb-12 sm:mb-16 lg:mb-20">
             <div className="flex-1">
-              <h2 className="font-medium text-black"
+              <h2 className="font-medium text-black cursor-default"
                   style={{
-                    fontSize: 'clamp(41px, 8vw, 68px)',
+                    fontSize: 'clamp(32px, 6vw, 48px)',
                     lineHeight: 'clamp(97%, 1vw, 100%)',
-                    letterSpacing: '-2.04px'
+                    letterSpacing: '-1.5px'
                   }}>
                 Our Edge
               </h2>
             </div>
             <div className="lg:self-end">
-              <p className="font-normal text-neutral-500 mb-1" 
-                 style={{ 
-                   fontSize: 'clamp(20px, 4vw, 28px)', 
-                   lineHeight: '110%', 
-                   letterSpacing: '-0.96px' 
+              <p className="font-normal text-neutral-500 mb-1 cursor-default"
+                 style={{
+                   fontSize: 'clamp(16px, 2.5vw, 20px)',
+                   lineHeight: '110%',
+                   letterSpacing: '-0.5px'
                  }}>
                 We&apos;re really f*cking good at what we do.
               </p>
@@ -78,7 +78,7 @@ export default function Achievements() {
             {achievements.map((achievement) => (
               <div
                 key={achievement.id}
-                className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px]"
+                className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px] cursor-default"
               >
                 {/* Top section with dot background and visual placeholder */}
                 <div 
@@ -102,10 +102,10 @@ export default function Achievements() {
 
                 {/* Text content */}
                 <div className="flex flex-col items-start gap-3 w-full">
-                  <h3 className="font-medium text-black text-lg leading-tight">
+                  <h3 className="font-medium text-black text-lg leading-tight cursor-default">
                     {achievement.title}
                   </h3>
-                  <p className="text-neutral-500 text-sm leading-relaxed">
+                  <p className="text-neutral-500 text-sm leading-relaxed cursor-default">
                     {achievement.description}
                   </p>
                 </div>

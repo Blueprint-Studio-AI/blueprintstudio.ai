@@ -35,11 +35,11 @@ export default function QuoteSection() {
                 <div className="py-32 lg:py-40 text-center px-4">
                     <blockquote>
                             <motion.h1
-                                className="font-medium text-neutral-800 mb-8"
+                                className="font-medium text-neutral-800 mb-8 cursor-default"
                                 style={{
-                                    fontSize: 'clamp(48px, 9vw, 80px)',
+                                    fontSize: 'clamp(32px, 6vw, 56px)',
                                     lineHeight: 'clamp(110%, 1.2vw, 120%)',
-                                    letterSpacing: '-2.2px',
+                                    letterSpacing: '-1.5px',
                                     textWrap: 'balance'
                                 }}
                             >
@@ -62,15 +62,15 @@ export default function QuoteSection() {
                             </motion.h1>
 
                             <motion.p
-                                className="text-neutral-600 font-normal not-italic"
+                                className="text-neutral-600 font-normal not-italic cursor-default"
                                 style={{
-                                    fontSize: 'clamp(20px, 4vw, 28px)',
+                                    fontSize: 'clamp(16px, 2.5vw, 20px)',
                                     lineHeight: '130%',
-                                    letterSpacing: '-0.96px',
+                                    letterSpacing: '-0.5px',
                                     textWrap: 'balance'
                                 }}
                             >
-                                {["You see the\u00A0future.", "We design and\u00A0build\u00A0it —", "products, brands, websites,", "apps, and\u00A0media."].map((phrase, i) => (
+                                {["An end-to-end", "creative studio for", "products, brands, websites,", "apps, and\u00A0media."].map((phrase, i) => (
                                     <motion.span
                                         key={i}
                                         className="inline-block"

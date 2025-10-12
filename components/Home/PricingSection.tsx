@@ -3,7 +3,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "../ui/SectionHeader";
-import { ArrowUpRight, Package, MessageCircle, CheckCircle, Palette, BarChart3 } from "lucide-react";
+import { ArrowUpRight, Package, MessageCircle, CheckCircle, Palette, BarChart3, ArrowRight } from "lucide-react";
 
 export default function PricingSection() {
   return (
@@ -32,7 +32,7 @@ export default function PricingSection() {
           
           {/* Heading and Description Row */}
           <div className="flex flex-col items-center text-center gap-4 mb-8 sm:mb-12">
-            <h2 className="font-medium text-black"
+            <h2 className="font-medium text-black cursor-default"
                 style={{
                   fontSize: 'clamp(48px, 10vw, 88px)',
                   lineHeight: 'clamp(97%, 1vw, 100%)',
@@ -40,14 +40,14 @@ export default function PricingSection() {
                 }}>
               Pricing
             </h2>
-            <p className="font-normal text-neutral-500 max-w-lg" 
+            {/* <p className="font-normal text-neutral-500 max-w-lg cursor-default"
                style={{ 
                  fontSize: 'clamp(18px, 3.5vw, 24px)', 
                  lineHeight: '110%', 
                  letterSpacing: '-0.96px' 
                }}>
               Become a studio partner
-            </p>
+            </p> */}
           </div>
 
           {/* Three Column Layout */}
@@ -63,8 +63,8 @@ export default function PricingSection() {
                   <span className="text-sm font-medium text-neutral-700">[1]</span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-base mb-1 text-black">Subscribe</h4>
-                  <p className="text-neutral-500 text-xs">Pick a plan that fits your goals</p>
+                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Subscribe</h4>
+                  <p className="text-neutral-500 text-xs cursor-default">Pick a plan that fits your goals</p>
                 </div>
               </div>
 
@@ -77,8 +77,8 @@ export default function PricingSection() {
                   <span className="text-sm font-medium text-neutral-700">[2]</span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-base mb-1 text-black">Request</h4>
-                  <p className="text-neutral-500 text-xs">Submit tasks via your company portal</p>
+                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Request</h4>
+                  <p className="text-neutral-500 text-xs cursor-default">Submit tasks via your company portal</p>
                 </div>
               </div>
 
@@ -91,8 +91,8 @@ export default function PricingSection() {
                   <span className="text-sm font-medium text-neutral-700">[3]</span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-base mb-1 text-black">Receive results</h4>
-                  <p className="text-neutral-500 text-xs">Pick a plan that fits your workflow</p>
+                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Receive results</h4>
+                  <p className="text-neutral-500 text-xs cursor-default">Pick a plan that fits your workflow</p>
                 </div>
               </div>
             </div>
@@ -105,42 +105,42 @@ export default function PricingSection() {
               </div>
               
               {/* Title */}
-              <h3 className="font-medium text-lg text-black">
+              <h3 className="font-medium text-lg text-black cursor-default">
                 Design & Build Subscription
               </h3>
               
               {/* Price */}
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-black">
+                <span className="text-2xl font-bold text-black cursor-default">
                   $10k+
                 </span>
-                <span className="text-sm text-neutral-500 italic">
+                <span className="text-sm text-neutral-500 italic cursor-default">
                   per month
                 </span>
               </div>
 
               {/* Description */}
-              <p className="text-neutral-500 text-sm">
+              <p className="text-neutral-500 text-sm cursor-default">
                 All inclusive service with dedicated team attached to you.
               </p>
 
               {/* Features */}
               <ul className="space-y-2">
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Dedicated team</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Dedicated team</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Unlimited requests</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Unlimited requests</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Priority support</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Priority support</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Rapid delivery</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Rapid delivery</p>
                 </li>
               </ul>
 
@@ -161,26 +161,26 @@ export default function PricingSection() {
                 <BarChart3 className="w-4 h-4 text-neutral-600" />
               </div>
               
-              <h3 className="font-medium text-lg text-black">Project-Based</h3>
-              <div className="text-2xl font-bold text-black">Get Instant Quote</div>
-              <p className="text-neutral-500 text-sm">Tailored solutions for your specific needs</p>
+              <h3 className="font-medium text-lg text-black cursor-default">Project-Based</h3>
+              <div className="text-2xl font-bold text-black cursor-default">Get Quote</div>
+              <p className="text-neutral-500 text-sm cursor-default">Tailored solutions for your specific needs</p>
 
               <ul className="space-y-2">
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Custom scope & timeline</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Custom scope & timeline</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Fixed pricing</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Fixed pricing</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Project management</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Project management</p>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ArrowUpRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm">Flexible options</p>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                  <p className="font-medium text-black text-sm cursor-default">Flexible options</p>
                 </li>
               </ul>
 
