@@ -30,10 +30,10 @@ export default function HeroB() {
     const breakpoint = useBreakpoint();
 
     // Determine video source based on breakpoint (only after client-side hydration)
-    const videoSource = !isClient ? "/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4" : // Default to horizontal during SSR
+    const videoSource = !isClient ? "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4" : // Default to horizontal during SSR
         (breakpoint === 'base' || breakpoint === 'xs')
-        ? "/media/highlight-reel/highlight-reel-vertical-001-compressed.mp4"
-        : "/media/highlight-reel/highlight-reel-horizontal-002-compressed.mp4";
+        ? "/media/highlight-reel/highlight-reel-vertical-003-compressed.mp4"
+        : "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4";
 
     // Handle video source changes without recreating the element
     useEffect(() => {
