@@ -61,7 +61,7 @@ const portfolioSections = [
         id: 'project-1-2',
         title: 'LivingIP — On-Chain AI Agents',
         description: 'x',
-        type: 'x' as const,
+        type: 'standard' as const,
         media: {
           type: 'image' as const,
           src: '/media/projects/living-ip/square-analytics.png',

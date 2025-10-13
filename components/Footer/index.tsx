@@ -7,7 +7,18 @@ import InnerContainer from '../ui/InnerContainer';
 import EmailCapture from "./EmailCapture";
 import FooterFX from "./FooterFX.client";
 
-const footerLinks = {
+interface FooterLink {
+  name: string;
+  href: string;
+  external?: boolean;
+}
+
+interface FooterSection {
+  title: string;
+  links: FooterLink[];
+}
+
+const footerLinks: Record<string, FooterSection> = {
   // services: {
   //   title: 'Services',
   //   links: [
@@ -17,19 +28,19 @@ const footerLinks = {
   //     { name: 'All Services', href: '/services-index' },
   //   ]
   // },
-  tools: {
-    title: 'Tools',
-    links: [
-      { name: 'Roast My Site', href: '/tools/roast-my-site' },
-      // { name: 'All Tools', href: '/tools' },
-    ]
-  },
   company: {
     title: 'Company',
     links: [
       { name: 'About', href: 'https://read.cv/teams/blueprint', external: true },
       { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
       // { name: 'Careers', href: '/careers' },
+    ]
+  },
+  tools: {
+    title: 'Tools',
+    links: [
+      { name: 'Roast My Site', href: '/tools/roast-my-site' },
+      // { name: 'All Tools', href: '/tools' },
     ]
   },
   // resources: {
