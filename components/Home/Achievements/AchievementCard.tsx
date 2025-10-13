@@ -1,7 +1,7 @@
 "use client";
+import { motion } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { useBreakpoint } from "@/lib/breakpoints";
-import { motion } from "framer-motion";
 import CompassSVG from "./CompassSVG";
 import ChatBubbles from "./ChatBubbles";
 import Map from "./Map";
@@ -27,10 +27,11 @@ export default function AchievementCard({
 }: AchievementCardProps) {
   const breakpoint = useBreakpoint();
   const [elementRef, isIntersecting] = useIntersectionObserver({
-    threshold: 0.6,
-    rootMargin: "-20% 0px -20% 0px"
+    threshold: 0.6, // Trigger when 60% of the card is visible (roughly center screen)
+    rootMargin: "-20% 0px -20% 0px" // More strict centering
   });
 
+  // Use intersection observer for smaller breakpoints (xs, sm, md), hover for larger
   const shouldUseIntersection = breakpoint === "base" || breakpoint === "xs" || breakpoint === "sm" || breakpoint === "md";
   const isActive = shouldUseIntersection ? isIntersecting : isHovered;
 
@@ -40,13 +41,19 @@ export default function AchievementCard({
       className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px] bg-[#FAFAFA]"
       onMouseEnter={shouldUseIntersection ? undefined : onMouseEnter}
       onMouseLeave={shouldUseIntersection ? undefined : onMouseLeave}
-      animate={{ y: !shouldUseIntersection && isHovered ? -8 : 0 }}
-      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      animate={{
+        y: !shouldUseIntersection && isHovered ? -25 : 0
+      }}
+      transition={{
+        duration: 0.3,
+        ease: [0.25, 0.1, 0.25, 1]
+      }}
     >
       {/* Top section with dot background and visual placeholder */}
       <div 
         className="w-full flex-1 rounded-lg relative border border-neutral-300 bg-neutral-100 overflow-hidden"
         style={{
+          // backgroundImage: 'radial-gradient(circle, hsl(var(--neutral-300)) 1px, transparent 1px)',
           backgroundSize: '16px 16px',
         }}
       >
