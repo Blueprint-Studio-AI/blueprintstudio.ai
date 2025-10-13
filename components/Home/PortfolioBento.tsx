@@ -477,7 +477,7 @@ export default function PortfolioBento() {
         </div>
       </div>
 
-      <SectionHeader leftText="PORTFOLIO" rightText="// SEPT 25" />
+      <SectionHeader leftText="PORTFOLIO" rightText="design / dev" />
 
       <OuterContainer className="flex-1">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6 relative">

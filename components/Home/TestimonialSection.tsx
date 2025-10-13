@@ -91,7 +91,7 @@ export default function TestimonialSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="TESTIMONIALS" rightText="trusted + proven" />
+      <SectionHeader leftText="TESTIMONIALS" rightText="// proven" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
@@ -128,7 +128,7 @@ export default function TestimonialSection() {
                     minHeight: '256px'
                   }}
                 >
-                  <Quote className="w-8 h-8 text-neutral-400 mb-4 hidden md:block" />
+                  {/* <Quote className="w-8 h-8 text-neutral-400 mb-4 hidden md:block" /> */}
                   <p className="text-base md:text-lg text-neutral-700 mb-6 leading-relaxed cursor-default">
                     "{testimonial.quote}"
                   </p>

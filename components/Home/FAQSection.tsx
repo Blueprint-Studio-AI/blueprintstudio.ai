@@ -10,19 +10,19 @@ import { motion } from "framer-motion";
 const faqs = [
   {
     question: "How does the subscription model work?",
-    answer: "Our subscription model provides you with a dedicated team of designers and developers on a monthly basis. You get unlimited requests, revisions, and consistent delivery without the overhead of hiring full-time staff. You can pause or cancel anytime with no long-term commitments."
+    answer: "Our subscription model provides you with a dedicated design and development expertise on a monthly basis. You get unlimited requests, revisions, and consistent delivery without the overhead of hiring full-time staff. You can pause or cancel anytime with no long-term commitments."
   },
   {
     question: "What's included in the subscription?",
-    answer: "Everything you need for digital success: UI/UX design, web development, mobile apps, branding, and ongoing maintenance. You'll have access to senior-level talent across all disciplines, a dedicated project manager, and our streamlined collaboration platform."
+    answer: "Everything you need for digital success: UI/UX design, web development, mobile apps, branding, and ongoing maintenance. You'll have access to senior-level talent, a dedicated project manager, and direct communication that keeps progress flowing."
   },
   {
     question: "How quickly can you start on my project?",
-    answer: "We can typically start within 48 hours of signing up. For subscription clients, you'll get immediate access to our platform where you can start submitting requests right away. Project-based work begins after a brief onboarding call to understand your specific needs."
+    answer: "We can typically start within 48 hours of signing up. Project-based work begins after a brief onboarding call to understand your specific needs."
   },
   {
     question: "What if I'm not satisfied with the work?",
-    answer: "We offer unlimited revisions until you're 100% satisfied. Our iterative process ensures we're aligned with your vision from the start, but we'll keep refining until it's perfect. For new clients, we also offer a 7-day trial period."
+    answer: "We offer unlimited revisions until you're 100% satisfied. Our iterative process ensures we're aligned with your vision from the start, but we'll keep refining until it's perfect."
   },
   {
     question: "Can I pause or cancel my subscription?",
@@ -30,15 +30,11 @@ const faqs = [
   },
   {
     question: "How do you handle communication and project management?",
-    answer: "You'll have a dedicated Slack channel, weekly sync calls, and access to our project management platform. We believe in transparent, asynchronous communication that respects your time while keeping you fully informed of progress."
+    answer: "You'll have a dedicated communication channel of your choice, weekly sync calls, and access to our project management platform. We believe in transparent, asynchronous communication that respects your time while keeping you fully informed of progress."
   },
   {
     question: "What's the difference between subscription and project pricing?",
     answer: "Subscriptions are ideal for ongoing needs with predictable monthly costs and unlimited requests. Project pricing works better for one-time initiatives with defined scope and timeline. Both include the same high-quality team and deliverables."
-  },
-  {
-    question: "Do you work with enterprises or just startups?",
-    answer: "We work with companies of all sizes. From solo founders needing their first website to Fortune 500 companies requiring enterprise solutions. Our flexible model and experienced team can scale to meet any requirement."
   }
 ];
 
@@ -90,6 +86,7 @@ function FaqItem({ question, answer, isLast = false }: FaqItemProps) {
 
 export default function FAQSection() {
   return (
+    <>
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
@@ -104,7 +101,7 @@ export default function FAQSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="FAQ" rightText="⋯ answers / clarity" />
+      <SectionHeader leftText="FAQ" rightText="// clarity" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
@@ -145,7 +142,7 @@ export default function FAQSection() {
             </div>
 
             {/* Contact CTA */}
-            <div className="text-center mt-12 pt-8">
+            {/* <div className="text-center mt-12 pt-8">
               <p className="text-neutral-600 mb-4 cursor-default"
                  style={{ textWrap: 'balance' }}>
                 Still have questions?
@@ -156,12 +153,18 @@ export default function FAQSection() {
               >
                 Get in touch
               </a>
-            </div>
+            </div> */}
           </div>
         </InnerContainer>
       </OuterContainer>
       
       <div className="w-full line-dash-x"/>
+
+      {/* Spacer to create double line effect */}
+      <div className="bg-neutral-100 py-4 sm:py-6 lg:py-8">
+        <div className="w-full line-dash-x"/>
+      </div>
     </Section>
+    </>
   );
 }

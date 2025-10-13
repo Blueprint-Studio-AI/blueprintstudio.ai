@@ -21,7 +21,7 @@ export default function PricingSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="PRICING" rightText="synced ⋯ secure" />
+      <SectionHeader leftText="PRICING" rightText="// transparent" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
@@ -78,7 +78,7 @@ export default function PricingSection() {
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black cursor-default">Request</h4>
-                  <p className="text-neutral-500 text-xs cursor-default">Submit tasks via your company portal</p>
+                  <p className="text-neutral-500 text-xs cursor-default">Submit tasks</p>
                 </div>
               </div>
 
@@ -92,7 +92,7 @@ export default function PricingSection() {
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black cursor-default">Receive results</h4>
-                  <p className="text-neutral-500 text-xs cursor-default">Pick a plan that fits your workflow</p>
+                  <p className="text-neutral-500 text-xs cursor-default">Updates delivered every 48 hours</p>
                 </div>
               </div>
             </div>
@@ -121,14 +121,14 @@ export default function PricingSection() {
 
               {/* Description */}
               <p className="text-neutral-500 text-sm cursor-default">
-                All inclusive service with dedicated team attached to you.
+                All inclusive service with dedicated expertise on tap.
               </p>
 
               {/* Features */}
               <ul className="space-y-2">
                 <li className="flex items-start gap-3">
                   <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
-                  <p className="font-medium text-black text-sm cursor-default">Dedicated team</p>
+                  <p className="font-medium text-black text-sm cursor-default">Dedicated expertise</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <ArrowRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
