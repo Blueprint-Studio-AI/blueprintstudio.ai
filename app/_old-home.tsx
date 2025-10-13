@@ -366,7 +366,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-medium mb-6">Ready to Get Started?</h2>
           <p className="text-lg text-gray-600 mb-8">
-            Let's discuss how we can help bring your vision to life.
+            Let&apos;s discuss how we can help bring your vision to life.
           </p>
           <a
             href="https://cal.com/blueprint-studio/intro-call"
