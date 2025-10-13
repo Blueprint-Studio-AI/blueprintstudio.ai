@@ -70,7 +70,7 @@ export default function Map({ isActive = false }: MapProps) {
         await new Promise(resolve => setTimeout(resolve, 200));
         rock2Controls.start({
           x: 15,
-          y: 25,
+          y: 15,
           transition: { 
             duration: 0.8, 
             ease: [0.25, 0.1, 0.25, 1]
@@ -80,7 +80,7 @@ export default function Map({ isActive = false }: MapProps) {
         await new Promise(resolve => setTimeout(resolve, 200));
         rock3Controls.start({
           x: -10,
-          y: -15,
+          y: -25,
           transition: { 
             duration: 0.8, 
             ease: [0.25, 0.1, 0.25, 1]
@@ -110,7 +110,7 @@ export default function Map({ isActive = false }: MapProps) {
         preserveAspectRatio="xMidYMid slice"
       >
         <g clipPath="url(#clip0_1041_11016)">
-          {/* Background gradient area - animated reveal */}
+          {/* Background gradient area - animated reveal with soft edge */}
           <motion.g
             initial={{ clipPath: "inset(0 100% 0 0)" }}
             animate={{ 
@@ -119,6 +119,9 @@ export default function Map({ isActive = false }: MapProps) {
             transition={{ 
               duration: 1,
               ease: "easeInOut"
+            }}
+            style={{
+              filter: "blur(1px)"
             }}
           >
             <motion.path 
@@ -137,7 +140,7 @@ export default function Map({ isActive = false }: MapProps) {
           <motion.path 
             d="M211.18 32.8317C211.723 32.3673 212.472 32.2279 213.146 32.466L253.097 46.5855C253.77 46.8236 254.266 47.4031 254.396 48.1055L262.144 89.7635C262.275 90.466 262.02 91.1848 261.477 91.6492L229.274 119.188C228.731 119.652 227.982 119.791 227.308 119.553L187.357 105.434C186.684 105.196 186.188 104.616 186.058 103.914L178.31 62.2559C178.18 61.5534 178.434 60.8346 178.977 60.3702L211.18 32.8317Z" 
             fill="url(#paint1_linear_1041_11016)"
-            initial={{ x: 15, y: 25 }}
+            initial={{ x: 15, y: 15 }}
             animate={rock2Controls}
           />
           <motion.path 
@@ -149,7 +152,7 @@ export default function Map({ isActive = false }: MapProps) {
           <motion.path 
             d="M142.309 181.858C142.996 182.056 143.525 182.605 143.697 183.298L150.955 212.56C151.127 213.253 150.916 213.986 150.401 214.482L128.689 235.398C128.174 235.894 127.434 236.077 126.747 235.879L97.7771 227.534C97.0905 227.336 96.5616 226.787 96.3896 226.094L89.1318 196.832C88.9598 196.138 89.1708 195.406 89.6854 194.91L111.398 173.994C111.912 173.498 112.652 173.315 113.339 173.512L142.309 181.858Z" 
             fill="url(#paint3_linear_1041_11016)"
-            initial={{ x: -10, y: -15 }}
+            initial={{ x: -10, y: -25 }}
             animate={rock3Controls}
           />
           <motion.path 
