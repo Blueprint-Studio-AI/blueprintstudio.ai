@@ -16,7 +16,7 @@ const lineVariants = {
     opacity: 0.8,
     transition: {
       duration: 0.4,
-      ease: 'easeOut'
+      ease: 'easeOut' as const
     }
   }
 };
@@ -28,7 +28,7 @@ const contentVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: 'easeOut'
+      ease: 'easeOut' as const
     }
   }
 };
