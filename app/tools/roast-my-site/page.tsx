@@ -339,7 +339,7 @@ const exportToPDF = async () => {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground services-theme">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="fixed inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
       
       {/* Email capture modal */}

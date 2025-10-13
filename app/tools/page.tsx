@@ -115,7 +115,7 @@ function ToolCard({ tool }: { tool: Tool }) {
 
 export default function ToolsPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground services-theme relative">
+    <main className="min-h-screen bg-background text-foreground relative">
       {/* Background patterns */}
       <div className="fixed inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
       

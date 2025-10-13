@@ -8,20 +8,20 @@ import EmailCapture from "./EmailCapture";
 import FooterFX from "./FooterFX.client";
 
 const footerLinks = {
-  services: {
-    title: 'Services',
-    links: [
-      { name: 'Web Design', href: '/web-design' },
-      { name: 'Service Design', href: '/service-design' },
-      { name: 'Small Business', href: '/small-business-web-design' },
-      { name: 'All Services', href: '/services-index' },
-    ]
-  },
+  // services: {
+  //   title: 'Services',
+  //   links: [
+  //     { name: 'Web Design', href: '/web-design' },
+  //     { name: 'Service Design', href: '/service-design' },
+  //     { name: 'Small Business', href: '/small-business-web-design' },
+  //     { name: 'All Services', href: '/services-index' },
+  //   ]
+  // },
   tools: {
     title: 'Tools',
     links: [
       { name: 'Roast My Site', href: '/tools/roast-my-site' },
-      { name: 'All Tools', href: '/tools' },
+      // { name: 'All Tools', href: '/tools' },
     ]
   },
   company: {
@@ -29,16 +29,16 @@ const footerLinks = {
     links: [
       { name: 'About', href: 'https://read.cv/teams/blueprint', external: true },
       { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
-      { name: 'Careers', href: '/careers' },
+      // { name: 'Careers', href: '/careers' },
     ]
   },
-  resources: {
-    title: 'Resources',
-    links: [
-      { name: 'Blog', href: '/blog' },
-      { name: 'Case Studies', href: '/case-studies' },
-    ]
-  },
+  // resources: {
+  //   title: 'Resources',
+  //   links: [
+  //     { name: 'Blog', href: '/blog' },
+  //     { name: 'Case Studies', href: '/case-studies' },
+  //   ]
+  // },
   legal: {
     title: 'Legal',
     links: [
@@ -79,10 +79,11 @@ export function Footer() {
         <OuterContainer>
           <div className="w-full pt-16 md:pt-28 px-2.5 md:px-6">
             <Image
-              src="logo-blueprint.svg"
+              src="/logo-blueprint.svg"
               alt="Blueprint Logo"
               width={639}
               height={83}
+              style={{ filter: 'grayscale(100%)' }}
             />
           </div>
         </OuterContainer>
@@ -166,7 +167,7 @@ export function Footer() {
        {/* Newsletter and Socials */}
       <Section semantic="div" className="flex-none">
         <OuterContainer>
-          <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-0 pr-6">
+          <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-0 md:pr-6">
             <EmailCapture/>
             <ul className="hidden md:flex flex-row gap-4">
               <li>

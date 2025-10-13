@@ -8,7 +8,7 @@ const Terms: React.FC = () => {
     const currentDate = new Date().toLocaleDateString();
     
     return (
-      <main className="min-h-screen bg-background text-foreground services-theme relative">
+      <main className="min-h-screen bg-background text-foreground relative">
         <div className="fixed inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
         
         <div className="relative">

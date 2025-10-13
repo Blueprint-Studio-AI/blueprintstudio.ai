@@ -7,7 +7,7 @@ const PrivacyPolicy: React.FC = () => {
     const currentDate = new Date().toLocaleDateString();
     
     return (
-      <main className="min-h-screen bg-background text-foreground services-theme relative">
+      <main className="min-h-screen bg-background text-foreground relative">
         <div className="fixed inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
         
         <div className="relative">
@@ -17,7 +17,7 @@ const PrivacyPolicy: React.FC = () => {
               <p>Last updated: {currentDate}&nbsp;</p>
 
               
-              <hr className="my-8" />
+              {/* <hr className="my-8" />
 
               <br/>
               <h1>SelfSci App Privacy Policy</h1>
@@ -94,7 +94,7 @@ const PrivacyPolicy: React.FC = () => {
                 <li>Request deletion of your Garmin data&nbsp;</li>
                 <li>Receive detailed reports on how your Garmin data is being used&nbsp;</li>
                 <li>Opt out of specific research initiatives while maintaining other services&nbsp;</li>
-              </ul>
+              </ul> */}
 
 
               <br/>

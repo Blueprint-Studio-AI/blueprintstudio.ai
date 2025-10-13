@@ -11,6 +11,7 @@ export default function EmailCapture() {
     const [error, setError] = useState('');
     const [showSubscribe, setShowSubscribe] = useState(true);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isFading, setIsFading] = useState(false);
 
     const handleTryAgain = () => {
         setError('')
@@ -55,7 +56,12 @@ export default function EmailCapture() {
             // Show success state
             setIsSuccess(true);
 
-            // Animate out after delay
+            // Start fade out after delay
+            setTimeout(() => {
+                setIsFading(true);
+            }, 1500);
+
+            // Hide completely after fade
             setTimeout(() => {
                 setShowSubscribe(false);
             }, 2000);
@@ -68,23 +74,23 @@ export default function EmailCapture() {
     };
 
     if (!showSubscribe) return (
-        <div className="p-4 flex flex-col gap-3 max-w-[400px] h-36" />
+        <div className="p-4 flex flex-col gap-3 w-full max-w-[400px] h-36" />
     );
 
     if (isSuccess) {
         // wait a few sec, then go to invisible
 
         return (
-            <div className="p-4 flex flex-col justify-center items-center gap-3 max-w-[400px] h-36 bg-neutral-800 rounded-xl border border-neutral-700 w-[400px]">
+            <div className={`flex flex-col justify-center items-center gap-3 w-full max-w-[400px] h-36 bg-neutral-800 rounded-xl border border-neutral-700 transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
                 <p className="text-neutral-400">Success!</p>
             </div>
         )
     }
 
     return (
-        <div className="bg-neutral-800 rounded-xl border border-neutral-700 p-4 flex flex-col justify-between w-[400px] h-36">
-            <p className="text-neutral-300">Join our newsletter for expert insights on web development, design, and digital innovation.</p>
-            <form onSubmit={handleSubscribe} className="flex gap-2" noValidate >
+        <div className="bg-neutral-800 rounded-xl border border-neutral-700 flex flex-col justify-between w-full max-w-[400px] h-36">
+            <p className="text-neutral-300 px-4 pt-4">Join our newsletter for insights on design, web development, and digital innovation.</p>
+            <form onSubmit={handleSubscribe} className="flex gap-2 px-4 pb-4" noValidate >
                 <div className="relative w-full">
                     <input
                         type="email"
