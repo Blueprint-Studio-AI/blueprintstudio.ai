@@ -205,7 +205,7 @@ export const FloatingNavNew = () => {
             {sections.map((section, index) => (
               <a
                 key={section.id}
-                ref={el => navItemsRef.current[index] = el}
+                ref={el => { navItemsRef.current[index] = el; }}
                 href={`#${section.id}`}
                 onClick={(e) => {
                   e.preventDefault();
