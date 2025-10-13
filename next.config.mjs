@@ -12,6 +12,15 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        encoding: false,
+      };
+    }
+    return config;
+  },
   turbopack: {
     root: __dirname,
   },
