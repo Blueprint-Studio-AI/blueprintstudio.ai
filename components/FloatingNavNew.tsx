@@ -22,9 +22,9 @@ const NavLink = ({
     e.preventDefault();
     onClick?.();
 
-    // If we're not on new-home, navigate there first
-    if (pathname !== '/new-home') {
-      window.location.href = `/new-home${href}`;
+    // If we're not on home, navigate there first
+    if (pathname !== '/') {
+      window.location.href = `/${href}`;
       return;
     }
 
@@ -102,8 +102,8 @@ export const FloatingNavNew = () => {
   }, [activeSection, sections]);
 
   useEffect(() => {
-    // Only track sections on new-home page
-    if (pathname !== '/new-home') {
+    // Only track sections on home page
+    if (pathname !== '/') {
       return;
     }
 
@@ -185,7 +185,7 @@ export const FloatingNavNew = () => {
           ref={scrollContainerRef}
           className={`
             flex items-center
-            px-2 py-1.5
+            px-1.5 py-1.5
             overflow-x-auto
             scrollbar-hide
             md:overflow-x-visible
@@ -201,7 +201,7 @@ export const FloatingNavNew = () => {
               display: none;
             }
           `}</style>
-          <div className="flex items-center flex-nowrap">
+          <div className="flex items-center flex-nowrap gap-1">
             {sections.map((section, index) => (
               <a
                 key={section.id}
@@ -209,9 +209,9 @@ export const FloatingNavNew = () => {
                 href={`#${section.id}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  // If we're not on new-home, navigate there first
-                  if (pathname !== '/new-home') {
-                    window.location.href = `/new-home#${section.id}`;
+                  // If we're not on home, navigate there first
+                  if (pathname !== '/') {
+                    window.location.href = `/#${section.id}`;
                     return;
                   }
                   // Smooth scroll to section
@@ -225,11 +225,11 @@ export const FloatingNavNew = () => {
                 className={`
                   flex items-center justify-center flex-shrink-0
                   ${section.icon
-                    ? 'w-[34px] h-[32px] rounded-lg'
-                    : 'px-3 py-1.5 rounded-lg whitespace-nowrap'
+                    ? 'w-[34px] h-[32px] rounded-2xl'
+                    : 'px-3 py-1.5 rounded-2xl whitespace-nowrap'
                   }
                   text-sm font-medium
-                  ${pathname === '/new-home' && activeSection === section.id
+                  ${pathname === '/' && activeSection === section.id
                     ? 'bg-black/10 text-[rgba(29,29,31,1)]'
                     : 'text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5'
                   }
