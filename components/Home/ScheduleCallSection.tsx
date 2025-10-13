@@ -66,7 +66,7 @@ export default function ScheduleCallSection() {
                style={{
                  textWrap: 'balance'
                }}>
-              See if we're a fit for you
+              See if we&apos;re a fit for you
             </p>
 
             {/* Calendar embed container */}

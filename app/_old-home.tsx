@@ -287,9 +287,9 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-medium mb-6">About Blueprint Studio</h2>
           <p className="text-lg text-gray-600 leading-relaxed">
-            We're a design and development studio that partners with ambitious founders and companies
-            to build exceptional digital products. Our approach combines strategic thinking,
-            beautiful design, and robust engineering to deliver results that drive business growth.
+            We&apos;re a design and development studio that partners with ambitious founders and companies
+            to build exceptional digital products. Our approach combines strategic thinking&#39;
+            beautiful design&#39; and robust engineering to deliver results that drive business growth.
           </p>
         </div>
       </section>
