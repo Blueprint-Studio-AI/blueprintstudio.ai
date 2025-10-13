@@ -245,6 +245,10 @@ export const FloatingNavNew = () => {
                     width={22}
                     height={22}
                     className="w-[22px] h-[22px]"
+                    style={{
+                      imageRendering: '-webkit-optimize-contrast',
+                      shapeRendering: 'crispEdges'
+                    }}
                   />
                 ) : (
                   section.label
