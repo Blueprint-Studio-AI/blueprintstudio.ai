@@ -450,7 +450,7 @@ function MediaCard({ item, aspectRatio, featured = false, imageOnly = false }: M
         </div>
         {/* Only show text for featured items, not for image-only sidebar items */}
         {featured && !imageOnly && (
-          <div className="text-black relative w-full pt-4">
+          <div className="text-black relative w-full pt-8">
             <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
               {item.title}
             </div>
@@ -522,7 +522,7 @@ export default function PortfolioBento() {
                           <MediaCard item={section.featured} aspectRatio="2/3" featured />
                           
                           {/* Mobile: Show sidebar images in a grid below */}
-                          <div className="grid grid-cols-3 gap-2 mt-4">
+                          <div className="grid grid-cols-3 gap-2 mt-8">
                             {section.sidebar.map((item) => (
                               <div key={item.id} className="relative">
                                 <MediaCard item={item} aspectRatio="1/1" imageOnly />

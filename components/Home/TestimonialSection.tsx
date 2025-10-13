@@ -105,10 +105,10 @@ export default function TestimonialSection() {
             {/* Scrollable Cards Container with Gradient Overlays */}
             <div className="flex-1 relative">
               {/* Top fade gradient */}
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-neutral-100 to-transparent z-10 pointer-events-none" />
+              <div className="absolute top-0 left-0 right-0 h-8 sm:h-16 bg-gradient-to-b from-neutral-100 to-transparent z-10 pointer-events-none" />
 
               {/* Bottom fade gradient */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-neutral-100 to-transparent z-10 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-8 sm:h-16 bg-gradient-to-t from-neutral-100 to-transparent z-10 pointer-events-none" />
 
               <div
                 ref={scrollContainerRef}
@@ -117,7 +117,7 @@ export default function TestimonialSection() {
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  height: '340px'
+                  height: '420px'
                 }}
               >
               {testimonials.map((testimonial) => (
