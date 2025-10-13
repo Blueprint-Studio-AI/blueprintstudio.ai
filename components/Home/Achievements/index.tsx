@@ -3,9 +3,8 @@ import { useState } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "../ui/SectionHeader";
-import CompassSVG from "@/components/ui/CompassSVG";
-import ChatBubbles from "@/components/ui/ChatBubbles";
+import SectionHeader from "@/components/ui/SectionHeader";
+import AchievementCard from "./AchievementCard";
 
 const achievements = [
   {
@@ -78,42 +77,13 @@ export default function Achievements() {
           {/* Achievement Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {achievements.map((achievement) => (
-              <div
+              <AchievementCard
                 key={achievement.id}
-                className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px] cursor-default"
+                achievement={achievement}
+                isHovered={hoveredCard === achievement.id}
                 onMouseEnter={() => setHoveredCard(achievement.id)}
                 onMouseLeave={() => setHoveredCard(null)}
-              >
-                {/* Top section with dot background and visual placeholder */}
-                <div 
-                  className="w-full flex-1 rounded-lg relative border border-neutral-300 bg-neutral-100 overflow-hidden"
-                  style={{
-                    backgroundImage: 'radial-gradient(circle, hsl(var(--neutral-300)) 1px, transparent 1px)',
-                    backgroundSize: '16px 16px',
-                  }}
-                >
-                  {/* Visual components for each card */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {achievement.id === 1 ? (
-                      <CompassSVG isHovered={hoveredCard === 1} />
-                    ) : achievement.id === 3 ? (
-                      <ChatBubbles isHovered={hoveredCard === 3} />
-                    ) : (
-                      <div className="w-16 h-16 bg-neutral-400 rounded-full opacity-60" />
-                    )}
-                  </div>
-                </div>
-
-                {/* Text content */}
-                <div className="flex flex-col items-start gap-3 w-full">
-                  <h3 className="font-medium text-black text-lg leading-tight cursor-default">
-                    {achievement.title}
-                  </h3>
-                  <p className="text-neutral-500 text-sm leading-relaxed cursor-default">
-                    {achievement.description}
-                  </p>
-                </div>
-              </div>
+              />
             ))}
           </div>
         </InnerContainer>
