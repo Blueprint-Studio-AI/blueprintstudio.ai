@@ -546,8 +546,8 @@ export default function PortfolioBento() {
                             <MediaCard item={item} aspectRatio="1/1" imageOnly />
                           </div>
                         ))}
-                        {/* Small spacer to delay sticky end timing */}
-                        <div className="h-16" />
+                        {/* Small spacer to delay sticky end timing - adjust for first and last sections */}
+                        <div style={{ height: (sectionIndex === 0 || sectionIndex === portfolioSections.length - 1) ? '76px' : '100px' }} />
                       </div>
                     </div>
                   </div>
