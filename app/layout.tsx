@@ -101,7 +101,7 @@ const organizationSchema = {
   "url": "https://blueprintstudio.ai",
   "logo": "https://blueprintstudio.ai/blueprint-logo.png",
   "sameAs": [
-    "https://x.com/blueprint_dao",
+    "https://x.com/bpstu",
     "https://www.linkedin.com/company/blueprint-studio-ai",
     "https://github.com/Blueprint-Studio-AI"
   ]
