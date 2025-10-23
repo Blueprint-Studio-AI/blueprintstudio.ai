@@ -19,6 +19,7 @@ export default function HeroB() {
     const [logoEntered, setLogoEntered] = useState(false);
     const [headerLogoVisible, setHeaderLogoVisible] = useState(false);
     const [headerAnimationsReady, setHeaderAnimationsReady] = useState(false);
+    const [hasVideoFrame, setHasVideoFrame] = useState(false);
     const [containerEntered, setContainerEntered] = useState(false);
     const [backgroundVisible, setBackgroundVisible] = useState(false);
     const [textAnimated, setTextAnimated] = useState(false);
@@ -42,8 +43,8 @@ export default function HeroB() {
         if (!video || !isClient) return;
 
         const wasPlaying = !video.paused;
-        const currentTime = video.currentTime;
-        
+
+        setHasVideoFrame(false);
         video.src = videoSource;
         video.load(); // Reload the video with new source
         
@@ -61,6 +62,12 @@ export default function HeroB() {
         const handleResize = () => setIsMobile(window.innerWidth < 640);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+        video.setAttribute('fetchpriority', 'high');
     }, []);
 
     // Start entrance animations immediately
@@ -128,7 +135,7 @@ export default function HeroB() {
 
         const textTimer = setTimeout(() => {
             setHeaderAnimationsReady(true);
-        }, 0);
+        }, 300);
 
         return () => {
             clearTimeout(textTimer);
@@ -139,54 +146,32 @@ export default function HeroB() {
         const video = videoRef.current;
         if (!video) return;
 
-        const handleVideoLoad = () => {
-            if (isVideoLoaded) return; // Prevent duplicate calls
-
+        const handleVideoReady = () => {
+            setHasVideoFrame(true);
             setIsVideoLoaded(true);
         };
 
-        // Listen for multiple events to catch first load
-        const handleLoadedMetadata = () => {
-            // Video metadata is loaded, dimensions are known
-            if (video.readyState >= 1) {
-                handleVideoLoad();
-            }
+        const handleFallback = () => {
+            setIsVideoLoaded(true);
         };
 
-        const handleCanPlay = () => {
-            handleVideoLoad();
-        };
+        video.addEventListener('loadeddata', handleVideoReady);
+        video.addEventListener('canplay', handleVideoReady);
+        video.addEventListener('canplaythrough', handleVideoReady);
 
-        const handleLoadedData = () => {
-            // First frame is available
-            handleVideoLoad();
-        };
-
-        // Add all event listeners for first load
-        video.addEventListener('loadedmetadata', handleLoadedMetadata);
-        video.addEventListener('loadeddata', handleLoadedData);
-        video.addEventListener('canplay', handleCanPlay);
-        video.addEventListener('canplaythrough', handleCanPlay);
-
-        // Check current state after adding listeners
         if (video.readyState >= 2) {
-            // HAVE_CURRENT_DATA or higher - can display current frame
-            handleVideoLoad();
+            handleVideoReady();
         }
 
-        // Fallback timer for any edge cases (allow longer buffer before forcing readiness)
-        const fallbackTimer = setTimeout(() => {
-            handleVideoLoad();
-        }, 6000);
+        const fallbackTimer = setTimeout(handleFallback, 6000);
 
         return () => {
-            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-            video.removeEventListener('loadeddata', handleLoadedData);
-            video.removeEventListener('canplay', handleCanPlay);
-            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('loadeddata', handleVideoReady);
+            video.removeEventListener('canplay', handleVideoReady);
+            video.removeEventListener('canplaythrough', handleVideoReady);
             clearTimeout(fallbackTimer);
         };
-    }, []); // Remove isVideoLoaded dependency to prevent re-runs
+    }, []);
 
     // Start animation only when both video is loaded AND minimum time has elapsed
     useEffect(() => {
@@ -424,6 +409,23 @@ export default function HeroB() {
                                 backgroundColor: 'transparent', // Remove any background
                             }}
                         >
+                            <div
+                                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                style={{
+                                    borderRadius: '0.75rem',
+                                    backgroundColor: '#FBFBFB',
+                                    opacity: hasVideoFrame ? 0 : 1,
+                                    transition: 'opacity 400ms cubic-bezier(.25, .46, .45, .94)',
+                                    boxShadow: '0 12px 40px rgba(29, 29, 31, 0.04), 0 4px 20px rgba(29, 29, 31, 0.04)'
+                                }}
+                            >
+                                <div className="flex flex-col items-center text-center gap-4 px-6 sm:px-8">
+                                    <p className="text-neutral-700 text-xl sm:text-3xl font-medium leading-relaxed cursor-default">
+                                        <span className="block mb-1">We partner with founders</span>
+                                        <span className="block">to build their future.</span>
+                                    </p>
+                                </div>
+                            </div>
                             {/* Video Element - apply mask to prevent corner bleeding */}
                             <video
                                 ref={videoRef}
@@ -432,6 +434,9 @@ export default function HeroB() {
                                     objectFit: 'cover',
                                     borderRadius: '0.75rem', // Match container exactly
                                     WebkitMaskImage: '-webkit-radial-gradient(white, black)', // Force GPU rendering
+                                    opacity: hasVideoFrame ? 1 : 0,
+                                    transition: 'opacity 300ms cubic-bezier(.16, 1, .3, 1)',
+                                    backgroundColor: 'transparent',
                                 }}
                                 loop
                                 muted

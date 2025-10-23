@@ -1,14 +1,25 @@
 "use client";
 
-import Cal, { getCalApi } from "@calcom/embed-react";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import OuterContainer from "../ui/OuterContainer";
 import InnerContainer from "../ui/InnerContainer";
 import Section from "../ui/Section";
 
+const Cal = dynamic(() => import("@calcom/embed-react").then((mod) => mod.default), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[520px] flex flex-col items-center justify-center gap-3 text-neutral-500">
+      <span className="text-xs uppercase tracking-[0.36em] text-neutral-400">Blueprint Studio</span>
+      <p className="text-sm sm:text-base text-neutral-500">Loading calendar…</p>
+    </div>
+  ),
+});
+
 export default function ScheduleCallSection() {
   useEffect(() => {
     (async function () {
+      const { getCalApi } = await import("@calcom/embed-react");
       const cal = await getCalApi({ namespace: "intro-call" });
       cal("ui", {
         theme: "light",
