@@ -18,6 +18,7 @@ export default function HeroB() {
     const [videoRevealed, setVideoRevealed] = useState(false);
     const [logoEntered, setLogoEntered] = useState(false);
     const [headerLogoVisible, setHeaderLogoVisible] = useState(false);
+    const [headerAnimationsReady, setHeaderAnimationsReady] = useState(false);
     const [containerEntered, setContainerEntered] = useState(false);
     const [backgroundVisible, setBackgroundVisible] = useState(false);
     const [textAnimated, setTextAnimated] = useState(false);
@@ -85,10 +86,6 @@ export default function HeroB() {
         }, 1600); // A moment after text has animated in
 
         // Header logo fade in with slight delay after text
-        const headerLogoTimer = setTimeout(() => {
-            setHeaderLogoVisible(true);
-        }, 2850);
-
         // Set minimum display time (e.g., 2.5 seconds to read the text)
         const minimumTimer = setTimeout(() => {
             setMinimumTimeElapsed(true);
@@ -99,7 +96,6 @@ export default function HeroB() {
             clearTimeout(logoTimer);
             clearTimeout(textTimer);
             clearTimeout(backgroundTimer);
-            clearTimeout(headerLogoTimer);
             clearTimeout(minimumTimer);
         };
     }, []);
@@ -117,6 +113,27 @@ export default function HeroB() {
             document.body.style.overflow = '';
         };
     }, [showOverlay]);
+
+    useEffect(() => {
+        if (showOverlay) {
+            setHeaderLogoVisible(false);
+            setHeaderAnimationsReady(false);
+        }
+    }, [showOverlay]);
+
+    useEffect(() => {
+        if (!isAnimating) return;
+
+        setHeaderLogoVisible(true);
+
+        const textTimer = setTimeout(() => {
+            setHeaderAnimationsReady(true);
+        }, 0);
+
+        return () => {
+            clearTimeout(textTimer);
+        };
+    }, [isAnimating]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -157,10 +174,10 @@ export default function HeroB() {
             handleVideoLoad();
         }
 
-        // Fallback timer for any edge cases
+        // Fallback timer for any edge cases (allow longer buffer before forcing readiness)
         const fallbackTimer = setTimeout(() => {
             handleVideoLoad();
-        }, 2000); // Faster fallback for better UX
+        }, 6000);
 
         return () => {
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -345,12 +362,26 @@ export default function HeroB() {
                     </div>
                 </div>
                 <SectionHeader
-                    leftText={<AnimatedCitySwitcher startDelay={2850} />}
+                    leftText={
+                        headerAnimationsReady
+                            ? <AnimatedCitySwitcher key="city-ready" startDelay={0} />
+                            : (
+                                <span
+                                    aria-hidden="true"
+                                    className="inline-block opacity-0"
+                                    style={{ minWidth: '350px' }}
+                                >
+                                    Los Angeles, California
+                                </span>
+                            )
+                    }
                     centerContent={
                         <div
-                            className="transition-opacity duration-7000"
                             style={{
                                 opacity: headerLogoVisible ? 1 : 0,
+                                filter: headerLogoVisible ? 'blur(0px)' : 'blur(6px)',
+                                transform: headerLogoVisible ? 'translateY(0)' : 'translateY(-32px)',
+                                transition: 'opacity 600ms cubic-bezier(.16, 1, .3, 1), filter 600ms cubic-bezier(.16, 1, .3, 1), transform 600ms cubic-bezier(.16, 1, .3, 1)',
                             }}
                         >
                             <Image
@@ -362,7 +393,19 @@ export default function HeroB() {
                             />
                         </div>
                     }
-                    rightText={<AnimatedDate startDelay={2850} />}
+                    rightText={
+                        headerAnimationsReady
+                            ? <AnimatedDate key="date-ready" startDelay={0} />
+                            : (
+                                <span
+                                    aria-hidden="true"
+                                    className="inline-block opacity-0"
+                                    style={{ minWidth: '120px' }}
+                                >
+                                    00.00.0000
+                                </span>
+                            )
+                    }
                 />
 
                 {/* Video Section */}
