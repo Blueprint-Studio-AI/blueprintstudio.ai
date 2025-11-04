@@ -1,1 +1,1 @@
-# Blueprint Studio Site
+# blueprintstudio.ai
