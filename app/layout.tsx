@@ -5,8 +5,9 @@ import { FloatingNavNew } from "@/components/FloatingNavNew";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Toaster } from "@/components/ui/toaster"
 import Background from "@/components/ui/Background";
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
-// Configure font
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -15,57 +16,61 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://blueprintstudio.ai'),
+  robots: { index: true, follow: true },
+  alternates: { canonical: '/' },
   title: {
-    default: "Blueprint Studio · Web & AI Solutions",
+    default: "Blueprint Studio · World-Class Design & Development Solutions",
     template: "%s | Blueprint Studio"
   },
-  description: "Blueprint Studio is a premier web design company & digital agency specializing in modern web solutions and AI integration.",
-  keywords: ["web design company", "AI automation", "digital agency", "web design", "service design"],
-  
-  // Basic icons we have
+  description:
+    "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
+  keywords: [
+    "web design company",
+    "build ai product",
+    "creative studio",
+    "product design",
+    "service design"
+  ],
+
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon.ico', type: 'image/x-icon' },
+      { url: '/icon.png', sizes: '512x512', type: 'image/png' },     
       { url: '/icon.svg', type: 'image/svg+xml' },
     ],
-    /* TODO: Add when assets are ready
-    apple: [
-      { url: '/apple-touch-icon.png' },
-    ],
-    other: [
-      {
-        rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
-      },
-    ],
-    */
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
-  
-  manifest: '/site.webmanifest',
   
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://blueprintstudio.ai',
     siteName: 'Blueprint Studio',
-    title: 'Blueprint Studio · Web & AI Solutions',
-    description: 'Professional web design & complex AI automation for modern businesses.',
-    images: [{
-      url: '/og-image.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'Blueprint Studio',
-    }],
+    title: 'Blueprint Studio · World-Class Design & Development Solutions',
+    description:
+      "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
+    images: [
+      {
+        url: 'https://blueprintstudio.ai/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Blueprint Studio',
+      },
+    ],
   },
   
-  /* TODO: Add when Twitter when we have the images
   twitter: {
     card: 'summary_large_image',
-    site: '@blueprint_dao',
-    creator: '@blueprint_dao',
-    images: '/twitter-image.jpg',
+    site: '@bpstu',    
+    creator: '@bpstu',  
+    title:
+      'Blueprint Studio · World-Class Design & Development Solutions',
+    description:
+      "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
+    images: [
+      'https://blueprintstudio.ai/og-image.jpg'
+    ],
   },
-  */
 
   /* TODO: Add when verification tokens are ready
   verification: {
@@ -76,32 +81,38 @@ export const metadata: Metadata = {
   */
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
+export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-};
+  themeColor: '#F0F0F0',
+} satisfies Viewport;
+
+const orgId = "https://blueprintstudio.ai/#organization";
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": "https://blueprintstudio.ai/#website",
   "name": "Blueprint Studio",
   "url": "https://blueprintstudio.ai",
+  "inLanguage": "en",
+  "publisher": { "@id": orgId }
 };
 
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": orgId,
   "name": "Blueprint Studio",
   "url": "https://blueprintstudio.ai",
-  "logo": "https://blueprintstudio.ai/blueprint-logo.png",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://blueprintstudio.ai/icon.png",
+    "width": 512,
+    "height": 512
+  },
   "sameAs": [
-    "https://x.com/blueprint_dao",
+    "https://x.com/bpstu",
     "https://www.linkedin.com/company/blueprint-studio-ai",
     "https://github.com/Blueprint-Studio-AI"
   ]
@@ -131,8 +142,6 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema)
           }}
         />
-        <link rel="canonical" href="https://blueprintstudio.ai" />
-        <meta name="robots" content="index, follow" />
       </head>
       <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
         <Background />
@@ -141,6 +150,8 @@ export default function RootLayout({
           {children}
           <Toaster />
         </main>
+        <Analytics />
+        <SpeedInsights />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>
     </html>

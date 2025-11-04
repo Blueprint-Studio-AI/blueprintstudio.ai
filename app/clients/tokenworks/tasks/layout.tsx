@@ -2,12 +2,12 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Blueprint Studio',
-  description: 'Privacy Policy for Blueprint Studio',
+  title: 'Tokenworks | Blueprint Studio',
+  description: 'Tokenworks Task Page for Blueprint Studio',
   openGraph: {
-    title: 'Privacy Policy | Blueprint Studio',
-    description: 'Privacy Policy for Blueprint Studio',
-    url: 'https://blueprintstudio.ai/privacy-policy',
+    title: 'Tokenworks | Blueprint Studio',
+    description: 'Tokenworks Task Page for Blueprint Studio',
+    url: 'https://blueprintstudio.ai/clients/tokenworks/tasks',
     siteName: 'Blueprint Studio',
     type: 'website',
   },

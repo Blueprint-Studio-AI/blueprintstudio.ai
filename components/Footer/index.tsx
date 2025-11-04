@@ -31,18 +31,19 @@ const footerLinks: Record<string, FooterSection> = {
   company: {
     title: 'Company',
     links: [
-      { name: 'About', href: 'https://read.cv/teams/blueprint', external: true },
+      { name: 'Tyler Stupart', href: 'https://www.linkedin.com/in/tylerstupart/', external: true },
+      { name: 'Jaidon Lalor', href: 'https://www.linkedin.com/in/jaidonlalor/', external: true },
       { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
       // { name: 'Careers', href: '/careers' },
     ]
   },
-  tools: {
-    title: 'Tools',
-    links: [
-      { name: 'Roast My Site', href: '/tools/roast-my-site' },
-      // { name: 'All Tools', href: '/tools' },
-    ]
-  },
+  // tools: {
+  //   title: 'Tools',
+  //   links: [
+  //     { name: 'Roast My Site', href: '/tools/roast-my-site' },
+  //     // { name: 'All Tools', href: '/tools' },
+  //   ]
+  // },
   // resources: {
   //   title: 'Resources',
   //   links: [
