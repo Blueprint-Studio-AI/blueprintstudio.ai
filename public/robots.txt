@@ -1,35 +1,9 @@
-# robots.txt for blueprintstudio.ai
-
-# Allow all crawlers and paths by default
 User-agent: *
 Allow: /
 
-# Block sensitive and utility paths
 Disallow: /api/
 Disallow: /_next/
-Disallow: /*?*  # Block URLs with query parameters
-Disallow: /privacy-policy
-Disallow: /terms
 Disallow: /cdn-cgi/
-Disallow: /*.json$
-Disallow: /*.xml$
+Disallow: /private/
 
-# Rate limiting for aggressive crawlers
-User-agent: AhrefsBot
-Crawl-delay: 10
-Disallow: /api/
-
-User-agent: SemrushBot
-Crawl-delay: 10
-Disallow: /api/
-Disallow: /admin/
-
-# Block known bad bots
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
-# Sitemap reference
 Sitemap: https://blueprintstudio.ai/sitemap.xml
