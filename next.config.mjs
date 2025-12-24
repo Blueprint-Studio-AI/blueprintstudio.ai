@@ -49,7 +49,20 @@ const nextConfig = {
   },
 
   async redirects() {
-    return []
+    return [
+      // Old indexed pages → homepage (301 permanent)
+      { source: '/web-design', destination: '/', permanent: true },
+      { source: '/service-index', destination: '/', permanent: true },
+      { source: '/services-index', destination: '/', permanent: true },
+      { source: '/blog', destination: '/', permanent: true },
+      { source: '/blog/:slug*', destination: '/', permanent: true },
+      { source: '/tools', destination: '/', permanent: true },
+      { source: '/learn', destination: '/', permanent: true },
+      { source: '/old-home', destination: '/', permanent: true },
+      { source: '/living-persona', destination: '/', permanent: true },
+      { source: '/project-metavision', destination: '/', permanent: true },
+      { source: '/cona-cash', destination: '/', permanent: true },
+    ]
   },
 
   // Keep only if self-hosting. If deploying to Vercel, remove this.
