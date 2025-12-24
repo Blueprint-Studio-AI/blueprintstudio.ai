@@ -51,7 +51,7 @@ export const portfolioProjects: PortfolioProject[] = [
       },
       mobile: {
         type: 'video',
-        src: '/media/projects/living-ip/living-ip-horizontal-compressed.mp4', // Using same video for now
+        src: '/media/projects/living-ip/living-ip-vertical-compressed.mp4',
         poster: '/media/projects/living-ip/living-ip-mobile-poster.jpg',
         alt: 'LivingIP Project Reel'
       }
@@ -100,7 +100,7 @@ export const portfolioProjects: PortfolioProject[] = [
       },
       mobile: {
         type: 'video',
-        src: '/media/projects/arch-vegas/arch-vegas-horizontal-compressed.mp4', // Using same video for now
+        src: '/media/projects/arch-vegas/arch-vegas-vertical-compressed.mp4',
         poster: '/media/projects/arch-vegas/arch-vegas-mobile-poster.jpg',
         alt: 'Arch Network BTC All-In Summit Project Reel'
       }
@@ -144,13 +144,13 @@ export const portfolioProjects: PortfolioProject[] = [
     featuredMedia: {
       desktop: {
         type: 'video',
-        src: '/media/projects/autara/autara-quick-edit-compressed.mp4',
+        src: '/media/projects/autara/autara-horizontal-compressed.mp4',
         poster: '/media/projects/autara/autara-desktop-poster.jpg',
         alt: 'Autara on Arch Network Project Reel'
       },
       mobile: {
         type: 'video',
-        src: '/media/projects/autara/autara-quick-edit-compressed.mp4', // Using same video for now
+        src: '/media/projects/autara/autara-vertical-compressed.mp4',
         poster: '/media/projects/autara/autara-mobile-poster.jpg',
         alt: 'Autara on Arch Network Project Reel'
       }
