@@ -242,12 +242,12 @@ export const portfolioProjects: PortfolioProject[] = [
     featuredMedia: {
       desktop: {
         type: 'image',
-        src: '/media/projects/breeze/hero-breeze.png',
+        src: '/media/projects/breeze/hero-breeze.jpg',
         alt: 'Breeze on Arch Network Reel'
       },
       mobile: {
         type: 'image',
-        src: '/media/projects/breeze/hero-breeze.png', // Using same image for now
+        src: '/media/projects/breeze/hero-breeze-mobile.jpg',
         alt: 'Breeze on Arch Network Reel'
       }
     },
