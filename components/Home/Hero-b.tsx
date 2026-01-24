@@ -35,6 +35,7 @@ export default function HeroB() {
     const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
     const videoContainerRef = useRef<HTMLDivElement>(null);
     const breakpoint = useBreakpoint();
+    const isMobileBreakpoint = breakpoint === 'base' || breakpoint === 'xs';
 
     const closeFullscreen = useCallback((trigger: 'scroll' | 'button' = 'button') => {
         triggerTypeRef.current = trigger; // Set immediately (sync) before state change
@@ -58,9 +59,11 @@ export default function HeroB() {
         setIsFullscreen(true);
     }, []);
 
-    // Handle scroll - close on scroll down, open on return to top
+    // Handle scroll - close on scroll down, open on return to top (desktop only)
     useEffect(() => {
-        // Only enable scroll handling after loader is gone and we've been in fullscreen
+        // Skip on mobile - no fullscreen functionality
+        if (isMobileBreakpoint) return;
+        // Only enable scroll handling after loader is gone
         if (showOverlay) return;
 
         let lastScrollY = window.scrollY;
@@ -84,7 +87,7 @@ export default function HeroB() {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [showOverlay, isFullscreen, hasScrolledAway, closeFullscreen, openFullscreen]);
+    }, [isMobileBreakpoint, showOverlay, isFullscreen, hasScrolledAway, closeFullscreen, openFullscreen]);
 
     // Close fullscreen on escape key
     useEffect(() => {
@@ -262,26 +265,28 @@ export default function HeroB() {
     // Start animation only when both video is loaded AND minimum time has elapsed
     useEffect(() => {
         if (isVideoLoaded && minimumTimeElapsed) {
-            // STEP 1: Activate fullscreen FIRST (appears instantly, but loader still covers view)
-            setIsFullscreen(true);
+            // Only activate fullscreen on desktop (mobile video is already almost fullscreen)
+            if (!isMobileBreakpoint) {
+                setIsFullscreen(true);
+            }
 
             // Start video playback immediately
             if (videoRef.current) {
                 videoRef.current.play();
             }
 
-            // STEP 2: After brief moment, start fading the loader to reveal fullscreen
+            // After brief moment, start fading the loader
             setTimeout(() => {
-                setLoaderContentFading(true); // Fade logo/text
-                setIsAnimating(true); // Fade loader overlay
+                setLoaderContentFading(true);
+                setIsAnimating(true);
             }, 100);
 
-            // STEP 3: Remove loader from DOM after fade completes
+            // Remove loader from DOM after fade completes
             setTimeout(() => {
                 setShowOverlay(false);
             }, 700);
         }
-    }, [isVideoLoaded, minimumTimeElapsed]);
+    }, [isVideoLoaded, minimumTimeElapsed, isMobileBreakpoint]);
 
     return (
         <>
@@ -492,8 +497,8 @@ export default function HeroB() {
                                 preload="auto"
                             />
 
-                            {/* Fullscreen Button - only show when not in fullscreen */}
-                            {hasVideoFrame && !showOverlay && !isFullscreen && (
+                            {/* Fullscreen Button - desktop only */}
+                            {hasVideoFrame && !showOverlay && !isFullscreen && !isMobileBreakpoint && (
                                 <motion.button
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
