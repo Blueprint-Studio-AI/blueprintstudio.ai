@@ -7,6 +7,7 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight, Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -52,13 +53,15 @@ export default function HeroSection() {
       <SectionHeader
         leftText="YC LAUNCH VIDEOS"
         centerContent={
-          <Image
-            src="/blueprint-logo-dark.svg"
-            alt="Blueprint Studio"
-            width={80}
-            height={20}
-            className="h-3 sm:h-4 w-auto"
-          />
+          <Link href="/" className="hover:opacity-70 transition-opacity">
+            <Image
+              src="/blueprint-logo-dark.svg"
+              alt="Blueprint Studio"
+              width={80}
+              height={20}
+              className="h-3 sm:h-4 w-auto"
+            />
+          </Link>
         }
         rightText="// fast-track"
       />

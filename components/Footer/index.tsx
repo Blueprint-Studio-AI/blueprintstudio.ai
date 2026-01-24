@@ -90,13 +90,15 @@ export function Footer() {
       <Section semantic="div" className="flex-1">
         <OuterContainer>
           <div className="w-full pt-16 md:pt-28 px-2.5 md:px-6">
-            <Image
-              src="/logo-blueprint.svg"
-              alt="Blueprint Logo"
-              width={639}
-              height={83}
-              style={{ filter: 'grayscale(100%)' }}
-            />
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo-blueprint.svg"
+                alt="Blueprint Logo"
+                width={639}
+                height={83}
+                style={{ filter: 'grayscale(100%)' }}
+              />
+            </Link>
           </div>
         </OuterContainer>
       </Section>

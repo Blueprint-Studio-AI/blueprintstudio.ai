@@ -66,12 +66,18 @@ const NavLink = ({
   );
 };
 
+// Routes where the floating nav should be hidden
+const HIDDEN_NAV_ROUTES = ['/launch-videos'];
+
 export const FloatingNavNew = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const pathname = usePathname();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
   const { scroll, isReady } = useSmoothScroll();
+
+  // Check if nav should be hidden (used in return, not early return to preserve hook order)
+  const shouldHideNav = HIDDEN_NAV_ROUTES.includes(pathname);
 
   // Helper function to scroll to element using Locomotive Scroll or fallback
   const scrollToElement = (elementId: string) => {
@@ -192,6 +198,11 @@ export const FloatingNavNew = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [pathname, allSections]);
+
+  // Hide nav on specific routes (after all hooks)
+  if (shouldHideNav) {
+    return null;
+  }
 
   return (
     <nav
