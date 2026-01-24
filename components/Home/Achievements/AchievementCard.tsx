@@ -35,25 +35,42 @@ export default function AchievementCard({
   const shouldUseIntersection = breakpoint === "base" || breakpoint === "xs" || breakpoint === "sm" || breakpoint === "md";
   const isActive = shouldUseIntersection ? isIntersecting : isHovered;
 
+  // Determine if this is the "Embedded" card (chat bubbles)
+  const isEmbeddedCard = achievement.id === 3;
+
   return (
-    <motion.div
+    <div
       ref={elementRef}
-      className="flex flex-col items-start gap-4 flex-1 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-[361px] bg-[#FAFAFA]"
+      className="flex-1 h-[361px] pb-3"
       onMouseEnter={shouldUseIntersection ? undefined : onMouseEnter}
       onMouseLeave={shouldUseIntersection ? undefined : onMouseLeave}
-      animate={{
-        y: !shouldUseIntersection && isHovered ? -25 : 0
-      }}
-      transition={{
-        duration: 0.3,
-        ease: [0.25, 0.1, 0.25, 1]
-      }}
     >
+      <motion.div
+        className="flex flex-col items-start gap-4 rounded-[20px] border border-neutral-300 bg-neutral-200 p-4 pb-6 h-full bg-[#FAFAFA]"
+        animate={{
+          y: !shouldUseIntersection && isHovered ? -12 : 0,
+          boxShadow: !shouldUseIntersection && isHovered
+            ? '0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04)'
+            : '0 0 0 rgba(0, 0, 0, 0)'
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25
+        }}
+      >
       {/* Top section with dot background and visual placeholder */}
-      <div 
-        className="w-full flex-1 rounded-lg relative border border-neutral-300 bg-neutral-100 overflow-hidden"
+      <motion.div
+        className="w-full flex-1 rounded-lg relative border overflow-hidden"
+        animate={{
+          backgroundColor: '#F5F5F5',
+          borderColor: 'hsl(240 4% 86%)',
+        }}
+        transition={{
+          duration: 0.4,
+          ease: [0.25, 0.1, 0.25, 1]
+        }}
         style={{
-          // backgroundImage: 'radial-gradient(circle, hsl(var(--neutral-300)) 1px, transparent 1px)',
           backgroundSize: '16px 16px',
         }}
       >
@@ -69,7 +86,7 @@ export default function AchievementCard({
             <div className="w-16 h-16 bg-neutral-400 rounded-full opacity-60" />
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Text content */}
       <div className="flex flex-col items-start gap-3 w-full">
@@ -81,5 +98,6 @@ export default function AchievementCard({
         </p>
       </div>
     </motion.div>
+    </div>
   );
 }

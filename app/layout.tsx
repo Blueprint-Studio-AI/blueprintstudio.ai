@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 import Background from "@/components/ui/Background";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
+import { SmoothScrollProvider } from "@/components/SmoothScroll"
 
 const inter = Inter({
   subsets: ['latin'],
@@ -144,12 +145,14 @@ export default function RootLayout({
         />
       </head>
       <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
-        <Background />
-        <FloatingNavNew />
-        <main>
-          {children}
-          <Toaster />
-        </main>
+        <SmoothScrollProvider>
+          <Background />
+          <FloatingNavNew />
+          <main>
+            {children}
+            <Toaster />
+          </main>
+        </SmoothScrollProvider>
         <Analytics />
         <SpeedInsights />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />

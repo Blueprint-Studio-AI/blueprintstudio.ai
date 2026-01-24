@@ -20,10 +20,10 @@ export default function Home() {
             {/* Spacer to create scroll space for revealing quote */}
             <div className="h-screen" />
             <div className="relative z-30">
-                <Achievements/>
                 <div id="work">
                     <PortfolioBento/>
                 </div>
+                <Achievements/>
                 <div id="pricing">
                     <PricingSection/>
                 </div>

@@ -1,7 +1,31 @@
 /* app/globals.css */
+@import "locomotive-scroll/dist/locomotive-scroll.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Locomotive Scroll overrides for premium feel */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
 
 /* Design color tokens */
 :root {

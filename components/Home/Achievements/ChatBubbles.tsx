@@ -33,18 +33,35 @@ const initialMessages: Message[] = [
   }
 ];
 
+// Spring configs
+const springConfig = {
+  stiffness: 260,
+  damping: 24,
+  mass: 0.7
+};
+
+const gentleSpring = {
+  stiffness: 180,
+  damping: 20,
+  mass: 0.8
+};
+
 export default function ChatBubbles({ isHovered = false }: ChatBubblesProps) {
   const [messages, setMessages] = React.useState<Message[]>(initialMessages);
   const [showTyping, setShowTyping] = React.useState(false);
   const [hasShownHoverMessage, setHasShownHoverMessage] = React.useState(false);
   const timeoutRef = React.useRef<NodeJS.Timeout>();
+  const resetTimeoutRef = React.useRef<NodeJS.Timeout>();
 
   // Handle hover state changes from parent
   React.useEffect(() => {
     if (isHovered && !hasShownHoverMessage) {
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+
       setShowTyping(true);
 
-      // Show typing indicator for 800ms, then add message
       timeoutRef.current = setTimeout(() => {
         setShowTyping(false);
         const newMessage: Message = {
@@ -55,58 +72,89 @@ export default function ChatBubbles({ isHovered = false }: ChatBubblesProps) {
         };
         setMessages(prev => [...prev, newMessage]);
         setHasShownHoverMessage(true);
-      }, 800);
+      }, 900);
     } else if (!isHovered) {
-      // Clear any pending timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      setShowTyping(false);
 
-      // Reset to allow re-hover after leaving
-      setTimeout(() => {
+      resetTimeoutRef.current = setTimeout(() => {
         setMessages(initialMessages);
-        setShowTyping(false);
         setHasShownHoverMessage(false);
-      }, 500);
+      }, 350);
     }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
   }, [isHovered, hasShownHoverMessage]);
 
-  // Round coordinates to avoid hydration issues
-  const round = (num: number) => Math.round(num * 1000) / 1000;
+  // Get staggered delay based on message position and whether it's ours
+  const getDelay = (index: number, fromClient: boolean) => {
+    if (!fromClient) {
+      // Our messages animate with staggered delay
+      const ourMessageIndex = messages.filter((m, i) => i <= index && !m.fromClient).length - 1;
+      return ourMessageIndex * 0.08;
+    }
+    return 0;
+  };
 
   return (
-    <div
-      className="absolute inset-0 flex flex-col justify-end p-3"
-    >
+    <div className="absolute inset-0 flex flex-col justify-end p-3 cursor-default select-none">
       <div className="space-y-2 max-h-full overflow-hidden">
         <AnimatePresence mode="popLayout">
           {messages.map((message, index) => (
             <motion.div
               key={message.id}
               layout
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16, scale: 0.92 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.88,
+                y: -8,
+                transition: { duration: 0.2, ease: "easeIn" }
+              }}
               transition={{
-                duration: 0.2,
-                ease: [0.25, 0.46, 0.45, 0.94], // ease-out-quad
-                layout: { duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }
+                type: "spring",
+                ...springConfig,
+                delay: index * 0.02
               }}
               className={`flex ${message.fromClient ? 'justify-start' : 'justify-end'}`}
             >
-              <div
+              <motion.div
                 className={`max-w-[80%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
                   message.fromClient
-                    ? 'bg-neutral-200 text-neutral-800 rounded-bl-md'
-                    : 'bg-neutral-800 text-white rounded-br-md'
+                    ? 'rounded-bl-md'
+                    : 'rounded-br-md'
                 }`}
+                animate={{
+                  backgroundColor: message.fromClient
+                    ? 'rgb(229, 229, 229)'
+                    : (isHovered ? '#60AEEE' : 'rgb(163, 163, 163)'),
+                  scale: !message.fromClient && isHovered ? 1.02 : 1,
+                  x: !message.fromClient && isHovered ? -2 : 0,
+                  y: !message.fromClient && isHovered ? -1 : 0,
+                }}
+                transition={{
+                  type: "spring",
+                  ...gentleSpring,
+                  delay: getDelay(index, message.fromClient)
+                }}
                 style={{
-                  fontSize: round(10),
-                  lineHeight: round(1.4)
+                  color: message.fromClient ? 'rgb(38, 38, 38)' : 'rgb(255, 255, 255)',
+                  fontSize: 10,
+                  lineHeight: 1.4
                 }}
               >
                 {message.text}
-              </div>
+              </motion.div>
             </motion.div>
           ))}
 
@@ -115,35 +163,49 @@ export default function ChatBubbles({ isHovered = false }: ChatBubblesProps) {
             <motion.div
               key="typing"
               layout
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              initial={{ opacity: 0, y: 16, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.85, y: -4, transition: { duration: 0.15 } }}
               transition={{
-                duration: 0.15,
-                ease: [0.25, 0.46, 0.45, 0.94] // ease-out-quad
+                type: "spring",
+                stiffness: 320,
+                damping: 22,
+                mass: 0.6
               }}
               className="flex justify-end"
             >
-              <div className="bg-neutral-800 text-white px-3 py-2 rounded-2xl rounded-br-md">
-                <div className="flex space-x-1">
+              <motion.div
+                className="px-3 py-2.5 rounded-2xl rounded-br-md"
+                initial={{ backgroundColor: 'rgb(163, 163, 163)' }}
+                animate={{
+                  backgroundColor: '#60AEEE',
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20,
+                  delay: 0.1
+                }}
+              >
+                <div className="flex space-x-1.5 items-center h-3">
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="w-1 h-1 bg-white rounded-full"
+                      className="w-1.5 h-1.5 bg-white rounded-full"
                       animate={{
-                        opacity: [0.3, 1, 0.3],
-                        scale: [0.8, 1, 0.8]
+                        scale: [0.85, 1.15, 0.85],
+                        opacity: [0.5, 1, 0.5],
                       }}
                       transition={{
-                        duration: 0.6,
+                        duration: 0.7,
                         repeat: Infinity,
-                        delay: i * 0.1,
-                        ease: [0.455, 0.03, 0.515, 0.955] // ease-in-out-quad
+                        delay: i * 0.15,
+                        ease: [0.45, 0.05, 0.55, 0.95]
                       }}
                     />
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
