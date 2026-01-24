@@ -53,7 +53,7 @@ export default function PricingSection() {
                  lineHeight: '140%',
                  letterSpacing: '-0.4px'
                }}>
-              Join the{' '}
+              Join{' '}
               <strong
                 className="font-semibold"
                 style={{
@@ -65,7 +65,7 @@ export default function PricingSection() {
               >
                 25+ tech founders
               </strong>
-              {' '}who have brought their visions<br className="hidden sm:block" /> to life with Blueprint Studio
+              {' '}who shipped<br className="sm:hidden" /> with Blueprint Studio.
             </p>
           </div>
 

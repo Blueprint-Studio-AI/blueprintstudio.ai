@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -9,13 +9,13 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useBreakpoint } from "@/lib/breakpoints";
+import { motion, AnimatePresence } from "framer-motion";
+import { Maximize2, X } from "lucide-react";
 
 export default function HeroB() {
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
-    const [containerAtVideo, setContainerAtVideo] = useState(false);
     const [showOverlay, setShowOverlay] = useState(true);
-    const [videoRevealed, setVideoRevealed] = useState(false);
     const [logoEntered, setLogoEntered] = useState(false);
     const [headerLogoVisible, setHeaderLogoVisible] = useState(false);
     const [headerAnimationsReady, setHeaderAnimationsReady] = useState(false);
@@ -23,13 +23,100 @@ export default function HeroB() {
     const [containerEntered, setContainerEntered] = useState(false);
     const [backgroundVisible, setBackgroundVisible] = useState(false);
     const [textAnimated, setTextAnimated] = useState(false);
+    const [loaderContentFading, setLoaderContentFading] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [minimumTimeElapsed, setMinimumTimeElapsed] = useState(false);
     const [isClient, setIsClient] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [hasScrolledAway, setHasScrolledAway] = useState(false);
+    const [isFirstFullscreen, setIsFirstFullscreen] = useState(true);
+    const triggerTypeRef = useRef<'scroll' | 'button'>('button');
     const videoRef = useRef<HTMLVideoElement>(null);
+    const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
     const videoContainerRef = useRef<HTMLDivElement>(null);
-    const loadStartTime = useRef<number>(Date.now());
     const breakpoint = useBreakpoint();
+
+    const closeFullscreen = useCallback((trigger: 'scroll' | 'button' = 'button') => {
+        triggerTypeRef.current = trigger; // Set immediately (sync) before state change
+        // Sync inline video to fullscreen video's current time
+        if (fullscreenVideoRef.current && videoRef.current) {
+            videoRef.current.currentTime = fullscreenVideoRef.current.currentTime;
+            videoRef.current.play().catch(() => {});
+        }
+        setIsFullscreen(false);
+        if (isFirstFullscreen) {
+            setIsFirstFullscreen(false);
+        }
+    }, [isFirstFullscreen]);
+
+    const openFullscreen = useCallback((trigger: 'scroll' | 'button' = 'button') => {
+        triggerTypeRef.current = trigger; // Set immediately (sync) before state change
+        // Pause inline video and sync fullscreen to its current time
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        setIsFullscreen(true);
+    }, []);
+
+    // Handle scroll - close on scroll down, open on return to top
+    useEffect(() => {
+        // Only enable scroll handling after loader is gone and we've been in fullscreen
+        if (showOverlay) return;
+
+        let lastScrollY = window.scrollY;
+
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+
+            // Close fullscreen if scrolling down past threshold
+            if (isFullscreen && scrollY > 50) {
+                closeFullscreen('scroll');
+                setHasScrolledAway(true);
+            }
+
+            // Open fullscreen when returning to top
+            if (!isFullscreen && hasScrolledAway && scrollY < 10 && lastScrollY > scrollY) {
+                openFullscreen('scroll');
+            }
+
+            lastScrollY = scrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [showOverlay, isFullscreen, hasScrolledAway, closeFullscreen, openFullscreen]);
+
+    // Close fullscreen on escape key
+    useEffect(() => {
+        if (!isFullscreen) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                closeFullscreen('button'); // Escape = button-style close (no parallax)
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFullscreen, closeFullscreen]);
+
+    // Pause inline video when fullscreen is active (only play the one that's visible)
+    useEffect(() => {
+        if (!videoRef.current) return;
+
+        if (isFullscreen) {
+            videoRef.current.pause();
+        }
+    }, [isFullscreen]);
+
+    // Lock body scroll when fullscreen
+    useEffect(() => {
+        if (isFullscreen) {
+            document.body.style.overflow = 'hidden';
+        } else if (!showOverlay) {
+            document.body.style.overflow = '';
+        }
+    }, [isFullscreen, showOverlay]);
 
     // Determine video source based on breakpoint (only after client-side hydration)
     const videoSource = !isClient ? "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4" : // Default to horizontal during SSR
@@ -90,10 +177,9 @@ export default function HeroB() {
         // White background appears after text animation
         const backgroundTimer = setTimeout(() => {
             setBackgroundVisible(true);
-        }, 1600); // A moment after text has animated in
+        }, 1600);
 
-        // Header logo fade in with slight delay after text
-        // Set minimum display time (e.g., 2.5 seconds to read the text)
+        // Set minimum display time (2.5 seconds to read the text)
         const minimumTimer = setTimeout(() => {
             setMinimumTimeElapsed(true);
         }, 2500);
@@ -176,106 +262,68 @@ export default function HeroB() {
     // Start animation only when both video is loaded AND minimum time has elapsed
     useEffect(() => {
         if (isVideoLoaded && minimumTimeElapsed) {
-            // Start the animation sequence
+            // STEP 1: Activate fullscreen FIRST (appears instantly, but loader still covers view)
+            setIsFullscreen(true);
+
+            // Start video playback immediately
+            if (videoRef.current) {
+                videoRef.current.play();
+            }
+
+            // STEP 2: After brief moment, start fading the loader to reveal fullscreen
             setTimeout(() => {
-                setIsAnimating(true);
+                setLoaderContentFading(true); // Fade logo/text
+                setIsAnimating(true); // Fade loader overlay
+            }, 100);
 
-                // Start video playback earlier in the animation
-                setTimeout(() => {
-                    if (videoRef.current) {
-                        videoRef.current.play();
-                    }
-                }, 0); // Start video earlier
-
-                // Container reaches video position
-                setTimeout(() => {
-                    setContainerAtVideo(true);
-                }, 650); // Just before animation completes
-
-                // Start video reveal animation AFTER loader completes transform
-                setTimeout(() => {
-                    setVideoRevealed(true);
-                }, 700); // Match loader animation duration
-
-                // Remove overlay
-                setTimeout(() => {
-                    setShowOverlay(false);
-                }, 750); // Quick fade after reaching position
-            }, 300); // Reduced delay before starting animation
+            // STEP 3: Remove loader from DOM after fade completes
+            setTimeout(() => {
+                setShowOverlay(false);
+            }, 700);
         }
     }, [isVideoLoaded, minimumTimeElapsed]);
 
     return (
         <>
-            {/* Loading Overlay - Site background that fades away */}
+            {/* Loading Overlay - Fullscreen-sized from the start */}
             {showOverlay && (
                 <div
-                    className="fixed inset-0 bg-neutral-50 z-[100] flex items-center justify-center"
+                    className="fixed inset-0 bg-neutral-50 z-[100]"
                     style={{
                         transition: isAnimating
-                            ? 'opacity 300ms cubic-bezier(.25, .46, .45, .94)' // ease-out-quad, much quicker
+                            ? 'opacity 400ms cubic-bezier(.25, .46, .45, .94) 200ms'
                             : 'none',
                         opacity: isAnimating ? 0 : 1,
                         pointerEvents: isAnimating ? 'none' : 'auto',
                     }}
                 >
-                    {/* Loader Container - Large, centered */}
+                    {/* Loader Container - Fullscreen positioned, just fades in at full size */}
                     <div
-                        className="loader-container relative rounded-2xl flex items-start justify-center overflow-hidden"
+                        className="loader-container absolute inset-4 sm:inset-8 lg:inset-12 rounded-2xl flex items-center justify-center overflow-hidden"
                         style={{
-                            width: 'calc(100vw - 80px)',
-                            maxWidth: '1200px',
-                            aspectRatio: isMobile ? '2/3' : '16/9',
-                            transformOrigin: 'center center',
-                            willChange: 'transform, opacity, filter',
-                            opacity: containerEntered && !containerAtVideo ? 1 : containerEntered && containerAtVideo ? 0 : 0,
-                            transform: containerEntered && !isAnimating
-                                ? 'scale(1)'
-                                : 'scale(0.9)',
-                            transition: isAnimating
-                                ? containerAtVideo
-                                    ? 'opacity 100ms ease-out, transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
-                                    : 'transform 700ms cubic-bezier(.23, 1, .32, 1), filter 700ms cubic-bezier(.23, 1, .32, 1)'
-                                : 'transform 600ms cubic-bezier(.34, 1.56, .64, 1), opacity 600ms cubic-bezier(.34, 1.56, .64, 1)', // bounce effect
-                            ...(isAnimating && videoContainerRef.current ? (() => {
-                                const videoRect = videoContainerRef.current.getBoundingClientRect();
-                                const loaderEl = document.querySelector('.loader-container');
-                                if (!loaderEl) return {};
-                                const loaderRect = loaderEl.getBoundingClientRect();
-
-                                const scaleX = videoRect.width / loaderRect.width;
-                                const scaleY = videoRect.height / loaderRect.height;
-                                const translateX = (videoRect.left + videoRect.width / 2) - (loaderRect.left + loaderRect.width / 2);
-                                const translateY = (videoRect.top + videoRect.height / 2) - (loaderRect.top + loaderRect.height / 2);
-
-                                return {
-                                    transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-                                    filter: 'blur(2px)',
-                                };
-                            })() : {})
+                            opacity: containerEntered ? 1 : 0,
+                            transition: 'opacity 500ms ease-out',
                         }}
                     >
-                            {/* White background with subtle scale animation */}
+                            {/* White background - simple fade */}
                             <div
                                 className="absolute inset-0 rounded-2xl"
                                 style={{
                                     backgroundColor: '#FBFBFB',
-                                    transform: backgroundVisible && !containerAtVideo ? 'scale(1)' : 'scale(0.98)',
-                                    opacity: backgroundVisible && !containerAtVideo ? 1 : 0,
-                                    transition: containerAtVideo
-                                        ? 'all 100ms ease-out' // Quick fade with container
-                                        : 'all 1600ms cubic-bezier(.165, .84, .44, 1), box-shadow 1600ms cubic-bezier(.165, .84, .44, 1) 800ms', // Slow fade in with shadow
-                                    transformOrigin: 'center center',
-                                    boxShadow: backgroundVisible && !containerAtVideo ? '0 8px 32px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.015)' : 'none',
+                                    opacity: loaderContentFading ? 0 : backgroundVisible ? 1 : 0,
+                                    transition: loaderContentFading
+                                        ? 'opacity 400ms ease-out'
+                                        : 'opacity 800ms ease-out',
+                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.015)',
                                 }}
                             />
 
-                            {/* Logo and text content - positioned higher */}
+                            {/* Logo and text content - centered */}
                             <div
-                                className={`relative flex flex-col items-center pt-[50%] sm:pt-[20%]`}
+                                className="relative flex flex-col items-center z-10"
                                 style={{
-                                    opacity: containerAtVideo ? 0 : 1,
-                                    transition: 'opacity 100ms ease-out',
+                                    opacity: loaderContentFading ? 0 : 1,
+                                    transition: 'opacity 400ms ease-out',
                                 }}
                             >
                                 {/* Blueprint Logo */}
@@ -403,10 +451,10 @@ export default function HeroB() {
                         {/* Video Container - visible from start */}
                         <div
                             ref={videoContainerRef}
-                            className="relative w-full max-w-5xl mx-auto aspect-[2/3] sm:aspect-video overflow-hidden"
+                            className="relative w-full max-w-5xl mx-auto aspect-[2/3] sm:aspect-video overflow-hidden group"
                             style={{
-                                borderRadius: '0.75rem', // Use inline style for better control
-                                backgroundColor: 'transparent', // Remove any background
+                                borderRadius: '0.75rem',
+                                backgroundColor: 'transparent',
                             }}
                         >
                             <div
@@ -432,8 +480,8 @@ export default function HeroB() {
                                 className="absolute inset-0 w-full h-full"
                                 style={{
                                     objectFit: 'cover',
-                                    borderRadius: '0.75rem', // Match container exactly
-                                    WebkitMaskImage: '-webkit-radial-gradient(white, black)', // Force GPU rendering
+                                    borderRadius: '0.75rem',
+                                    WebkitMaskImage: '-webkit-radial-gradient(white, black)',
                                     opacity: hasVideoFrame ? 1 : 0,
                                     transition: 'opacity 300ms cubic-bezier(.16, 1, .3, 1)',
                                     backgroundColor: 'transparent',
@@ -443,7 +491,134 @@ export default function HeroB() {
                                 playsInline
                                 preload="auto"
                             />
+
+                            {/* Fullscreen Button - only show when not in fullscreen */}
+                            {hasVideoFrame && !showOverlay && !isFullscreen && (
+                                <motion.button
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.5, duration: 0.3 }}
+                                    onClick={() => openFullscreen('button')}
+                                    className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition-all duration-200 hover:bg-black/60 cursor-pointer opacity-0 group-hover:opacity-100"
+                                    aria-label="View fullscreen"
+                                >
+                                    <Maximize2 className="h-3.5 w-3.5" />
+                                </motion.button>
+                            )}
                         </div>
+
+                        {/* Fullscreen Overlay - Polished "Whoosh" Animations */}
+                        <AnimatePresence mode="sync">
+                            {isFullscreen && (
+                                <>
+                                    {/* Backdrop */}
+                                    <motion.div
+                                        initial={{ opacity: isFirstFullscreen ? 1 : 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.35 }}
+                                        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md"
+                                        onClick={() => closeFullscreen('button')}
+                                    />
+
+                                    {/* Fullscreen Video Container */}
+                                    <motion.div
+                                        initial={isFirstFullscreen
+                                            ? { opacity: 1 }  // First time: instant (loader covers us, then fades to reveal)
+                                            : triggerTypeRef.current === 'scroll'
+                                                ? { opacity: 0, scale: 0.96, y: -50 }  // Scroll: float DOWN from where it exited
+                                                : { opacity: 0, scale: 0.96 }  // Button: just scale, no parallax
+                                        }
+                                        animate={{
+                                            opacity: 1,
+                                            scale: 1,
+                                            y: 0,
+                                        }}
+                                        exit={triggerTypeRef.current === 'scroll'
+                                            ? {
+                                                opacity: 0,
+                                                scale: 0.96,
+                                                y: -50,  // Scroll: float up (parallax)
+                                                transition: {
+                                                    duration: 0.4,
+                                                    ease: [0.4, 0, 0.2, 1],
+                                                }
+                                            }
+                                            : {
+                                                opacity: 0,
+                                                scale: 0.96,  // Button: just scale, no parallax
+                                                transition: {
+                                                    duration: 0.35,
+                                                    ease: [0.4, 0, 0.2, 1],
+                                                }
+                                            }
+                                        }
+                                        transition={{
+                                            duration: 0.4,
+                                            ease: [0.4, 0, 0.2, 1],
+                                        }}
+                                        className="fixed inset-4 sm:inset-8 lg:inset-12 z-[201] flex items-center justify-center overflow-hidden"
+                                        style={{ borderRadius: '1rem' }}
+                                        onClick={() => closeFullscreen('button')}
+                                    >
+                                        <motion.div
+                                            className="relative w-full h-full overflow-hidden flex items-center justify-center"
+                                            style={{ borderRadius: '1rem' }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            initial={isFirstFullscreen
+                                                ? { filter: 'blur(0px)' } // First time: no blur
+                                                : { filter: 'blur(4px)' }
+                                            }
+                                            animate={{
+                                                filter: 'blur(0px)',
+                                            }}
+                                            exit={{
+                                                filter: 'blur(4px)',
+                                                transition: { duration: 0.3 }
+                                            }}
+                                            transition={{
+                                                duration: 0.3,
+                                            }}
+                                        >
+                                            <video
+                                                ref={fullscreenVideoRef}
+                                                className="w-full h-full object-cover"
+                                                style={{
+                                                    borderRadius: '1rem',
+                                                }}
+                                                src={videoSource}
+                                                loop
+                                                muted
+                                                playsInline
+                                                onLoadedData={() => {
+                                                    // Sync to inline video's time and play
+                                                    if (fullscreenVideoRef.current && videoRef.current) {
+                                                        fullscreenVideoRef.current.currentTime = videoRef.current.currentTime;
+                                                        fullscreenVideoRef.current.play().catch(() => {});
+                                                    }
+                                                }}
+                                            />
+
+                                            {/* Close Button */}
+                                            <motion.button
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{
+                                                    delay: isFirstFullscreen ? 0.5 : 0.15, // Wait for loader to fade on first
+                                                    duration: 0.25,
+                                                }}
+                                                onClick={() => closeFullscreen('button')}
+                                                className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-lg transition-all duration-200 hover:bg-white/20 cursor-pointer"
+                                                aria-label="Close fullscreen"
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </motion.button>
+                                        </motion.div>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
                     </InnerContainer>
                 </OuterContainer>
 
