@@ -3,7 +3,8 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "../ui/SectionHeader";
-import { ArrowUpRight, Package, MessageCircle, CheckCircle, Palette, BarChart3 } from "lucide-react";
+import { ArrowUpRight, Package, MessageCircle, CheckCircle, Palette, Rocket } from "lucide-react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const GreenCheckIcon = () => (
@@ -79,7 +80,7 @@ export default function PricingSection() {
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <CheckCircle className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-700">[1]</span>
+                  <span className="text-sm font-medium text-neutral-400">[1]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black cursor-default">Subscribe</h4>
@@ -93,7 +94,7 @@ export default function PricingSection() {
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <MessageCircle className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-700">[2]</span>
+                  <span className="text-sm font-medium text-neutral-400">[2]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black cursor-default">Request</h4>
@@ -107,7 +108,7 @@ export default function PricingSection() {
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <Package className="w-4 h-4 text-neutral-600" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-700">[3]</span>
+                  <span className="text-sm font-medium text-neutral-400">[3]</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-base mb-1 text-black cursor-default">Receive results</h4>
@@ -123,11 +124,16 @@ export default function PricingSection() {
                 <Package className="w-4 h-4 text-neutral-600" />
               </div>
               
-              {/* Title */}
-              <h3 className="font-medium text-lg text-black cursor-default">
-                Design & Build Subscription
-              </h3>
-              
+              {/* Title & Description */}
+              <div>
+                <h3 className="font-medium text-lg text-black cursor-default">
+                  Design & Build Subscription
+                </h3>
+                <p className="text-neutral-500 text-sm cursor-default mt-1">
+                  All inclusive service with dedicated expertise on&nbsp;tap.
+                </p>
+              </div>
+
               {/* Price */}
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-bold text-black cursor-default">
@@ -137,11 +143,6 @@ export default function PricingSection() {
                   per month
                 </span>
               </div>
-
-              {/* Description */}
-              <p className="text-neutral-500 text-sm cursor-default">
-                All inclusive service with dedicated expertise on tap.
-              </p>
 
               {/* Features */}
               <ul className="space-y-2">
@@ -237,35 +238,62 @@ export default function PricingSection() {
               </motion.button>
             </div>
 
-            {/* Third Column - Project Based */}
+            {/* Third Column - Launch Packages */}
             <div className="flex flex-col items-start gap-6 p-5 rounded-[20px] border border-neutral-300 bg-neutral-100">
               {/* Icon */}
               <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-300 bg-neutral-200">
-                <BarChart3 className="w-4 h-4 text-neutral-600" />
+                <Rocket className="w-4 h-4 text-neutral-600" />
               </div>
-              
-              <h3 className="font-medium text-lg text-black cursor-default">Project-Based</h3>
-              <div className="text-2xl font-bold text-black cursor-default">Get Quote</div>
-              <p className="text-neutral-500 text-sm cursor-default">Tailored solutions for your specific needs</p>
 
-              <ul className="space-y-2">
-                <li className="flex items-start gap-3">
-                  <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Custom scope & timeline</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Fixed pricing</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Project management</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Flexible options</p>
-                </li>
-              </ul>
+              <div>
+                <h3 className="font-medium text-lg text-black cursor-default">Launch Packages</h3>
+                <p className="text-neutral-500 text-sm cursor-default mt-1">Everything you need to&nbsp;launch.</p>
+              </div>
+
+              {/* Package Rows */}
+              <div className="w-full space-y-2">
+                <Link
+                  href="/launch-video"
+                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm text-black">Launch Video</span>
+                    <span className="text-xs text-neutral-500">1-2 weeks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-black">$5K – $15K</span>
+                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
+                  </div>
+                </Link>
+
+                <Link
+                  href="/brand"
+                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm text-black">Brand Identity</span>
+                    <span className="text-xs text-neutral-500">3-4 weeks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-black">$15K – $20K</span>
+                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
+                  </div>
+                </Link>
+
+                <Link
+                  href="/launch"
+                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm text-black">Full Launch</span>
+                    <span className="text-xs text-neutral-500">6-8 weeks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-black">$50K – $120K</span>
+                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
+                  </div>
+                </Link>
+              </div>
 
               {/* Button with holographic border */}
               <motion.div
@@ -326,18 +354,18 @@ export default function PricingSection() {
                   }}
                 />
 
-                {/* Inner button - py-[10px] to account for 2px border and match Book a Call height */}
-                <button
+                {/* Inner button */}
+                <Link
+                  href="/launch"
                   className="relative w-full py-[10px] px-6 font-medium flex items-center justify-center text-neutral-700 rounded-[10px] text-sm"
                   style={{
                     background: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(8px)',
                   }}
-                  onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
                 >
-                  <span>Get Quote</span>
+                  <span>View Packages</span>
                   <ArrowUpRight className="w-4 h-4 ml-2" />
-                </button>
+                </Link>
               </motion.div>
             </div>
           </div>
