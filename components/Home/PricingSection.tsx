@@ -130,14 +130,14 @@ export default function PricingSection() {
                   Design & Build Subscription
                 </h3>
                 <p className="text-neutral-500 text-sm cursor-default mt-1">
-                  All inclusive service with dedicated expertise on&nbsp;tap.
+                  Keep&nbsp;shipping.
                 </p>
               </div>
 
               {/* Price */}
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-bold text-black cursor-default">
-                  $10k+
+                  $15k+
                 </span>
                 <span className="text-sm text-neutral-500 italic cursor-default">
                   per month
@@ -156,11 +156,11 @@ export default function PricingSection() {
                 </li>
                 <li className="flex items-start gap-3">
                   <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Priority support</p>
+                  <p className="font-medium text-black text-sm cursor-default">Rapid delivery</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <GreenCheckIcon />
-                  <p className="font-medium text-black text-sm cursor-default">Rapid delivery</p>
+                  <p className="font-medium text-black text-sm cursor-default">Pause or cancel anytime</p>
                 </li>
               </ul>
 
@@ -247,7 +247,7 @@ export default function PricingSection() {
 
               <div>
                 <h3 className="font-medium text-lg text-black cursor-default">Launch Packages</h3>
-                <p className="text-neutral-500 text-sm cursor-default mt-1">Everything you need to&nbsp;launch.</p>
+                <p className="text-neutral-500 text-sm cursor-default mt-1">Get to&nbsp;market.</p>
               </div>
 
               {/* Package Rows */}
@@ -286,7 +286,7 @@ export default function PricingSection() {
                 >
                   <div className="flex flex-col">
                     <span className="font-medium text-sm text-black">Full Launch</span>
-                    <span className="text-xs text-neutral-500">6-8 weeks</span>
+                    <span className="text-xs text-neutral-500">6-12 weeks</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-sm text-black">$50K – $120K</span>
