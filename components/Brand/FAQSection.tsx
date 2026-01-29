@@ -16,9 +16,9 @@ const faqs = [
       "We can work with what you have. If it's solid, we'll build the system around it. If it needs refinement, we'll propose updates. Either way, you'll get the full identity system.",
   },
   {
-    question: "What's a Brand GPT?",
+    question: "What are the AI prompts?",
     answer:
-      "A custom AI trained on your brand voice, messaging, and guidelines. Use it to draft copy, check tone, onboard teammates, or stay consistent as you scale. It's yours to keep.",
+      "Pre-configured prompts for ChatGPT, Claude, and Midjourney that are trained on your brand voice and guidelines. Use them to draft copy, generate visuals, or stay consistent as you scale. They're yours to keep and share with your team.",
   },
   {
     question: 'What are the "applications of choice"?',
@@ -44,9 +44,9 @@ const faqs = [
           href="/launch"
           className="underline hover:text-neutral-900 transition-colors"
         >
-          Full Launch
+          Launch Package
         </Link>{" "}
-        package — it includes brand identity plus website, pitch deck, and
+        — it includes brand identity plus website, pitch deck, and
         launch video starting at $50K.
       </>
     ),
@@ -60,7 +60,7 @@ const faqs = [
           href="/"
           className="underline hover:text-neutral-900 transition-colors"
         >
-          $15K/mo partnership
+          monthly partnership
         </Link>{" "}
         after launch for ongoing design, development, and iteration.
       </>
@@ -90,11 +90,11 @@ function FaqItem({ question, answer }: FaqItemProps) {
           {question}
         </h4>
         <motion.div
-          className="shrink-0 w-8 h-8 rounded-full bg-neutral-100 border border-neutral-300 flex items-center justify-center group-hover:bg-neutral-200 transition-colors"
+          className="shrink-0"
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="w-5 h-5 text-neutral-600" />
+          <ChevronDown className="w-5 h-5 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
         </motion.div>
       </button>
       <motion.div

@@ -11,11 +11,6 @@ import { motion } from "framer-motion";
 
 const faqs = [
   {
-    question: "What's the difference between Full Launch and Full Launch + Product?",
-    answer:
-      "Full Launch assumes you already have a product (live app, beta, or working prototype). We build your brand, website, deck, and video around it. Full Launch + Product is for founders who need us to design and build the product itself — UX, UI, and functional MVP — in addition to the launch assets.",
-  },
-  {
     question: "What if I only need some of the deliverables?",
     answer: (
       <>
@@ -26,15 +21,15 @@ const faqs = [
         >
           Brand Identity
         </Link>{" "}
-        ($15-20K) and{" "}
+        and{" "}
         <Link
           href="/launch-videos"
           className="underline hover:text-neutral-900 transition-colors"
         >
-          Launch Video
+          Launch Videos
         </Link>{" "}
-        ($5-15K) as standalone packages. But if you need most of the bundle,
-        Full Launch is better value and you get a fully aligned team.
+        as standalone packages. But if you need most of the bundle, the Launch
+        Package is better value and you get a fully aligned team.
       </>
     ),
   },
@@ -51,12 +46,12 @@ const faqs = [
   {
     question: "What tech stack do you use for websites?",
     answer:
-      "Framer or Webflow depending on your needs. Both are modern, fast, and easy for your team to update. We can also build in React/Next.js if you need custom functionality.",
+      "Framer for marketing sites, or Next.js/Astro for custom builds. All are modern, fast, and optimized for performance. We'll recommend the best fit based on your needs.",
   },
   {
     question: "Do you write the pitch deck copy?",
     answer:
-      "We develop the narrative structure and key messaging together. You provide the core content (product details, traction, team bios, financials). We shape it into a compelling story and design it.",
+      "We develop the narrative structure and key messaging together. You provide the core content (product details, traction, team bios, financials). We shape it into a compelling story and design it in Figma.",
   },
   {
     question: "What about the launch video script?",
@@ -64,9 +59,9 @@ const faqs = [
       "We write it. You review and approve. We've written 100+ scripts for YC founders — we know what works.",
   },
   {
-    question: "What's a Brand GPT?",
+    question: "What are the AI prompts?",
     answer:
-      "A custom AI trained on your brand voice, messaging, and guidelines. Use it to draft copy, check tone, onboard teammates. It's yours to keep.",
+      "Pre-configured prompts for ChatGPT, Claude, and Midjourney trained on your brand voice and guidelines. Use them to draft copy, generate visuals, or stay consistent as you scale. They're yours to keep.",
   },
   {
     question: "What happens after launch?",
@@ -77,10 +72,10 @@ const faqs = [
           href="/"
           className="underline hover:text-neutral-900 transition-colors"
         >
-          $15K/mo partnership
+          monthly partnership
         </Link>{" "}
         for ongoing design, development, and iteration. But there&apos;s no
-        obligation — the Full Launch package is complete on its own.
+        obligation — the Launch Package is complete on its own.
       </>
     ),
   },

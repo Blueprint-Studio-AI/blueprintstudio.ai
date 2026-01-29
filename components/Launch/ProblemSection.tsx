@@ -4,6 +4,14 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Image from "next/image";
+
+const comparison = [
+  { typical: "4 vendors", blueprint: "1 team" },
+  { typical: "12+ weeks", blueprint: "6 weeks" },
+  { typical: "$80-150K", blueprint: "$50K" },
+  { typical: "Misaligned assets", blueprint: "One cohesive brand" },
+];
 
 export default function ProblemSection() {
   return (
@@ -18,83 +26,72 @@ export default function ProblemSection() {
         </div>
       </div>
 
-      <SectionHeader
-        leftText="THE PROBLEM"
-        rightText="// why founders fail at launch"
-      />
+      <SectionHeader leftText="THE PROBLEM" rightText="// why this exists" />
 
       <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-12 sm:pt-16 lg:pt-24 pb-12 sm:pb-16 lg:pb-24 px-2.5 sm:px-6 relative">
+        <InnerContainer className="pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 px-2.5 sm:px-6 relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
           <div className="max-w-3xl mx-auto">
             {/* Headline */}
-            <h2
-              className="font-medium text-black cursor-default mb-8 sm:mb-12"
-              style={{
-                fontSize: "clamp(32px, 6vw, 48px)",
-                lineHeight: "110%",
-                letterSpacing: "-1px",
-              }}
-            >
-              Launching is a mess.
-            </h2>
-
-            {/* Body Copy */}
-            <div className="space-y-6">
-              <p
-                className="text-neutral-600 cursor-default"
+            <div className="text-center mb-12 sm:mb-16">
+              <p className="text-neutral-500 mb-4 cursor-default text-sm sm:text-base">
+                Agencies want retainers. Freelancers ghost you.
+              </p>
+              <h2
+                className="font-medium text-black cursor-default"
                 style={{
-                  fontSize: "clamp(16px, 2.5vw, 20px)",
-                  lineHeight: "160%",
+                  fontSize: "clamp(28px, 5vw, 44px)",
+                  lineHeight: "110%",
+                  letterSpacing: "-1px",
                 }}
               >
-                You&apos;re juggling four vendors. Brand agency. Web dev. Deck
-                designer. Video team.
-              </p>
-
-              <p
-                className="text-neutral-600 cursor-default"
-                style={{
-                  fontSize: "clamp(16px, 2.5vw, 20px)",
-                  lineHeight: "160%",
-                }}
-              >
-                Different timelines. Different styles. Different prices. Nothing
-                connects.
-              </p>
-
-              <p
-                className="text-neutral-600 cursor-default"
-                style={{
-                  fontSize: "clamp(16px, 2.5vw, 20px)",
-                  lineHeight: "160%",
-                }}
-              >
-                You spend more time project managing than building your product.
-              </p>
-
-              <p
-                className="text-black font-medium cursor-default"
-                style={{
-                  fontSize: "clamp(18px, 3vw, 24px)",
-                  lineHeight: "160%",
-                }}
-              >
-                We fix that.
-              </p>
-
-              <p
-                className="text-neutral-600 cursor-default"
-                style={{
-                  fontSize: "clamp(16px, 2.5vw, 20px)",
-                  lineHeight: "160%",
-                }}
-              >
-                One team. One timeline. One cohesive launch.
-              </p>
+                Launching shouldn&apos;t mean
+                <br />
+                managing 4 different vendors.
+              </h2>
             </div>
+
+            {/* Comparison table */}
+            <div className="grid grid-cols-[1fr_1.2fr] sm:grid-cols-[1fr_1.3fr]">
+              {/* Header row */}
+              <div className="py-3 sm:py-4 pr-4 sm:pr-8 border-b border-neutral-300 flex items-center justify-center">
+                <span className="text-xs text-neutral-400 uppercase tracking-wider cursor-default">
+                  Typical
+                </span>
+              </div>
+              <div className="py-3 sm:py-4 px-4 sm:px-8 border-b border-neutral-300 border-l bg-white/50 flex items-center justify-center">
+                <Image
+                  src="/blueprint-logo-dark.svg"
+                  alt="Blueprint"
+                  width={80}
+                  height={20}
+                  className="h-3 w-auto opacity-50 grayscale"
+                />
+              </div>
+
+              {/* Data rows */}
+              {comparison.map((row, i) => (
+                <div key={i} className="contents">
+                  <div className="py-4 sm:py-5 pr-4 sm:pr-8 border-b border-neutral-200">
+                    <span className="text-neutral-400 line-through cursor-default text-sm sm:text-base">
+                      {row.typical}
+                    </span>
+                  </div>
+                  <div className="py-4 sm:py-5 pl-4 sm:pl-8 border-b border-neutral-200 border-l bg-white/50">
+                    <span className="text-black font-medium cursor-default text-base sm:text-lg">
+                      {row.blueprint}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tagline */}
+            <p className="text-center text-neutral-600 mt-12 sm:mt-16 cursor-default font-medium">
+              On time. On budget. On brand.
+            </p>
           </div>
         </InnerContainer>
       </OuterContainer>

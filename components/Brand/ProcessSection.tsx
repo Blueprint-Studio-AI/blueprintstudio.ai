@@ -33,7 +33,7 @@ const steps = [
     number: "04",
     title: "Delivery",
     description:
-      "You receive the full brand package plus a custom Brand GPT — an AI trained on your voice and guidelines to keep you on-brand forever.",
+      "You receive the full brand package plus AI prompts configured for your voice and guidelines — so you stay on-brand as you scale.",
     image: "/brand/process-delivery.png",
   },
 ];
