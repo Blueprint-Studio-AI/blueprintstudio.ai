@@ -30,11 +30,11 @@ export default function PricingSection() {
           {/* Section Title */}
           <div className="text-center mb-8 sm:mb-10">
             <h2
-              className="font-semibold text-black cursor-default"
+              className="font-medium text-black cursor-default"
               style={{
-                fontSize: "clamp(40px, 8vw, 72px)",
-                lineHeight: "100%",
-                letterSpacing: "-2px",
+                fontSize: "clamp(32px, 6vw, 48px)",
+                lineHeight: "110%",
+                letterSpacing: "-1.5px",
               }}
             >
               Investment
@@ -43,8 +43,8 @@ export default function PricingSection() {
 
           {/* Pricing Card */}
           <div className="max-w-lg mx-auto">
-            <div className="flex flex-col p-6 sm:p-8 rounded-2xl border border-neutral-300 bg-white">
-              <h3 className="font-medium text-2xl sm:text-3xl text-black mb-2 cursor-default">
+            <div className="flex flex-col p-6 sm:p-8 rounded-xl border border-neutral-200 bg-white">
+              <h3 className="font-medium text-xl text-black mb-1 cursor-default">
                 Brand Identity
               </h3>
               <p className="text-neutral-500 text-sm mb-4 cursor-default">
@@ -53,57 +53,33 @@ export default function PricingSection() {
               </p>
 
               {/* Price */}
-              <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-3xl sm:text-4xl font-bold text-black">
-                  $15,000 – $20,000
+              <div className="flex items-baseline gap-1.5 mb-6">
+                <span className="text-xs text-neutral-400 uppercase tracking-wide">
+                  From
+                </span>
+                <span
+                  className="font-semibold text-black"
+                  style={{ fontSize: "clamp(32px, 5vw, 40px)" }}
+                >
+                  $18,000
                 </span>
               </div>
 
               {/* Features */}
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    Brand strategy & positioning
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    Complete logo system
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    Color, typography, guidelines
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    Social kit + email signature
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    Brand GPT (custom AI)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                  <span className="text-sm text-neutral-700">
-                    2-3 applications of choice
-                  </span>
-                </li>
-              </ul>
-
-              {/* Details */}
-              <div className="space-y-1 mb-6 text-sm text-neutral-500">
-                <p>• 3-4 week delivery</p>
-                <p>• Dedicated team</p>
-                <p>• One point of contact</p>
+              <div className="space-y-3 mb-6">
+                {[
+                  "Brand strategy & positioning",
+                  "Complete logo system",
+                  "Color, typography, guidelines",
+                  "Social kit + email signature",
+                  "AI prompts & asset generator",
+                  "2-3 applications of choice",
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <span className="text-sm text-neutral-600">{item}</span>
+                  </div>
+                ))}
               </div>
 
               {/* CTA */}

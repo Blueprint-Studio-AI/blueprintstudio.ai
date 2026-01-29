@@ -4,7 +4,8 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight, Check, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function PricingSection() {
   return (
@@ -27,202 +28,354 @@ export default function PricingSection() {
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
           {/* Section Title */}
-          <div className="text-center mb-8 sm:mb-10">
+          <div className="text-center mb-10 sm:mb-14">
             <h2
-              className="font-semibold text-black cursor-default"
+              className="font-medium text-black cursor-default mb-4"
               style={{
-                fontSize: "clamp(40px, 8vw, 72px)",
+                fontSize: "clamp(36px, 7vw, 56px)",
                 lineHeight: "100%",
                 letterSpacing: "-2px",
               }}
             >
               Investment
             </h2>
+            {/* Trust element */}
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex -space-x-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-neutral-500 cursor-default">
+                Trusted by{" "}
+                <strong
+                  className="font-semibold"
+                  style={{
+                    background:
+                      "linear-gradient(92deg, #60AEEE -1.22%, #2563EB 18.8%, #3B82F6 38.82%, #60AEEE 69.04%, #3B82F6 87.52%, #2563EB 98.88%)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  25+ tech founders
+                </strong>{" "}
+                across AI, Web3, and YC.
+              </span>
+            </div>
           </div>
 
           {/* Pricing Cards */}
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Full Launch Card */}
-              <div className="flex flex-col p-6 sm:p-8 rounded-2xl border border-neutral-300 bg-white">
-                <h3 className="font-medium text-2xl sm:text-3xl text-black mb-2 cursor-default">
-                  Full Launch
-                </h3>
-                <p className="text-neutral-500 text-sm mb-4 cursor-default">
-                  Everything you need to go to market.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              {/* Launch Package Card - Secondary */}
+              <div className="flex flex-col rounded-xl border border-neutral-200 bg-neutral-50 overflow-hidden">
+                {/* Header */}
+                <div className="p-6 sm:p-8 border-b border-neutral-200">
+                  <h3 className="font-medium text-xl text-black mb-1 cursor-default">
+                    Launch Package
+                  </h3>
+                  <p className="text-neutral-500 text-sm cursor-default">
+                    Everything you need to go to market.
+                  </p>
 
-                {/* Price */}
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-3xl sm:text-4xl font-bold text-black">
-                    $50,000
-                  </span>
+                  {/* Price */}
+                  <div className="flex items-baseline gap-1.5 mt-4">
+                    <span className="text-xs text-neutral-400 uppercase tracking-wide">
+                      From
+                    </span>
+                    <span
+                      className="font-semibold text-black"
+                      style={{ fontSize: "clamp(32px, 5vw, 40px)" }}
+                    >
+                      $50,000
+                    </span>
+                  </div>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-4 mb-6 flex-1">
-                  <div>
-                    <div className="flex items-start gap-2 mb-1">
-                      <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                <div className="p-6 sm:p-8 space-y-3 flex-1">
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
                       <span className="text-sm font-medium text-black">
                         Brand Identity
                       </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Logo, guidelines, social kit, AI prompts
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-500 ml-6">
-                      Logo, colors, typography, guidelines, social kit, Brand
-                      GPT
-                    </p>
                   </div>
-                  <div>
-                    <div className="flex items-start gap-2 mb-1">
-                      <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
                       <span className="text-sm font-medium text-black">
                         Website
                       </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Custom design in Framer, Next.js, or Astro
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-500 ml-6">
-                      Custom design + Framer/Webflow development
-                    </p>
                   </div>
-                  <div>
-                    <div className="flex items-start gap-2 mb-1">
-                      <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
                       <span className="text-sm font-medium text-black">
                         Pitch Deck
                       </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Narrative strategy + full design in Figma
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-500 ml-6">
-                      Narrative strategy + full design (12-20 slides)
-                    </p>
                   </div>
-                  <div>
-                    <div className="flex items-start gap-2 mb-1">
-                      <Check className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <div>
                       <span className="text-sm font-medium text-black">
                         Launch Video
                       </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Script, production, 30-60s video
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-500 ml-6">
-                      Script, production, 30-60s video
-                    </p>
                   </div>
                 </div>
 
-                {/* Details */}
-                <div className="space-y-1 mb-6 text-sm text-neutral-500">
-                  <p>• 6-8 week delivery</p>
-                  <p>• Dedicated team</p>
-                  <p>• One point of contact</p>
-                </div>
+                {/* Footer */}
+                <div className="p-6 sm:p-8 pt-0">
+                  {/* Holographic border button */}
+                  <motion.div
+                    className="relative w-full rounded-xl p-[2px] overflow-hidden"
+                    whileTap={{ scale: 0.97 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 30,
+                    }}
+                  >
+                    {/* Holographic border background */}
+                    <div
+                      className="absolute inset-0 rounded-xl"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
+                      }}
+                    />
 
-                {/* CTA */}
-                <button
-                  className="w-full py-3 px-6 font-medium flex items-center justify-center bg-white text-black border border-neutral-300 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all duration-200 text-sm group"
-                  onClick={() =>
-                    window.open(
-                      "https://cal.com/blueprint-studio/intro-call",
-                      "_blank"
-                    )
-                  }
-                >
-                  <span>Book a Call</span>
-                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </button>
+                    {/* Animated shader on border */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 50% 80% at 30% 50%, rgba(147, 197, 253, 0.5) 0%, transparent 50%),
+                          radial-gradient(ellipse 40% 70% at 70% 50%, rgba(96, 174, 238, 0.4) 0%, transparent 50%)
+                        `,
+                        filter: "blur(1px)",
+                      }}
+                      animate={{
+                        backgroundPosition: [
+                          "0% 0%, 100% 0%",
+                          "100% 0%, 0% 0%",
+                          "0% 0%, 100% 0%",
+                        ],
+                      }}
+                      transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    {/* Drifting highlight on border */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl"
+                      style={{
+                        background:
+                          "radial-gradient(ellipse 80% 100% at center, rgba(147, 197, 253, 0.4) 0%, transparent 60%)",
+                        filter: "blur(2px)",
+                      }}
+                      animate={{
+                        x: ["-40%", "40%", "-40%"],
+                      }}
+                      transition={{
+                        duration: 7,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    {/* Inner button */}
+                    <button
+                      className="relative w-full py-[10px] px-6 font-medium flex items-center justify-center text-neutral-700 rounded-[10px] text-sm"
+                      style={{
+                        background: "rgba(255, 255, 255, 0.92)",
+                        backdropFilter: "blur(8px)",
+                      }}
+                      onClick={() =>
+                        window.open(
+                          "https://cal.com/blueprint-studio/intro-call",
+                          "_blank"
+                        )
+                      }
+                    >
+                      <span>Book a Call</span>
+                      <ArrowUpRight className="w-4 h-4 ml-2" />
+                    </button>
+                  </motion.div>
+                </div>
               </div>
 
-              {/* Full Launch + Product Card (Featured) */}
-              <div className="flex flex-col p-6 sm:p-8 rounded-2xl border-2 border-black bg-neutral-900 text-white relative">
-                {/* Featured Badge */}
-                <div className="absolute -top-3 left-6 px-3 py-1 bg-black text-white text-xs font-medium rounded-full border border-neutral-700">
-                  MOST COMPREHENSIVE
-                </div>
+              {/* Launch Package + Product Card - Primary */}
+              <div className="flex flex-col rounded-xl border border-neutral-200 bg-white overflow-hidden">
+                {/* Header */}
+                <div className="p-6 sm:p-8 border-b border-neutral-100">
+                  <h3 className="font-medium text-xl text-black mb-1 cursor-default">
+                    Launch Package + Product
+                  </h3>
+                  <p className="text-neutral-500 text-sm cursor-default">
+                    Go to market with a working MVP.
+                  </p>
 
-                <h3 className="font-medium text-2xl sm:text-3xl text-white mb-2 cursor-default mt-2">
-                  Full Launch + Product
-                </h3>
-                <p className="text-neutral-400 text-sm mb-4 cursor-default">
-                  Launch ready, with a working product.
-                </p>
-
-                {/* Price */}
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-3xl sm:text-4xl font-bold text-white">
-                    $80,000 – $120,000
-                  </span>
+                  {/* Price */}
+                  <div className="flex items-baseline gap-1.5 mt-4">
+                    <span className="text-xs text-neutral-400 uppercase tracking-wide">
+                      From
+                    </span>
+                    <span
+                      className="font-semibold text-black"
+                      style={{ fontSize: "clamp(32px, 5vw, 40px)" }}
+                    >
+                      $120,000
+                    </span>
+                  </div>
                 </div>
 
                 {/* Features */}
-                <div className="mb-4">
-                  <p className="text-sm text-neutral-400 mb-4">
-                    Everything in Full Launch, plus:
+                <div className="p-6 sm:p-8 space-y-3 flex-1">
+                  <p className="text-xs text-neutral-500 mb-2">
+                    Everything in Launch Package, plus:
                   </p>
-                  <div className="space-y-4 flex-1">
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                     <div>
-                      <div className="flex items-start gap-2 mb-1">
-                        <Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />
-                        <span className="text-sm font-medium text-white">
-                          Product Design
-                        </span>
-                      </div>
-                      <p className="text-xs text-neutral-500 ml-6">
+                      <span className="text-sm font-medium text-black">
+                        Product Design
+                      </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
                         UX strategy, wireframes, high-fidelity UI
                       </p>
                     </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                     <div>
-                      <div className="flex items-start gap-2 mb-1">
-                        <Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />
-                        <span className="text-sm font-medium text-white">
-                          MVP Development
-                        </span>
-                      </div>
-                      <p className="text-xs text-neutral-500 ml-6">
-                        Functional product (web or mobile), tech stack tailored
-                        to your needs
+                      <span className="text-sm font-medium text-black">
+                        MVP Development
+                      </span>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Functional web or mobile app, custom tech stack
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Details */}
-                <div className="space-y-1 mb-6 text-sm text-neutral-400">
-                  <p>• 10-12 week delivery</p>
-                  <p>• Technical architecture support</p>
-                  <p>• Post-launch iteration available</p>
-                </div>
+                {/* Footer */}
+                <div className="p-6 sm:p-8 pt-0">
+                  <motion.button
+                    className="relative w-full py-3 px-6 font-medium flex items-center justify-center text-white rounded-xl text-sm overflow-hidden"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
+                      boxShadow: `
+                        0 1px 2px rgba(0, 0, 0, 0.1),
+                        0 2px 8px rgba(96, 174, 238, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                        0 1px 0 rgba(255, 255, 255, 0.2) inset
+                      `,
+                    }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 30,
+                    }}
+                    onClick={() =>
+                      window.open(
+                        "https://cal.com/blueprint-studio/intro-call",
+                        "_blank"
+                      )
+                    }
+                  >
+                    {/* Shader-like animated gradient */}
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 50% 80% at 30% 50%, rgba(147, 197, 253, 0.4) 0%, transparent 50%),
+                          radial-gradient(ellipse 40% 70% at 70% 50%, rgba(96, 174, 238, 0.35) 0%, transparent 50%)
+                        `,
+                        filter: "blur(1px)",
+                      }}
+                      animate={{
+                        backgroundPosition: [
+                          "0% 0%, 100% 0%",
+                          "100% 0%, 0% 0%",
+                          "0% 0%, 100% 0%",
+                        ],
+                      }}
+                      transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
 
-                {/* CTA */}
-                <button
-                  className="w-full py-3 px-6 font-medium flex items-center justify-center bg-white text-black rounded-lg hover:bg-neutral-200 transition-all duration-200 text-sm group mt-auto"
-                  onClick={() =>
-                    window.open(
-                      "https://cal.com/blueprint-studio/intro-call",
-                      "_blank"
-                    )
-                  }
-                >
-                  <span>Book a Call</span>
-                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </button>
+                    {/* Drifting highlight */}
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "radial-gradient(ellipse 80% 100% at center, rgba(147, 197, 253, 0.3) 0%, transparent 60%)",
+                        filter: "blur(3px)",
+                      }}
+                      animate={{
+                        x: ["-40%", "40%", "-40%"],
+                      }}
+                      transition={{
+                        duration: 7,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+
+                    {/* Top highlight */}
+                    <div
+                      className="absolute inset-x-0 top-0 h-[1px]"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.4) 80%, transparent 100%)",
+                      }}
+                    />
+
+                    <span
+                      className="relative z-10"
+                      style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)" }}
+                    >
+                      Book a Call
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 ml-2 relative z-10" />
+                  </motion.button>
+                </div>
               </div>
             </div>
 
             {/* Clarification */}
-            <div className="mt-8 p-5 rounded-xl border border-neutral-200 bg-neutral-100 text-center">
-              <p className="font-medium text-black mb-2 cursor-default">
-                Not sure which tier?
-              </p>
-              <p className="text-neutral-500 text-sm mb-1 cursor-default">
-                <strong>Full Launch</strong> is for founders who have a product
-                and need the go-to-market package.
-              </p>
-              <p className="text-neutral-500 text-sm mb-3 cursor-default">
-                <strong>Full Launch + Product</strong> is for founders starting
-                from zero who need us to build it too.
-              </p>
-              <p className="text-neutral-600 text-sm cursor-default">
-                Book a call and we&apos;ll scope it together.
-              </p>
-            </div>
+            <p className="text-center text-neutral-500 text-sm mt-8 cursor-default">
+              Not sure which fits? Book a call and we&apos;ll scope it together.
+            </p>
           </div>
         </InnerContainer>
       </OuterContainer>
