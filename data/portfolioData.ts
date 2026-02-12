@@ -86,9 +86,150 @@ export const portfolioProjects: PortfolioProject[] = [
     }
   },
   {
+    id: 'huch',
+    title: 'Huch — Rebrand, Redesign & Platform Build',
+    description: 'Full rebrand, product redesign, and end-to-end platform build.',
+    category: 'Platform Design, Development, Branding, Research',
+    link: '/portfolio/huch',
+    featuredMedia: {
+      desktop: {
+        type: 'video',
+        src: '/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4',
+        alt: 'Huch Platform Redesign & Rebrand Reel'
+      },
+      mobile: {
+        type: 'video',
+        src: '/media/projects/huch/huch-brand-overview-vertical-compressed.mp4',
+        alt: 'Huch Platform Redesign & Rebrand Reel'
+      }
+    },
+    showcaseMedia: [
+      {
+        id: 'huch-asset-1',
+        type: 'image',
+        src: '/media/projects/huch/huch-asset-1.png',
+        alt: 'Huch platform redesign',
+        caption: 'Platform redesign'
+      },
+      {
+        id: 'huch-asset-2',
+        type: 'image',
+        src: '/media/projects/huch/huch-asset-2.png',
+        alt: 'Huch rebrand',
+        caption: 'Brand identity'
+      },
+      {
+        id: 'huch-asset-3',
+        type: 'image',
+        src: '/media/projects/huch/huch-asset-3.png',
+        alt: 'Huch social media',
+        caption: 'Social media kit'
+      }
+    ],
+    metadata: {
+      client: 'Huch',
+      year: '2025',
+      services: ['Platform Design', 'Development', 'Branding', 'Social Media', 'Customer Research']
+    }
+  },
+  {
+    id: 'uni',
+    title: 'UNI — Brand Identity',
+    description: 'Brand identity for a Bitcoin-denominated stablecoin. Logo system, brand narrative, type & palette, and visual language.',
+    category: 'Branding',
+    link: '/portfolio/uni',
+    featuredMedia: {
+      desktop: {
+        type: 'image',
+        src: '/media/projects/uni/uni-brand-overview-horizontal.png',
+        alt: 'UNI Brand Identity Overview'
+      },
+      mobile: {
+        type: 'image',
+        src: '/media/projects/uni/uni-brand-overview-vertical.png',
+        alt: 'UNI Brand Identity Overview'
+      }
+    },
+    showcaseMedia: [
+      {
+        id: 'uni-asset-1',
+        type: 'image',
+        src: '/media/projects/uni/uni-brand-asset-1.png',
+        alt: 'UNI brand asset',
+        caption: 'Logo system'
+      },
+      {
+        id: 'uni-asset-2',
+        type: 'image',
+        src: '/media/projects/uni/uni-brand-asset-2.png',
+        alt: 'UNI brand asset',
+        caption: 'Type & palette'
+      },
+      {
+        id: 'uni-asset-3',
+        type: 'image',
+        src: '/media/projects/uni/uni-brand-asset-3.png',
+        alt: 'UNI brand asset',
+        caption: 'Visual language'
+      }
+    ],
+    metadata: {
+      client: 'UNI',
+      year: '2025',
+      services: ['Brand Identity', 'Logo Design', 'Visual Language']
+    }
+  },
+  {
+    id: 'bump',
+    title: 'Bump — Brand & Product Design',
+    description: 'Brand identity, product design, UX, and customer research for a memecoin platform.',
+    category: 'Branding, Product Design, UX, Research',
+    link: '/portfolio/bump',
+    featuredMedia: {
+      desktop: {
+        type: 'video',
+        src: '/media/projects/bump/bump-brand-overview-horizontal-compressed.mp4',
+        alt: 'Bump Brand & Product Design Reel'
+      },
+      mobile: {
+        type: 'video',
+        src: '/media/projects/bump/bump-brand-overview-vertical-compressed.mp4',
+        alt: 'Bump Brand & Product Design Reel'
+      }
+    },
+    showcaseMedia: [
+      {
+        id: 'bump-asset-1',
+        type: 'image',
+        src: '/media/projects/bump/bump-asset-1.png',
+        alt: 'Bump brand asset',
+        caption: 'Brand identity'
+      },
+      {
+        id: 'bump-asset-2',
+        type: 'image',
+        src: '/media/projects/bump/bump-asset-2.png',
+        alt: 'Bump product design',
+        caption: 'Product design'
+      },
+      {
+        id: 'bump-asset-3',
+        type: 'image',
+        src: '/media/projects/bump/bump-asset-3.png',
+        alt: 'Bump platform UX',
+        caption: 'Platform UX'
+      }
+    ],
+    metadata: {
+      client: 'Bump',
+      year: '2025',
+      services: ['Brand Identity', 'Brand Strategy', 'Product Design', 'UX', 'Customer Research']
+    }
+  },
+  {
     id: 'arch-network',
     title: 'Arch Network — BTC All-In Summit',
-    description: 'Las Vegas event motion media and graphic design for the BTC All-In Summit; ongoing design & build partner.',
+    description: 'Event branding, motion media and marketing for the BTC All-In Summit.',
     category: 'Motion Media, Graphic Design, IRL Event',
     link: '/portfolio/arch-network',
     featuredMedia: {
@@ -131,7 +272,54 @@ export const portfolioProjects: PortfolioProject[] = [
     ],
     metadata: {
       client: 'Arch Network',
-      year: '2024',
+      year: '2025',
+      services: ['Motion Design', 'Event Graphics', 'Brand Design']
+    }
+  },
+  {
+    id: 'perena',
+    title: 'Perena — Landing Page',
+    description: 'Landing page design, development, and motion media for the launch of USD*.',
+    category: 'Design, Development, Motion Media',
+    link: '/portfolio/perena',
+    featuredMedia: {
+      desktop: {
+        type: 'video',
+        src: '/media/projects/perena/perena-horizontal-compressed.mp4',
+        alt: 'Perena USD* Landing Page Project Reel'
+      },
+      mobile: {
+        type: 'video',
+        src: '/media/projects/perena/perena-vertical-compressed.mp4',
+        alt: 'Perena USD* Landing Page Project Reel'
+      }
+    },
+    showcaseMedia: [
+      {
+        id: 'perena-asset-1',
+        type: 'image',
+        src: '/media/projects/perena/perena-brand-asset-1.png',
+        alt: 'Landing hero image',
+        caption: 'Landing hero dark'
+      },
+      {
+        id: 'perena-asset-2',
+        type: 'image',
+        src: '/media/projects/perena/perena-brand-asset-2.png',
+        alt: 'APY breakdown section',
+        caption: 'APY breakdown'
+      },
+      {
+        id: 'perena-asset-3',
+        type: 'image',
+        src: '/media/projects/perena/perena-brand-asset-3.png',
+        alt: 'Mobile versions',
+        caption: 'Mobile versions'
+      }
+    ],
+    metadata: {
+      client: 'Perena',
+      year: '2026',
       services: ['Motion Design', 'Event Graphics', 'Brand Design']
     }
   },
@@ -179,9 +367,9 @@ export const portfolioProjects: PortfolioProject[] = [
       }
     ],
     metadata: {
-      client: 'Autara',
-      year: '2024',
-      services: ['Brand Identity', 'Web Design', 'Framer Development']
+      client: 'Perena',
+      year: '2025',
+      services: ['Landing Page Design', 'Web Development', 'Motion Media']
     }
   },
   {
@@ -229,7 +417,7 @@ export const portfolioProjects: PortfolioProject[] = [
     ],
     metadata: {
       client: 'TokenWorks',
-      year: '2023-2024',
+      year: '2023-2026',
       services: ['Video Production', 'Marketing', 'Full-Stack Development', 'E-commerce']
     }
   },
@@ -277,7 +465,7 @@ export const portfolioProjects: PortfolioProject[] = [
     ],
     metadata: {
       client: 'Breeze',
-      year: '2024',
+      year: '2025',
       services: ['Brand Identity', 'Framer Site', 'Social Media Kit']
     }
   }
