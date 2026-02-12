@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -91,21 +92,11 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
             ) : (
               <div className="h-full w-full">
                 <div className="group relative h-full w-full overflow-hidden rounded-none bg-transparent transition-colors duration-300" style={{ aspectRatio }}>
-                  <img
+                  <Image
                     alt={media.alt}
-                    loading="lazy"
-                    decoding="async"
+                    fill
+                    sizes="(max-width: 1024px) 33vw, 250px"
                     className={`object-cover object-center transition-transform duration-300 ${scaleClass}`}
-                    style={{
-                      position: 'absolute',
-                      height: '100%',
-                      width: '100%',
-                      left: 0,
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      color: 'transparent'
-                    }}
                     src={media.src}
                   />
                 </div>
