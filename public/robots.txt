@@ -7,3 +7,7 @@ Disallow: /cdn-cgi/
 Disallow: /private/
 
 Sitemap: https://blueprintstudio.ai/sitemap.xml
+
+# LLM-friendly site documentation
+# See https://llmstxt.org for the specification
+llms.txt: https://blueprintstudio.ai/llms.txt

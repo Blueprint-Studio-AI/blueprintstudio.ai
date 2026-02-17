@@ -1,0 +1,41 @@
+# Blueprint Studio
+
+> Blueprint Studio is a design and build studio that partners with companies to build their digital future. We offer end-to-end product design, development, branding, and AI engineering as a subscription service or project-based engagement.
+
+## About
+
+Blueprint Studio works with companies that have a great product but an underbuilt digital surface. We close the gap between product quality and digital presence.
+
+Founded by Tyler Stupart and Jaidon Lalor. US-based, embedded in your tools and time zone.
+
+## Services
+
+- Product design and management
+- UX/UI design
+- Web and mobile development (frontend, backend, AI)
+- Branding and graphic design
+- Product videos and launch content
+- Landing pages and digital surfaces
+
+## Pricing
+
+Two engagement models:
+
+- **Design & Build Subscription**: $15k+/month. Dedicated expertise, unlimited requests, priority support, 48-hour delivery cycles. Pause or cancel anytime.
+- **Project-Based**: Custom scope, fixed pricing, dedicated project management. Get a quote via intro call.
+
+## How to Engage
+
+- Book an intro call: https://cal.com/blueprint-studio/intro-call
+
+## Links
+
+- [Website](https://blueprintstudio.ai): Main site with portfolio, pricing, testimonials, and FAQ
+- [Privacy Policy](https://blueprintstudio.ai/privacy-policy): Privacy policy
+- [Terms of Service](https://blueprintstudio.ai/terms): Terms of service
+
+## Social
+
+- X (Twitter): https://x.com/bpstu
+- LinkedIn: https://www.linkedin.com/company/blueprint-studio-ai
+- GitHub: https://github.com/Blueprint-Studio-AI
