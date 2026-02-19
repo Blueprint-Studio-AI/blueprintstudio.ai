@@ -99,21 +99,17 @@ export default function ClientLogoTicker() {
     if (!el) return;
     const animations = el.getAnimations();
     animations.forEach((anim) => {
-      if (anim instanceof CSSAnimation) {
-        // Smoothly ramp playback rate
-        const target = isHovered ? 0.3 : 1;
-        const current = anim.playbackRate;
-        const step = () => {
-          const diff = target - anim.playbackRate;
-          if (Math.abs(diff) < 0.02) {
-            anim.playbackRate = target;
-            return;
-          }
-          anim.playbackRate += diff * 0.1;
-          requestAnimationFrame(step);
-        };
+      const target = isHovered ? 0.3 : 1;
+      const step = () => {
+        const diff = target - anim.playbackRate;
+        if (Math.abs(diff) < 0.02) {
+          anim.playbackRate = target;
+          return;
+        }
+        anim.playbackRate += diff * 0.1;
         requestAnimationFrame(step);
-      }
+      };
+      requestAnimationFrame(step);
     });
   }, [isHovered]);
 
