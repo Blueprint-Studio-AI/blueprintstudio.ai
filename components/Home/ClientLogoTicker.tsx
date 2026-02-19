@@ -7,9 +7,34 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 
 const clients = [
-  { name: "TokenWorks", logo: "/logos/tokenworks-gray-logo.svg" },
-  { name: "Arch", logo: "/logos/arch-gray-logo.svg" },
-  // Add more client logos here as they come in
+  { name: "TokenWorks", logo: "/logos/tokenworks.png" },
+  { name: "Arch Network", logo: "/logos/arch-network.png" },
+  { name: "Jinba", logo: "/logos/jinba.png" },
+  { name: "Logical", logo: "/logos/Logical.png" },
+  { name: "Pyra", logo: "/logos/pyra.png" },
+  { name: "Hildene", logo: "/logos/hildene.png" },
+  { name: "HoneyB", logo: "/logos/HoneyB-Logo.png" },
+  { name: "Perena", logo: "/logos/perena.png" },
+  { name: "Hashplay", logo: "/logos/hashplay.png" },
+  { name: "Huch", logo: "/logos/huch.png" },
+  { name: "Bold", logo: "/logos/bold.png" },
+  { name: "Bump", logo: "/logos/bump.png" },
+  { name: "Cona", logo: "/logos/cona.png" },
+  { name: "DAG", logo: "/logos/dag.png" },
+  { name: "Bitfrost", logo: "/logos/bitfrost.png" },
+  { name: "Autara", logo: "/logos/autara.png" },
+  { name: "Pregame", logo: "/logos/pregame.png" },
+  { name: "Twelve", logo: "/logos/twelve.png" },
+  { name: "Reshift", logo: "/logos/reshift.png" },
+  { name: "PavePower", logo: "/logos/pavepower.png" },
+  { name: "BTC Vegas", logo: "/logos/btc-vegas.png" },
+  { name: "Satoshi Bet", logo: "/logos/satoshi-bet.png" },
+  { name: "Panta", logo: "/logos/panta.png" },
+  { name: "Herth", logo: "/logos/herth.png" },
+  { name: "Customer Compass", logo: "/logos/customer-compass.png" },
+  { name: "Answers From Me", logo: "/logos/answers-from-me.png" },
+  { name: "LivingIP", logo: "/logos/LivingIP.png" },
+  { name: "Uni", logo: "/logos/uni.png" },
 ];
 
 export default function ClientLogoTicker() {
@@ -44,11 +69,8 @@ export default function ClientLogoTicker() {
     };
   }, []);
 
-  // Repeat logos enough times to fill the scroll
-  const repeatedClients = [
-    ...clients, ...clients, ...clients, ...clients,
-    ...clients, ...clients, ...clients, ...clients,
-  ];
+  // Duplicate for infinite scroll effect
+  const repeatedClients = [...clients, ...clients];
 
   return (
     <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
