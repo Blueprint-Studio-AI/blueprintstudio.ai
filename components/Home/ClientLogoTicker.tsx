@@ -65,8 +65,9 @@ export default function ClientLogoTicker() {
           <p
             className="text-neutral-500 uppercase text-center mb-8 sm:mb-10 cursor-default"
             style={{
-              fontSize: "clamp(14px, 1.5vw, 18px)",
-              letterSpacing: "0.08em",
+              fontSize: "clamp(13px, 1.3vw, 16px)",
+              letterSpacing: "-0.02em",
+              fontWeight: 500,
             }}
           >
             Trusted by
