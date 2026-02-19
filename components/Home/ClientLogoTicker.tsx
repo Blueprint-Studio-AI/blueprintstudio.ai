@@ -126,10 +126,10 @@ export default function ClientLogoTicker() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Left fade */}
-            <div className="absolute left-0 top-0 h-16 sm:h-20 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
+            {/* Left fade — full height to cover logos + service text */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
             {/* Right fade */}
-            <div className="absolute right-0 top-0 h-16 sm:h-20 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
 
             {/* Clip only the horizontal scroll, not the service text below */}
             <div className="overflow-x-clip">
