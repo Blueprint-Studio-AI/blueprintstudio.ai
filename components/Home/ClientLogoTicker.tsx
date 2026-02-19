@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -37,45 +36,33 @@ const clients = [
   { name: "Uni", logo: "/logos-match-height/uni.png" },
 ];
 
+function LogoTrack() {
+  return (
+    <div className="flex items-center gap-16 sm:gap-24 shrink-0">
+      {clients.map((client, index) => (
+        <div
+          key={index}
+          className="flex-shrink-0 flex items-center justify-center h-12 sm:h-16 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={client.logo}
+            alt={client.name}
+            loading="eager"
+            decoding="async"
+            className="h-full w-auto object-contain"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ClientLogoTicker() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
-
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    let scrollPosition = 0;
-    const speed = 0.3;
-
-    const animate = () => {
-      scrollPosition += speed;
-
-      const halfWidth = scrollContainer.scrollWidth / 2;
-      if (scrollPosition >= halfWidth) {
-        scrollPosition = 0;
-      }
-
-      scrollContainer.scrollLeft = scrollPosition;
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
-
-  // Duplicate for infinite scroll effect
-  const repeatedClients = [...clients, ...clients];
-
   return (
     <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
-      {/* Solid vertical lines — matching PortfolioBento */}
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+      {/* Solid vertical lines — z-20 to sit above fade overlays */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px] z-20">
         <div className="w-full flex-1 flex justify-center relative">
           <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300" />
           <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300" />
@@ -95,31 +82,18 @@ export default function ClientLogoTicker() {
             Trusted by
           </p>
 
-          <div className="relative">
+          <div className="relative overflow-hidden">
             {/* Left fade */}
             <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
             {/* Right fade */}
             <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
 
-            <div
-              ref={scrollRef}
-              className="flex items-center gap-12 sm:gap-20 overflow-x-hidden hide-scrollbar"
-              style={{ scrollBehavior: "auto" }}
-            >
-              {repeatedClients.map((client, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 flex items-center justify-center h-10 sm:h-14 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-                >
-                  <Image
-                    src={client.logo}
-                    alt={client.name}
-                    width={160}
-                    height={56}
-                    className="h-full w-auto object-contain"
-                  />
-                </div>
-              ))}
+            {/* CSS-animated ticker — GPU accelerated, no JS scroll */}
+            <div className="flex w-max animate-logo-scroll">
+              <LogoTrack />
+              <div className="pl-16 sm:pl-24">
+                <LogoTrack />
+              </div>
             </div>
           </div>
         </InnerContainer>
