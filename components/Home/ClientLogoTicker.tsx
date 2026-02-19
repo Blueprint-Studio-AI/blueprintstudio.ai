@@ -89,7 +89,7 @@ export default function ClientLogoTicker() {
             <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
 
             {/* CSS-animated ticker — GPU accelerated, no JS scroll */}
-            <div className="flex w-max animate-logo-scroll">
+            <div className="flex w-max animate-logo-scroll" style={{ willChange: "transform", backfaceVisibility: "hidden" }}>
               <LogoTrack />
               <div className="pl-16 sm:pl-24">
                 <LogoTrack />
