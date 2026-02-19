@@ -42,7 +42,7 @@ function LogoTrack({ hovered }: { hovered: boolean }) {
       {clients.map((client, index) => (
         <div
           key={index}
-          className="flex-shrink-0 flex flex-col items-start group"
+          className="flex-shrink-0 relative group"
         >
           <div
             className={`flex items-center justify-center h-12 sm:h-16 transition-all duration-500 ${
@@ -58,11 +58,13 @@ function LogoTrack({ hovered }: { hovered: boolean }) {
               className="h-full w-auto object-contain"
             />
           </div>
-          {/* Services text — appears on hover */}
-          <div className="overflow-hidden max-h-0 group-hover:max-h-12 transition-all duration-500 ease-out">
-            <p className="text-neutral-400 text-[11px] sm:text-xs mt-2 whitespace-nowrap">
-              {client.services.filter(Boolean).join(" · ") || "\u00A0"}
-            </p>
+          {/* Services text — absolutely positioned, no layout impact */}
+          <div className="absolute top-full left-0 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+            {client.services.filter(Boolean).map((service, i) => (
+              <p key={i} className="text-neutral-400 text-[11px] sm:text-xs leading-relaxed whitespace-nowrap">
+                {service}
+              </p>
+            ))}
           </div>
         </div>
       ))}
