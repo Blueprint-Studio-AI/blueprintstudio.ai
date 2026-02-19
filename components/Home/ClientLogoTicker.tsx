@@ -36,7 +36,7 @@ const clients = [
   { name: "Uni", logo: "/logos-match-height/uni.png", services: ["Branding", "Landing Page"] },
 ];
 
-function LogoTrack({ hovered }: { hovered: boolean }) {
+function LogoTrack() {
   return (
     <div className="flex items-start gap-16 sm:gap-24 shrink-0">
       {clients.map((client, index) => (
@@ -45,9 +45,7 @@ function LogoTrack({ hovered }: { hovered: boolean }) {
           className="flex-shrink-0 relative group"
         >
           <div
-            className={`flex items-center justify-center h-12 sm:h-16 transition-all duration-500 ${
-              hovered ? "" : "grayscale opacity-50"
-            } group-hover:grayscale-0 group-hover:opacity-100`}
+            className="flex items-center justify-center h-12 sm:h-16 transition-all duration-500 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -124,27 +122,30 @@ export default function ClientLogoTicker() {
           </p>
 
           <div
-            className="relative overflow-hidden"
+            className="relative"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             {/* Left fade */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 h-16 sm:h-20 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
             {/* Right fade */}
-            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 h-16 sm:h-20 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
 
-            {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
-            <div
-              ref={trackRef}
-              className="flex w-max animate-logo-scroll"
-              style={{
-                willChange: "transform",
-                backfaceVisibility: "hidden",
-              }}
-            >
-              <LogoTrack hovered={isHovered} />
-              <div className="pl-16 sm:pl-24">
-                <LogoTrack hovered={isHovered} />
+            {/* Clip only the horizontal scroll, not the service text below */}
+            <div className="overflow-x-clip">
+              {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
+              <div
+                ref={trackRef}
+                className="flex w-max animate-logo-scroll"
+                style={{
+                  willChange: "transform",
+                  backfaceVisibility: "hidden",
+                }}
+              >
+                <LogoTrack />
+                <div className="pl-16 sm:pl-24">
+                  <LogoTrack />
+                </div>
               </div>
             </div>
           </div>
