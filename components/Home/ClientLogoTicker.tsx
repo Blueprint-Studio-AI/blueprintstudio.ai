@@ -93,6 +93,17 @@ export default function ClientLogoTicker() {
   const [isHovered, setIsHovered] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>();
+  const hoverTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Debounced hover handlers — prevents scroll-triggered jitter on Safari
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => setIsHovered(true), 80);
+  };
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsHovered(false);
+  };
 
   useEffect(() => {
     const el = trackRef.current;
@@ -156,8 +167,8 @@ export default function ClientLogoTicker() {
 
           <div
             className="relative hidden sm:block"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             {/* Fade overlays — extend below parent to cover service text, z-30 above all content */}
             <div className="absolute left-0 top-0 w-24 bg-gradient-to-r from-neutral-100 to-transparent z-30 pointer-events-none" style={{ height: "calc(100% + 6rem)" }} />
