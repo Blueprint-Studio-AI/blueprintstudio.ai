@@ -51,10 +51,24 @@ export default function ClientLogoTicker() {
   ];
 
   return (
-    <Section className="relative z-30 bg-neutral-100 overflow-hidden py-0">
+    <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
+      {/* Vertical lines — matching PortfolioBento */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
+        <div className="w-full flex-1 flex justify-center relative">
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
+          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
+        </div>
+      </div>
+
       <OuterContainer>
-        <InnerContainer className="py-8 sm:py-12 px-0">
-          <p className="text-neutral-500 text-xs sm:text-sm tracking-widest uppercase text-center mb-6 sm:mb-8 cursor-default">
+        <InnerContainer className="pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-0 relative">
+          {/* Inner dashed vertical lines on desktop */}
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+
+          <p className="text-neutral-500 text-xs sm:text-sm tracking-widest uppercase text-center mb-8 sm:mb-10 cursor-default">
             Trusted by
           </p>
 
