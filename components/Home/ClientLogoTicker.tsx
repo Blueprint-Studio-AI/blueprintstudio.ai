@@ -1,39 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 
 const clients = [
-  { name: "TokenWorks", logo: "/logos-match-height/tokenworks.png", services: ["Product Videos", "Landing Page", "Client Portal"] },
-  { name: "Arch Network", logo: "/logos-match-height/arch-network.png", services: [""] },
-  { name: "Jinba", logo: "/logos-match-height/jinba.png", services: [""] },
-  { name: "Logical", logo: "/logos-match-height/logical.png", services: [""] },
-  { name: "Pyra", logo: "/logos-match-height/pyra.png", services: [""] },
-  { name: "Hildene", logo: "/logos-match-height/hildene.png", services: [""] },
-  { name: "HoneyB", logo: "/logos-match-height/honeyb.png", services: [""] },
-  { name: "Perena", logo: "/logos-match-height/perena.png", services: [""] },
-  { name: "Hashplay", logo: "/logos-match-height/hashplay.png", services: [""] },
-  { name: "Huch", logo: "/logos-match-height/huch.png", services: [""] },
-  { name: "Bold", logo: "/logos-match-height/bold.png", services: [""] },
-  { name: "Bump", logo: "/logos-match-height/bump.png", services: [""] },
-  { name: "Cona", logo: "/logos-match-height/cona.png", services: [""] },
-  { name: "DAG", logo: "/logos-match-height/dag.png", services: [""] },
-  { name: "Bitfrost", logo: "/logos-match-height/bitfrost.png", services: [""] },
-  { name: "Autara", logo: "/logos-match-height/autara.png", services: [""] },
-  { name: "Pregame", logo: "/logos-match-height/pregame.png", services: [""] },
-  { name: "Twelve", logo: "/logos-match-height/twelve.png", services: [""] },
-  { name: "Reshift", logo: "/logos-match-height/reshift.png", services: [""] },
-  { name: "PavePower", logo: "/logos-match-height/pavepower.png", services: [""] },
-  { name: "BTC Summit Vegas", logo: "/logos-match-height/btc-summit-vegas.png", services: [""] },
-  { name: "Satoshi Bet", logo: "/logos-match-height/satoshibet.png", services: [""] },
-  { name: "Panta", logo: "/logos-match-height/panta.png", services: [""] },
-  { name: "Herth", logo: "/logos-match-height/herth.png", services: [""] },
-  { name: "Customer Compass", logo: "/logos-match-height/customer-compass.png", services: [""] },
-  { name: "Answers From Me", logo: "/logos-match-height/answers-from-me.png", services: [""] },
-  { name: "LivingIP", logo: "/logos-match-height/livingip.png", services: [""] },
-  { name: "Uni", logo: "/logos-match-height/uni.png", services: [""] },
+  { name: "TokenWorks", logo: "/logos-match-height/tokenworks.png", services: ["Digital Transformation", "Service Design", "Client Portal", "Product Videos"] },
+  { name: "Arch Network", logo: "/logos-match-height/arch-network.png", services: ["Service Design", "Branding", "Development", "Content Creation"] },
+  { name: "Perena", logo: "/logos-match-height/perena.png", services: ["Landing Page", "Service Design", "Development"] },
+  { name: "Jinba", logo: "/logos-match-height/jinba.png", services: ["Branding", "Landing Page", "Launch Video"] },
+  { name: "Bump", logo: "/logos-match-height/bump.png", services: ["Branding", "Product Design", "UX"] },
+  { name: "Logical", logo: "/logos-match-height/logical.png", services: ["Launch Video"] },
+  { name: "Pyra", logo: "/logos-match-height/pyra.png", services: ["Launch Videos", "Content Creation"] },
+  { name: "Hildene", logo: "/logos-match-height/hildene.png", services: ["Service Design", "Content Creation"] },
+  { name: "HoneyB", logo: "/logos-match-height/honeyb.png", services: ["Branding", "Landing Page", "Product Design", "Development"] },
+  { name: "Hashplay", logo: "/logos-match-height/hashplay.png", services: ["Branding", "Landing Page", "Development"] },
+  { name: "Huch", logo: "/logos-match-height/huch.png", services: ["Branding", "Product Design", "Platform Development", "Pitch Deck"] },
+  { name: "Bold", logo: "/logos-match-height/bold.png", services: ["Branding", "Platform UX", "Landing Page"] },
+  { name: "Cona", logo: "/logos-match-height/cona.png", services: ["Service Design", "Content Creation"] },
+  { name: "DAG", logo: "/logos-match-height/dag.png", services: ["Branding", "Merch Design"] },
+  { name: "Bitfrost", logo: "/logos-match-height/bitfrost.png", services: ["Branding", "Pitch Deck"] },
+  { name: "Autara", logo: "/logos-match-height/autara.png", services: ["Branding", "Landing Page", "Development"] },
+  { name: "Pregame", logo: "/logos-match-height/pregame.png", services: ["Content Creation"] },
+  { name: "Twelve", logo: "/logos-match-height/twelve.png", services: ["AI Automation", "Service Design", "Development", "UX Design"] },
+  { name: "Reshift", logo: "/logos-match-height/reshift.png", services: ["AI Automation", "Development", "Service Design"] },
+  { name: "PavePower", logo: "/logos-match-height/pavepower.png", services: ["Landing Page"] },
+  { name: "BTC Summit Vegas", logo: "/logos-match-height/btc-summit-vegas.png", services: ["Branding", "Content Creation", "Immersive Video Installations"] },
+  { name: "Satoshi Bet", logo: "/logos-match-height/satoshibet.png", services: ["Landing Page", "Development"] },
+  { name: "Panta", logo: "/logos-match-height/panta.png", services: ["Launch Video"] },
+  { name: "Herth", logo: "/logos-match-height/herth.png", services: ["Product Design", "Development"] },
+  { name: "Customer Compass", logo: "/logos-match-height/customer-compass.png", services: ["Service Design", "Customer Research"] },
+  { name: "Answers From Me", logo: "/logos-match-height/answers-from-me.png", services: ["Service Design", "AI Automation", "Development"] },
+  { name: "LivingIP", logo: "/logos-match-height/livingip.png", services: ["Branding", "Product Design"] },
+  { name: "Uni", logo: "/logos-match-height/uni.png", services: ["Branding", "Landing Page"] },
 ];
 
 function LogoTrack({ hovered }: { hovered: boolean }) {
@@ -72,6 +72,31 @@ function LogoTrack({ hovered }: { hovered: boolean }) {
 
 export default function ClientLogoTicker() {
   const [isHovered, setIsHovered] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Smoothly transition speed by adjusting playbackRate-style via CSS variable
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const animations = el.getAnimations();
+    animations.forEach((anim) => {
+      if (anim instanceof CSSAnimation) {
+        // Smoothly ramp playback rate
+        const target = isHovered ? 0.3 : 1;
+        const current = anim.playbackRate;
+        const step = () => {
+          const diff = target - anim.playbackRate;
+          if (Math.abs(diff) < 0.02) {
+            anim.playbackRate = target;
+            return;
+          }
+          anim.playbackRate += diff * 0.1;
+          requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    });
+  }, [isHovered]);
 
   return (
     <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
@@ -106,15 +131,13 @@ export default function ClientLogoTicker() {
             {/* Right fade */}
             <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
 
-            {/* CSS-animated ticker — slows on hover */}
+            {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
             <div
-              className="flex w-max"
+              ref={trackRef}
+              className="flex w-max animate-logo-scroll"
               style={{
                 willChange: "transform",
                 backfaceVisibility: "hidden",
-                animation: `logo-scroll 120s linear infinite`,
-                animationPlayState: isHovered ? "running" : "running",
-                animationDuration: isHovered ? "240s" : "120s",
               }}
             >
               <LogoTrack hovered={isHovered} />
