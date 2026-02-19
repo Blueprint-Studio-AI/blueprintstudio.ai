@@ -52,23 +52,23 @@ export default function ClientLogoTicker() {
 
   return (
     <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
-      {/* Vertical lines — matching PortfolioBento */}
+      {/* Solid vertical lines — matching PortfolioBento */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300" />
+          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300" />
         </div>
       </div>
 
       <OuterContainer>
         <InnerContainer className="pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 px-0 relative">
-          {/* Inner dashed vertical lines on desktop */}
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-
-          <p className="text-neutral-500 text-xs sm:text-sm tracking-widest uppercase text-center mb-8 sm:mb-10 cursor-default">
+          <p
+            className="text-neutral-500 uppercase text-center mb-8 sm:mb-10 cursor-default"
+            style={{
+              fontSize: "clamp(13px, 1.2vw, 15px)",
+              letterSpacing: "0.2em",
+            }}
+          >
             Trusted by
           </p>
 
@@ -86,7 +86,7 @@ export default function ClientLogoTicker() {
               {repeatedClients.map((client, index) => (
                 <div
                   key={index}
-                  className="flex-shrink-0 flex items-center justify-center h-8 sm:h-10 opacity-50 hover:opacity-80 transition-opacity duration-300"
+                  className="flex-shrink-0 flex items-center justify-center h-8 sm:h-10 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
                 >
                   <Image
                     src={client.logo}
