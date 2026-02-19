@@ -92,25 +92,43 @@ function LogoTrackMobile() {
 export default function ClientLogoTicker() {
   const [isHovered, setIsHovered] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>();
 
-  // Smoothly transition speed by adjusting playbackRate-style via CSS variable
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    const animations = el.getAnimations();
-    animations.forEach((anim) => {
-      const target = isHovered ? 0.3 : 1;
-      const step = () => {
+
+    // Cancel any in-flight ramp
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    const target = isHovered ? 0.3 : 1;
+
+    const step = () => {
+      // Re-query animations each frame — Safari drops stale references
+      const anims = el.getAnimations();
+      if (!anims.length) return;
+
+      let done = true;
+      anims.forEach((anim) => {
         const diff = target - anim.playbackRate;
         if (Math.abs(diff) < 0.02) {
           anim.playbackRate = target;
-          return;
+        } else {
+          anim.playbackRate += diff * 0.1;
+          done = false;
         }
-        anim.playbackRate += diff * 0.1;
-        requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
+      });
+
+      if (!done) {
+        rafRef.current = requestAnimationFrame(step);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [isHovered]);
 
   return (
