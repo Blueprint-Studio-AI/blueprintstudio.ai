@@ -7,6 +7,7 @@ import PricingSection from "./PricingSection";
 import TestimonialSection from "./TestimonialSection";
 import FAQSection from "./FAQSection";
 import ScheduleCallSection from "./ScheduleCallSection";
+import ClientLogoTicker from "./ClientLogoTicker";
 
 export default function Home() {
     return (
@@ -20,6 +21,7 @@ export default function Home() {
             {/* Spacer to create scroll space for revealing quote */}
             <div className="h-screen" />
             <div className="relative z-30">
+                <ClientLogoTicker />
                 <div id="work">
                     <PortfolioBento/>
                 </div>
