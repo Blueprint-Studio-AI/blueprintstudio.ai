@@ -145,14 +145,11 @@ export default function ClientLogoTicker() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* CSS mask for smooth fade on both edges — covers everything including text */}
-            <div
-              className="overflow-x-clip"
-              style={{
-                maskImage: "linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent)",
-                WebkitMaskImage: "linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent)",
-              }}
-            >
+            {/* Fade overlays — high z so they cover text too */}
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-100 to-transparent z-30 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-100 to-transparent z-30 pointer-events-none" />
+
+            <div>
               {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
               <div
                 ref={trackRef}
