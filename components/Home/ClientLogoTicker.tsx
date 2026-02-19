@@ -162,7 +162,7 @@ export default function ClientLogoTicker() {
   }, [isHovered]);
 
   return (
-    <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden">
+    <Section className="flex flex-col relative z-30 bg-neutral-100 overflow-hidden" style={{ contain: "content" }}>
       {/* Solid vertical lines — z-20 to sit above fade overlays */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px] z-20">
         <div className="w-full flex-1 flex justify-center relative">
@@ -199,8 +199,8 @@ export default function ClientLogoTicker() {
                 ref={trackRef}
                 className="flex w-max animate-logo-scroll"
                 style={{
-                  willChange: "transform",
-                  backfaceVisibility: "hidden",
+                  
+                  transform: "translate3d(0,0,0)",
                 }}
               >
                 <LogoTrack />
@@ -223,8 +223,8 @@ export default function ClientLogoTicker() {
               <div
                 className="flex w-max animate-logo-scroll"
                 style={{
-                  willChange: "transform",
-                  backfaceVisibility: "hidden",
+                  
+                  transform: "translate3d(0,0,0)",
                 }}
               >
                 <LogoTrackMobile />
