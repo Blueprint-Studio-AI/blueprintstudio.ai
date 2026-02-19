@@ -70,6 +70,25 @@ function LogoTrack() {
   );
 }
 
+function LogoTrackMobile() {
+  return (
+    <div className="flex items-center gap-16 shrink-0">
+      {clients.map((client, index) => (
+        <div key={index} className="flex-shrink-0 flex items-center justify-center h-12 grayscale opacity-50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={client.logo}
+            alt={client.name}
+            loading="eager"
+            decoding="async"
+            className="h-full w-auto object-contain"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ClientLogoTicker() {
   const [isHovered, setIsHovered] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -122,17 +141,18 @@ export default function ClientLogoTicker() {
           </p>
 
           <div
-            className="relative"
+            className="relative hidden sm:block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Left fade — full height to cover logos + service text */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
-            {/* Right fade */}
-            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
-
-            {/* Clip only the horizontal scroll, not the service text below */}
-            <div className="overflow-x-clip">
+            {/* CSS mask for smooth fade on both edges — covers everything including text */}
+            <div
+              className="overflow-x-clip"
+              style={{
+                maskImage: "linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent)",
+                WebkitMaskImage: "linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent)",
+              }}
+            >
               {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
               <div
                 ref={trackRef}
@@ -145,6 +165,30 @@ export default function ClientLogoTicker() {
                 <LogoTrack />
                 <div className="pl-16 sm:pl-24">
                   <LogoTrack />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile — no hover effects, just scroll */}
+          <div className="relative sm:hidden">
+            <div
+              className="overflow-x-clip"
+              style={{
+                maskImage: "linear-gradient(to right, transparent, black 3rem, black calc(100% - 3rem), transparent)",
+                WebkitMaskImage: "linear-gradient(to right, transparent, black 3rem, black calc(100% - 3rem), transparent)",
+              }}
+            >
+              <div
+                className="flex w-max animate-logo-scroll"
+                style={{
+                  willChange: "transform",
+                  backfaceVisibility: "hidden",
+                }}
+              >
+                <LogoTrackMobile />
+                <div className="pl-16">
+                  <LogoTrackMobile />
                 </div>
               </div>
             </div>
