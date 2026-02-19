@@ -93,15 +93,34 @@ export default function ClientLogoTicker() {
   const [isHovered, setIsHovered] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>();
-  const hoverTimeoutRef = useRef<NodeJS.Timeout>();
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const hoverIntentRef = useRef(false);
 
-  // Debounced hover handlers — prevents scroll-triggered jitter on Safari
+  // Track scrolling — disable hover during scroll
+  useEffect(() => {
+    const onScroll = () => {
+      isScrollingRef.current = true;
+      if (hoverIntentRef.current) {
+        setIsHovered(false);
+        hoverIntentRef.current = false;
+      }
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 150);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handleMouseEnter = () => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => setIsHovered(true), 80);
+    if (isScrollingRef.current) return;
+    hoverIntentRef.current = true;
+    setIsHovered(true);
   };
   const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverIntentRef.current = false;
     setIsHovered(false);
   };
 
