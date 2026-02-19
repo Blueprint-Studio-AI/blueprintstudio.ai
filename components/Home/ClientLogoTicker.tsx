@@ -145,12 +145,12 @@ export default function ClientLogoTicker() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Fade overlays — high z so they cover text too */}
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-100 to-transparent z-30 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-100 to-transparent z-30 pointer-events-none" />
+            {/* Fade overlays — extend below parent to cover service text, z-30 above all content */}
+            <div className="absolute left-0 top-0 w-24 bg-gradient-to-r from-neutral-100 to-transparent z-30 pointer-events-none" style={{ height: "calc(100% + 6rem)" }} />
+            <div className="absolute right-0 top-0 w-24 bg-gradient-to-l from-neutral-100 to-transparent z-30 pointer-events-none" style={{ height: "calc(100% + 6rem)" }} />
 
-            <div>
-              {/* CSS-animated ticker — smoothly slows on hover via playbackRate */}
+            {/* overflowX clip — hides logos horizontally, allows service text to show below */}
+            <div style={{ overflowX: "clip" }}>
               <div
                 ref={trackRef}
                 className="flex w-max animate-logo-scroll"
@@ -160,7 +160,7 @@ export default function ClientLogoTicker() {
                 }}
               >
                 <LogoTrack />
-                <div className="pl-16 sm:pl-24">
+                <div className="pl-24">
                   <LogoTrack />
                 </div>
               </div>
