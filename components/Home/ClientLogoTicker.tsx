@@ -65,8 +65,8 @@ export default function ClientLogoTicker() {
           <p
             className="text-neutral-500 uppercase text-center mb-8 sm:mb-10 cursor-default"
             style={{
-              fontSize: "clamp(13px, 1.2vw, 15px)",
-              letterSpacing: "0.2em",
+              fontSize: "clamp(14px, 1.5vw, 18px)",
+              letterSpacing: "0.08em",
             }}
           >
             Trusted by
@@ -86,13 +86,13 @@ export default function ClientLogoTicker() {
               {repeatedClients.map((client, index) => (
                 <div
                   key={index}
-                  className="flex-shrink-0 flex items-center justify-center h-8 sm:h-10 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                  className="flex-shrink-0 flex items-center justify-center h-10 sm:h-14 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
                 >
                   <Image
                     src={client.logo}
                     alt={client.name}
-                    width={120}
-                    height={40}
+                    width={160}
+                    height={56}
                     className="h-full w-auto object-contain"
                   />
                 </div>
