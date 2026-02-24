@@ -8,6 +8,7 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Palette, Globe, Presentation, Play, Check } from "lucide-react";
+import { ValueOf } from "next/dist/shared/lib/constants";
 
 const packageItems = [
   {
