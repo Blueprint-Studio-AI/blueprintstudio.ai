@@ -197,12 +197,17 @@ export default function PackageSection() {
                 onClick={() => handleTabChange(index)}
                 className={`flex items-center gap-3 px-3.5 sm:px-4 py-2 rounded-full text-sm border transition-all duration-200 cursor-pointer ${
                   activeIndex === index
-                    ? "bg-white text-black border-neutral-300 shadow-sm"
+                    ? "bg-white text-black border-neutral-300"
                     : "bg-transparent text-neutral-400 border-neutral-200 hover:text-neutral-600 hover:border-neutral-300"
                 }`}
+                style={
+                  activeIndex === index
+                    ? { boxShadow: "0 1px 4px 0 rgba(0, 0, 0, 0.25), 0 0 27.791px 0 rgba(255, 255, 255, 0.58)" }
+                    : undefined
+                }
               >
-                <span className="text-base text-[#C2C6CC] font-medium">{item.num}</span>
-                <span className="text-base font-medium">{item.label}</span>
+                <span className="text-base text-[#C2C6CC] font-normal">{item.num}</span>
+                <span className="text-base font-normal">{item.label}</span>
               </button>
             ))}
           </div>
