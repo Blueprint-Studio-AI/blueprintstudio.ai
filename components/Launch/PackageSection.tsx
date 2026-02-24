@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -29,6 +30,8 @@ const GreenCheckIcon = () => (
 const packageItems = [
   {
     id: "brand",
+    num: "01",
+    label: "Brand",
     title: "Brand Identity",
     example: "/launch/example-brand.png",
     exampleAlt: "Brand identity example",
@@ -43,6 +46,8 @@ const packageItems = [
   },
   {
     id: "website",
+    num: "02",
+    label: "Website",
     title: "Website",
     example: "/launch/example-website.png",
     exampleAlt: "Website example",
@@ -57,6 +62,8 @@ const packageItems = [
   },
   {
     id: "deck",
+    num: "03",
+    label: "Deck",
     title: "Pitch Deck",
     example: "/launch/example-deck.png",
     exampleAlt: "Pitch deck example",
@@ -70,6 +77,8 @@ const packageItems = [
   },
   {
     id: "video",
+    num: "04",
+    label: "Video",
     title: "Launch Video",
     example: "/launch/example-video.png",
     exampleAlt: "Launch video example",
@@ -83,49 +92,33 @@ const packageItems = [
   },
 ];
 
-function PackageCard({
-  item,
-  index,
-}: {
-  item: (typeof packageItems)[0];
-  index: number;
-}) {
+function PackageContent({ item }: { item: (typeof packageItems)[0] }) {
   const [imageError, setImageError] = useState(false);
   const Icon = item.icon;
 
   return (
-    <div className="bg-neutral-50 cursor-default group hover:bg-white transition-colors flex flex-col relative">
-      {/* Numbered tab */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-neutral-200 shadow-sm">
-        <span className="text-[10px] font-mono text-neutral-500">
-          0{index + 1}
-        </span>
-        <span className="text-xs font-medium text-neutral-700">
-          {item.title}
-        </span>
-      </div>
-
-      {/* Example Image */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-100">
-        {!imageError ? (
-          <Image
-            src={item.example}
-            alt={item.exampleAlt}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-neutral-100 to-neutral-200">
-            <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-              <Icon className="w-6 h-6 text-neutral-400" />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 max-w-5xl mx-auto border border-neutral-200">
+      <div className="bg-neutral-50 relative overflow-hidden">
+        <div className="relative aspect-[16/10] w-full bg-neutral-100">
+          {!imageError ? (
+            <Image
+              src={item.example}
+              alt={item.exampleAlt}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-neutral-100 to-neutral-200">
+              <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+                <Icon className="w-6 h-6 text-neutral-400" />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="p-6 sm:p-8 flex-1">
+      <div className="bg-neutral-50 p-6 sm:p-8 flex flex-col justify-center">
         <h3
           className="font-medium text-black mb-5"
           style={{
@@ -152,6 +145,15 @@ function PackageCard({
 }
 
 export default function PackageSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const handleTabChange = (index: number) => {
+    if (index === activeIndex) return;
+    setDirection(index > activeIndex ? 1 : -1);
+    setActiveIndex(index);
+  };
+
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       {/* Vertical lines */}
@@ -172,7 +174,7 @@ export default function PackageSection() {
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
           {/* Section Title */}
-          <div className="text-center mb-10 sm:mb-14">
+          <div className="text-center mb-8 sm:mb-10">
             <h2
               className="font-medium text-black cursor-default"
               style={{
@@ -187,11 +189,38 @@ export default function PackageSection() {
             </h2>
           </div>
 
-          {/* Package Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 max-w-5xl mx-auto border border-neutral-200">
+          {/* Deliverable Pills */}
+          <div className="flex justify-center flex-wrap gap-2.5 mb-8 sm:mb-12">
             {packageItems.map((item, index) => (
-              <PackageCard key={item.id} item={item} index={index} />
+              <button
+                key={item.id}
+                onClick={() => handleTabChange(index)}
+                className={`flex items-center gap-3 px-3.5 sm:px-4 py-2 rounded-full text-sm border transition-all duration-200 cursor-pointer ${
+                  activeIndex === index
+                    ? "bg-white text-black border-neutral-300 shadow-sm"
+                    : "bg-transparent text-neutral-400 border-neutral-200 hover:text-neutral-600 hover:border-neutral-300"
+                }`}
+              >
+                <span className="text-base text-[#C2C6CC] font-medium">{item.num}</span>
+                <span className="text-base font-medium">{item.label}</span>
+              </button>
             ))}
+          </div>
+
+          {/* Animated Content */}
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={packageItems[activeIndex].id}
+                custom={direction}
+                initial={{ opacity: 0, x: direction * 80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction * -80 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <PackageContent item={packageItems[activeIndex]} />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Price note */}
