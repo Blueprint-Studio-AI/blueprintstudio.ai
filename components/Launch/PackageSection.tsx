@@ -96,13 +96,13 @@ function FeatureItem({
   return (
     <button
       onClick={onToggle}
-      className="w-full text-left py-3 border-b border-neutral-200 cursor-pointer group"
+      className="w-full text-left py-6 border-b border-neutral-200 cursor-pointer group"
     >
-      <div className="flex items-center gap-3">
-        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 ${isOpen ? "bg-black" : "bg-neutral-200 group-hover:bg-neutral-300"}`}>
-          <Check className={`w-3 h-3 transition-colors duration-200 ${isOpen ? "text-white" : "text-neutral-400"}`} />
+      <div className="flex items-center gap-4">
+        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 border-[1.75px] border-[#22D462]`}>
+          <Check strokeWidth={3} className={`w-3 h-3 transition-colors duration-200 text-[#22D462]`} />
         </div>
-        <span className="text-sm font-medium text-black">{feature.name}</span>
+        <span className="text-md font-normal text-black">{feature.name}</span>
       </div>
       <AnimatePresence>
         {isOpen && (
@@ -113,7 +113,7 @@ function FeatureItem({
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
             className="overflow-hidden"
           >
-            <p className="text-sm text-neutral-500 mt-1.5 pl-8">{feature.detail}</p>
+            <p className="text-[16px] text-neutral-500 mt-3 pl-9">{feature.detail}</p>
           </motion.div>
         )}
       </AnimatePresence>
