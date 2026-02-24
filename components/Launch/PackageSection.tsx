@@ -23,6 +23,8 @@ const packageItems = [
       { name: "Social Kit", detail: "Profiles, banners, and templates for every platform" },
       { name: "AI Prompting", detail: "Brand asset generator setup with custom prompts" },
     ],
+    workSubtitle: "Recent client work",
+    workHeading: "Brands we've built",
     gallery: [
       "/images/work/LivingPersona-Desktop1.png",
       "/images/work/ProjectMetaVison-Desktop1.png",
@@ -41,6 +43,8 @@ const packageItems = [
       { name: "Responsive", detail: "Fully responsive across all devices" },
       { name: "CMS & SEO", detail: "Content management, SEO foundations, and analytics" },
     ],
+    workSubtitle: "Recent client work",
+    workHeading: "Sites we've built to convert",
     gallery: [
       "/images/work/LivingPersona-Desktop1.png",
       "/images/work/ProjectMetaVison-Desktop1.png",
@@ -59,6 +63,8 @@ const packageItems = [
       { name: "Speaker Notes", detail: "Speaker notes and flow guidance" },
       { name: "Source Files", detail: "Editable source file for future updates" },
     ],
+    workSubtitle: "Recent client work",
+    workHeading: "Stories we've helped tell",
     gallery: [
       "/images/work/LivingPersona-Desktop1.png",
       "/images/work/ProjectMetaVison-Desktop1.png",
@@ -77,12 +83,16 @@ const packageItems = [
       { name: "Screen Recordings", detail: "Product walkthroughs and screen captures" },
       { name: "Platform Optimized", detail: "Optimized for social and embed" },
     ],
+    workSubtitle: "Recent client work",
+    workHeading: "Videos that drive traction",
     gallery: [
       "/images/work/LivingPersona-Desktop1.png",
       "/images/work/ProjectMetaVison-Desktop1.png",
     ],
   },
 ];
+
+type PackageItem = typeof packageItems[0];
 
 function FeatureItem({
   feature,
@@ -121,11 +131,11 @@ function FeatureItem({
   );
 }
 
-function PackageContent({ item }: { item: (typeof packageItems)[0] }) {
+function PackageContent({ item }: { item: PackageItem }) {
   const [openFeature, setOpenFeature] = useState<number | null>(null);
 
   return (
-    <div className="max-w-5xl mx-auto px-12">
+    <div className="max-w-5xl mx-auto pl-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         {/* Left: Number, Title, Description */}
         <div>
@@ -151,8 +161,13 @@ function PackageContent({ item }: { item: (typeof packageItems)[0] }) {
         </div>
       </div>
 
-      {/* Image Gallery */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-10">
+      {/* Work Section */}
+      <div className="mt-24 text-center">
+        <p className="text-base font-medium text-neutral-500">{item.workSubtitle}</p>
+        <h4 className="text-2xl font-medium text-black mt-2">{item.workHeading}</h4>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
         {item.gallery.map((src, i) => (
           <div
             key={i}
