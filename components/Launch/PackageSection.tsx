@@ -206,7 +206,7 @@ export default function PackageSection() {
                     : undefined
                 }
               >
-                <span className="text-base text-[#C2C6CC] font-normal">{item.num}</span>
+                <span className={`text-base font-normal ${activeIndex === index ? "text-[#C2C6CC]" : "text-[#E0E2E6]"}`}>{item.num}</span>
                 <span className="text-base font-normal">{item.label}</span>
               </button>
             ))}
