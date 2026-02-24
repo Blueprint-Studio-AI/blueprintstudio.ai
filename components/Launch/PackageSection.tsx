@@ -7,41 +7,25 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { Palette, Globe, Presentation, Play } from "lucide-react";
-
-const GreenCheckIcon = () => (
-  <svg
-    className="shrink-0 mt-0.5"
-    width="16"
-    height="17"
-    viewBox="0 0 16 17"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M8 16.5C12.4183 16.5 16 12.9183 16 8.5C16 4.08172 12.4183 0.5 8 0.5C3.58172 0.5 0 4.08172 0 8.5C0 12.9183 3.58172 16.5 8 16.5ZM12.1402 6.76822C12.5645 6.41466 12.6218 5.78409 12.2682 5.35982C11.9147 4.93554 11.2841 4.87821 10.8598 5.23178C8.77424 6.96976 7.16738 9.14507 6.32238 10.4082L5.20711 9.29289C4.81658 8.90237 4.18342 8.90237 3.79289 9.29289C3.40237 9.68342 3.40237 10.3166 3.79289 10.7071L5.05227 11.9665L5.07158 11.9858C5.18281 12.0971 5.30509 12.2194 5.41781 12.3151C5.53751 12.4167 5.74124 12.5732 6.0259 12.6469C6.37714 12.7379 6.73665 12.7013 7.06241 12.5416C7.33043 12.4101 7.5004 12.2102 7.59559 12.0881C7.68769 11.9699 7.78489 11.8223 7.87507 11.6855L7.87509 11.6854L7.89023 11.6625L7.89083 11.6616C8.66198 10.4919 10.1883 8.3948 12.1402 6.76822Z"
-      fill="#22D461"
-    />
-  </svg>
-);
+import { Palette, Globe, Presentation, Play, Check } from "lucide-react";
 
 const packageItems = [
   {
     id: "brand",
     num: "01",
     label: "Brand",
-    title: "Brand Identity",
-    example: "/launch/example-brand.png",
-    exampleAlt: "Brand identity example",
+    title: "Brand\nIdentity",
+    description: "A complete visual system that is fully built to scale. Includes:",
     icon: Palette,
-    items: [
-      "Logo system (primary, secondary, icon, lockups)",
-      "Color palette & typography",
-      "20-30 page brand guidelines",
-      "Social kit (profiles, banners, templates)",
-      "AI prompt setup with brand asset generator",
+    features: [
+      { name: "Logo System", detail: "Primary, secondary, icon, and lockup variations" },
+      { name: "Design System", detail: "Typography, color palette, visual language" },
+      { name: "Social Kit", detail: "Profiles, banners, and templates for every platform" },
+      { name: "AI Prompting", detail: "Brand asset generator setup with custom prompts" },
+    ],
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
     ],
   },
   {
@@ -49,96 +33,139 @@ const packageItems = [
     num: "02",
     label: "Website",
     title: "Website",
-    example: "/launch/example-website.png",
-    exampleAlt: "Website example",
+    description: "A world-class site designed and built to convert. Includes:",
     icon: Globe,
-    items: [
-      "World-class design with custom animations",
-      "Built in Framer, Next.js, or Astro",
-      "Fully responsive across all devices",
-      "CMS for blog & content updates",
-      "SEO foundations & analytics",
+    features: [
+      { name: "Custom Design", detail: "World-class design with custom animations" },
+      { name: "Development", detail: "Built in Framer, Next.js, or Astro" },
+      { name: "Responsive", detail: "Fully responsive across all devices" },
+      { name: "CMS & SEO", detail: "Content management, SEO foundations, and analytics" },
+    ],
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
     ],
   },
   {
     id: "deck",
     num: "03",
     label: "Deck",
-    title: "Pitch Deck",
-    example: "/launch/example-deck.png",
-    exampleAlt: "Pitch deck example",
+    title: "Pitch\nDeck",
+    description: "A compelling narrative designed to close rounds. Includes:",
     icon: Presentation,
-    items: [
-      "Narrative strategy & story arc",
-      "Fully designed slides in Figma",
-      "Speaker notes & flow guidance",
-      "Editable source file",
+    features: [
+      { name: "Narrative Strategy", detail: "Story arc and flow designed to persuade" },
+      { name: "Slide Design", detail: "Fully designed slides in Figma" },
+      { name: "Speaker Notes", detail: "Speaker notes and flow guidance" },
+      { name: "Source Files", detail: "Editable source file for future updates" },
+    ],
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
     ],
   },
   {
     id: "video",
     num: "04",
     label: "Video",
-    title: "Launch Video",
-    example: "/launch/example-video.png",
-    exampleAlt: "Launch video example",
+    title: "Launch\nVideo",
+    description: "A short-form video built for traction. Includes:",
     icon: Play,
-    items: [
-      "Script & storyboard",
-      "30-60 second video",
-      "Screen recordings + motion graphics",
-      "Optimized for social & embed",
+    features: [
+      { name: "Script & Storyboard", detail: "Full creative direction from concept to final" },
+      { name: "Production", detail: "30–60 second video with motion graphics" },
+      { name: "Screen Recordings", detail: "Product walkthroughs and screen captures" },
+      { name: "Platform Optimized", detail: "Optimized for social and embed" },
+    ],
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
     ],
   },
 ];
 
+function FeatureItem({
+  feature,
+  isOpen,
+  onToggle,
+}: {
+  feature: { name: string; detail: string };
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full text-left py-3 border-b border-neutral-200 cursor-pointer group"
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 ${isOpen ? "bg-black" : "bg-neutral-200 group-hover:bg-neutral-300"}`}>
+          <Check className={`w-3 h-3 transition-colors duration-200 ${isOpen ? "text-white" : "text-neutral-400"}`} />
+        </div>
+        <span className="text-sm font-medium text-black">{feature.name}</span>
+      </div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="overflow-hidden"
+          >
+            <p className="text-sm text-neutral-500 mt-1.5 pl-8">{feature.detail}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}
+
 function PackageContent({ item }: { item: (typeof packageItems)[0] }) {
-  const [imageError, setImageError] = useState(false);
-  const Icon = item.icon;
+  const [openFeature, setOpenFeature] = useState<number | null>(null);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 max-w-5xl mx-auto border border-neutral-200">
-      <div className="bg-neutral-50 relative overflow-hidden">
-        <div className="relative aspect-[16/10] w-full bg-neutral-100">
-          {!imageError ? (
-            <Image
-              src={item.example}
-              alt={item.exampleAlt}
-              fill
-              className="object-cover"
-              onError={() => setImageError(true)}
+    <div className="max-w-5xl mx-auto px-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+        {/* Left: Number, Title, Description */}
+        <div>
+          <span className="text-5xl font-medium text-neutral-400 mb-3 block">{item.num}</span>
+          <h3 className="font-medium text-black whitespace-pre-line text-[clamp(40px,6vw,64px)] leading-[110%] tracking-[-1px]">
+            {item.title}
+          </h3>
+          <p className="text-neutral-500 text-lg leading-6 mt-4 max-w-xs">
+            {item.description}
+          </p>
+        </div>
+
+        {/* Right: Interactive Feature Checklist */}
+        <div className="flex flex-col">
+          {item.features.map((feature, i) => (
+            <FeatureItem
+              key={feature.name}
+              feature={feature}
+              isOpen={openFeature === i}
+              onToggle={() => setOpenFeature(openFeature === i ? null : i)}
             />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-neutral-100 to-neutral-200">
-              <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-                <Icon className="w-6 h-6 text-neutral-400" />
-              </div>
-            </div>
-          )}
+          ))}
         </div>
       </div>
 
-      <div className="bg-neutral-50 p-6 sm:p-8 flex flex-col justify-center">
-        <h3
-          className="font-medium text-black mb-5"
-          style={{
-            fontSize: "clamp(20px, 3vw, 24px)",
-            letterSpacing: "-0.5px",
-          }}
-        >
-          {item.title}
-        </h3>
-        <ul className="space-y-2.5">
-          {item.items.map((listItem) => (
-            <li
-              key={listItem}
-              className="text-neutral-600 text-sm sm:text-base flex items-start gap-2.5"
-            >
-              <GreenCheckIcon />
-              <span>{listItem}</span>
-            </li>
-          ))}
-        </ul>
+      {/* Image Gallery */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-10">
+        {item.gallery.map((src, i) => (
+          <div
+            key={i}
+            className="relative aspect-[4/3] bg-neutral-100 rounded-lg overflow-hidden"
+          >
+            <Image
+              src={src}
+              alt={`${item.label} example ${i + 1}`}
+              fill
+              className="object-cover"
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -175,14 +202,7 @@ export default function PackageSection() {
 
           {/* Section Title */}
           <div className="text-center mb-8 sm:mb-10">
-            <h2
-              className="font-medium text-black cursor-default"
-              style={{
-                fontSize: "clamp(32px, 6vw, 48px)",
-                lineHeight: "110%",
-                letterSpacing: "-1.5px",
-              }}
-            >
+            <h2 className="font-medium text-black cursor-default text-[clamp(32px,6vw,48px)] leading-[110%] tracking-[-1.5px]">
               Four deliverables.
               <br />
               One unified brand.
@@ -197,16 +217,11 @@ export default function PackageSection() {
                 onClick={() => handleTabChange(index)}
                 className={`flex items-center gap-3 px-3.5 sm:px-4 py-2 rounded-full text-sm border transition-all duration-200 cursor-pointer ${
                   activeIndex === index
-                    ? "bg-white text-black border-neutral-300"
+                    ? "bg-white text-black border-neutral-300 shadow-[0_1px_4px_0_rgba(0,0,0,0.25),0_0_27.791px_0_rgba(255,255,255,0.58)]"
                     : "bg-transparent text-neutral-400 border-neutral-200 hover:text-neutral-600 hover:border-neutral-300"
                 }`}
-                style={
-                  activeIndex === index
-                    ? { boxShadow: "0 1px 4px 0 rgba(0, 0, 0, 0.25), 0 0 27.791px 0 rgba(255, 255, 255, 0.58)" }
-                    : undefined
-                }
               >
-                <span className={`text-base font-normal ${activeIndex === index ? "text-[#C2C6CC]" : "text-[#E0E2E6]"}`}>{item.num}</span>
+                <span className={`text-base font-normal ${activeIndex === index ? "text-neutral-400" : "text-neutral-200"}`}>{item.num}</span>
                 <span className="text-base font-normal">{item.label}</span>
               </button>
             ))}
