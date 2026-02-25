@@ -42,11 +42,26 @@ const config: Config = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "logo-scroll-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
+        "gallery-scroll": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "gallery-scroll-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "logo-scroll": "logo-scroll 120s linear infinite",
+        "logo-scroll-reverse": "logo-scroll-reverse 60s linear infinite",
+        "gallery-scroll": "gallery-scroll 40s linear infinite",
+        "gallery-scroll-reverse": "gallery-scroll-reverse 40s linear infinite",
       },
       colors: {
         neutral: {
