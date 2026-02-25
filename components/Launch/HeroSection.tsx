@@ -159,7 +159,7 @@ export default function HeroSection() {
                 </span>
               </div>
 
-              <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,16px)] leading-[160%]">
+              <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,16px)] leading-[128%]">
                 One team. One timeline. Six weeks.
                 <br />
                 Built by founders, for founders.
@@ -177,7 +177,7 @@ export default function HeroSection() {
           </div>
 
           {/* Scrolling image gallery */}
-          <div className="mt-24 -mx-2.5 sm:-mx-6">
+          <div className="mt-24">
             <ImageTicker />
           </div>
         </InnerContainer>
