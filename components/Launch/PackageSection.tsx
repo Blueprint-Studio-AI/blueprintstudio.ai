@@ -7,8 +7,9 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { Palette, Globe, Presentation, Play, Check } from "lucide-react";
+import { Palette, Globe, Presentation, Play } from "lucide-react";
 import { ValueOf } from "next/dist/shared/lib/constants";
+import GreenCheckmark from "@/components/ui/GreenCheckmark";
 
 const packageItems = [
   {
@@ -110,9 +111,7 @@ function FeatureItem({
       className="w-full text-left py-6 border-b border-neutral-200 cursor-pointer group"
     >
       <div className="flex items-center gap-4">
-        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 border-[1.75px] border-[#22D462]`}>
-          <Check strokeWidth={3} className={`w-3 h-3 transition-colors duration-200 text-[#22D462]`} />
-        </div>
+        <GreenCheckmark />
         <span className="text-md font-normal text-black">{feature.name}</span>
       </div>
       <AnimatePresence>
