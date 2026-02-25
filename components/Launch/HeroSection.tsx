@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,33 +17,64 @@ const deliverables = [
   { num: "04", label: "Video" },
 ];
 
-export default function HeroSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+const galleryImages = [
+  { src: "/images/work/LivingPersona-Desktop1.png", alt: "LivingPersona" },
+  { src: "/images/work/ProjectMetaVison-Desktop1.png", alt: "Project MetaVision" },
+  { src: "/images/work/idscanner.png", alt: "ID Scanner" },
+  { src: "/images/work/juris.png", alt: "Juris" },
+  { src: "/images/work/manchester-energy.png", alt: "Manchester Energy" },
+];
+
+function ImageTicker() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    let scrollPosition = 0;
+    const speed = 0.6;
 
-    const handleLoaded = () => {
-      setIsVideoLoaded(true);
-      video.play().catch(console.error);
+    const animate = () => {
+      scrollPosition += speed;
+      const halfWidth = scrollContainer.scrollWidth / 2;
+      if (scrollPosition >= halfWidth) {
+        scrollPosition = 0;
+      }
+      scrollContainer.scrollLeft = scrollPosition;
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    video.addEventListener("canplaythrough", handleLoaded);
-    if (video.readyState >= 3) handleLoaded();
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, []);
 
-    return () => video.removeEventListener("canplaythrough", handleLoaded);
-  }, [isMobile]);
+  return (
+    <div className="relative w-full">
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-hidden"
+        style={{ scrollBehavior: "auto" }}
+      >
+        {[...galleryImages, ...galleryImages].map((img, i) => (
+          <div
+            key={i}
+            className="flex-shrink-0 w-[280px] sm:w-[360px] aspect-video relative rounded-xl overflow-hidden bg-neutral-200"
+          >
+            <Image src={img.src} alt={img.alt} fill className="object-cover" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
+export default function HeroSection() {
   return (
     <Section className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
       {/* Vertical lines */}
@@ -72,120 +104,76 @@ export default function HeroSection() {
       />
 
       <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-2.5 sm:pt-20 lg:pt-28 pb-8 sm:pb-20 lg:pb-28 px-2.5 sm:px-6 relative">
+        <InnerContainer className="pt-16 sm:pt-24 lg:pt-32 pb-0 px-2.5 sm:px-6 relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-          {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-center">
-            {/* Left: Text Content */}
-            <div
-              className={`flex flex-col gap-6 order-2 lg:order-1 ${isMobile ? "-mt-20 relative z-10 bg-neutral-50/70 backdrop-blur-xl pt-6 px-4 w-full" : ""}`}
-            >
-              <h1
-                className="font-medium text-black cursor-default"
+          {/* Centered text content */}
+          <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
+            <h1 className="font-medium text-black cursor-default text-[clamp(32px,8vw,60px)] leading-[118%] tracking-[-2.5px]">
+              Everything you<br/>need&nbsp;to&nbsp;
+              <motion.span
                 style={{
-                  fontSize: "clamp(40px, 8vw, 72px)",
-                  lineHeight: "100%",
-                  letterSpacing: "-2.5px",
+                  backgroundImage: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                  backgroundSize: "300% 300%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  color: "transparent",
                 }}
+                animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               >
-                Everything you need to launch.
-              </h1>
+                launch
+              </motion.span>
+              .
+            </h1>
 
-              {/* Deliverables - numbered pills */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                {deliverables.map((item) => (
-                  <div
-                    key={item.num}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 border border-neutral-200 rounded-full cursor-default hover:bg-neutral-200/50 transition-colors"
-                  >
-                    <span className="text-[10px] font-mono text-neutral-400">
-                      {item.num}
-                    </span>
-                    <span className="text-sm text-neutral-700 font-medium">
-                      {item.label}
-                    </span>
-                  </div>
+            {/* Deliverables pills */}
+            <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3">
+              {deliverables.map((item) => (
+                <div
+                  key={item.num}
+                  className="flex items-center gap-3 px-3.5 sm:px-4 py-2 bg-white text-black border border-neutral-300 rounded-full cursor-default"
+                >
+                  <span className="text-base font-normal text-neutral-400">{item.num}</span>
+                  <span className="text-base font-normal">{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Social proof */}
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-
-              <p
-                className="text-neutral-500 cursor-default max-w-md"
-                style={{
-                  fontSize: "clamp(15px, 2vw, 17px)",
-                  lineHeight: "160%",
-                }}
-              >
-                One team. One timeline. Six weeks.
-                <br />
-                Built by founders, for founders.
-              </p>
-
-              {/* Social proof */}
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <div className="w-px h-4 bg-neutral-300" />
-                <span className="text-sm text-neutral-600 cursor-default tracking-tight">
-                  <span className="font-medium text-neutral-900">25+</span> startups launched
-                </span>
-              </div>
-
-              {/* CTA */}
-              <button
-                className="w-fit py-3.5 px-7 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm group cursor-pointer shadow-sm"
-                onClick={() =>
-                  window.open(
-                    "https://cal.com/blueprint-studio/intro-call",
-                    "_blank"
-                  )
-                }
-              >
-                <span>Book a Call</span>
-                <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
+              <div className="w-px h-4 bg-neutral-300" />
+              <span className="text-sm text-neutral-600 cursor-default tracking-tight">
+                <span className="font-medium text-neutral-900">25+</span> startups launched
+              </span>
             </div>
 
-            {/* Right: Video Reel */}
-            <div
-              className={`relative overflow-hidden bg-neutral-200 order-1 lg:order-2 w-full ${isMobile ? "aspect-[3/4] rounded-lg" : "aspect-video rounded-xl"}`}
+            <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,17px)] leading-[160%]">
+              One team. One timeline. Six weeks.
+              <br />
+              Built by founders, for founders.
+            </p>
+
+            {/* CTA */}
+            <button
+              className="w-fit py-3.5 px-7 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm group cursor-pointer shadow-sm"
+              onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
             >
-              <video
-                ref={videoRef}
-                key={isMobile ? "mobile" : "desktop"}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{
-                  opacity: isVideoLoaded ? 1 : 0,
-                  transition: "opacity 300ms ease",
-                }}
-                loop
-                muted
-                playsInline
-                autoPlay
-                preload="auto"
-              >
-                <source
-                  src={
-                    isMobile
-                      ? "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4"
-                      : "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4"
-                  }
-                  type="video/mp4"
-                />
-              </video>
-              {!isVideoLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-neutral-400 text-sm">Loading reel...</div>
-                </div>
-              )}
-            </div>
+              <span>Book a Call</span>
+              <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
+          </div>
+
+          {/* Scrolling image gallery */}
+          <div className="mt-24 -mx-2.5 sm:-mx-6">
+            <ImageTicker />
           </div>
         </InnerContainer>
       </OuterContainer>
