@@ -404,10 +404,6 @@ export default function ProcessSection() {
                     </span>
                   </div>
                 ))}
-                {/* End tick */}
-                <div className="absolute right-0 flex flex-col items-center">
-                  <div className="w-px h-3 bg-neutral-400" />
-                </div>
               </div>
             </div>
 
