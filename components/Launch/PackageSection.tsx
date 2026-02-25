@@ -12,19 +12,52 @@ import { Palette, Globe, Presentation, Play } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { cn } from "@/lib/utils";
 
-const galleryImages = [
-  "/images/work/LivingPersona-Desktop1.png",
-  "/images/work/ProjectMetaVison-Desktop1.png",
-  "/images/work/LivingPersona-Desktop1.png",
-  "/images/work/ProjectMetaVison-Desktop1.png",
-  "/images/work/LivingPersona-Desktop1.png",
-  "/images/work/ProjectMetaVison-Desktop1.png",
+const deckBrands = [
+  {
+    id: "brand1",
+    name: "Brand 1",
+    logo: "/images/work/LivingPersona-Desktop1.png",
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+    ],
+  },
+  {
+    id: "brand2",
+    name: "Brand 2",
+    logo: "/images/work/ProjectMetaVison-Desktop1.png",
+    gallery: [
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+    ],
+  },
+  {
+    id: "brand3",
+    name: "Brand 3",
+    logo: "/images/work/LivingPersona-Desktop1.png",
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+    ],
+  },
 ];
 
-function GalleryTrack() {
+function GalleryTrack({ images }: { images: string[] }) {
   return (
     <div className="flex items-center gap-4 shrink-0">
-      {galleryImages.map((src, i) => (
+      {images.map((src, i) => (
         <div key={i} className="relative w-64 aspect-video rounded-xl overflow-hidden flex-shrink-0 bg-neutral-200">
           <Image src={src} alt="" fill className="object-cover" />
         </div>
@@ -33,7 +66,7 @@ function GalleryTrack() {
   );
 }
 
-function MarqueeGalleryRow({ reverse = false }: { reverse?: boolean }) {
+function MarqueeGalleryRow({ reverse = false, images }: { reverse?: boolean; images: string[] }) {
   return (
     <div className="relative overflow-x-clip">
       <div
@@ -48,9 +81,9 @@ function MarqueeGalleryRow({ reverse = false }: { reverse?: boolean }) {
         className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
       >
-        <GalleryTrack />
+        <GalleryTrack images={images} />
         <div className="pl-4">
-          <GalleryTrack />
+          <GalleryTrack images={images} />
         </div>
       </div>
     </div>
@@ -186,6 +219,8 @@ function FeatureItem({
 
 function PackageContent({ item }: { item: PackageItem }) {
   const [openFeature, setOpenFeature] = useState<number | null>(null);
+  const [selectedBrandId, setSelectedBrandId] = useState(deckBrands[0].id);
+  const selectedBrand = deckBrands.find((b) => b.id === selectedBrandId) ?? deckBrands[0];
 
   return (
     <div className="max-w-5xl mx-auto pl-12 space-y-12">
@@ -245,9 +280,30 @@ function PackageContent({ item }: { item: PackageItem }) {
           ))}
         </div>
       ) : item.id === "deck" ? (
-        <div className="flex flex-col gap-4">
-          <MarqueeGalleryRow />
-          <MarqueeGalleryRow reverse />
+        <div className="flex flex-col gap-6">
+          <div className="flex gap-3 items-center justify-center h-[72px]">
+            {deckBrands.map((brand) => {
+              const isActive = brand.id === selectedBrandId;
+              return (
+                <button
+                  key={brand.id}
+                  onClick={() => setSelectedBrandId(brand.id)}
+                  className={cn(
+                    "cursor-pointer flex-shrink-0 transition-all duration-300 rounded-lg",
+                    isActive
+                      ? "w-[72px] h-[72px] p-1 bg-white shadow-[0_2.157px_8.843px_0_rgba(0,0,0,0.34)] opacity-100"
+                      : "w-[60px] h-[60px] bg-transparent shadow-none opacity-40"
+                  )}
+                >
+                  <div className={cn("relative w-full h-full overflow-hidden", isActive ? "rounded" : "rounded-lg")}>
+                    <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <MarqueeGalleryRow images={selectedBrand.gallery} />
+          <MarqueeGalleryRow images={selectedBrand.gallery} reverse />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
