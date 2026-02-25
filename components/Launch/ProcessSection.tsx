@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -16,6 +17,7 @@ import {
   ChevronRight,
   LucideIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Workstream {
   id: string;
@@ -124,13 +126,44 @@ function WorkstreamCarouselCard({
           {getWeekLabel(ws)}
         </span>
       </div>
-      <p className={`mt-6 font-medium text-lg text-neutral-800`}>
+      <p className={`mt-3 font-medium text-lg text-neutral-800`}>
         {ws.name}
       </p>
-      <p className="mt-4 text-xs text-neutral-500 leading-[128%]">{ws.description}</p>
+      <p className="mt-1 text-xs text-neutral-500 leading-[128%]">{ws.description}</p>
     </div>
   );
 }
+
+function CircularButton({
+  onClick,
+  disabled,
+  icon: Icon,
+  className,
+}: {
+  onClick?: () => void;
+  disabled?: boolean;
+  icon: LucideIcon;
+  className?: string;
+}) {
+  return (
+    
+     <button
+        onClick={onClick}
+        disabled={disabled}
+        aria-label="Next workstream"
+        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all")}
+        style={{
+          boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
+        }}
+      >
+        <Icon className="w-8 h-8" color="black" />
+      </button>
+  )
+}
+
+// Number of clones on each side of the real items.
+// Must be >= 2 so the card adjacent to the active clone is always filled.
+const EXTRA = 2;
 
 function WorkstreamCarousel({
   workstreams,
@@ -141,49 +174,102 @@ function WorkstreamCarousel({
   activeWorkstream: number;
   setActiveWorkstream: (i: number) => void;
 }) {
-  const canPrev = activeWorkstream > 0;
-  const canNext = activeWorkstream < workstreams.length - 1;
+  const total = workstreams.length;
+  // Layout: [EXTRA left clones | real items | EXTRA right clones]
+  // Real item at activeWorkstream lives at internalIndex = activeWorkstream + EXTRA
+  const [internalIndex, setInternalIndex] = useState(activeWorkstream + EXTRA);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const isWrapping = useRef(false);
+
+  // Sync when Gantt bar (or other external source) changes activeWorkstream
+  useEffect(() => {
+    if (!isWrapping.current) {
+      setInternalIndex(activeWorkstream + EXTRA);
+    }
+  }, [activeWorkstream]);
+
+  const snapWithoutTransition = (newIndex: number, newActive: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.style.transitionDuration = "0ms";
+    flushSync(() => {
+      setInternalIndex(newIndex);
+      setActiveWorkstream(newActive);
+    });
+    requestAnimationFrame(() => {
+      if (track) track.style.transitionDuration = "";
+      isWrapping.current = false;
+    });
+  };
+
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    // Ignore bubbled events from child elements (cards have transition-all which fires its own events)
+    if (e.target !== trackRef.current || e.propertyName !== "transform") return;
+    if (internalIndex < EXTRA) {
+      // Entered left clone zone — jump to the corresponding real position
+      snapWithoutTransition(internalIndex + total, activeWorkstream);
+    } else if (internalIndex >= EXTRA + total) {
+      // Entered right clone zone — jump to the corresponding real position
+      snapWithoutTransition(internalIndex - total, activeWorkstream);
+    } else {
+      isWrapping.current = false;
+    }
+  };
+
+  const prev = () => {
+    if (isWrapping.current) return;
+    isWrapping.current = true;
+    setInternalIndex((i) => i - 1);
+    setActiveWorkstream((activeWorkstream - 1 + total) % total);
+  };
+
+  const next = () => {
+    if (isWrapping.current) return;
+    isWrapping.current = true;
+    setInternalIndex((i) => i + 1);
+    setActiveWorkstream((activeWorkstream + 1) % total);
+  };
+
+  // [last EXTRA items, ...real items, first EXTRA items]
+  const items = [
+    ...workstreams.slice(-EXTRA),
+    ...workstreams,
+    ...workstreams.slice(0, EXTRA),
+  ];
 
   return (
-    <div className="flex items-center gap-3 max-w-3xl mx-auto mt-8">
-      <button
-        onClick={() => setActiveWorkstream(activeWorkstream - 1)}
-        disabled={!canPrev}
-        aria-label="Previous workstream"
-        className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-      >
-        <ChevronLeft className="w-4 h-4" />
-      </button>
+    <div className="flex items-center gap-3 mx-auto mt-8">
+      <CircularButton icon={ChevronLeft} onClick={prev} />
 
       <div className="flex-1 overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
 
         <div
+          ref={trackRef}
           className="flex transition-transform duration-300 ease-out"
           style={{
             gap: `${CARD_GAP}px`,
-            transform: `translateX(calc(50% - ${activeWorkstream * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
+            transform: `translateX(calc(50% - ${internalIndex * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
           }}
+          onTransitionEnd={handleTransitionEnd}
         >
-          {workstreams.map((ws, i) => (
+          {items.map((ws, i) => (
             <WorkstreamCarouselCard
-            workstream={ws}
-            isActive={i === activeWorkstream}
-            onClick={() => setActiveWorkstream(i)}
+              key={`${ws.id}-${i}`}
+              workstream={ws}
+              isActive={ws.id === workstreams[activeWorkstream].id}
+              onClick={
+                i < EXTRA ? () => prev() :
+                i >= EXTRA + total ? () => next() :
+                () => setActiveWorkstream(i - EXTRA)
+              }
             />
           ))}
         </div>
       </div>
 
-      <button
-        onClick={() => setActiveWorkstream(activeWorkstream + 1)}
-        disabled={!canNext}
-        aria-label="Next workstream"
-        className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-      >
-        <ChevronRight className="w-4 h-4" />
-      </button>
+      <CircularButton icon={ChevronRight} onClick={next} />
     </div>
   );
 }
