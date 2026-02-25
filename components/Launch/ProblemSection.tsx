@@ -46,7 +46,7 @@ export default function ProblemSection() {
               <h2
                 className="font-medium text-black cursor-default"
                 style={{
-                  fontSize: "clamp(28px, 5vw, 44px)",
+                  fontSize: "clamp(28px, 5vw, 48px)",
                   lineHeight: "110%",
                   letterSpacing: "-1px",
                 }}
