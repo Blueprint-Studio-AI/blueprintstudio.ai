@@ -88,14 +88,17 @@ const packageItems = [
     ],
     workSubtitle: "Recent client work",
     workHeading: "Videos that drive traction",
-    gallery: [
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
+    gallery: [] as string[],
+    videos: [
+      { thumbnail: "/images/work/LivingPersona-Desktop1.png", label: "Jinba", videoType: "Launch Video" },
+      { thumbnail: "/images/work/ProjectMetaVison-Desktop1.png", label: "Pyra", videoType: "Launch Video" },
+      { thumbnail: "/images/work/LivingPersona-Desktop1.png", label: "AgeVisor 3", videoType: "Launch Video" },
+      { thumbnail: "/images/work/ProjectMetaVison-Desktop1.png", label: "Logical", videoType: "Launch Video" },
     ],
   },
 ];
 
-type PackageItem = typeof packageItems[0];
+type PackageItem = (typeof packageItems)[number];
 
 function FeatureItem({
   feature,
@@ -168,21 +171,51 @@ function PackageContent({ item }: { item: PackageItem }) {
       </div>
 
       {/* Work Section */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
-        {item.gallery.map((src, i) => (
-          <div
-            key={i}
-            className="relative aspect-[4/3] bg-neutral-100 rounded-lg overflow-hidden"
-          >
-            <Image
-              src={src}
-              alt={`${item.label} example ${i + 1}`}
-              fill
-              className="object-cover"
-            />
-          </div>
-        ))}
-      </div>
+      {item.videos ? (
+        <div className="grid grid-cols-2 gap-x-6 gap-y-12">
+          {item.videos.map((video, i) => (
+            <div key={i} className="group cursor-pointer">
+              <div className="rounded-xl border border-neutral-300">
+                <div className="relative aspect-video bg-neutral-900 [clip-path:inset(0_round_11px)] [transform:translateZ(0)]">
+                  <Image
+                    src={video.thumbnail}
+                    alt={video.label}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-[72px] h-[72px] rounded-full backdrop-blur-[2px] bg-[#252525]/50 border border-t-white/60 border-l-white/40 border-b-white/10 border-r-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)] flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:bg-[#252525]/70 group-hover:border-t-white/80 group-hover:border-l-white/60">
+                      <Play className="w-8 h-8 text-white fill-white ml-0.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+              className="flex gap-4 items-center mt-4"
+              >
+                <p className="text-lg font-medium text-neutral-800 tracking-tight">{video.label}</p>
+                <p className="text-base text-neutral-500">{video.videoType}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
+          {item.gallery.map((src, i) => (
+            <div
+              key={i}
+              className="relative aspect-[4/3] bg-neutral-100 rounded-lg overflow-hidden"
+            >
+              <Image
+                src={src}
+                alt={`${item.label} example ${i + 1}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
