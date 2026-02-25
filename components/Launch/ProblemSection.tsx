@@ -5,10 +5,11 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const comparison = [
-  { typical: "4 vendors", blueprint: "1 team" },
-  { typical: "12+ weeks", blueprint: "6 weeks" },
+  { typical: "3-4 vendors", blueprint: "1 team" },
+  { typical: "8-12+ weeks", blueprint: "6 weeks" },
   { typical: "$80-150K", blueprint: "$50K" },
   { typical: "Misaligned assets", blueprint: "One cohesive brand" },
 ];
@@ -54,11 +55,11 @@ export default function ProblemSection() {
             </div>
 
             {/* Comparison table */}
-            <div className="grid grid-cols-[1fr_1.2fr] sm:grid-cols-[1fr_1.3fr]">
+            <div className="grid grid-cols-[1fr_1.2fr] sm:grid-cols-[1fr_1.3fr] text-neutral-500">
               {/* Header row */}
-              <div className="py-3 sm:py-4 pr-4 sm:pr-8 border-b border-neutral-300 flex items-center justify-center">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider cursor-default">
-                  Typical
+              <div className="py-3 sm:py-4 pr-4 sm:pr-8 flex items-center">
+                <span className="text-md cursor-default">
+                  Free
                 </span>
               </div>
               <div className="py-3 sm:py-4 px-4 sm:px-8 border-b border-neutral-300 border-l bg-white/50 flex items-center justify-center">
@@ -74,8 +75,10 @@ export default function ProblemSection() {
               {/* Data rows */}
               {comparison.map((row, i) => (
                 <div key={i} className="contents">
-                  <div className="py-4 sm:py-5 pr-4 sm:pr-8 border-b border-neutral-200">
-                    <span className="text-neutral-400 line-through cursor-default text-sm sm:text-base">
+                  <div className={cn("py-8 sm:py-5 pr-4 sm:pr-8", {
+                    "border-b border-neutral-300": i !== comparison.length - 1,
+                  })}>
+                    <span className="line-through cursor-default text-sm sm:text-base">
                       {row.typical}
                     </span>
                   </div>
