@@ -12,6 +12,51 @@ import { Palette, Globe, Presentation, Play } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { cn } from "@/lib/utils";
 
+const galleryImages = [
+  "/images/work/LivingPersona-Desktop1.png",
+  "/images/work/ProjectMetaVison-Desktop1.png",
+  "/images/work/LivingPersona-Desktop1.png",
+  "/images/work/ProjectMetaVison-Desktop1.png",
+  "/images/work/LivingPersona-Desktop1.png",
+  "/images/work/ProjectMetaVison-Desktop1.png",
+];
+
+function GalleryTrack() {
+  return (
+    <div className="flex items-center gap-4 shrink-0">
+      {galleryImages.map((src, i) => (
+        <div key={i} className="relative w-64 aspect-video rounded-xl overflow-hidden flex-shrink-0 bg-neutral-200">
+          <Image src={src} alt="" fill className="object-cover" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MarqueeGalleryRow({ reverse = false }: { reverse?: boolean }) {
+  return (
+    <div className="relative overflow-x-clip">
+      <div
+        className="absolute left-0 top-0 bottom-0 w-24 pointer-events-none z-10"
+        style={{ background: "linear-gradient(to right, hsl(var(--neutral-50)), transparent)" }}
+      />
+      <div
+        className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10"
+        style={{ background: "linear-gradient(to left, hsl(var(--neutral-50)), transparent)" }}
+      />
+      <div
+        className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
+        style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+      >
+        <GalleryTrack />
+        <div className="pl-4">
+          <GalleryTrack />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const packageItems = [
   {
     id: "brand",
@@ -198,6 +243,11 @@ function PackageContent({ item }: { item: PackageItem }) {
               </div>
             </div>
           ))}
+        </div>
+      ) : item.id === "deck" ? (
+        <div className="flex flex-col gap-4">
+          <MarqueeGalleryRow />
+          <MarqueeGalleryRow reverse />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
