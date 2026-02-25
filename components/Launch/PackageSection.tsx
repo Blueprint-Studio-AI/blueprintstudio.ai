@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useScrollTo } from "@/components/SmoothScroll";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Section from "@/components/ui/Section";
@@ -8,8 +9,8 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Palette, Globe, Presentation, Play } from "lucide-react";
-import { ValueOf } from "next/dist/shared/lib/constants";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
+import { cn } from "@/lib/utils";
 
 const packageItems = [
   {
@@ -100,15 +101,19 @@ function FeatureItem({
   feature,
   isOpen,
   onToggle,
+  isLast = false,
 }: {
   feature: { name: string; detail: string };
   isOpen: boolean;
+  isLast?: boolean
   onToggle: () => void;
 }) {
   return (
     <button
       onClick={onToggle}
-      className="w-full text-left py-6 border-b border-neutral-200 cursor-pointer group"
+      className={cn("w-full text-left py-6 cursor-pointer group", {
+        "border-b border-neutral-200": !isLast,
+  })}
     >
       <div className="flex items-center gap-4">
         <GreenCheckmark />
@@ -135,7 +140,7 @@ function PackageContent({ item }: { item: PackageItem }) {
   const [openFeature, setOpenFeature] = useState<number | null>(null);
 
   return (
-    <div className="max-w-5xl mx-auto pl-12">
+    <div className="max-w-5xl mx-auto pl-12 space-y-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         {/* Left: Number, Title, Description */}
         <div>
@@ -155,6 +160,7 @@ function PackageContent({ item }: { item: PackageItem }) {
               key={feature.name}
               feature={feature}
               isOpen={openFeature === i}
+              isLast={i === item.features.length - 1}
               onToggle={() => setOpenFeature(openFeature === i ? null : i)}
             />
           ))}
@@ -162,11 +168,6 @@ function PackageContent({ item }: { item: PackageItem }) {
       </div>
 
       {/* Work Section */}
-      <div className="mt-24 text-center">
-        <p className="text-base font-medium text-neutral-500">{item.workSubtitle}</p>
-        <h4 className="text-2xl font-medium text-black mt-2">{item.workHeading}</h4>
-      </div>
-
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
         {item.gallery.map((src, i) => (
           <div
@@ -188,12 +189,42 @@ function PackageContent({ item }: { item: PackageItem }) {
 
 export default function PackageSection() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([null, null, null, null]);
+  const scrollTo = useScrollTo();
 
-  const handleTabChange = (index: number) => {
-    if (index === activeIndex) return;
-    setDirection(index > activeIndex ? 1 : -1);
-    setActiveIndex(index);
+  useEffect(() => {
+    const visibleSections = new Set<number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = sectionRefs.current.findIndex((ref) => ref === entry.target);
+          if (index === -1) return;
+          if (entry.isIntersecting) {
+            visibleSections.add(index);
+          } else {
+            visibleSections.delete(index);
+          }
+        });
+
+        if (visibleSections.size > 0) {
+          setActiveIndex(Math.min(...visibleSections));
+        }
+      },
+      { rootMargin: "0px 0px -60% 0px", threshold: 0 }
+    );
+
+    sectionRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (index: number) => {
+    const el = sectionRefs.current[index];
+    if (!el) return;
+    scrollTo(el, { offset: 0, duration: 1 });
   };
 
   return (
@@ -229,7 +260,7 @@ export default function PackageSection() {
             {packageItems.map((item, index) => (
               <button
                 key={item.id}
-                onClick={() => handleTabChange(index)}
+                onClick={() => scrollToSection(index)}
                 className={`flex items-center gap-3 px-3.5 sm:px-4 py-2 rounded-full text-sm border transition-all duration-200 cursor-pointer ${
                   activeIndex === index
                     ? "bg-white text-black border-neutral-300 shadow-[0_1px_4px_0_rgba(0,0,0,0.25),0_0_27.791px_0_rgba(255,255,255,0.58)]"
@@ -242,20 +273,17 @@ export default function PackageSection() {
             ))}
           </div>
 
-          {/* Animated Content */}
-          <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={packageItems[activeIndex].id}
-                custom={direction}
-                initial={{ opacity: 0, x: direction * 80 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: direction * -80 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          {/* All Package Sections */}
+          <div className="flex flex-col">
+            {packageItems.map((item, index) => (
+              <div
+                key={item.id}
+                ref={(el) => { sectionRefs.current[index] = el; }}
+                className={index > 0 ? "mt-16 sm:mt-24" : ""}
               >
-                <PackageContent item={packageItems[activeIndex]} />
-              </motion.div>
-            </AnimatePresence>
+                <PackageContent item={item} />
+              </div>
+            ))}
           </div>
 
           {/* Price note */}
