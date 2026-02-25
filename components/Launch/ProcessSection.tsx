@@ -90,7 +90,7 @@ function getWeekLabel(ws: Workstream) {
   const endWeek = Math.ceil(ws.start + ws.duration);
   return startWeek === endWeek
     ? `WEEK ${startWeek}`
-    : `WEEKS ${startWeek} – ${endWeek}`;
+    : `WEEK ${startWeek} - ${endWeek}`;
 }
 
 function WorkstreamCarouselCard({
@@ -126,7 +126,7 @@ function WorkstreamCarouselCard({
       <p className={`mt-3 font-medium text-lg text-neutral-800`}>
         {ws.name}
       </p>
-      <p className="mt-1 text-xs text-neutral-500 leading-[128%]">{ws.description}</p>
+      <p className="mt-1 text-sm text-neutral-500 leading-[128%]">{ws.description}</p>
     </div>
   );
 }
