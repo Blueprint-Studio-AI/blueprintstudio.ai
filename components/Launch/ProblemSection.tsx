@@ -1,16 +1,19 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
+import GradientButton from "@/components/ui/GradientButton";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { ArrowUpRight } from "lucide-react";
+import GreenCheckmark from "@/components/ui/GreenCheckmark";
 
 const comparison = [
-  { typical: "3-4 vendors", blueprint: "1 team" },
-  { typical: "8-12+ weeks", blueprint: "6 weeks" },
-  { typical: "$80-150K", blueprint: "$50K" },
+  { typical: "3-4 Vendors", blueprint: "1 Unified Team" },
+  { typical: "8-12 Weeks", blueprint: "6 Weeks" },
+  { typical: "$80-150K", blueprint: "$50k" },
   { typical: "Misaligned assets", blueprint: "One cohesive brand" },
 ];
 
@@ -34,7 +37,7 @@ export default function ProblemSection() {
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-          <div className="max-w-3xl mx-auto">
+          <div className="mx-auto">
             {/* Headline */}
             <div className="text-center mb-12 sm:mb-16">
               <p className="text-neutral-500 mb-4 cursor-default text-sm sm:text-base">
@@ -54,41 +57,65 @@ export default function ProblemSection() {
               </h2>
             </div>
 
-            {/* Comparison table */}
-            <div className="grid grid-cols-[1fr_1.2fr] sm:grid-cols-[1fr_1.3fr] text-neutral-500">
-              {/* Header row */}
-              <div className="py-3 sm:py-4 pr-4 sm:pr-8 flex items-center">
-                <span className="text-md cursor-default">
-                  Free
-                </span>
-              </div>
-              <div className="py-3 sm:py-4 px-4 sm:px-8 border-b border-neutral-300 border-l bg-white/50 flex items-center justify-center">
-                <Image
-                  src="/blueprint-logo-dark.svg"
-                  alt="Blueprint"
-                  width={80}
-                  height={20}
-                  className="h-3 w-auto opacity-50 grayscale"
+            {/* Comparison table — flat grid so rows align naturally */}
+            <div className="relative grid grid-cols-2 gap-x-6">
+
+              {/* Gradient border card overlay — spans entire right column */}
+              <div className="absolute right-0 inset-y-0 rounded-2xl p-px pointer-events-none"
+                style={{ width: "calc(50% - 0.75rem)" }}
+              >
+                <motion.div
+                  className="absolute inset-0 rounded-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                    backgroundSize: "300% 300%",
+                  }}
+                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 />
+                <div className="absolute inset-0.5 rounded-[calc(1rem-1px)] bg-white" />
+              </div>
+
+              {/* Header row */}
+              <div className="py-4 sm:py-5 pr-6">
+                <span className="text-neutral-500 text-[20px] cursor-default">Free</span>
+              </div>
+              <div className="py-4 sm:py-5 px-6 relative z-10">
+                <Image src="/blueprint-logo-dark.svg" alt="Blueprint Studio" width={80} height={16} className="h-4 w-auto" />
               </div>
 
               {/* Data rows */}
               {comparison.map((row, i) => (
                 <div key={i} className="contents">
-                  <div className={cn("py-8 sm:py-5 pr-4 sm:pr-8", {
-                    "border-b border-neutral-300": i !== comparison.length - 1,
-                  })}>
-                    <span className="line-through cursor-default text-sm sm:text-base">
+                  <div className={`flex  items-center gap-3 py-4 sm:py-5 ${i !== comparison.length - 1 ? "border-b border-neutral-300" : ""}`}>
+                    <div className={'w-3 h-3 aspect-square rounded-full bg-neutral-300'} />
+                    <span className="line-through cursor-default text-neutral-400 text-sm sm:text-base">
                       {row.typical}
                     </span>
                   </div>
-                  <div className="py-4 sm:py-5 pl-4 sm:pl-8 border-b border-neutral-200 border-l bg-white/50">
-                    <span className="text-black font-medium cursor-default text-base sm:text-lg">
+                  <div className="py-4 sm:py-5 px-6 relative z-10 flex items-center gap-3">
+                    <GreenCheckmark />
+                    <span className="text-black cursor-default text-base sm:text-md">
                       {row.blueprint}
                     </span>
+                    {i !== comparison.length - 1 && (
+                      <div className="absolute bottom-0 left-0.5 right-0.5 h-px bg-neutral-100" />
+                    )}
                   </div>
                 </div>
               ))}
+
+              {/* Button row — right column only */}
+              <div />
+              <div className="py-4 sm:py-5 px-6 relative z-10">
+                <GradientButton
+                  className="w-full justify-center"
+                  onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                >
+                  Book a Call
+                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </GradientButton>
+              </div>
             </div>
 
             {/* Tagline */}
