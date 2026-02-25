@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import GradientButton from "@/components/ui/GradientButton";
 
 const deliverables = [
   { num: "01", label: "Brand" },
@@ -64,7 +65,7 @@ function ImageTicker() {
         {[...galleryImages, ...galleryImages].map((img, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[280px] sm:w-[360px] aspect-video relative rounded-xl overflow-hidden bg-neutral-200"
+            className="flex-shrink-0 w-[280px] sm:w-[400px] aspect-video relative rounded-xl overflow-hidden bg-neutral-200"
           >
             <Image src={img.src} alt={img.alt} fill className="object-cover" />
           </div>
@@ -142,33 +143,37 @@ export default function HeroSection() {
               ))}
             </div>
 
-            {/* Social proof */}
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <div className="w-px h-4 bg-neutral-300" />
-              <span className="text-sm text-neutral-600 cursor-default tracking-tight">
-                <span className="font-medium text-neutral-900">25+</span> startups launched
-              </span>
-            </div>
-
-            <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,17px)] leading-[160%]">
-              One team. One timeline. Six weeks.
-              <br />
-              Built by founders, for founders.
-            </p>
-
-            {/* CTA */}
-            <button
-              className="w-fit py-3.5 px-7 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm group cursor-pointer shadow-sm"
-              onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+            <div
+            className={'flex flex-col items-center text-center gap-6'}
             >
-              <span>Book a Call</span>
-              <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
+              {/* Social proof */}
+              <div className="flex items-center gap-3">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <div className="w-0.5 h-4 bg-neutral-400" />
+                <span className="text-md text-neutral-600 cursor-default tracking-tight">
+                  <span className="font-medium text-neutral-900">25+</span> startups launched
+                </span>
+              </div>
+
+              <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,16px)] leading-[160%]">
+                One team. One timeline. Six weeks.
+                <br />
+                Built by founders, for founders.
+              </p>
+
+              {/* CTA */}
+              <GradientButton 
+              className={'w-full'}
+              onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}>
+                Book a Call
+                <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </GradientButton>
+            </div>
+           
           </div>
 
           {/* Scrolling image gallery */}
