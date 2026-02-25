@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -148,7 +147,7 @@ function CircularButton({
         onClick={onClick}
         disabled={disabled}
         aria-label="Next workstream"
-        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all")}
+        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-0 disabled:pointer-events-none transition-all duration-300")}
         style={{
           boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
         }}
@@ -157,10 +156,6 @@ function CircularButton({
       </button>
   )
 }
-
-// Number of clones on each side of the real items.
-// Must be >= 2 so the card adjacent to the active clone is always filled.
-const EXTRA = 2;
 
 function WorkstreamCarousel({
   workstreams,
@@ -172,96 +167,32 @@ function WorkstreamCarousel({
   setActiveWorkstream: (i: number) => void;
 }) {
   const total = workstreams.length;
-  // Layout: [EXTRA left clones | real items | EXTRA right clones]
-  // Real item at activeWorkstream lives at internalIndex = activeWorkstream + EXTRA
-  const [internalIndex, setInternalIndex] = useState(activeWorkstream + EXTRA);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const isWrapping = useRef(false);
 
-  // Sync when Gantt bar (or other external source) changes activeWorkstream
-  useEffect(() => {
-    if (!isWrapping.current) {
-      setInternalIndex(activeWorkstream + EXTRA);
-    }
-  }, [activeWorkstream]);
-
-  const snapWithoutTransition = (newIndex: number, newActive: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    track.style.transitionDuration = "0ms";
-    flushSync(() => {
-      setInternalIndex(newIndex);
-      setActiveWorkstream(newActive);
-    });
-    requestAnimationFrame(() => {
-      if (track) track.style.transitionDuration = "";
-      isWrapping.current = false;
-    });
-  };
-
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
-    // Ignore bubbled events from child elements (cards have transition-all which fires its own events)
-    if (e.target !== trackRef.current || e.propertyName !== "transform") return;
-    if (internalIndex < EXTRA) {
-      // Entered left clone zone — jump to the corresponding real position
-      snapWithoutTransition(internalIndex + total, activeWorkstream);
-    } else if (internalIndex >= EXTRA + total) {
-      // Entered right clone zone — jump to the corresponding real position
-      snapWithoutTransition(internalIndex - total, activeWorkstream);
-    } else {
-      isWrapping.current = false;
-    }
-  };
-
-  const prev = () => {
-    if (isWrapping.current) return;
-    isWrapping.current = true;
-    setInternalIndex((i) => i - 1);
-    setActiveWorkstream((activeWorkstream - 1 + total) % total);
-  };
-
-  const next = () => {
-    if (isWrapping.current) return;
-    isWrapping.current = true;
-    setInternalIndex((i) => i + 1);
-    setActiveWorkstream((activeWorkstream + 1) % total);
-  };
-
-  // [last EXTRA items, ...real items, first EXTRA items]
-  const items = [
-    ...workstreams.slice(-EXTRA),
-    ...workstreams,
-    ...workstreams.slice(0, EXTRA),
-  ];
+  const prev = () => setActiveWorkstream(Math.max(0, activeWorkstream - 1));
+  const next = () => setActiveWorkstream(Math.min(total - 1, activeWorkstream + 1));
 
   return (
     <div className="relative mx-auto mt-8">
-      <CircularButton icon={ChevronLeft} onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
-      <CircularButton icon={ChevronRight} onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
+      <CircularButton icon={ChevronLeft} onClick={prev} disabled={activeWorkstream === 0} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+      <CircularButton icon={ChevronRight} onClick={next} disabled={activeWorkstream === total - 1} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
 
       <div className="overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
 
         <div
-          ref={trackRef}
           className="flex transition-transform duration-500 ease-in-out"
           style={{
             gap: `${CARD_GAP}px`,
-            transform: `translateX(calc(50% - ${internalIndex * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
+            transform: `translateX(calc(50% - ${activeWorkstream * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
           }}
-          onTransitionEnd={handleTransitionEnd}
         >
-          {items.map((ws, i) => (
+          {workstreams.map((ws, i) => (
             <WorkstreamCarouselCard
-              key={`${ws.id}-${i}`}
+              key={ws.id}
               workstream={ws}
-              isActive={ws.id === workstreams[activeWorkstream].id}
-              onClick={
-                i < EXTRA ? () => prev() :
-                i >= EXTRA + total ? () => next() :
-                () => setActiveWorkstream(i - EXTRA)
-              }
+              isActive={i === activeWorkstream}
+              onClick={() => setActiveWorkstream(i)}
             />
           ))}
         </div>
