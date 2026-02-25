@@ -318,12 +318,6 @@ export default function PackageSection() {
               </div>
             ))}
           </div>
-
-          {/* Price note */}
-          <p className="text-center text-neutral-500 mt-12 sm:mt-16 cursor-default">
-            All four deliverables.{" "}
-            <span className="text-black font-medium">$50,000.</span>
-          </p>
         </InnerContainer>
       </OuterContainer>
 
