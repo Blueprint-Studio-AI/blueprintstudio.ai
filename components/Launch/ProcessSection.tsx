@@ -103,16 +103,13 @@ function WorkstreamCarouselCard({
   onClick?: () => void;
 }) {
   const Icon = ws.icon;
-  const isLaunch = ws.id === "launch";
 
   return (
     <div
       key={ws.id}
       onClick={onClick}
-      className={`flex-shrink-0 flex flex-col p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
-        isActive
-          ? "bg-white border-neutral-200 shadow-sm"
-          : "scale-90 bg-neutral-100/60 border-transparent opacity-50 hover:opacity-75"
+      className={`bg-white border border-neutral-200 shadow-sm flex-shrink-0 flex flex-col p-5 rounded-2xl cursor-pointer transition-all duration-500 ease-in-out ${
+        isActive ? "" : "scale-90 opacity-50 hover:opacity-75"
       }`}
       style={{ width: CARD_WIDTH }}
     >
@@ -238,16 +235,17 @@ function WorkstreamCarousel({
   ];
 
   return (
-    <div className="flex items-center gap-3 mx-auto mt-8">
-      <CircularButton icon={ChevronLeft} onClick={prev} />
+    <div className="relative mx-auto mt-8">
+      <CircularButton icon={ChevronLeft} onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+      <CircularButton icon={ChevronRight} onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
 
-      <div className="flex-1 overflow-hidden relative">
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
+      <div className="overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
 
         <div
           ref={trackRef}
-          className="flex transition-transform duration-300 ease-out"
+          className="flex transition-transform duration-500 ease-in-out"
           style={{
             gap: `${CARD_GAP}px`,
             transform: `translateX(calc(50% - ${internalIndex * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
@@ -268,8 +266,6 @@ function WorkstreamCarousel({
           ))}
         </div>
       </div>
-
-      <CircularButton icon={ChevronRight} onClick={next} />
     </div>
   );
 }
