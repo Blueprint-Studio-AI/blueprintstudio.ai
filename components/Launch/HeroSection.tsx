@@ -63,7 +63,7 @@ function ImageTicker() {
         {[...galleryImages, ...galleryImages].map((img, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[320px] sm:w-[700px] lg:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
+            className="flex-shrink-0 w-[480px] sm:w-[700px] lg:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
           >
             <Image src={img.src} alt={img.alt} fill className="object-cover" />
           </div>
