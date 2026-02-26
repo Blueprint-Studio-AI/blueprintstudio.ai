@@ -19,11 +19,9 @@ const deliverables = [
 ];
 
 const galleryImages = [
-  { src: "/images/work/LivingPersona-Desktop1.png", alt: "LivingPersona" },
-  { src: "/images/work/ProjectMetaVison-Desktop1.png", alt: "Project MetaVision" },
-  { src: "/images/work/idscanner.png", alt: "ID Scanner" },
-  { src: "/images/work/juris.png", alt: "Juris" },
-  { src: "/images/work/manchester-energy.png", alt: "Manchester Energy" },
+  { src: "/launch-assets/brand-identity_assets/brand-identity_UNI.png", alt: "UNI" },
+  { src: "/launch-assets/brand-identity_assets/brand-identity_autara.png", alt: "Autara" },
+  { src: "/launch-assets/brand-identity_assets/brand-identity_huch.png", alt: "Huch" },
 ];
 
 function ImageTicker() {
@@ -65,7 +63,7 @@ function ImageTicker() {
         {[...galleryImages, ...galleryImages].map((img, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[280px] sm:w-[400px] aspect-video relative rounded-xl overflow-hidden bg-neutral-200"
+            className="flex-shrink-0 w-[700px] sm:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
           >
             <Image src={img.src} alt={img.alt} fill className="object-cover" />
           </div>
