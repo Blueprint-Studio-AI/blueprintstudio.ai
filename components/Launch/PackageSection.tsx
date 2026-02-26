@@ -102,7 +102,7 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
             onClick={() => onSelect(brand.id)}
             className={cn(
               "cursor-pointer flex-shrink-0 transition-all duration-300 rounded-lg p-1 bg-white shadow-[0_2.157px_8.843px_0_rgba(0,0,0,0.34)]",
-              isActive ? "w-[72px] h-[72px] opacity-100" : "w-[60px] h-[60px] opacity-40"
+              isActive ? "w-[72px] h-[72px] opacity-100" : "w-[60px] h-[60px] opacity-40 hover:opacity-70"
             )}
           >
             <div className="relative w-full h-full overflow-hidden rounded-md">
@@ -285,9 +285,17 @@ function FeatureItem({
       })}
     >
       <div
-        className={'hidden sm:block transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full h-4 group-hover:h-12 top-1/2 opacity-0 group-hover:opacity-100 -translate-y-1/2'} />
+        className={cn(
+          'transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full top-1/2 -translate-y-1/2',
+          isOpen ? 'h-12 opacity-100' : 'h-4 opacity-0 group-hover:h-12 group-hover:opacity-100'
+        )} />
       <GreenCheckmark
-        className="w-6 h-6 shrink-0 border-neutral-400 text-green-500/60 transition-all group-hover:bg-green-500/10 group-hover:border-green-500 group-hover:text-green-500"
+        className={cn(
+          "w-6 h-6 shrink-0 transition-all",
+          isOpen
+            ? "bg-green-500/10 border-green-500 text-green-500"
+            : "border-neutral-400 text-green-500/60 group-hover:bg-green-500/10 group-hover:border-green-500 group-hover:text-green-500"
+        )}
       />
       <div className="flex-1">
         <span className="text-md font-medium text-black">{feature.name}</span>
