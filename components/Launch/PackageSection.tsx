@@ -339,6 +339,17 @@ function PackageContent({ item }: { item: PackageItem }) {
   const [selectedWebsiteBrandId, setSelectedWebsiteBrandId] = useState(websiteBrands[0].id);
   const selectedWebsiteBrand = websiteBrands.find((b) => b.id === selectedWebsiteBrandId) ?? websiteBrands[0];
   const [activeWebTab, setActiveWebTab] = useState<"web" | "mobile">("web");
+  const slideDir = useRef(0);
+
+  const handleWebTabChange = (tab: "web" | "mobile") => {
+    slideDir.current = tab === "mobile" ? 1 : -1;
+    setActiveWebTab(tab);
+  };
+
+  const handleWebBrandChange = (id: string) => {
+    slideDir.current = 0;
+    setSelectedWebsiteBrandId(id);
+  };
 
   return (
     <div className="max-w-5xl mx-auto pl-12 space-y-12">
@@ -367,6 +378,18 @@ function PackageContent({ item }: { item: PackageItem }) {
       </div>
 
       {/* Work Section */}
+      <div className="relative rounded-2xl py-6">
+        <div
+          className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden"
+          style={{
+            backgroundImage: `radial-gradient(circle, #000 1px, transparent 1px)`,
+            backgroundSize: "20px 20px",
+            opacity: 0.07,
+            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+          }}
+        />
+        <div className="relative z-10">
       {item.videos ? (
         <div className="grid grid-cols-2 gap-x-6 gap-y-12">
           {item.videos.map((video, i) => (
@@ -421,32 +444,39 @@ function PackageContent({ item }: { item: PackageItem }) {
           </div>
         </div>
       ) : item.id === "website" ? (
-        <div className="grid grid-cols-[3fr_2fr] gap-12 items-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${selectedWebsiteBrandId}-${activeWebTab}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className="relative w-full aspect-[4/3]">
+        <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
+          <div className="relative w-full aspect-[4/3] overflow-hidden">
+            <AnimatePresence custom={slideDir.current}>
+              <motion.div
+                key={`${selectedWebsiteBrandId}-${activeWebTab}`}
+                custom={slideDir.current}
+                variants={{
+                  enter: (dir: number) => ({ x: dir !== 0 ? `${dir * 100}%` : 0, opacity: dir === 0 ? 0 : 1 }),
+                  center: { x: 0, opacity: 1 },
+                  exit: (dir: number) => ({ x: dir !== 0 ? `${dir * -100}%` : 0, opacity: dir === 0 ? 0 : 1 }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                className="absolute inset-0"
+              >
                 <Image
                   src={activeWebTab === "web" ? selectedWebsiteBrand.desktop : selectedWebsiteBrand.mobile}
                   alt={selectedWebsiteBrand.name}
                   fill
                   className="object-contain select-none"
                 />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-12">
             <div className="flex gap-1 bg-neutral-100 rounded-full p-1 self-start border border-neutral-200">
               {(["web", "mobile"] as const).map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveWebTab(tab)}
+                  onClick={() => handleWebTabChange(tab)}
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all duration-200 cursor-pointer",
                     activeWebTab === tab
@@ -462,7 +492,7 @@ function PackageContent({ item }: { item: PackageItem }) {
             <BrandPicker
               brands={websiteBrands}
               selectedId={selectedWebsiteBrandId}
-              onSelect={setSelectedWebsiteBrandId}
+              onSelect={handleWebBrandChange}
             />
             <p className="text-neutral-500 text-base leading-snug max-w-xs">{item.description}</p>
           </div>
@@ -493,6 +523,8 @@ function PackageContent({ item }: { item: PackageItem }) {
           ))}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
