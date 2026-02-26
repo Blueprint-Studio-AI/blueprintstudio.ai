@@ -114,18 +114,19 @@ function WorkstreamCarouselCard({
     >
       <div className="flex items-center justify-between">
         <div
-        className={'p-2 rounded-xl border border-neutral-300 bg-neutral-50'}
+        className={'flex flex-row items-center gap-3'}
         >
-          <Icon className={`w-4 h-4 text-neutral-800`} />
+          <Icon className={`w-5 h-5 text-neutral-800`} />
+          <p className={`font-medium text-lg text-neutral-800 tracking-tight`}>
+            {ws.name}
+          </p>
         </div>
         <span className="text-xs font-medium text-neutral-500 uppercase">
           {getWeekLabel(ws)}
         </span>
       </div>
-      <p className={`mt-3 font-medium text-lg text-neutral-800`}>
-        {ws.name}
-      </p>
-      <p className="mt-1 text-sm text-neutral-500 leading-[128%]">{ws.description}</p>
+      
+      <p className="mt-4 text-sm text-neutral-500 leading-[128%]">{ws.description}</p>
     </div>
   );
 }
@@ -147,7 +148,7 @@ function CircularButton({
         onClick={onClick}
         disabled={disabled}
         aria-label="Next workstream"
-        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 disabled:opacity-0 disabled:pointer-events-none transition-all duration-300")}
+        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 transition-all duration-300")}
         style={{
           boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
         }}
@@ -168,13 +169,13 @@ function WorkstreamCarousel({
 }) {
   const total = workstreams.length;
 
-  const prev = () => setActiveWorkstream(Math.max(0, activeWorkstream - 1));
-  const next = () => setActiveWorkstream(Math.min(total - 1, activeWorkstream + 1));
+  const prev = () => setActiveWorkstream((activeWorkstream - 1 + total) % total);
+  const next = () => setActiveWorkstream((activeWorkstream + 1) % total);
 
   return (
     <div className="relative mx-auto mt-8">
-      <CircularButton icon={ChevronLeft} onClick={prev} disabled={activeWorkstream === 0} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
-      <CircularButton icon={ChevronRight} onClick={next} disabled={activeWorkstream === total - 1} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
+      <CircularButton icon={ChevronLeft} onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+      <CircularButton icon={ChevronRight} onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
 
       <div className="overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
