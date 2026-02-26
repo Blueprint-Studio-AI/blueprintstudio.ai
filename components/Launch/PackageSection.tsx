@@ -332,7 +332,7 @@ function PackageContent({ item }: { item: PackageItem }) {
         {/* Left: Number, Title, Description */}
         <div>
           <span className="text-5xl font-medium text-neutral-400 mb-3 block">{item.num}</span>
-          <h3 className="font-medium text-black whitespace-pre-line text-[clamp(28px,6vw,64px)] leading-[110%] tracking-[-1px]">
+          <h3 className="font-medium text-black whitespace-pre-line text-[clamp(36px,6vw,64px)] leading-[110%] tracking-[-1px]">
             {item.title}
           </h3>
           <p className="text-neutral-500 text-lg leading-6 mt-4 max-w-xs">
