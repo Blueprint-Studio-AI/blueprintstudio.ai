@@ -105,7 +105,7 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
               isActive ? "w-[72px] h-[72px] opacity-100" : "w-[60px] h-[60px] opacity-40"
             )}
           >
-            <div className="relative w-full h-full overflow-hidden rounded">
+            <div className="relative w-full h-full overflow-hidden rounded-md">
               <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
             </div>
           </button>
