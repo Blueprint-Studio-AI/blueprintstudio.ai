@@ -8,7 +8,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { Palette, Globe, Presentation, Play } from "lucide-react";
+import { Palette, Globe, Presentation, Play, ChevronRight } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { cn } from "@/lib/utils";
 
@@ -180,45 +180,48 @@ type PackageItem = (typeof packageItems)[number];
 
 function FeatureItem({
   feature,
-  isOpen,
-  onToggle,
   isLast = false,
 }: {
   feature: { name: string; detail: string };
-  isOpen: boolean;
-  isLast?: boolean
-  onToggle: () => void;
+  isLast?: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <button
-      onClick={onToggle}
-      className={cn("w-full text-left py-6 cursor-pointer group", {
+    <div
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+      className={cn("relative w-full min-h-[5rem] flex items-center gap-4 py-3 group", {
         "border-b border-neutral-200": !isLast,
-  })}
+      })}
     >
-      <div className="flex items-center gap-4">
-        <GreenCheckmark />
-        <span className="text-md font-normal text-black">{feature.name}</span>
+      <div
+        className={'transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full h-4 group-hover:h-12 top-1/2 opacity-0 group-hover:opacity-100 -translate-y-1/2'} />
+      <GreenCheckmark
+        className="w-6 h-6 shrink-0 border-neutral-400 text-green-500/60 transition-all group-hover:bg-green-500/10 group-hover:border-green-500 group-hover:text-green-500"
+      />
+      <div className="flex-1">
+        <span className="text-md font-medium text-black">{feature.name}</span>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="overflow-hidden"
+            >
+              <p className="text-sm text-neutral-500 mt-2">{feature.detail}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="overflow-hidden"
-          >
-            <p className="text-[16px] text-neutral-500 mt-3 pl-9">{feature.detail}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
+      <ChevronRight className="w-6 h-6 shrink-0 text-neutral-400 transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:text-neutral-500" />
+    </div>
   );
 }
 
 function PackageContent({ item }: { item: PackageItem }) {
-  const [openFeature, setOpenFeature] = useState<number | null>(null);
   const [selectedBrandId, setSelectedBrandId] = useState(deckBrands[0].id);
   const selectedBrand = deckBrands.find((b) => b.id === selectedBrandId) ?? deckBrands[0];
 
@@ -242,9 +245,7 @@ function PackageContent({ item }: { item: PackageItem }) {
             <FeatureItem
               key={feature.name}
               feature={feature}
-              isOpen={openFeature === i}
               isLast={i === item.features.length - 1}
-              onToggle={() => setOpenFeature(openFeature === i ? null : i)}
             />
           ))}
         </div>
