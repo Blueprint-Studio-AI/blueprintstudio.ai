@@ -106,7 +106,7 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
             )}
           >
             <div className="relative w-full h-full overflow-hidden rounded-md">
-              <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
+              <Image src={brand.logo} alt={brand.name} fill sizes="72px" loading="eager" className="object-cover" />
             </div>
           </button>
         );
@@ -115,19 +115,19 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
   );
 }
 
-function GalleryTrack({ images, imageClassName }: { images: string[]; imageClassName?: string }) {
+function GalleryTrack({ images, imageClassName, sizes }: { images: string[]; imageClassName?: string; sizes?: string }) {
   return (
     <div className="flex items-center gap-4 shrink-0">
       {images.map((src, i) => (
         <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0", imageClassName ?? "w-64 aspect-video")}>
-          <Image src={src} alt="" fill className="object-cover" />
+          <Image src={src} alt="" fill sizes={sizes ?? "256px"} className="object-cover" />
         </div>
       ))}
     </div>
   );
 }
 
-function MarqueeGalleryRow({ reverse = false, images, imageClassName }: { reverse?: boolean; images: string[]; imageClassName?: string }) {
+function MarqueeGalleryRow({ reverse = false, images, imageClassName, sizes }: { reverse?: boolean; images: string[]; imageClassName?: string; sizes?: string }) {
   return (
     <div className="relative overflow-x-clip">
       <div
@@ -142,9 +142,9 @@ function MarqueeGalleryRow({ reverse = false, images, imageClassName }: { revers
         className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
       >
-        <GalleryTrack images={images} imageClassName={imageClassName} />
+        <GalleryTrack images={images} imageClassName={imageClassName} sizes={sizes} />
         <div className="pl-4">
-          <GalleryTrack images={images} imageClassName={imageClassName} />
+          <GalleryTrack images={images} imageClassName={imageClassName} sizes={sizes} />
         </div>
       </div>
     </div>
@@ -375,6 +375,7 @@ function PackageContent({ item }: { item: PackageItem }) {
                     src={video.thumbnail}
                     alt={video.label}
                     fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -395,7 +396,7 @@ function PackageContent({ item }: { item: PackageItem }) {
         <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
           {/* Left: moving gallery */}
           <div className="overflow-hidden">
-            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-72 w-[1150px]" />
+            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-72 w-[1150px]" sizes="1150px" />
           </div>
 
           {/* Right: picker + brand showcase */}
@@ -409,7 +410,7 @@ function PackageContent({ item }: { item: PackageItem }) {
               <div className="flex items-stretch">
                 <div className="flex-1 p-6">
                   <div className="relative h-10 w-24 mb-8">
-                    <Image src={selectedBrandPortfolio.logoMark} alt={selectedBrandPortfolio.name} fill className="object-contain object-left" />
+                    <Image src={selectedBrandPortfolio.logoMark} alt={selectedBrandPortfolio.name} fill sizes="96px" className="object-contain object-left" />
                   </div>
                   <p className="text-base font-medium text-neutral-800">{selectedBrandPortfolio.headline}</p>
                   <p className="text-sm text-neutral-500 mt-1 leading-snug">{selectedBrandPortfolio.description}</p>
@@ -440,6 +441,7 @@ function PackageContent({ item }: { item: PackageItem }) {
                   src={activeWebTab === "web" ? selectedWebsiteBrand.desktop : selectedWebsiteBrand.mobile}
                   alt={selectedWebsiteBrand.name}
                   fill
+                  sizes="(max-width: 640px) 100vw, 60vw"
                   className="object-contain select-none"
                 />
               </motion.div>
@@ -481,8 +483,8 @@ function PackageContent({ item }: { item: PackageItem }) {
               onSelect={setSelectedDeckBrandId}
             />
           </div>
-          <MarqueeGalleryRow images={selectedDeckBrand.gallery} />
-          <MarqueeGalleryRow images={selectedDeckBrand.gallery} reverse />
+          <MarqueeGalleryRow images={selectedDeckBrand.gallery} sizes="256px" />
+          <MarqueeGalleryRow images={selectedDeckBrand.gallery} sizes="256px" reverse />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
