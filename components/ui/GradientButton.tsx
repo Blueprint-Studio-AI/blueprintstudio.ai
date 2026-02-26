@@ -13,7 +13,7 @@ export default function GradientButton({ onClick, children, className = "" }: Gr
   return (
     <motion.button
       onClick={onClick}
-      className={`relative w-fit py-3.5 px-7 font-medium flex items-center justify-center text-white rounded-lg text-md cursor-pointer overflow-hidden group ${className}`}
+      className={`relative w-fit py-2.5 px-5 sm:py-3.5 sm:px-7 font-medium flex items-center justify-center text-white rounded-lg text-sm sm:text-md cursor-pointer overflow-hidden group ${className}`}
       style={{
         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
         boxShadow: "0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(96,174,238,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset, 0 1px 0 rgba(255,255,255,0.2) inset",
