@@ -60,8 +60,8 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "logo-scroll": "logo-scroll 120s linear infinite",
         "logo-scroll-reverse": "logo-scroll-reverse 60s linear infinite",
-        "gallery-scroll": "gallery-scroll 40s linear infinite",
-        "gallery-scroll-reverse": "gallery-scroll-reverse 40s linear infinite",
+        "gallery-scroll": "gallery-scroll 80s linear infinite",
+        "gallery-scroll-reverse": "gallery-scroll-reverse 80s linear infinite",
       },
       colors: {
         neutral: {
