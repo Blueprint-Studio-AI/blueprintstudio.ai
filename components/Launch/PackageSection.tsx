@@ -72,7 +72,7 @@ const deckBrands = [
   {
     id: "honeyb",
     name: "HoneyB",
-    logo: "/logos-match-height/honeyb.png",
+    logo: "/launch-assets/brand-picker-icons/honeyb.png",
     gallery: Array.from({ length: 12 }, (_, i) => `/launch-assets/slide-deck_assets/honeyb_deck-assets/honeyb-${i + 1}.jpg`),
   },
   {
@@ -162,14 +162,14 @@ const websiteBrands = [
   {
     id: "honeyb",
     name: "HoneyB",
-    logo: "/logos-match-height/honeyb.png",
+    logo: "/launch-assets/brand-picker-icons/honeyb.png",
     desktop: "/launch-assets/web-design_assets/desktop-honeyb.png",
     mobile: "/launch-assets/web-design_assets/mobile-honeyb.png",
   },
   {
     id: "perena",
     name: "Perena",
-    logo: "/logos-match-height/perena.png",
+    logo: "/launch-assets/brand-picker-icons/perena.png",
     desktop: "/launch-assets/web-design_assets/desktop-perena.png",
     mobile: "/launch-assets/web-design_assets/mobile-perena.png",
   },
