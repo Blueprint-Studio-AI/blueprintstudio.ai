@@ -282,7 +282,7 @@ function FeatureItem({
       })}
     >
       <div
-        className={'transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full h-4 group-hover:h-12 top-1/2 opacity-0 group-hover:opacity-100 -translate-y-1/2'} />
+        className={'hidden sm:block transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full h-4 group-hover:h-12 top-1/2 opacity-0 group-hover:opacity-100 -translate-y-1/2'} />
       <GreenCheckmark
         className="w-6 h-6 shrink-0 border-neutral-400 text-green-500/60 transition-all group-hover:bg-green-500/10 group-hover:border-green-500 group-hover:text-green-500"
       />
@@ -327,12 +327,12 @@ function PackageContent({ item }: { item: PackageItem }) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto pl-12 space-y-12">
+    <div className="max-w-5xl mx-auto pl-0 sm:pl-12 space-y-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         {/* Left: Number, Title, Description */}
         <div>
           <span className="text-5xl font-medium text-neutral-400 mb-3 block">{item.num}</span>
-          <h3 className="font-medium text-black whitespace-pre-line text-[clamp(40px,6vw,64px)] leading-[110%] tracking-[-1px]">
+          <h3 className="font-medium text-black whitespace-pre-line text-[clamp(28px,6vw,64px)] leading-[110%] tracking-[-1px]">
             {item.title}
           </h3>
           <p className="text-neutral-500 text-lg leading-6 mt-4 max-w-xs">
@@ -366,7 +366,7 @@ function PackageContent({ item }: { item: PackageItem }) {
         />
         <div className="relative z-10">
       {item.videos ? (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 sm:gap-y-12">
           {item.videos.map((video, i) => (
             <div key={i} className="group cursor-pointer">
               <div className="rounded-xl border border-neutral-300">
@@ -393,10 +393,10 @@ function PackageContent({ item }: { item: PackageItem }) {
           ))}
         </div>
       ) : item.id === "brand" ? (
-        <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 md:gap-12 items-start">
           {/* Left: moving gallery */}
           <div className="overflow-hidden">
-            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-72 w-[1150px]" sizes="1150px" />
+            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-48 sm:h-72 w-[1150px]" sizes="1150px" />
           </div>
 
           {/* Right: picker + brand showcase */}
@@ -420,7 +420,7 @@ function PackageContent({ item }: { item: PackageItem }) {
           </div>
         </div>
       ) : item.id === "website" ? (
-        <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 md:gap-12 items-start">
           <div className="relative w-full aspect-[4/3] overflow-hidden">
             <AnimatePresence custom={slideDir.current}>
               <motion.div
@@ -475,7 +475,7 @@ function PackageContent({ item }: { item: PackageItem }) {
           </div>
         </div>
       ) : item.id === "deck" ? (
-        <div className="flex flex-col gap-6 -ml-12">
+        <div className="flex flex-col gap-6 ml-0 sm:-ml-12">
           <div className="flex justify-center">
             <BrandPicker
               brands={deckBrands}
