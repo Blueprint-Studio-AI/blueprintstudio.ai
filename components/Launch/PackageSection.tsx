@@ -494,7 +494,7 @@ function PackageContent({ item }: { item: PackageItem }) {
               selectedId={selectedWebsiteBrandId}
               onSelect={handleWebBrandChange}
             />
-            <p className="text-neutral-500 text-base leading-snug max-w-xs">{item.description}</p>
+            <p className="text-neutral-500 text-base leading-snug max-w-xs mt-4">{item.description}</p>
           </div>
         </div>
       ) : item.id === "deck" ? (
