@@ -33,7 +33,7 @@ function ImageTicker() {
     if (!scrollContainer) return;
 
     let scrollPosition = 0;
-    const speed = 0.6;
+    const speed = 0.3;
 
     const animate = () => {
       scrollPosition += speed;
