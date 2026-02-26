@@ -53,7 +53,7 @@ const deckBrands = [
   {
     id: "friday-table",
     name: "Friday Table",
-    logo: `${FT}/1%20v3.jpg`,
+    logo: "/launch-assets/brand-picker-icons/friday.png",
     gallery: [
       `${FT}/1%20v3.jpg`,
       `${FT}/2%20v3.jpg`,
