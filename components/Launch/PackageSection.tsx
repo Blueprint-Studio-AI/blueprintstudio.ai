@@ -12,6 +12,60 @@ import { Palette, Globe, Presentation, Play, ChevronRight } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { cn } from "@/lib/utils";
 
+const brandPortfolio = [
+  {
+    id: "uni",
+    name: "UNI",
+    tagline: "ウニ",
+    accentColor: "#E8392A",
+    headline: "Japanese Street Food Brand",
+    description: "Bold, playful identity for a fast-casual concept launching in LA.",
+    logo: "/images/work/LivingPersona-Desktop1.png",
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+    ],
+  },
+  {
+    id: "pyra",
+    name: "Pyra",
+    tagline: "AI Infrastructure",
+    accentColor: "#6366F1",
+    headline: "Developer-First AI Platform",
+    description: "Clean, technical identity for a Series A infrastructure startup.",
+    logo: "/images/work/ProjectMetaVison-Desktop1.png",
+    gallery: [
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+    ],
+  },
+  {
+    id: "jinba",
+    name: "Jinba",
+    tagline: "人馬一体",
+    accentColor: "#16A34A",
+    headline: "Performance Sports Brand",
+    description: "Minimal, refined identity rooted in Japanese craftsmanship.",
+    logo: "/images/work/LivingPersona-Desktop1.png",
+    gallery: [
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+      "/images/work/LivingPersona-Desktop1.png",
+      "/images/work/ProjectMetaVison-Desktop1.png",
+    ],
+  },
+];
+
 const deckBrands = [
   {
     id: "brand1",
@@ -54,11 +108,43 @@ const deckBrands = [
   },
 ];
 
-function GalleryTrack({ images }: { images: string[] }) {
+function BrandPicker<T extends { id: string; logo: string; name: string }>({
+  brands,
+  selectedId,
+  onSelect,
+}: {
+  brands: T[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="flex gap-3 items-center h-[72px]">
+      {brands.map((brand) => {
+        const isActive = brand.id === selectedId;
+        return (
+          <button
+            key={brand.id}
+            onClick={() => onSelect(brand.id)}
+            className={cn(
+              "cursor-pointer flex-shrink-0 transition-all duration-300 rounded-lg p-1 bg-white shadow-[0_2.157px_8.843px_0_rgba(0,0,0,0.34)]",
+              isActive ? "w-[72px] h-[72px] opacity-100" : "w-[60px] h-[60px] opacity-40"
+            )}
+          >
+            <div className="relative w-full h-full overflow-hidden rounded">
+              <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function GalleryTrack({ images, imageClassName }: { images: string[]; imageClassName?: string }) {
   return (
     <div className="flex items-center gap-4 shrink-0">
       {images.map((src, i) => (
-        <div key={i} className="relative w-64 aspect-video rounded-xl overflow-hidden flex-shrink-0 bg-neutral-200">
+        <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0 bg-neutral-200", imageClassName ?? "w-64 aspect-video")}>
           <Image src={src} alt="" fill className="object-cover" />
         </div>
       ))}
@@ -66,7 +152,7 @@ function GalleryTrack({ images }: { images: string[] }) {
   );
 }
 
-function MarqueeGalleryRow({ reverse = false, images }: { reverse?: boolean; images: string[] }) {
+function MarqueeGalleryRow({ reverse = false, images, imageClassName }: { reverse?: boolean; images: string[]; imageClassName?: string }) {
   return (
     <div className="relative overflow-x-clip">
       <div
@@ -81,9 +167,9 @@ function MarqueeGalleryRow({ reverse = false, images }: { reverse?: boolean; ima
         className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
       >
-        <GalleryTrack images={images} />
+        <GalleryTrack images={images} imageClassName={imageClassName} />
         <div className="pl-4">
-          <GalleryTrack images={images} />
+          <GalleryTrack images={images} imageClassName={imageClassName} />
         </div>
       </div>
     </div>
@@ -216,14 +302,15 @@ function FeatureItem({
           )}
         </AnimatePresence>
       </div>
-      <ChevronRight className="w-6 h-6 shrink-0 text-neutral-400 transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:text-neutral-500" />
     </div>
   );
 }
 
 function PackageContent({ item }: { item: PackageItem }) {
-  const [selectedBrandId, setSelectedBrandId] = useState(deckBrands[0].id);
-  const selectedBrand = deckBrands.find((b) => b.id === selectedBrandId) ?? deckBrands[0];
+  const [selectedBrandPortfolioId, setSelectedBrandPortfolioId] = useState(brandPortfolio[0].id);
+  const selectedBrandPortfolio = brandPortfolio.find((b) => b.id === selectedBrandPortfolioId) ?? brandPortfolio[0];
+  const [selectedDeckBrandId, setSelectedDeckBrandId] = useState(deckBrands[0].id);
+  const selectedDeckBrand = deckBrands.find((b) => b.id === selectedDeckBrandId) ?? deckBrands[0];
 
   return (
     <div className="max-w-5xl mx-auto pl-12 space-y-12">
@@ -271,48 +358,54 @@ function PackageContent({ item }: { item: PackageItem }) {
                   </div>
                 </div>
               </div>
-              <div
-              className="flex gap-4 items-center mt-4"
-              >
+              <div className="flex gap-4 items-center mt-4">
                 <p className="text-lg font-medium text-neutral-800 tracking-tight">{video.label}</p>
                 <p className="text-base text-neutral-500">{video.videoType}</p>
               </div>
             </div>
           ))}
         </div>
+      ) : item.id === "brand" ? (
+        <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
+          {/* Left: moving gallery */}
+          <div className="overflow-hidden">
+            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="w-64 aspect-square" />
+          </div>
+
+          {/* Right: picker + brand showcase */}
+          <div className="flex flex-col gap-4">
+            <BrandPicker
+              brands={brandPortfolio}
+              selectedId={selectedBrandPortfolioId}
+              onSelect={setSelectedBrandPortfolioId}
+            />
+            <div className="overflow-hidden">
+              <div className="flex items-stretch">
+                <div className="flex-1 p-6">
+                  <div className="relative h-10 w-24 mb-8">
+                    <Image src={selectedBrandPortfolio.logo} alt={selectedBrandPortfolio.name} fill className="object-contain object-left" />
+                  </div>
+                  <p className="text-base font-medium text-neutral-800">{selectedBrandPortfolio.headline}</p>
+                  <p className="text-sm text-neutral-500 mt-1 leading-snug">{selectedBrandPortfolio.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : item.id === "deck" ? (
         <div className="flex flex-col gap-6">
-          <div className="flex gap-3 items-center justify-center h-[72px]">
-            {deckBrands.map((brand) => {
-              const isActive = brand.id === selectedBrandId;
-              return (
-                <button
-                  key={brand.id}
-                  onClick={() => setSelectedBrandId(brand.id)}
-                  className={cn(
-                    "cursor-pointer flex-shrink-0 transition-all duration-300 rounded-lg",
-                    isActive
-                      ? "w-[72px] h-[72px] p-1 bg-white shadow-[0_2.157px_8.843px_0_rgba(0,0,0,0.34)] opacity-100"
-                      : "w-[60px] h-[60px] bg-transparent shadow-none opacity-40"
-                  )}
-                >
-                  <div className={cn("relative w-full h-full overflow-hidden", isActive ? "rounded" : "rounded-lg")}>
-                    <Image src={brand.logo} alt={brand.name} fill className="object-cover" />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          <MarqueeGalleryRow images={selectedBrand.gallery} />
-          <MarqueeGalleryRow images={selectedBrand.gallery} reverse />
+          <BrandPicker
+            brands={deckBrands}
+            selectedId={selectedDeckBrandId}
+            onSelect={setSelectedDeckBrandId}
+          />
+          <MarqueeGalleryRow images={selectedDeckBrand.gallery} />
+          <MarqueeGalleryRow images={selectedDeckBrand.gallery} reverse />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
           {item.gallery.map((src, i) => (
-            <div
-              key={i}
-              className="relative aspect-[4/3] bg-neutral-100 rounded-lg overflow-hidden"
-            >
+            <div key={i} className="relative aspect-[4/3] bg-neutral-100 rounded-lg overflow-hidden">
               <Image
                 src={src}
                 alt={`${item.label} example ${i + 1}`}
