@@ -271,11 +271,15 @@ function FeatureItem({
   feature: { name: string; detail: string };
   isLast?: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const isOpen = isHovered || isLocked;
 
   return (
     <div
-      onClick={() => setIsOpen((prev) => !prev)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => setIsLocked((prev) => !prev)}
       className={cn("relative w-full min-h-[5rem] flex items-center gap-4 py-3 cursor-pointer group", {
         "border-b border-neutral-200": !isLast,
       })}
