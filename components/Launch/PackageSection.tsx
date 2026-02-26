@@ -20,49 +20,31 @@ const brandPortfolio = [
     accentColor: "#E8392A",
     headline: "Japanese Street Food Brand",
     description: "Bold, playful identity for a fast-casual concept launching in LA.",
-    logo: "/images/work/LivingPersona-Desktop1.png",
-    gallery: [
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-    ],
+    logo: "/launch-assets/brand-identity_assets/brand-identity_UNI.png",
+    logoMark: "/logos-match-height/uni.png",
+    gallery: ["/launch-assets/brand-identity_assets/brand-identity_UNI.png"],
   },
   {
-    id: "pyra",
-    name: "Pyra",
+    id: "autara",
+    name: "Autara",
     tagline: "AI Infrastructure",
     accentColor: "#6366F1",
     headline: "Developer-First AI Platform",
     description: "Clean, technical identity for a Series A infrastructure startup.",
-    logo: "/images/work/ProjectMetaVison-Desktop1.png",
-    gallery: [
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-    ],
+    logo: "/launch-assets/brand-identity_assets/brand-identity_autara.png",
+    logoMark: "/logos-match-height/autara.png",
+    gallery: ["/launch-assets/brand-identity_assets/brand-identity_autara.png"],
   },
   {
-    id: "jinba",
-    name: "Jinba",
-    tagline: "人馬一体",
+    id: "huch",
+    name: "Huch",
+    tagline: "Gaming Platform",
     accentColor: "#16A34A",
-    headline: "Performance Sports Brand",
-    description: "Minimal, refined identity rooted in Japanese craftsmanship.",
-    logo: "/images/work/LivingPersona-Desktop1.png",
-    gallery: [
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-      "/images/work/LivingPersona-Desktop1.png",
-      "/images/work/ProjectMetaVison-Desktop1.png",
-    ],
+    headline: "Gaming Cases Marketplace",
+    description: "Bold, dark identity built for a competitive gaming audience.",
+    logo: "/launch-assets/brand-identity_assets/brand-identity_huch.png",
+    logoMark: "/logos-match-height/huch.png",
+    gallery: ["/launch-assets/brand-identity_assets/brand-identity_huch.png"],
   },
 ];
 
@@ -144,7 +126,7 @@ function GalleryTrack({ images, imageClassName }: { images: string[]; imageClass
   return (
     <div className="flex items-center gap-4 shrink-0">
       {images.map((src, i) => (
-        <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0 bg-neutral-200", imageClassName ?? "w-64 aspect-video")}>
+        <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0", imageClassName ?? "w-64 aspect-video")}>
           <Image src={src} alt="" fill className="object-cover" />
         </div>
       ))}
@@ -420,7 +402,7 @@ function PackageContent({ item }: { item: PackageItem }) {
         <div className="grid grid-cols-[3fr_2fr] gap-12 items-start">
           {/* Left: moving gallery */}
           <div className="overflow-hidden">
-            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="w-64 aspect-square" />
+            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-72 w-[1150px]" />
           </div>
 
           {/* Right: picker + brand showcase */}
@@ -434,7 +416,7 @@ function PackageContent({ item }: { item: PackageItem }) {
               <div className="flex items-stretch">
                 <div className="flex-1 p-6">
                   <div className="relative h-10 w-24 mb-8">
-                    <Image src={selectedBrandPortfolio.logo} alt={selectedBrandPortfolio.name} fill className="object-contain object-left" />
+                    <Image src={selectedBrandPortfolio.logoMark} alt={selectedBrandPortfolio.name} fill className="object-contain object-left" />
                   </div>
                   <p className="text-base font-medium text-neutral-800">{selectedBrandPortfolio.headline}</p>
                   <p className="text-sm text-neutral-500 mt-1 leading-snug">{selectedBrandPortfolio.description}</p>
