@@ -275,9 +275,8 @@ function FeatureItem({
 
   return (
     <div
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      className={cn("relative w-full min-h-[5rem] flex items-center gap-4 py-3 group", {
+      onClick={() => setIsOpen((prev) => !prev)}
+      className={cn("relative w-full min-h-[5rem] flex items-center gap-4 py-3 cursor-pointer group", {
         "border-b border-neutral-200": !isLast,
       })}
     >
