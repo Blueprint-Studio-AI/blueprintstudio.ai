@@ -57,8 +57,33 @@ export default function ProblemSection() {
               </h2>
             </div>
 
-            {/* Comparison table — flat grid so rows align naturally */}
-            <div className="relative grid grid-cols-2 gap-x-6">
+            {/* Mobile: stacked cards */}
+            <div className="sm:hidden space-y-2">
+              {comparison.map((row, i) => (
+                <div key={i} className="flex items-center justify-between gap-4 px-4 py-3 bg-white rounded-xl border border-neutral-200">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 shrink-0 rounded-full bg-neutral-300" />
+                    <span className="line-through text-neutral-400 text-sm">{row.typical}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <GreenCheckmark />
+                    <span className="text-black text-sm font-medium">{row.blueprint}</span>
+                  </div>
+                </div>
+              ))}
+              <div className="pt-2">
+                <GradientButton
+                  className="w-full justify-center"
+                  onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                >
+                  Book a Call
+                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </GradientButton>
+              </div>
+            </div>
+
+            {/* Desktop: comparison table — flat grid so rows align naturally */}
+            <div className="hidden sm:grid relative grid-cols-2 gap-x-6">
 
               {/* Gradient border card overlay — spans entire right column */}
               <div className="absolute right-0 inset-y-0 rounded-2xl p-px pointer-events-none"
