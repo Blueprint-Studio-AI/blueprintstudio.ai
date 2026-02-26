@@ -254,10 +254,10 @@ const packageItems = [
     workHeading: "Videos that drive traction",
     gallery: [] as string[],
     videos: [
-      { thumbnail: "/images/work/LivingPersona-Desktop1.png", label: "Jinba", videoType: "Launch Video" },
-      { thumbnail: "/images/work/ProjectMetaVison-Desktop1.png", label: "Pyra", videoType: "Launch Video" },
-      { thumbnail: "/images/work/LivingPersona-Desktop1.png", label: "AgeVisor 3", videoType: "Launch Video" },
-      { thumbnail: "/images/work/ProjectMetaVison-Desktop1.png", label: "Logical", videoType: "Launch Video" },
+      { thumbnail: "/launch-videos/script.png", label: "Jinba", videoType: "Launch Video" },
+      { thumbnail: "/launch-videos/production.png", label: "Pyra", videoType: "Launch Video" },
+      { thumbnail: "/launch-videos/focus.png", label: "AgeVisor 3", videoType: "Launch Video" },
+      { thumbnail: "/launch-videos/delivery.png", label: "Logical", videoType: "Launch Video" },
     ],
   },
 ];
