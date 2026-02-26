@@ -78,7 +78,7 @@ const deckBrands = [
   {
     id: "huch",
     name: "Huch",
-    logo: "/logos-match-height/huch.png",
+    logo: "/launch-assets/brand-picker-icons/huch.png",
     gallery: Array.from({ length: 15 }, (_, i) => `/launch-assets/slide-deck_assets/huch_deck-assets/huch-${i + 1}.jpg`),
   },
 ];
@@ -155,21 +155,21 @@ const websiteBrands = [
   {
     id: "huch",
     name: "Huch",
-    logo: "/launch-assets/web-design_assets/desktop-huch.png",
+    logo: "/launch-assets/brand-picker-icons/huch.png",
     desktop: "/launch-assets/web-design_assets/desktop-huch.png",
     mobile: "/launch-assets/web-design_assets/mobile-huch.png",
   },
   {
     id: "honeyb",
     name: "HoneyB",
-    logo: "/launch-assets/web-design_assets/desktop-honeyb.png",
+    logo: "/logos-match-height/honeyb.png",
     desktop: "/launch-assets/web-design_assets/desktop-honeyb.png",
     mobile: "/launch-assets/web-design_assets/mobile-honeyb.png",
   },
   {
     id: "perena",
     name: "Perena",
-    logo: "/launch-assets/web-design_assets/desktop-perena.png",
+    logo: "/logos-match-height/perena.png",
     desktop: "/launch-assets/web-design_assets/desktop-perena.png",
     mobile: "/launch-assets/web-design_assets/mobile-perena.png",
   },
