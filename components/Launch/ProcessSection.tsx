@@ -81,7 +81,7 @@ const workstreams: Workstream[] = [
 
 const weeks = [1, 2, 3, 4, 5, 6];
 
-const CARD_WIDTH = 340;
+const MAX_CARD_WIDTH = 340;
 const CARD_GAP = 12;
 
 function getWeekLabel(ws: Workstream) {
@@ -95,10 +95,12 @@ function getWeekLabel(ws: Workstream) {
 function WorkstreamCarouselCard({
   workstream: ws,
   isActive,
+  cardWidth,
   onClick
 }: {
   workstream: Workstream;
   isActive: boolean;
+  cardWidth: number;
   onClick?: () => void;
 }) {
   const Icon = ws.icon;
@@ -110,14 +112,12 @@ function WorkstreamCarouselCard({
       className={`bg-white border border-neutral-200 shadow-sm flex-shrink-0 flex flex-col p-5 rounded-2xl cursor-pointer transition-all duration-500 ease-in-out ${
         isActive ? "" : "scale-90 opacity-50 hover:opacity-75"
       }`}
-      style={{ width: CARD_WIDTH }}
+      style={{ width: cardWidth }}
     >
       <div className="flex items-center justify-between">
-        <div
-        className={'flex flex-row items-center gap-3'}
-        >
-          <Icon className={`w-5 h-5 text-neutral-800`} />
-          <p className={`font-medium text-lg text-neutral-800 tracking-tight`}>
+        <div className="flex flex-row items-center gap-3">
+          <Icon className="w-5 h-5 text-neutral-800" />
+          <p className="font-medium text-lg text-neutral-800 tracking-tight">
             {ws.name}
           </p>
         </div>
@@ -125,7 +125,7 @@ function WorkstreamCarouselCard({
           {getWeekLabel(ws)}
         </span>
       </div>
-      
+
       <p className="mt-4 text-sm text-neutral-500 leading-[128%]">{ws.description}</p>
     </div>
   );
@@ -143,19 +143,21 @@ function CircularButton({
   className?: string;
 }) {
   return (
-    
-     <button
-        onClick={onClick}
-        disabled={disabled}
-        aria-label="Next workstream"
-        className={cn(className, "shrink-0 w-14 h-14 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 transition-all duration-300")}
-        style={{
-          boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
-        }}
-      >
-        <Icon className="w-8 h-8" color="black" />
-      </button>
-  )
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label="Next workstream"
+      className={cn(
+        "shrink-0 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 transition-all duration-300",
+        className
+      )}
+      style={{
+        boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
+      }}
+    >
+      <Icon className="w-5 h-5" color="black" />
+    </button>
+  );
 }
 
 function WorkstreamCarousel({
@@ -168,35 +170,60 @@ function WorkstreamCarousel({
   setActiveWorkstream: (i: number) => void;
 }) {
   const total = workstreams.length;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState(MAX_CARD_WIDTH);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width;
+      // On mobile: leave 48px for peek; on desktop: leave 120px for side buttons + peek
+      const isMobile = w < 640;
+      setCardWidth(Math.min(MAX_CARD_WIDTH, w - (isMobile ? 48 : 120)));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const prev = () => setActiveWorkstream((activeWorkstream - 1 + total) % total);
   const next = () => setActiveWorkstream((activeWorkstream + 1) % total);
 
   return (
-    <div className="relative mx-auto mt-8">
-      <CircularButton icon={ChevronLeft} onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
-      <CircularButton icon={ChevronRight} onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
+    <div className="mx-auto mt-8 flex flex-col gap-4">
+      <div className="relative">
+        {/* Desktop: buttons on sides */}
+        <CircularButton icon={ChevronLeft} onClick={prev} className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+        <CircularButton icon={ChevronRight} onClick={next} className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20" />
 
-      <div className="overflow-hidden relative">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
+        <div ref={containerRef} className="overflow-hidden relative">
+          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
 
-        <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{
-            gap: `${CARD_GAP}px`,
-            transform: `translateX(calc(50% - ${activeWorkstream * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2}px))`,
-          }}
-        >
-          {workstreams.map((ws, i) => (
-            <WorkstreamCarouselCard
-              key={ws.id}
-              workstream={ws}
-              isActive={i === activeWorkstream}
-              onClick={() => setActiveWorkstream(i)}
-            />
-          ))}
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{
+              gap: `${CARD_GAP}px`,
+              transform: `translateX(calc(50% - ${activeWorkstream * (cardWidth + CARD_GAP) + cardWidth / 2}px))`,
+            }}
+          >
+            {workstreams.map((ws, i) => (
+              <WorkstreamCarouselCard
+                key={ws.id}
+                workstream={ws}
+                isActive={i === activeWorkstream}
+                cardWidth={cardWidth}
+                onClick={() => setActiveWorkstream(i)}
+              />
+            ))}
+          </div>
         </div>
+      </div>
+
+      {/* Mobile: buttons below */}
+      <div className="flex sm:hidden justify-center gap-3">
+        <CircularButton icon={ChevronLeft} onClick={prev} />
+        <CircularButton icon={ChevronRight} onClick={next} />
       </div>
     </div>
   );
@@ -225,7 +252,10 @@ function GanttBar({
       {/* Label with icon */}
       <div className="w-32 sm:w-36 shrink-0 flex items-center gap-2">
         <Icon
-          className={`w-3.5 h-3.5 ${isLaunch ? "text-green-500" : "text-neutral-500"} group-hover:text-neutral-600 transition-colors`}
+          className={cn(
+            "hidden sm:block w-3.5 h-3.5 transition-colors",
+            isLaunch ? "text-green-500" : "text-neutral-500 group-hover:text-neutral-600"
+          )}
         />
         <span
           className={`text-sm ${isLaunch ? "text-green-600 font-medium" : "text-neutral-500"} group-hover:text-black transition-colors`}
@@ -249,7 +279,6 @@ function GanttBar({
           style={{
             left: `${startPercent}%`,
             width: isVisible ? `${widthPercent}%` : "0%",
-            //transitionDelay: `${index * 100}ms`,
           }}
         />
       </div>
@@ -304,7 +333,7 @@ export default function ProcessSection() {
             <h2
               className="font-medium text-black cursor-default mb-3"
               style={{
-                fontSize: "clamp(32px, 6vw, 48px)",
+                fontSize: "clamp(28px, 6vw, 48px)",
                 lineHeight: "110%",
                 letterSpacing: "-1.5px",
               }}
@@ -313,7 +342,7 @@ export default function ProcessSection() {
               <br />
               in parallel.
             </h2>
-            <p className="text-neutral-500 max-w-md mx-auto cursor-default">
+            <p className="text-neutral-500 max-w-md mx-auto cursor-default text-sm sm:text-base">
               We don&apos;t work sequentially. Multiple workstreams run
               simultaneously, so you get everything in 6 weeks.
             </p>
