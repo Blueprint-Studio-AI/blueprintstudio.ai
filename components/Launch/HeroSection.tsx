@@ -63,7 +63,7 @@ function ImageTicker() {
         {[...galleryImages, ...galleryImages].map((img, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[700px] sm:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
+            className="flex-shrink-0 w-[320px] sm:w-[700px] lg:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
           >
             <Image src={img.src} alt={img.alt} fill className="object-cover" />
           </div>
@@ -129,7 +129,7 @@ export default function HeroSection() {
             </h1>
 
             {/* Deliverables pills */}
-            <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-2 sm:gap-3">
               {deliverables.map((item) => (
                 <div
                   key={item.num}
@@ -141,32 +141,31 @@ export default function HeroSection() {
               ))}
             </div>
 
-            <div
-            className={'flex flex-col items-center text-center gap-6'}
-            >
+            <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
               {/* Social proof */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <div className="w-0.5 h-4 bg-neutral-400" />
-                <span className="text-md text-neutral-600 cursor-default tracking-tight">
+                <div className="hidden sm:block w-0.5 h-4 bg-neutral-400" />
+                <span className="text-sm sm:text-md text-neutral-600 cursor-default tracking-tight">
                   <span className="font-medium text-neutral-900">25+</span> startups launched
                 </span>
               </div>
 
-              <p className="text-neutral-500 cursor-default text-[clamp(15px,2vw,16px)] leading-[128%]">
+              <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,16px)] leading-[128%]">
                 One team. One timeline. Six weeks.
                 <br />
                 Built by founders, for founders.
               </p>
 
               {/* CTA */}
-              <GradientButton 
-              className={'w-full'}
-              onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}>
+              <GradientButton
+                className="w-full"
+                onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+              >
                 Book a Call
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </GradientButton>
@@ -175,7 +174,7 @@ export default function HeroSection() {
           </div>
 
           {/* Scrolling image gallery */}
-          <div className="mt-24">
+          <div className="mt-12 sm:mt-20">
             <ImageTicker />
           </div>
         </InnerContainer>
