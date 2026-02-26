@@ -8,7 +8,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { Palette, Globe, Presentation, Play, ChevronRight } from "lucide-react";
+import { Palette, Globe, Presentation, Play, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { cn } from "@/lib/utils";
 
@@ -176,6 +176,31 @@ function MarqueeGalleryRow({ reverse = false, images, imageClassName }: { revers
   );
 }
 
+const websiteBrands = [
+  {
+    id: "huch",
+    name: "Huch",
+    logo: "/launch-assets/web-design_assets/desktop-huch.png",
+    desktop: "/launch-assets/web-design_assets/desktop-huch.png",
+    mobile: "/launch-assets/web-design_assets/mobile-huch.png",
+  },
+  {
+    id: "honeyb",
+    name: "HoneyB",
+    logo: "/launch-assets/web-design_assets/desktop-honeyb.png",
+    desktop: "/launch-assets/web-design_assets/desktop-honeyb.png",
+    mobile: "/launch-assets/web-design_assets/mobile-honeyb.png",
+  },
+  {
+    id: "perena",
+    name: "Perena",
+    logo: "/launch-assets/web-design_assets/desktop-perena.png",
+    desktop: "/launch-assets/web-design_assets/desktop-perena.png",
+    mobile: "/launch-assets/web-design_assets/mobile-perena.png",
+  },
+];
+
+
 const packageItems = [
   {
     id: "brand",
@@ -311,6 +336,9 @@ function PackageContent({ item }: { item: PackageItem }) {
   const selectedBrandPortfolio = brandPortfolio.find((b) => b.id === selectedBrandPortfolioId) ?? brandPortfolio[0];
   const [selectedDeckBrandId, setSelectedDeckBrandId] = useState(deckBrands[0].id);
   const selectedDeckBrand = deckBrands.find((b) => b.id === selectedDeckBrandId) ?? deckBrands[0];
+  const [selectedWebsiteBrandId, setSelectedWebsiteBrandId] = useState(websiteBrands[0].id);
+  const selectedWebsiteBrand = websiteBrands.find((b) => b.id === selectedWebsiteBrandId) ?? websiteBrands[0];
+  const [activeWebTab, setActiveWebTab] = useState<"web" | "mobile">("web");
 
   return (
     <div className="max-w-5xl mx-auto pl-12 space-y-12">
@@ -392,13 +420,62 @@ function PackageContent({ item }: { item: PackageItem }) {
             </div>
           </div>
         </div>
+      ) : item.id === "website" ? (
+        <div className="grid grid-cols-[3fr_2fr] gap-12 items-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${selectedWebsiteBrandId}-${activeWebTab}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="relative w-full aspect-[4/3]">
+                <Image
+                  src={activeWebTab === "web" ? selectedWebsiteBrand.desktop : selectedWebsiteBrand.mobile}
+                  alt={selectedWebsiteBrand.name}
+                  fill
+                  className="object-contain select-none"
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-1 bg-neutral-100 rounded-full p-1 self-start border border-neutral-200">
+              {(["web", "mobile"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveWebTab(tab)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all duration-200 cursor-pointer",
+                    activeWebTab === tab
+                      ? "bg-white shadow-sm text-black font-medium"
+                      : "text-neutral-500 hover:text-neutral-700"
+                  )}
+                >
+                  {tab === "web" ? <Monitor className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
+                  {tab === "web" ? "Web" : "Mobile"}
+                </button>
+              ))}
+            </div>
+            <BrandPicker
+              brands={websiteBrands}
+              selectedId={selectedWebsiteBrandId}
+              onSelect={setSelectedWebsiteBrandId}
+            />
+            <p className="text-neutral-500 text-base leading-snug max-w-xs">{item.description}</p>
+          </div>
+        </div>
       ) : item.id === "deck" ? (
-        <div className="flex flex-col gap-6">
-          <BrandPicker
-            brands={deckBrands}
-            selectedId={selectedDeckBrandId}
-            onSelect={setSelectedDeckBrandId}
-          />
+        <div className="flex flex-col gap-6 -ml-12">
+          <div className="flex justify-center">
+            <BrandPicker
+              brands={deckBrands}
+              selectedId={selectedDeckBrandId}
+              onSelect={setSelectedDeckBrandId}
+            />
+          </div>
           <MarqueeGalleryRow images={selectedDeckBrand.gallery} />
           <MarqueeGalleryRow images={selectedDeckBrand.gallery} reverse />
         </div>
