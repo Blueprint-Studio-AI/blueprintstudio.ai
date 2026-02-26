@@ -52,8 +52,8 @@ export default function ProblemSection() {
                 }}
               >
                 Launching shouldn&apos;t mean
-                <br />
-                managing 4 different vendors.
+                <br className="hidden sm:block" />
+                {" "}managing 4 different vendors.
               </h2>
             </div>
 
@@ -80,7 +80,7 @@ export default function ProblemSection() {
               <div className="py-4 sm:py-5 pr-6">
                 <span className="text-neutral-500 text-[20px] cursor-default">Free</span>
               </div>
-              <div className="py-4 sm:py-5 px-6 relative z-10">
+              <div className="py-4 sm:py-5 px-3 sm:px-6 relative z-10">
                 <Image src="/blueprint-logo-dark.svg" alt="Blueprint Studio" width={80} height={16} className="h-4 w-auto" />
               </div>
 
@@ -93,9 +93,9 @@ export default function ProblemSection() {
                       {row.typical}
                     </span>
                   </div>
-                  <div className="py-4 sm:py-5 px-6 relative z-10 flex items-center gap-3">
+                  <div className="py-4 sm:py-5 px-3 sm:px-6 relative z-10 flex items-center gap-2 sm:gap-3">
                     <GreenCheckmark />
-                    <span className="text-black cursor-default text-base sm:text-md">
+                    <span className="text-black cursor-default text-sm sm:text-base">
                       {row.blueprint}
                     </span>
                     {i !== comparison.length - 1 && (
@@ -107,7 +107,7 @@ export default function ProblemSection() {
 
               {/* Button row — right column only */}
               <div />
-              <div className="py-4 sm:py-5 px-6 relative z-10">
+              <div className="py-4 sm:py-5 px-3 sm:px-6 relative z-10">
                 <GradientButton
                   className="w-full justify-center"
                   onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
