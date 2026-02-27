@@ -250,15 +250,19 @@ function GanttBar({
     onClick={onClick}
     className="flex items-center gap-3 sm:gap-4 group">
       {/* Label with icon */}
-      <div className="w-32 sm:w-36 shrink-0 flex items-center gap-2">
+      <div className={cn("text-neutral-500 w-32 sm:w-36 shrink-0 flex items-center gap-2", {
+        "text-green-600": isLaunch && isActive,
+        "text-green-500": isLaunch && !isActive,
+        "text-neutral-800": isActive,
+      })}>
         <Icon
           className={cn(
             "hidden sm:block w-3.5 h-3.5 transition-colors",
-            isLaunch ? "text-green-500" : "text-neutral-500 group-hover:text-neutral-600"
+            isLaunch ? "text-green-600 group-hover:text-green-500" : "group-hover:text-black"
           )}
         />
         <span
-          className={`text-sm ${isLaunch ? "text-green-600 font-medium" : "text-neutral-500"} group-hover:text-black transition-colors`}
+          className={`text-sm ${isLaunch ? "text-green-600 font-medium group-hover:text-green-500" : isActive ? "text-neutral-700" : "text-neutral-500"} group-hover:text-black transition-colors`}
         >
           {workstream.name}
         </span>
