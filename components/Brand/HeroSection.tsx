@@ -4,21 +4,23 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { ArrowUpRight, Star } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import GradientButton from "@/components/ui/GradientButton";
+import GradientText from "@/components/ui/GradientText";
+import DeliverablePill from "@/components/ui/DeliverablePill";
+import SocialProof from "@/components/ui/SocialProof";
 
 const deliverables = [
   { num: "01", label: "Logo" },
   { num: "02", label: "Guidelines" },
-  { num: "03", label: "Social Kit" },
   { num: "04", label: "AI Prompts" },
 ];
 
 export default function HeroSection() {
   return (
     <Section className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
-      {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
@@ -41,87 +43,46 @@ export default function HeroSection() {
             />
           </Link>
         }
-        rightText="$18K"
+        rightText="// for founders"
       />
 
       <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="text-center pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 lg:pb-32 px-2.5 sm:px-6 relative">
+        <InnerContainer className="pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 lg:pb-32 px-2.5 sm:px-6 relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-          {/* Headline */}
-          <h1
-            className="font-medium text-black cursor-default mb-8 sm:mb-10"
-            style={{
-              fontSize: "clamp(44px, 9vw, 80px)",
-              lineHeight: "95%",
-              letterSpacing: "-2.5px",
-            }}
-          >
-            Your brand.
-            <br />
-            3 weeks.
-          </h1>
+          <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
+            <h1 className="font-medium text-black cursor-default text-[clamp(32px,8vw,60px)] leading-[118%] tracking-[-2.5px]">
+              Your brand<br/>
+              <GradientText>3&nbsp;weeks</GradientText>
+            </h1>
 
-          {/* Deliverables - numbered pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10 sm:mb-12">
-            {deliverables.map((item) => (
-              <div
-                key={item.num}
-                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 border border-neutral-200 rounded-full cursor-default hover:bg-neutral-200/50 transition-colors"
-              >
-                <span className="text-[10px] font-mono text-neutral-400">
-                  {item.num}
-                </span>
-                <span className="text-sm text-neutral-700 font-medium">
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Subhead */}
-          <p
-            className="text-neutral-500 cursor-default max-w-md mx-auto mb-8 sm:mb-10"
-            style={{
-              fontSize: "clamp(16px, 2vw, 18px)",
-              lineHeight: "150%",
-            }}
-          >
-            Logo, guidelines, and AI prompts for on-brand content.
-            <br />
-            Built for founders who move fast.
-          </p>
-
-          {/* Social proof */}
-          <div className="flex items-center justify-center gap-3 mb-10 sm:mb-12">
-            <div className="flex -space-x-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                />
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-2 sm:gap-3">
+              {deliverables.map((item) => (
+                <DeliverablePill key={item.num} num={item.num} label={item.label} />
               ))}
             </div>
-            <div className="w-px h-4 bg-neutral-300" />
-            <span className="text-sm text-neutral-600 cursor-default tracking-tight">
-              <span className="font-medium text-neutral-900">25+</span> brands shipped
-            </span>
-          </div>
 
-          {/* CTA */}
-          <button
-            className="py-4 px-8 font-medium bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors text-sm group inline-flex items-center cursor-pointer"
-            onClick={() =>
-              window.open(
-                "https://cal.com/blueprint-studio/intro-call",
-                "_blank"
-              )
-            }
-          >
-            <span>Book a Call</span>
-            <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </button>
+            <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
+              <SocialProof showDivider>
+                <span className="font-medium text-neutral-900">25+</span> startups launched
+              </SocialProof>
+
+              <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,16px)] leading-[128%]">
+                Logo, guidelines, and AI prompts for on-brand content.
+                <br />
+                Built for founders who move fast.
+              </p>
+
+              <GradientButton
+                className="w-full"
+                onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+              >
+                Book a Call
+                <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </GradientButton>
+            </div>
+          </div>
         </InnerContainer>
       </OuterContainer>
 
