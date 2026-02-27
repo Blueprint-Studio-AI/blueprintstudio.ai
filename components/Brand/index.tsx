@@ -2,6 +2,7 @@
 
 import { Footer } from "@/components/Footer/index";
 import HeroSection from "./HeroSection";
+import ProblemSection from "./ProblemSection";
 import RecentWorkSection from "./RecentWorkSection";
 import ProcessSection from "./ProcessSection";
 import DeliverablesSection from "./DeliverablesSection";
@@ -15,6 +16,7 @@ export default function BrandPage() {
   return (
     <div>
       <HeroSection />
+      <ProblemSection />
       <RecentWorkSection />
       <ProcessSection />
       <DeliverablesSection />
