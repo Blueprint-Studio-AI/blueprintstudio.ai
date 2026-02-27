@@ -115,21 +115,21 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
   );
 }
 
-function GalleryTrack({ images, imageClassName, sizes }: { images: string[]; imageClassName?: string; sizes?: string }) {
+function GalleryTrack({ images, imageClassName, imgClassName, sizes }: { images: string[]; imageClassName?: string; imgClassName?: string; sizes?: string }) {
   return (
     <div className="flex items-center gap-4 shrink-0">
       {images.map((src, i) => (
         <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0", imageClassName ?? "w-64 aspect-video")}>
-          <Image src={src} alt="" fill sizes={sizes ?? "256px"} className="object-cover" />
+          <Image src={src} alt="" fill sizes={sizes ?? "256px"} className={cn("object-cover", imgClassName)} />
         </div>
       ))}
     </div>
   );
 }
 
-function MarqueeGalleryRow({ reverse = false, images, imageClassName, sizes }: { reverse?: boolean; images: string[]; imageClassName?: string; sizes?: string }) {
+function MarqueeGalleryRow({ reverse = false, images, imageClassName, imgClassName, sizes }: { reverse?: boolean; images: string[]; imageClassName?: string; imgClassName?: string; sizes?: string }) {
   return (
-    <div className="relative overflow-x-clip">
+    <div className="relative overflow-hidden">
       <div
         className="absolute left-0 top-0 bottom-0 w-24 pointer-events-none z-10"
         style={{ background: "linear-gradient(to right, hsl(var(--neutral-50)), transparent)" }}
@@ -142,9 +142,9 @@ function MarqueeGalleryRow({ reverse = false, images, imageClassName, sizes }: {
         className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
       >
-        <GalleryTrack images={images} imageClassName={imageClassName} sizes={sizes} />
+        <GalleryTrack images={images} imageClassName={imageClassName} imgClassName={imgClassName} sizes={sizes} />
         <div className="pl-4">
-          <GalleryTrack images={images} imageClassName={imageClassName} sizes={sizes} />
+          <GalleryTrack images={images} imageClassName={imageClassName} imgClassName={imgClassName} sizes={sizes} />
         </div>
       </div>
     </div>
@@ -400,7 +400,7 @@ function PackageContent({ item }: { item: PackageItem }) {
         <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 md:gap-12 items-start">
           {/* Left: moving gallery */}
           <div className="overflow-hidden">
-            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-48 sm:h-72 w-[1150px]" sizes="1150px" />
+            <MarqueeGalleryRow images={selectedBrandPortfolio.gallery} imageClassName="h-48 sm:h-72 w-[1150px]" imgClassName="object-contain" sizes="1150px" />
           </div>
 
           {/* Right: picker + brand showcase */}
