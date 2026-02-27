@@ -254,15 +254,55 @@ const packageItems = [
     workHeading: "Videos that drive traction",
     gallery: [] as string[],
     videos: [
-      { thumbnail: "/launch-videos/script.png", label: "Jinba", videoType: "Launch Video" },
-      { thumbnail: "/launch-videos/production.png", label: "Pyra", videoType: "Launch Video" },
-      { thumbnail: "/launch-videos/focus.png", label: "AgeVisor 3", videoType: "Launch Video" },
-      { thumbnail: "/launch-videos/delivery.png", label: "Logical", videoType: "Launch Video" },
+      { thumbnail: "/launch-videos/script.png", label: "Jinba", videoType: "Launch Video", youtubeId: "aD9XnupXf_w" },
+      { thumbnail: "/launch-videos/production.png", label: "Pyra", videoType: "Launch Video", youtubeId: "A1hq1u_M7L8" },
+      { thumbnail: "/launch-videos/focus.png", label: "AgeVisor 3", videoType: "Launch Video", youtubeId: "PBJbbMQ17eo" },
+      { thumbnail: "/launch-videos/delivery.png", label: "Logical", videoType: "Launch Video", youtubeId: "W9gC1McdJMg" },
     ],
   },
 ];
 
 type PackageItem = (typeof packageItems)[number];
+
+function VideoCard({ video }: { video: { thumbnail: string; label: string; videoType: string; youtubeId: string } }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  return (
+    <div className="group cursor-pointer" onClick={() => setIsPlaying(true)}>
+      <div className="rounded-xl border border-neutral-300">
+        <div className="relative aspect-video bg-neutral-900 [clip-path:inset(0_round_11px)] [transform:translateZ(0)]">
+          {isPlaying ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+              title={video.label}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+            />
+          ) : (
+            <>
+              <Image
+                src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                alt={video.label}
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-[72px] h-[72px] rounded-full backdrop-blur-[2px] bg-[#252525]/50 border border-t-white/60 border-l-white/40 border-b-white/10 border-r-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)] flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:bg-[#252525]/70 group-hover:border-t-white/80 group-hover:border-l-white/60">
+                  <Play className="w-8 h-8 text-white fill-white ml-0.5" />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      <div className="flex gap-4 items-center mt-4">
+        <p className="text-lg font-medium text-neutral-800 tracking-tight">{video.label}</p>
+        <p className="text-base text-neutral-500">{video.videoType}</p>
+      </div>
+    </div>
+  );
+}
 
 function FeatureItem({
   feature,
@@ -372,28 +412,7 @@ function PackageContent({ item }: { item: PackageItem }) {
       {item.videos ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 sm:gap-y-12">
           {item.videos.map((video, i) => (
-            <div key={i} className="group cursor-pointer">
-              <div className="rounded-xl border border-neutral-300">
-                <div className="relative aspect-video bg-neutral-900 [clip-path:inset(0_round_11px)] [transform:translateZ(0)]">
-                  <Image
-                    src={video.thumbnail}
-                    alt={video.label}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-[72px] h-[72px] rounded-full backdrop-blur-[2px] bg-[#252525]/50 border border-t-white/60 border-l-white/40 border-b-white/10 border-r-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)] flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:bg-[#252525]/70 group-hover:border-t-white/80 group-hover:border-l-white/60">
-                      <Play className="w-8 h-8 text-white fill-white ml-0.5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center mt-4">
-                <p className="text-lg font-medium text-neutral-800 tracking-tight">{video.label}</p>
-                <p className="text-base text-neutral-500">{video.videoType}</p>
-              </div>
-            </div>
+            <VideoCard key={i} video={video} />
           ))}
         </div>
       ) : item.id === "brand" ? (
