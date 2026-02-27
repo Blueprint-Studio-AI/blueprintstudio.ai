@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useScrollTo } from "@/components/SmoothScroll";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -289,14 +289,7 @@ function FeatureItem({
           'transition-all duration-300 absolute bg-black w-1 -left-6 rounded-full top-1/2 -translate-y-1/2',
           isOpen ? 'h-12 opacity-100' : 'h-4 opacity-0 group-hover:h-12 group-hover:opacity-100'
         )} />
-      <GreenCheckmark
-        className={cn(
-          "w-6 h-6 shrink-0 transition-all",
-          isOpen
-            ? "bg-green-500/10 border-green-500 text-green-500"
-            : "border-neutral-400 text-green-500/60 group-hover:bg-green-500/10 group-hover:border-green-500 group-hover:text-green-500"
-        )}
-      />
+      <GreenCheckmark className="w-6 h-6 shrink-0 border-green-500 text-green-500" />
       <div className="flex-1">
         <span className="text-md font-medium text-black">{feature.name}</span>
         <AnimatePresence>
@@ -518,38 +511,8 @@ function PackageContent({ item }: { item: PackageItem }) {
 }
 
 export default function PackageSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([null, null, null, null]);
   const scrollTo = useScrollTo();
-
-  useEffect(() => {
-    const visibleSections = new Set<number>();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const index = sectionRefs.current.findIndex((ref) => ref === entry.target);
-          if (index === -1) return;
-          if (entry.isIntersecting) {
-            visibleSections.add(index);
-          } else {
-            visibleSections.delete(index);
-          }
-        });
-
-        if (visibleSections.size > 0) {
-          setActiveIndex(Math.min(...visibleSections));
-        }
-      },
-      { rootMargin: "0px 0px -60% 0px", threshold: 0 }
-    );
-
-    sectionRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   const scrollToSection = (index: number) => {
     const el = sectionRefs.current[index];
@@ -586,18 +549,14 @@ export default function PackageSection() {
           </div>
 
           {/* Deliverable Pills */}
-          <div className="flex justify-center flex-wrap gap-2.5 mb-8 sm:mb-12">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-2 sm:gap-3 mb-8 sm:mb-12">
             {packageItems.map((item, index) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(index)}
-                className={`flex items-center gap-3 px-3.5 sm:px-4 py-2 rounded-full text-sm border transition-all duration-200 cursor-pointer ${
-                  activeIndex === index
-                    ? "bg-white text-black border-neutral-300 shadow-[0_1px_4px_0_rgba(0,0,0,0.25),0_0_27.791px_0_rgba(255,255,255,0.58)]"
-                    : "bg-transparent text-neutral-400 border-neutral-200 hover:text-neutral-600 hover:border-neutral-300"
-                }`}
+                className="flex items-center gap-3 px-3.5 sm:px-4 py-2 bg-white text-black border border-neutral-300 rounded-full cursor-pointer"
               >
-                <span className={`text-base font-normal ${activeIndex === index ? "text-neutral-400" : "text-neutral-200"}`}>{item.num}</span>
+                <span className="text-base font-normal text-neutral-400">{item.num}</span>
                 <span className="text-base font-normal">{item.label}</span>
               </button>
             ))}

@@ -33,7 +33,7 @@ function ImageTicker() {
     if (!scrollContainer) return;
 
     let scrollPosition = 0;
-    const speed = 0.3;
+    const speed = 0.7;
 
     const animate = () => {
       scrollPosition += speed;
@@ -63,9 +63,9 @@ function ImageTicker() {
         {[...galleryImages, ...galleryImages].map((img, i) => (
           <div
             key={i}
-            className="flex-shrink-0 w-[520px] sm:w-[700px] lg:w-[1000px] aspect-[4/1] relative rounded-xl overflow-hidden bg-neutral-200"
+            className="flex-shrink-0 w-[640px] sm:w-[860px] lg:w-[1200px] aspect-[4/1] relative rounded-xl overflow-hidden"
           >
-            <Image src={img.src} alt={img.alt} fill className="object-cover" />
+            <Image src={img.src} alt={img.alt} fill className="object-contain" />
           </div>
         ))}
       </div>
