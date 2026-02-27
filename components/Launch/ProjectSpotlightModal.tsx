@@ -127,18 +127,72 @@ export default function ProjectSpotlightModal({
               </div>
 
               {[
-                { num: "01", title: "Brand\nIdentity", description: "Placeholder — describe what was delivered for the brand identity." },
-                { num: "02", title: "Website", description: "Placeholder — describe what was delivered for the website." },
-                { num: "03", title: "Pitch\nDeck", description: "Placeholder — describe what was delivered for the pitch deck." },
+                {
+                  num: "01",
+                  title: "Brand\nIdentity",
+                  description: "Placeholder — describe what was delivered for the brand identity.",
+                  subsections: [
+                    {
+                      heading: "Logo System",
+                      description: "We designed a flexible logo system with primary wordmark, icon, and lockup variations. The stacked horizontal lines reference both blockchain architecture and honey\u2019s layered structure, creating instant brand recognition across every touchpoint.",
+                      images: [
+                        { src: "/logos-match-height/honeyb.png", className: "object-contain" },
+                        { src: "/launch-assets/honeyb-spotlight/honeyb-logos.png", className: "object-cover" },
+                      ],
+                    },
+                    { heading: "Color System", description: "Placeholder — describe the color system deliverable." },
+                    { heading: "Type System", description: "Placeholder — describe the type system deliverable." },
+                  ],
+                },
+                {
+                  num: "02",
+                  title: "Website",
+                  description: "Placeholder — describe what was delivered for the website.",
+                  subsections: [
+                    { heading: "Custom Design", description: "Placeholder — describe the design deliverable." },
+                    { heading: "Development", description: "Placeholder — describe the development deliverable." },
+                    { heading: "Responsive", description: "Placeholder — describe the responsive deliverable." },
+                  ],
+                },
+                {
+                  num: "03",
+                  title: "Pitch\nDeck",
+                  description: "Placeholder — describe what was delivered for the pitch deck.",
+                  subsections: [
+                    { heading: "Narrative Strategy", description: "Placeholder — describe the narrative strategy." },
+                    { heading: "Slide Design", description: "Placeholder — describe the slide design." },
+                    { heading: "Source Files", description: "Placeholder — describe the source files deliverable." },
+                  ],
+                },
               ].map((item, i) => (
                 <div key={item.num} className={i > 0 ? "pt-10 border-t border-neutral-200" : ""}>
-                  <span className="text-4xl font-medium text-neutral-300 block mb-2">{item.num}</span>
-                  <h3 className="font-medium text-black whitespace-pre-line text-2xl leading-[110%] tracking-[-0.5px]">
+                  <span className="text-5xl font-medium text-neutral-400 block mb-3">{item.num}</span>
+                  <h3 className="font-medium text-black whitespace-pre-line text-[clamp(36px,6vw,64px)] leading-[110%] tracking-[-1px]">
                     {item.title}
                   </h3>
-                  <p className="text-neutral-500 leading-relaxed mt-3 max-w-2xl">
+                  <p className="text-neutral-500 text-lg leading-6 mt-4 max-w-xs">
                     {item.description}
                   </p>
+                  <div className="flex flex-col mt-16">
+                    {item.subsections.map((sub, j) => (
+                      <div key={sub.heading}>
+                        {j > 0 && <div className="line-dash-x my-8" />}
+                        <div>
+                          <h4 className="text-lg font-medium text-black">{sub.heading}</h4>
+                          <p className="text-neutral-500 leading-relaxed mt-6 max-w-[50%]">{sub.description}</p>
+                          {"images" in sub && sub.images && (
+                            <div className="grid grid-cols-2 gap-20 mt-12 max-w-md mx-auto py-16">
+                              {(sub.images as { src: string; className: string }[]).map((img) => (
+                                <div key={img.src} className="relative h-24">
+                                  <Image src={img.src} alt="" fill className="object-contain object-center" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
