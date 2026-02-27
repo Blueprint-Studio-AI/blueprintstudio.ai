@@ -5,11 +5,13 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { motion } from "framer-motion";
-import { ArrowUpRight, Star } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import GradientButton from "@/components/ui/GradientButton";
+import GradientText from "@/components/ui/GradientText";
+import DeliverablePill from "@/components/ui/DeliverablePill";
+import SocialProof from "@/components/ui/SocialProof";
 
 const deliverables = [
   { num: "01", label: "Brand" },
@@ -111,49 +113,21 @@ export default function HeroSection() {
           <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
             <h1 className="font-medium text-black cursor-default text-[clamp(32px,8vw,60px)] leading-[118%] tracking-[-2.5px]">
               Everything you<br/>need&nbsp;to&nbsp;
-              <motion.span
-                style={{
-                  backgroundImage: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-                  backgroundSize: "300% 300%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
-                animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              >
-                launch
-              </motion.span>
-              .
+              <GradientText>launch</GradientText>.
             </h1>
 
             {/* Deliverables pills */}
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-2 sm:gap-3">
               {deliverables.map((item) => (
-                <div
-                  key={item.num}
-                  className="flex items-center gap-3 px-3.5 sm:px-4 py-2 bg-white text-black border border-neutral-300 rounded-full cursor-default"
-                >
-                  <span className="text-base font-normal text-neutral-400">{item.num}</span>
-                  <span className="text-base font-normal">{item.label}</span>
-                </div>
+                <DeliverablePill key={item.num} num={item.num} label={item.label} />
               ))}
             </div>
 
             <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
               {/* Social proof */}
-              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <div className="hidden sm:block w-0.5 h-4 bg-neutral-400" />
-                <span className="text-sm sm:text-md text-neutral-600 cursor-default tracking-tight">
-                  <span className="font-medium text-neutral-900">25+</span> startups launched
-                </span>
-              </div>
+              <SocialProof showDivider>
+                <span className="font-medium text-neutral-900">25+</span> startups launched
+              </SocialProof>
 
               <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,16px)] leading-[128%]">
                 One team. One timeline. Six weeks.

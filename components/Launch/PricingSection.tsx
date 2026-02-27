@@ -4,7 +4,8 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { ArrowUpRight, Check, Star } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
+import SocialProof from "@/components/ui/SocialProof";
 import { motion } from "framer-motion";
 
 export default function PricingSection() {
@@ -40,32 +41,22 @@ export default function PricingSection() {
               Investment
             </h2>
             {/* Trust element */}
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex -space-x-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-neutral-500 cursor-default">
-                Trusted by{" "}
-                <strong
-                  className="font-semibold"
-                  style={{
-                    background:
-                      "linear-gradient(92deg, #60AEEE -1.22%, #2563EB 18.8%, #3B82F6 38.82%, #60AEEE 69.04%, #3B82F6 87.52%, #2563EB 98.88%)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  25+ tech founders
-                </strong>{" "}
-                across AI, Web3, and YC.
-              </span>
-            </div>
+            <SocialProof starSize="sm" className="justify-center">
+              Trusted by{" "}
+              <strong
+                className="font-semibold"
+                style={{
+                  background:
+                    "linear-gradient(92deg, #60AEEE -1.22%, #2563EB 18.8%, #3B82F6 38.82%, #60AEEE 69.04%, #3B82F6 87.52%, #2563EB 98.88%)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                25+ tech founders
+              </strong>{" "}
+              across AI, Web3, and YC.
+            </SocialProof>
           </div>
 
           {/* Pricing Cards */}

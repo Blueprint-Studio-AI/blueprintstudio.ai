@@ -5,7 +5,8 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { ArrowUpRight, Star } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import SocialProof from "@/components/ui/SocialProof";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -99,19 +100,9 @@ export default function HeroSection() {
               </p>
 
               {/* Rating */}
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <span className="text-sm text-neutral-600 cursor-default">
-                  100+ video projects delivered
-                </span>
-              </div>
+              <SocialProof>
+                100+ video projects delivered
+              </SocialProof>
 
               {/* CTA Button */}
               <button
