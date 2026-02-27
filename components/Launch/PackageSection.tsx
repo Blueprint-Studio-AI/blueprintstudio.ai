@@ -93,7 +93,7 @@ function BrandPicker<T extends { id: string; logo: string; name: string }>({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="flex gap-3 items-center h-[72px]">
+    <div className="flex gap-3 items-center justify-center md:justify-start h-[72px]">
       {brands.map((brand) => {
         const isActive = brand.id === selectedId;
         return (
@@ -432,7 +432,7 @@ function PackageContent({ item }: { item: PackageItem }) {
             <div className="overflow-hidden">
               <div className="flex items-stretch">
                 <div className="flex-1 p-6">
-                  <div className="relative h-10 w-24 mb-8">
+                  <div className="relative h-10 w-24 mb-4">
                     <Image src={selectedBrandPortfolio.logoMark} alt={selectedBrandPortfolio.name} fill sizes="96px" className="object-contain object-left" />
                   </div>
                   <p className="text-base font-medium text-neutral-800">{selectedBrandPortfolio.headline}</p>
@@ -471,8 +471,8 @@ function PackageContent({ item }: { item: PackageItem }) {
             </AnimatePresence>
           </div>
 
-          <div className="flex flex-col gap-4 mt-12">
-            <div className="flex gap-1 bg-neutral-100 rounded-full p-1 self-start border border-neutral-200">
+          <div className="flex flex-col gap-4 mt-4 md:mt-12 items-center md:items-start">
+            <div className="flex gap-1 bg-neutral-100 rounded-full p-1 border border-neutral-200">
               {(["web", "mobile"] as const).map((tab) => (
                 <button
                   key={tab}
@@ -494,11 +494,10 @@ function PackageContent({ item }: { item: PackageItem }) {
               selectedId={selectedWebsiteBrandId}
               onSelect={handleWebBrandChange}
             />
-            <p className="text-neutral-500 text-base leading-snug max-w-xs mt-4">{item.description}</p>
           </div>
         </div>
       ) : item.id === "deck" ? (
-        <div className="flex flex-col gap-6 ml-0 sm:-ml-12">
+        <div className="flex flex-col gap-10 ml-0 sm:-ml-12">
           <div className="flex justify-center">
             <BrandPicker
               brands={deckBrands}
