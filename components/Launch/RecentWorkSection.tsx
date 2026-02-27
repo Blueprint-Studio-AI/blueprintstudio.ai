@@ -6,111 +6,90 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import DeliverablePill from "@/components/ui/DeliverablePill";
+import ProjectSpotlightModal from "./ProjectSpotlightModal";
 
-// Client logos for the carousel
 const clientLogos = [
-  { name: "Jinba", logo: "/launch/logos/jinba.svg" },
-  { name: "Logical", logo: "/launch/logos/logical.svg" },
-  { name: "Arch Network", logo: "/launch/logos/arch.svg" },
-  { name: "Sidekick", logo: "/launch/logos/sidekick.svg" },
-  { name: "Luminary", logo: "/launch/logos/luminary.svg" },
-  { name: "Nebula", logo: "/launch/logos/nebula.svg" },
+  { name: "TokenWorks", logo: "/logos-match-height/tokenworks.png" },
+  { name: "Arch Network", logo: "/logos-match-height/arch-network.png" },
+  { name: "Perena", logo: "/logos-match-height/perena.png" },
+  { name: "Jinba", logo: "/logos-match-height/jinba.png" },
+  { name: "Bump", logo: "/logos-match-height/bump.png" },
+  { name: "Logical", logo: "/logos-match-height/logical.png" },
+  { name: "Pyra", logo: "/logos-match-height/pyra.png" },
+  { name: "Hildene", logo: "/logos-match-height/hildene.png" },
+  { name: "HoneyB", logo: "/logos-match-height/honeyb.png" },
+  { name: "Hashplay", logo: "/logos-match-height/hashplay.png" },
+  { name: "Huch", logo: "/logos-match-height/huch.png" },
+  { name: "Bold", logo: "/logos-match-height/bold.png" },
+  { name: "Cona", logo: "/logos-match-height/cona.png" },
+  { name: "DAG", logo: "/logos-match-height/dag.png" },
+  { name: "Bitfrost", logo: "/logos-match-height/bitfrost.png" },
+  { name: "Autara", logo: "/logos-match-height/autara.png" },
+  { name: "Pregame", logo: "/logos-match-height/pregame.png" },
+  { name: "Twelve", logo: "/logos-match-height/twelve.png" },
+  { name: "Reshift", logo: "/logos-match-height/reshift.png" },
+  { name: "PavePower", logo: "/logos-match-height/pavepower.png" },
+  { name: "BTC Summit Vegas", logo: "/logos-match-height/btc-summit-vegas.png" },
+  { name: "Satoshi Bet", logo: "/logos-match-height/satoshibet.png" },
+  { name: "Panta", logo: "/logos-match-height/panta.png" },
+  { name: "Herth", logo: "/logos-match-height/herth.png" },
+  { name: "Customer Compass", logo: "/logos-match-height/customer-compass.png" },
+  { name: "Answers From Me", logo: "/logos-match-height/answers-from-me.png" },
+  { name: "LivingIP", logo: "/logos-match-height/livingip.png" },
+  { name: "Uni", logo: "/logos-match-height/uni.png" },
 ];
 
-// Featured project
 const featuredProject = {
   name: "HoneyB",
-  tagline: "Modern payroll for contractors",
-  description: "Complete brand identity, marketing website, and investor deck for their seed raise.",
-  deliverables: ["Brand", "Website", "Deck"],
-  image: "/launch/honeyb.png",
+  logo: "/logos-match-height/honeyb.png",
+  title: "Bitcoin yield platform",
+  description:
+    "From blank slate to market-ready in one package. We built HoneyB\u2019s entire brand presence as a single cohesive system.",
+  deliverables: [
+    { num: "01", label: "Brand" },
+    { num: "02", label: "Website" },
+    { num: "03", label: "Deck" },
+  ],
+  image: "/launch-assets/honeyb-spotlight/spotlight-background.png",
+  href: "/work",
 };
 
-function LogoCarousel() {
-  const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
-
+function LogoTrack() {
   return (
-    <div className="flex items-center justify-center gap-8 sm:gap-12 flex-wrap">
-      {clientLogos.map((client) => (
+    <div className="flex items-center gap-16 sm:gap-24 shrink-0">
+      {clientLogos.map((client, i) => (
         <div
-          key={client.name}
-          className="flex items-center justify-center h-8 opacity-40 hover:opacity-70 transition-opacity cursor-default"
+          key={i}
+          className="flex-shrink-0 flex items-center justify-center h-12 sm:h-16 grayscale"
         >
-          {!logoErrors[client.name] ? (
-            <Image
-              src={client.logo}
-              alt={client.name}
-              width={100}
-              height={32}
-              className="h-6 sm:h-7 w-auto object-contain grayscale"
-              onError={() =>
-                setLogoErrors((prev) => ({ ...prev, [client.name]: true }))
-              }
-            />
-          ) : (
-            <span className="text-sm font-medium text-neutral-400">
-              {client.name}
-            </span>
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={client.logo}
+            alt={client.name}
+            loading="eager"
+            decoding="async"
+            className="h-full w-auto object-contain"
+          />
         </div>
       ))}
     </div>
   );
 }
 
-function FeaturedProject() {
-  const [imageError, setImageError] = useState(false);
-
+function LogoCarousel() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Image */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-amber-50 to-orange-100">
-          {!imageError ? (
-            <Image
-              src={featuredProject.image}
-              alt={featuredProject.name}
-              fill
-              className="object-cover"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-semibold text-neutral-300">
-                {featuredProject.name}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col">
-          <span className="text-xs text-neutral-400 uppercase tracking-wider mb-2">
-            Featured Launch
-          </span>
-          <h3
-            className="font-medium text-black mb-2"
-            style={{ fontSize: "clamp(24px, 4vw, 32px)", letterSpacing: "-0.5px" }}
-          >
-            {featuredProject.name}
-          </h3>
-          <p className="text-neutral-500 mb-4">{featuredProject.tagline}</p>
-          <p className="text-neutral-600 text-sm mb-6">
-            {featuredProject.description}
-          </p>
-
-          {/* Deliverables */}
-          <div className="flex flex-wrap gap-2">
-            {featuredProject.deliverables.map((d) => (
-              <span
-                key={d}
-                className="text-xs px-3 py-1.5 bg-neutral-200 text-neutral-600 rounded-full"
-              >
-                {d}
-              </span>
-            ))}
+    <div className="relative">
+      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
+      <div className="overflow-x-clip">
+        <div
+          className="flex w-max animate-logo-scroll will-change-transform backface-hidden"
+        >
+          <LogoTrack />
+          <div className="pl-16 sm:pl-24">
+            <LogoTrack />
           </div>
         </div>
       </div>
@@ -118,7 +97,63 @@ function FeaturedProject() {
   );
 }
 
+function FeaturedProject({ onViewProject }: { onViewProject: () => void }) {
+  return (
+    <div className="relative w-full overflow-hidden rounded-2xl bg-white border border-neutral-200 min-h-[320px] sm:min-h-[380px]">
+      <div
+        className="absolute right-0 top-0 bottom-0 w-[55%] hidden lg:block"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 100%)",
+        }}
+      >
+        <Image
+          src={featuredProject.image}
+          alt={featuredProject.name}
+          fill
+          className="object-cover"
+        />
+      </div>
+
+      <div className="relative z-10 flex flex-col justify-center p-8 sm:p-10 lg:py-9 lg:px-12 max-w-[520px] h-full">
+        <div className="flex items-center gap-2.5 mb-5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={featuredProject.logo}
+            alt=""
+            className="object-contain max-h-16"
+          />
+        </div>
+
+        <h3 className="font-medium text-black text-[clamp(12px,3.5vw,18px)] tracking-[-0.5px] leading-[120%] mb-3">
+          {featuredProject.title}
+        </h3>
+
+        <p className="text-neutral-500 text-base leading-[128%] mb-8">
+          {featuredProject.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2 mb-8">
+          {featuredProject.deliverables.map((item) => (
+            <DeliverablePill key={item.num} num={item.num} label={item.label} className="bg-neutral-50/50" />
+          ))}
+        </div>
+
+        <button
+          onClick={onViewProject}
+          className="group inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-700 transition-colors cursor-pointer"
+        >
+          <span>View Full Project</span>
+          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function RecentWorkSection() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <Section
       id="portfolio"
@@ -144,12 +179,7 @@ export default function RecentWorkSection() {
           {/* Section Title */}
           <div className="text-center mb-10 sm:mb-12">
             <h2
-              className="font-medium text-black cursor-default"
-              style={{
-                fontSize: "clamp(32px, 6vw, 48px)",
-                lineHeight: "110%",
-                letterSpacing: "-1.5px",
-              }}
+              className="font-medium text-black cursor-default text-[clamp(32px,6vw,48px)] leading-[110%] tracking-[-1.5px]"
             >
               Recent Launches
             </h2>
@@ -161,22 +191,17 @@ export default function RecentWorkSection() {
           </div>
 
           {/* Featured Project */}
-          <FeaturedProject />
-
-          {/* View All */}
-          <div className="flex justify-center mt-10 sm:mt-12">
-            <Link
-              href="/work"
-              className="group inline-flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-black transition-colors"
-            >
-              <span>View all work</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Link>
-          </div>
+          <FeaturedProject onViewProject={() => setModalOpen(true)} />
         </InnerContainer>
       </OuterContainer>
 
       <div className="w-full line-dash-x" />
+
+      <ProjectSpotlightModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        project={featuredProject}
+      />
     </Section>
   );
 }
