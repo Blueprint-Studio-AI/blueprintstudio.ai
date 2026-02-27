@@ -60,7 +60,7 @@ export default function ProjectSpotlightModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-[#FAFAF9] rounded-2xl shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 border-b border-neutral-100">
