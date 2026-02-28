@@ -24,39 +24,39 @@ const testimonials = [
   },
   {
     id: 3,
+    quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
+    author: "Shina Foo",
+    role: "COO",
+    company: "Perena",
+    image: "/testimonials/shina-foo-perena.jpg"
+  },
+  {
+    id: 4,
     quote: "This looks so good wtf",
     author: "Hugo",
     role: "CEO & Founder",
     company: "HUCH"
   },
   {
-    id: 4,
+    id: 5,
     quote: "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
     author: "Steven Luis Howell",
     role: "CEO & Co-Founder",
     company: "Project Metavision"
   },
   {
-    id: 5,
+    id: 6,
     quote: "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
     author: "Mauricio Manhaes",
     role: "President",
     company: "SDN Academic Task Force"
   },
   {
-    id: 6,
+    id: 7,
     quote: "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
     author: "Alex Escudero",
     role: "Co-Founder",
     company: "Project Metavision"
-  },
-  {
-    id: 7,
-    quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
-    author: "Shina Foo",
-    role: "COO",
-    company: "Perena",
-    image: "/testimonials/shina-foo-perena.jpg"
   }
 ];
 
