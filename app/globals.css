@@ -190,6 +190,19 @@ html.lenis body {
     opacity: 1;
   }
 
+  .line-dash-border {
+    position: relative;
+  }
+
+  .line-dash-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px dashed #d4d4d4;
+  }
+
   .btn-construction > * {
     position: relative;
     z-index: 2;
