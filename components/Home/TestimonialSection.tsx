@@ -26,7 +26,7 @@ const testimonials = [
     id: 3,
     quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
     author: "Shina Foo",
-    role: "COO",
+    role: "Head of Growth",
     company: "Perena",
     image: "/testimonials/shina-foo-perena.jpg"
   },
