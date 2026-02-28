@@ -52,7 +52,7 @@ const testimonials = [
   },
   {
     id: 7,
-    quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work : scoped precisely, delivered reliably. They quickly understood what we needed and made collaboration with our internal team feel effortless. Communication was professional throughout, with minimal friction. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
+    quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
     author: "Shina Foo",
     role: "COO",
     company: "Perena",
