@@ -43,6 +43,8 @@ export default function ProjectSpotlightModal({
     };
   }, [isOpen, onClose, scroll]);
 
+  if (typeof document === "undefined") return null;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
