@@ -54,11 +54,6 @@ const deliverables = [
   },
 ];
 
-const bonuses = [
-  "Email signature template",
-  "2-3 application designs",
-  "All source files (Figma, fonts)",
-];
 
 function FeatureItem({
   feature,
@@ -202,24 +197,6 @@ export default function DeliverablesSection() {
             ))}
           </div>
 
-          <div className="max-w-5xl mx-auto mt-16 sm:mt-20">
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="text-neutral-400 text-sm">Also included:</span>
-              {bonuses.map((bonus, i) => (
-                <span key={i} className="text-neutral-600 text-sm">
-                  {bonus}
-                  {i < bonuses.length - 1 && (
-                    <span className="text-neutral-300 ml-6">&middot;</span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-center text-neutral-500 mt-10 cursor-default">
-            Complete brand package.{" "}
-            <span className="text-black font-medium">$18,000.</span>
-          </p>
         </InnerContainer>
       </OuterContainer>
 

@@ -172,13 +172,13 @@ function WorkstreamCarousel({
   const total = workstreams.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const [cardWidth, setCardWidth] = useState(MAX_CARD_WIDTH);
+  const isTransitioning = useRef(false);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      // On mobile: leave 48px for peek; on desktop: leave 120px for side buttons + peek
       const isMobile = w < 640;
       setCardWidth(Math.min(MAX_CARD_WIDTH, w - (isMobile ? 48 : 120)));
     });
@@ -186,8 +186,15 @@ function WorkstreamCarousel({
     return () => observer.disconnect();
   }, []);
 
-  const prev = () => setActiveWorkstream((activeWorkstream - 1 + total) % total);
-  const next = () => setActiveWorkstream((activeWorkstream + 1) % total);
+  const navigate = (index: number) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    setActiveWorkstream(index);
+    setTimeout(() => { isTransitioning.current = false; }, 500);
+  };
+
+  const prev = () => navigate((activeWorkstream - 1 + total) % total);
+  const next = () => navigate((activeWorkstream + 1) % total);
 
   return (
     <div className="mx-auto mt-8 flex flex-col gap-4">

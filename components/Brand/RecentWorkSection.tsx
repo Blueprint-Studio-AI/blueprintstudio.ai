@@ -55,17 +55,15 @@ export default function RecentWorkSection() {
 
           <div className="text-center mb-10 sm:mb-12">
             <h2 className="font-medium text-black cursor-default text-[clamp(32px,6vw,48px)] leading-[110%] tracking-[-1.5px]">
-              Brands we&apos;ve built
-              <br />
-              to last
+              Brands we&apos;ve<br/>built&nbsp;to&nbsp;last
             </h2>
             <p className="text-neutral-500 mt-3 cursor-default">
               Each delivered in 3 weeks or less
             </p>
           </div>
 
-          <div className="max-w-xl mx-auto">
-            <div className="relative overflow-hidden rounded-2xl bg-white border border-neutral-200">
+          <div className="max-w-lg mx-auto">
+            <div className="relative overflow-hidden drop-shadow-xl">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={project.id}
@@ -75,13 +73,13 @@ export default function RecentWorkSection() {
                   exit={{ x: direction > 0 ? "-100%" : "100%", opacity: 0 }}
                   transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
                 >
-                  <div className="relative w-full aspect-[16/10]">
+                  <div className="relative w-full aspect-[4/3]">
                     <Image
                       src={project.image}
                       alt={project.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, 768px"
-                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 512px"
+                      className="object-contain"
                     />
                   </div>
                 </motion.div>
