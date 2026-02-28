@@ -190,6 +190,20 @@ html.lenis body {
     opacity: 1;
   }
 
+  .line-dash-border {
+    position: relative;
+    --dash-color: hsl(var(--neutral-300));
+  }
+
+  .line-dash-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect x='0.5' y='0.5' width='99%25' height='99%25' rx='12' ry='12' fill='none' stroke='%23d4d4d4' stroke-width='1' stroke-dasharray='6%2C6'/%3E%3C/svg%3E");
+  }
+
   .btn-construction > * {
     position: relative;
     z-index: 2;
