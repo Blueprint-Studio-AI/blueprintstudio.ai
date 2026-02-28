@@ -166,7 +166,7 @@ export default function PricingSection() {
 
               {/* Button */}
               <motion.button
-                className="relative w-full py-3 px-6 font-medium flex items-center justify-center text-white rounded-xl mt-auto text-sm overflow-hidden"
+                className="group relative w-full py-3 px-6 font-medium flex items-center justify-center text-white rounded-xl mt-auto text-sm overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)',
                   boxShadow: `
@@ -234,7 +234,7 @@ export default function PricingSection() {
                 />
 
                 <span className="relative z-10" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Book a Call</span>
-                <ArrowUpRight className="w-4 h-4 ml-2 relative z-10" />
+                <ArrowUpRight className="w-4 h-4 ml-2 relative z-10 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </motion.button>
             </div>
 

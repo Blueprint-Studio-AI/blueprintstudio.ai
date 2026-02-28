@@ -166,7 +166,7 @@ export default function PricingSection() {
             </div>
 
             <motion.div
-              className="inline-flex rounded-xl p-px"
+              className="inline-flex rounded-xl p-[2px]"
               style={{
                 background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
                 backgroundSize: "300% 300%",
@@ -176,10 +176,10 @@ export default function PricingSection() {
             >
               <Link
                 href="/launch"
-                className="inline-flex items-center gap-1.5 px-8 py-3 text-sm font-medium text-black rounded-[calc(0.75rem-1px)] bg-neutral-50 transition-colors hover:text-neutral-700"
+                className="group inline-flex items-center gap-1.5 px-8 py-3 text-sm font-medium text-black rounded-[calc(0.75rem-2px)] bg-neutral-50 transition-colors hover:text-neutral-700"
               >
                 See full launch package
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
             </motion.div>
           </div>
