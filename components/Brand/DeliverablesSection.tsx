@@ -1,12 +1,26 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useScrollTo } from "@/components/SmoothScroll";
+import dynamic from "next/dynamic";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import FeatureItem from "@/components/ui/FeatureItem";
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
+function LottieAnimation({ src }: { src: string }) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetch(src)
+      .then((res) => res.json())
+      .then(setData);
+  }, [src]);
+  if (!data) return <div className="w-full aspect-video bg-neutral-100 rounded-2xl animate-pulse" />;
+  return <Lottie animationData={data} loop autoplay className="w-full h-auto" />;
+}
 
 const deliverables = [
   {
@@ -15,7 +29,7 @@ const deliverables = [
     label: "Logo",
     title: "Logo &\nIdentity",
     description: "A complete visual system built to scale. Includes:",
-    video: "/brand-assets/visual-identity.mp4",
+    lottie: "/brand-assets/lottie/visual-identity.json",
     features: [
       { name: "Logo System", detail: "Primary, secondary, icon, and lockup variations" },
       { name: "Color Palette", detail: "Full palette with usage rules and accessibility checks" },
@@ -29,7 +43,7 @@ const deliverables = [
     label: "Guidelines",
     title: "Brand\nGuidelines",
     description: "Everything your team needs to stay on-brand. Includes:",
-    video: "/brand-assets/brand-application.mp4",
+    lottie: "/brand-assets/lottie/brand-guidelines.json",
     features: [
       { name: "Brand Book", detail: "20-30 page comprehensive brand book" },
       { name: "Voice & Tone", detail: "Documentation for consistent messaging" },
@@ -43,7 +57,7 @@ const deliverables = [
     label: "AI Prompts",
     title: "AI\nPrompts",
     description: "Stay on-brand at scale with AI-ready assets. Includes:",
-    video: "/brand-assets/ai-promopts.mp4",
+    lottie: "/brand-assets/lottie/ai-prompts.json",
     features: [
       { name: "Brand Voice Prompts", detail: "Pre-configured prompts tuned to your brand voice" },
       { name: "Asset Generator", detail: "Custom prompts for on-brand visual generation" },
@@ -110,16 +124,9 @@ export default function DeliverablesSection() {
                 className={index > 0 ? "mt-16 sm:mt-24" : ""}
               >
                 <div className="max-w-5xl mx-auto pl-0 sm:pl-12 space-y-6">
-                  {"video" in item && item.video && (
-                    <div className="w-full rounded-2xl overflow-hidden">
-                      <video
-                        src={item.video}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-auto"
-                      />
+                  {item.lottie && (
+                    <div className="w-full max-w-md mx-auto rounded-2xl overflow-hidden">
+                      <LottieAnimation src={item.lottie} />
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
