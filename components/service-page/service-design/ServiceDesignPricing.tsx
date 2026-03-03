@@ -144,7 +144,7 @@ export function ServiceDesignPricing() {
                 onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
               >
                 <span>Book a Call</span>
-                <ArrowUpRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
 
               {/* Calendar Preview */}
@@ -212,7 +212,7 @@ export function ServiceDesignPricing() {
                 onMouseLeave={() => setShowChatPreview(false)}
               >
                 <span>Get Service Design Quote</span>
-                <ArrowUpRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
 
 
