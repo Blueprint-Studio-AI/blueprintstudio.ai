@@ -100,7 +100,19 @@ export default function PricingSection() {
               </div>
 
               <div className="p-4 sm:p-8 lg:p-10">
-                <div className={`rounded-[12px] p-6 sm:p-8 flex flex-col h-full transition-colors border ${deckAdded ? "bg-white border-[#186FF5]" : "bg-neutral-50/50 border-transparent line-dash-border"}`}>
+                <motion.div
+                  className="rounded-[12px] h-full"
+                  style={{
+                    padding: deckAdded ? 2 : 0,
+                    background: deckAdded
+                      ? "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)"
+                      : "transparent",
+                    backgroundSize: "300% 300%",
+                  }}
+                  animate={deckAdded ? { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] } : {}}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
+                <div className={`rounded-[11px] p-6 sm:p-8 flex flex-col h-full transition-colors ${deckAdded ? "bg-white" : "bg-neutral-50/50 border border-transparent line-dash-border"}`}>
                   <h3 className="font-medium text-xl text-black mb-1 cursor-default">
                     <span className="text-neutral-400">+</span> Pitch Deck
                   </h3>
@@ -136,6 +148,7 @@ export default function PricingSection() {
                     </button>
                   </div>
                 </div>
+                </motion.div>
               </div>
             </div>
 
