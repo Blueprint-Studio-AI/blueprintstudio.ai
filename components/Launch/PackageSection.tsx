@@ -10,43 +10,10 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Palette, Globe, Presentation, Play, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import FeatureItem from "@/components/ui/FeatureItem";
+import BrandPicker from "@/components/ui/BrandPicker";
+import MarqueeGalleryRow from "@/components/ui/MarqueeGalleryRow";
+import { brandPortfolio } from "@/data/brandPortfolio";
 import { cn } from "@/lib/utils";
-
-const brandPortfolio = [
-  {
-    id: "uni",
-    name: "UNI",
-    tagline: "ウニ",
-    accentColor: "#E8392A",
-    headline: "Japanese Street Food Brand",
-    description: "Bold, playful identity for a fast-casual concept launching in LA.",
-    logo: "/launch-assets/brand-picker-icons/uni.png",
-    logoMark: "/logos-match-height/uni.png",
-    gallery: ["/launch-assets/brand-identity_assets/brand-identity_UNI.png"],
-  },
-  {
-    id: "autara",
-    name: "Autara",
-    tagline: "AI Infrastructure",
-    accentColor: "#6366F1",
-    headline: "Developer-First AI Platform",
-    description: "Clean, technical identity for a Series A infrastructure startup.",
-    logo: "/launch-assets/brand-picker-icons/autara.png",
-    logoMark: "/logos-match-height/autara.png",
-    gallery: ["/launch-assets/brand-identity_assets/brand-identity_autara.png"],
-  },
-  {
-    id: "huch",
-    name: "Huch",
-    tagline: "Gaming Platform",
-    accentColor: "#16A34A",
-    headline: "Gaming Cases Marketplace",
-    description: "Bold, dark identity built for a competitive gaming audience.",
-    logo: "/launch-assets/brand-picker-icons/huch.png",
-    logoMark: "/logos-match-height/huch.png",
-    gallery: ["/launch-assets/brand-identity_assets/brand-identity_huch.png"],
-  },
-];
 
 const FT = "/launch-assets/slide-deck_assets/friday-table_deck-assets";
 const deckBrands = [
@@ -82,74 +49,6 @@ const deckBrands = [
     gallery: Array.from({ length: 15 }, (_, i) => `/launch-assets/slide-deck_assets/huch_deck-assets/huch-${i + 1}.jpg`),
   },
 ];
-
-function BrandPicker<T extends { id: string; logo: string; name: string }>({
-  brands,
-  selectedId,
-  onSelect,
-}: {
-  brands: T[];
-  selectedId: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="flex gap-3 items-center justify-center md:justify-start h-[72px]">
-      {brands.map((brand) => {
-        const isActive = brand.id === selectedId;
-        return (
-          <button
-            key={brand.id}
-            onClick={() => onSelect(brand.id)}
-            className={cn(
-              "cursor-pointer flex-shrink-0 transition-all duration-300 rounded-lg p-1 bg-white shadow-[0_2.157px_8.843px_0_rgba(0,0,0,0.34)]",
-              isActive ? "w-[72px] h-[72px] opacity-100" : "w-[60px] h-[60px] opacity-40 hover:opacity-70"
-            )}
-          >
-            <div className="relative w-full h-full overflow-hidden rounded-md">
-              <Image src={brand.logo} alt={brand.name} fill sizes="72px" loading="eager" className="object-cover" />
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function GalleryTrack({ images, imageClassName, imgClassName, sizes }: { images: string[]; imageClassName?: string; imgClassName?: string; sizes?: string }) {
-  return (
-    <div className="flex items-center gap-4 shrink-0">
-      {images.map((src, i) => (
-        <div key={i} className={cn("relative rounded-xl overflow-hidden flex-shrink-0", imageClassName ?? "w-64 aspect-video")}>
-          <Image src={src} alt="" fill sizes={sizes ?? "256px"} className={cn("object-cover", imgClassName)} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MarqueeGalleryRow({ reverse = false, images, imageClassName, imgClassName, sizes }: { reverse?: boolean; images: string[]; imageClassName?: string; imgClassName?: string; sizes?: string }) {
-  return (
-    <div className="relative overflow-hidden">
-      <div
-        className="absolute left-0 top-0 bottom-0 w-24 pointer-events-none z-10"
-        style={{ background: "linear-gradient(to right, hsl(var(--neutral-50)), transparent)" }}
-      />
-      <div
-        className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10"
-        style={{ background: "linear-gradient(to left, hsl(var(--neutral-50)), transparent)" }}
-      />
-      <div
-        className={`flex w-max ${reverse ? "animate-gallery-scroll-reverse" : "animate-gallery-scroll"}`}
-        style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-      >
-        <GalleryTrack images={images} imageClassName={imageClassName} imgClassName={imgClassName} sizes={sizes} />
-        <div className="pl-4">
-          <GalleryTrack images={images} imageClassName={imageClassName} imgClassName={imgClassName} sizes={sizes} />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const websiteBrands = [
   {

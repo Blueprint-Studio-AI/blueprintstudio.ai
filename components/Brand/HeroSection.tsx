@@ -11,12 +11,16 @@ import GradientButton from "@/components/ui/GradientButton";
 import GradientText from "@/components/ui/GradientText";
 import DeliverablePill from "@/components/ui/DeliverablePill";
 import SocialProof from "@/components/ui/SocialProof";
+import MarqueeGalleryRow from "@/components/ui/MarqueeGalleryRow";
+import { brandPortfolio } from "@/data/brandPortfolio";
 
 const deliverables = [
   { num: "01", label: "Logo" },
   { num: "02", label: "Guidelines" },
   { num: "04", label: "AI Prompts" },
 ];
+
+const allGalleryImages = brandPortfolio.flatMap((b) => b.gallery);
 
 export default function HeroSection() {
   return (
@@ -82,6 +86,10 @@ export default function HeroSection() {
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </GradientButton>
             </div>
+          </div>
+
+          <div className="mt-16 sm:mt-24">
+            <MarqueeGalleryRow images={allGalleryImages} imageClassName="h-48 sm:h-72 w-[1150px]" imgClassName="object-contain" sizes="1150px" />
           </div>
         </InnerContainer>
       </OuterContainer>
