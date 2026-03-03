@@ -17,9 +17,9 @@ export default function BrandPage() {
     <div>
       <HeroSection />
       <ProblemSection />
-      <RecentWorkSection />
-      <ProcessSection />
       <DeliverablesSection />
+      <ProcessSection />
+      <RecentWorkSection />
       <TestimonialTicker />
       <PricingSection />
       <FoundersSection />
