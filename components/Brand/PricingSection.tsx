@@ -169,14 +169,6 @@ export default function PricingSection() {
               Add website, pitch deck, and launch video.
             </p>
 
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="w-16 h-16 rounded-xl bg-neutral-200" />
-              <span className="text-neutral-400 text-lg font-light">+</span>
-              <div className="w-16 h-16 rounded-xl bg-neutral-200" />
-              <div className="w-16 h-16 rounded-xl bg-neutral-200" />
-              <div className="w-16 h-16 rounded-xl bg-neutral-200" />
-            </div>
-
             <motion.div
               className="inline-flex rounded-xl p-[2px]"
               style={{
