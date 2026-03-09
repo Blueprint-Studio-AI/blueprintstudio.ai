@@ -17,7 +17,7 @@ import { brandPortfolio } from "@/data/brandPortfolio";
 const deliverables = [
   { num: "01", label: "Logo" },
   { num: "02", label: "Guidelines" },
-  { num: "04", label: "AI Prompts" },
+  { num: "03", label: "AI Prompts" },
 ];
 
 const allGalleryImages = brandPortfolio.flatMap((b) => b.gallery);

@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Brand Identity | Blueprint Studio",
   description:
-    "Your brand in 3 weeks. Logo, guidelines, and a custom AI trained on your brand. Built for founders moving fast. $15-20K.",
+    "Your brand in 3 weeks. Logo, guidelines, and a custom AI trained on your brand. Built for founders moving fast. Starting at $18K.",
   keywords: [
     "brand identity",
     "logo design",
