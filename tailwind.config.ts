@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import { breakpoints } from "./lib/breakpoints";
 
 const config: Config = {
   content: [
@@ -17,14 +16,14 @@ const config: Config = {
       },
     },
     screens: {
-      'xs': breakpoints.xs,
-      'sm': breakpoints.sm,
-      'md': breakpoints.md,
-      'lg': breakpoints.lg,
-      'xl': breakpoints.xl,
-      '2xl': breakpoints['2xl'],
-      'custom': breakpoints.custom,
-      'wide': breakpoints.wide,
+      'xs': "475px",
+      'sm': "640px",
+      'md': "768px",
+      'lg': "1024px",
+      'xl': "1280px",
+      '2xl': "1536px",
+      'custom': "1124px",
+      'wide': "1387px",
     },
     extend: {
       fontFamily: {
@@ -43,11 +42,26 @@ const config: Config = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "logo-scroll-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
+        "gallery-scroll": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "gallery-scroll-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "logo-scroll": "logo-scroll 120s linear infinite",
+        "logo-scroll-reverse": "logo-scroll-reverse 60s linear infinite",
+        "gallery-scroll": "gallery-scroll 80s linear infinite",
+        "gallery-scroll-reverse": "gallery-scroll-reverse 80s linear infinite",
       },
       colors: {
         neutral: {

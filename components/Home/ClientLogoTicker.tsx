@@ -45,7 +45,7 @@ function LogoTrack() {
           className="flex-shrink-0 relative group"
         >
           <div
-            className="flex items-center justify-center h-12 sm:h-16 transition-all duration-500 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100"
+            className="flex items-center justify-center h-12 sm:h-24 transition-all duration-500 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
