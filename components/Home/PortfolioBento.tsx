@@ -95,7 +95,8 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
                   <Image
                     alt={media.alt}
                     fill
-                    sizes="(max-width: 1024px) 33vw, 250px"
+                    sizes={featured ? "(max-width: 768px) 100vw, (max-width: 1024px) 75vw, 750px" : "(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 250px"}
+                    quality={90}
                     className={`object-cover object-center transition-transform duration-300 ${scaleClass}`}
                     src={media.src}
                   />
