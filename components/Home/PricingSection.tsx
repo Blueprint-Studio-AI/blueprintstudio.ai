@@ -253,7 +253,7 @@ export default function PricingSection() {
               {/* Package Rows */}
               <div className="w-full space-y-2">
                 <Link
-                  href="/launch-video"
+                  href="/launch-videos"
                   className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
                 >
                   <div className="flex flex-col">
@@ -261,7 +261,7 @@ export default function PricingSection() {
                     <span className="text-xs text-neutral-500">1-2 weeks</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$5K – $15K</span>
+                    <span className="font-semibold text-sm text-black">$6K – $15K</span>
                     <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                   </div>
                 </Link>
@@ -275,7 +275,7 @@ export default function PricingSection() {
                     <span className="text-xs text-neutral-500">3-4 weeks</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$15K – $20K</span>
+                    <span className="font-semibold text-sm text-black">$18K – $23K</span>
                     <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                   </div>
                 </Link>
