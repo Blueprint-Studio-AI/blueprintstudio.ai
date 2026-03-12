@@ -44,13 +44,12 @@ const footerLinks: Record<string, FooterSection> = {
   //     // { name: 'All Tools', href: '/tools' },
   //   ]
   // },
-  // resources: {
-  //   title: 'Resources',
-  //   links: [
-  //     { name: 'Blog', href: '/blog' },
-  //     { name: 'Case Studies', href: '/case-studies' },
-  //   ]
-  // },
+  resources: {
+    title: 'Resources',
+    links: [
+      { name: 'Insights', href: '/insights' },
+    ]
+  },
   legal: {
     title: 'Legal',
     links: [
