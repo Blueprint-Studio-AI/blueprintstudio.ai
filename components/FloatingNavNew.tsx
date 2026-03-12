@@ -67,7 +67,7 @@ const NavLink = ({
 };
 
 // Routes where the floating nav should be hidden
-const HIDDEN_NAV_ROUTES = ['/launch-videos'];
+const HIDDEN_NAV_ROUTES = ['/launch-videos', '/launch', '/brand'];
 
 export const FloatingNavNew = () => {
   const [activeSection, setActiveSection] = useState('hero');
