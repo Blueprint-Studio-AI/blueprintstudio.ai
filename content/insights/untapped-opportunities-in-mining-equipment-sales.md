@@ -9,16 +9,7 @@ author: "Blueprint Studio"
 
 Mining companies with great products and dated digital presence have the most to gain from how B2B purchasing is shifting in mining. This report examines how mining buyers make decisions, where vendors are falling short, and what the companies winning these deals are doing differently. It draws on conversations with over 40 companies at Minexchange 2026, a review of 15 secondary sources on mining procurement, and an original audit of 30 mining company websites.
 
-**Contents**
-1. The Race Is Already Over
-2. Your Buyer Needs Ammunition
-3. The Communication Gap
-4. The Silent Killer: Time
-5. Generational Shifts and AI
-6. Industry Benchmarks: 30 Websites Audited
-7. Conclusion: Five Opportunities to Lead
-
-## 1) The Race Is Already Over
+## The Race Is Already Over
 
 84% of B2B deals are often decided before the selling organization even knows a buying journey has started ([6sense, 2025](https://6sense.com/newsroom/84-of-b2b-deals-are-decided-before-marketers-even-know-about-them/)). The buyer has already researched solutions, talked to peers, stalked vendor websites, and formed a shortlist. Buyers remain anonymous for roughly 61% of their entire purchasing journey, before approaching a vendor ([6sense, 2025](https://6sense.com/science-of-b2b/buyer-experience-report-2025/)).
 
@@ -28,7 +19,7 @@ Even in relationship-driven industries, the research that happens before the fir
 
 The companies that win in this environment aren't the ones who respond fastest to the RFP. They're the ones who were present, visible, and credible long before the RFP was written.
 
-## 2) Your Buyer Needs Ammunition
+## Your Buyer Needs Ammunition
 
 The person who likes your product is rarely the person who signs the check. Mining purchasing decisions run through a network of stakeholders, each with different priorities and risk tolerances. ([Canadian Mining Journal, March 2026](https://www.canadianminingjournal.com/featured-article/selling-the-technology-bridging-the-gap-between-innovation-and-the-operational-realities-on-mine-sites/))
 
@@ -36,7 +27,7 @@ The person on-site who sees the value in your product has to sell it to everyone
 
 Automotive, aerospace, and pharma already build for this: product configurators, ROI calculators, board-ready business cases. Most mining vendor websites still say "call for a quote." Meanwhile, 61% of B2B buyers prefer finding information on their own terms before engaging a rep ([Gartner, 2025](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-sales-survey-finds-61-percent-of-b2b-buyers-prefer-a-rep-free-buying-experience)). The companies competing against bigger reputations don't close the gap by outspending. They close it by arming every stakeholder with exactly what they need to say yes.
 
-## 3) The Communication Gap
+## The Communication Gap
 
 There's a disconnect between how mining vendors present themselves and how mines evaluate them. Two gaps, both exploitable.
 
@@ -54,13 +45,13 @@ The industry adage holds: "mines buy with their eyes" ([Canadian Mining Journal,
 
 Most mining companies don't capture or showcase this proof systematically. That's a wedge for any company willing to exploit it. Always capture, always publish. Social proof compounds.
 
-## 4) The Silent Killer: Time
+## The Silent Killer: Time
 
 The deals that win are able to survive shifts in budget cycles, leadership, and commodity prices. Steve Gravel maps a five-phase buying process: concept, pilot, demo, integration, scale ([Canadian Mining Journal, 2026](https://www.canadianminingjournal.com/featured-article/selling-the-technology-bridging-the-gap-between-innovation-and-the-operational-realities-on-mine-sites/)). Each phase is a gate where the deal can stall.
 
 The deals that survive look different from the ones that start conversations. Pilot credits that convert to scale-up discounts. Pay-for-performance arrangements. Equipment-as-a-service models and leasing options that shift purchases from CapEx to OpEx. These structures make the deal durable enough to survive five phases of validation, a budget freeze, or a champion leaving mid-cycle. The vendors who survive long sales cycles are the ones who design their commercial model to move with the buyer, not against them.
 
-## 5) Generational Shifts and AI
+## Generational Shifts and AI
 
 The workforce is turning over, and how buyers find you is changing with it.
 
@@ -74,7 +65,7 @@ Boomers hold 22% of the mining workforce. Gen Z holds 10%, expected to double by
 
 Zero of the 30 companies we audited have implemented llms.txt, the emerging standard for AI-driven discovery (*Blueprint Studio, 2026*). None have structured data designed for AI parsing. The good news: these fixes are cheap and fast. llms.txt takes hours to implement. Structured data and direct-answer content are straightforward. The cost of doing nothing is watching the next generation of buyers find your competitor instead.
 
-## 6) Industry Benchmarks: 30 Websites Audited
+## Industry Benchmarks: 30 Websites Audited
 
 We audited 30 mining company websites across equipment manufacturers, exploration firms, and technology companies. We scored mobile performance, accessibility, SEO, and content quality using PageSpeed Insights and DataForSEO. The goal: if a buyer researches you online first, what do they find?
 
