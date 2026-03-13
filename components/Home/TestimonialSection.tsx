@@ -31,6 +31,13 @@ const testimonials = [
     image: "/testimonials/shina-foo-perena.jpg"
   },
   {
+    id: 8,
+    quote: "Blueprint helped us turn our ideas into focused, effective marketing materials. They were fast, responsive, and the quality speaks for itself. We'll definitely be working with them again.",
+    author: "Ali Khalatpour",
+    role: "Founder",
+    company: "Piris Labs"
+  },
+  {
     id: 4,
     quote: "This looks so good wtf",
     author: "Hugo",
