@@ -54,6 +54,15 @@ const testimonials = [
   },
   {
     quote:
+      "It was great working with you guys. You helped us focus our ideas and the final product came out really well. We'll be back for sure 🙂",
+    name: "Ali Khalatpour & Keyvan Moghadam",
+    position: "Founders",
+    company: "Pirus Labs",
+    batch: "YC W26",
+    image: null,
+  },
+  {
+    quote:
       "I absolutely love the video and feel it captures our company impeccably.",
     name: "Julia Zema",
     position: "CMO",
