@@ -137,7 +137,7 @@ export default function TestimonialTicker() {
     if (!scrollContainer) return;
 
     let scrollPosition = 0;
-    const speed = 0.5; // pixels per frame
+    const speed = 0.8; // pixels per frame
 
     const animate = () => {
       scrollPosition += speed;
