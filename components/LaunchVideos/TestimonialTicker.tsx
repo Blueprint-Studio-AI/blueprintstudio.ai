@@ -55,11 +55,11 @@ const testimonials = [
   {
     quote:
       "It was great working with you guys. You helped us focus our ideas and the final product came out really well. We'll be back for sure 🙂",
-    name: "Ali Khalatpour & Keyvan Moghadam",
-    position: "Founders",
+    name: "Ali Khalatpour",
+    position: "Founder",
     company: "Pirus Labs",
     batch: "YC W26",
-    image: null,
+    image: "/testimonials/ali-khalatpour.png",
   },
   {
     quote:
