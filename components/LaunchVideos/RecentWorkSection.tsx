@@ -52,13 +52,21 @@ const featuredProjects: FeaturedProject[] = [
     postUrl: "https://x.com/perena/status/2002083042308104204",
   },
   {
+    name: "Pirus Labs",
+    type: "Launch Video",
+    batch: "YC W26",
+    timeline: "",
+    youtubeId: "PeaWXlRNjPE",
+    postUrl: "",
+  },
+  /* {
     name: "AgeVisor 3",
     type: "Launch Video",
     batch: "",
     timeline: "7 days",
     youtubeId: "PBJbbMQ17eo",
     postUrl: "https://youtu.be/PBJbbMQ17eo?si=tpK1OctSAuHLP6T8",
-  },
+  }, */
   {
     name: "Blueprint Studio",
     type: "Show Reel",
