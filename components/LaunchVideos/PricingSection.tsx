@@ -62,10 +62,7 @@ export default function PricingSection() {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-neutral-400 line-through text-lg">$10,000</span>
-                  <span className="text-3xl font-bold text-black">
-                    $6,000<sup className="text-base text-black font-semibold ml-0.5">*</sup>
-                  </span>
+                  <span className="text-3xl font-bold text-black">$8,000</span>
                 </div>
 
                 {/* Features */}
@@ -155,12 +152,6 @@ export default function PricingSection() {
               </div>
             </div>
 
-            {/* Footnote - centered under Fast card */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-              <p className="text-xs text-neutral-500 text-center cursor-default">
-                <span className="text-black">*</span> Tag us in your launch post to unlock this rate.
-              </p>
-            </div>
           </div>
         </InnerContainer>
       </OuterContainer>
