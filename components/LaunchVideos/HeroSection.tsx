@@ -101,7 +101,7 @@ export default function HeroSection() {
 
               {/* Rating */}
               <SocialProof>
-                100+ video projects delivered
+                2M+ views across YouTube, LinkedIn, and X
               </SocialProof>
 
               {/* CTA Button */}

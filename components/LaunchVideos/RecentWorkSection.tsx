@@ -5,8 +5,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { X, Play, ExternalLink } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Play, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 interface FeaturedProject {
@@ -103,7 +102,7 @@ function VideoCard({ project }: { project: FeaturedProject }) {
   return (
     <div className="group flex flex-col">
       {/* Video/Thumbnail Area - Clean, no overlays */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-neutral-900">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-neutral-200">
         {isPlaying && project.youtubeId ? (
           // YouTube Embed
           <iframe
@@ -173,11 +172,8 @@ function VideoCard({ project }: { project: FeaturedProject }) {
 }
 
 export default function RecentWorkSection() {
-  const [showModal, setShowModal] = useState(false);
-
   return (
-    <>
-      <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
         {/* Vertical lines */}
         <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
           <div className="w-full flex-1 flex justify-center relative">
@@ -216,61 +212,47 @@ export default function RecentWorkSection() {
               ))}
             </div>
 
-            {/* More Projects Button */}
-            <div className="flex justify-center mt-8">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-neutral-300 bg-white text-sm font-medium text-neutral-500 cursor-default">
-                <span>+75 more projects</span>
+          </InnerContainer>
+        </OuterContainer>
+
+        {/* Stats Bar */}
+        <div className="w-full line-dash-x" />
+        <OuterContainer>
+          <InnerContainer className="px-0 sm:px-6 relative">
+            <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+            <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+            <div className="grid grid-cols-3">
+              <div className="flex flex-col items-center justify-center py-10 sm:py-14">
+                <span
+                  className="font-semibold text-black tracking-tight"
+                  style={{ fontSize: "clamp(22px, 4vw, 32px)" }}
+                >
+                  100+
+                </span>
+                <span className="text-[10px] sm:text-sm text-neutral-400 uppercase tracking-wider sm:tracking-widest mt-2 text-center leading-relaxed">Videos<br className="sm:hidden" /> Delivered</span>
+              </div>
+              <div className="flex flex-col items-center justify-center py-10 sm:py-14 border-x border-neutral-300">
+                <span
+                  className="font-semibold text-black tracking-tight"
+                  style={{ fontSize: "clamp(22px, 4vw, 32px)" }}
+                >
+                  2M+
+                </span>
+                <span className="text-[10px] sm:text-sm text-neutral-400 uppercase tracking-wider sm:tracking-widest mt-2 text-center leading-relaxed">Total<br className="sm:hidden" /> Views</span>
+              </div>
+              <div className="flex flex-col items-center justify-center py-10 sm:py-14">
+                <span
+                  className="font-semibold text-black tracking-tight"
+                  style={{ fontSize: "clamp(22px, 4vw, 32px)" }}
+                >
+                  10 Days
+                </span>
+                <span className="text-[10px] sm:text-sm text-neutral-400 uppercase tracking-wider sm:tracking-widest mt-2 text-center leading-relaxed">Avg.<br className="sm:hidden" /> Turnaround</span>
               </div>
             </div>
           </InnerContainer>
         </OuterContainer>
-
         <div className="w-full line-dash-x" />
       </Section>
-
-      {/* Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-            onClick={() => setShowModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[80vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-medium text-xl text-black">All Projects</h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
-                >
-                  <X className="w-4 h-4 text-neutral-600" />
-                </button>
-              </div>
-
-              <div className="space-y-2">
-                {[...featuredProjects.map((p) => p.name), ...moreProjects].map(
-                  (name, index) => (
-                    <div
-                      key={index}
-                      className="py-2 px-3 rounded-lg hover:bg-neutral-50 text-neutral-700 text-sm"
-                    >
-                      {name}
-                    </div>
-                  )
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
   );
 }
