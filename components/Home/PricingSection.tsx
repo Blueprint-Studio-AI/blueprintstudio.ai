@@ -261,7 +261,7 @@ export default function PricingSection() {
                     <span className="text-xs text-neutral-500">1-2 weeks</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$6K – $15K</span>
+                    <span className="font-semibold text-sm text-black">$8K – $15K</span>
                     <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                   </div>
                 </Link>
