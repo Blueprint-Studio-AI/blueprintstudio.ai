@@ -101,7 +101,8 @@ export default function HeroSection() {
 
               {/* Rating */}
               <SocialProof>
-                2M+ views across YouTube, LinkedIn, and X
+                <span className="sm:hidden">2M+ views across socials</span>
+                <span className="hidden sm:inline">2M+ views across YouTube, LinkedIn, and X</span>
               </SocialProof>
 
               {/* CTA Button */}
