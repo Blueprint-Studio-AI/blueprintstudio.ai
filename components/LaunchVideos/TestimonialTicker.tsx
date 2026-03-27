@@ -23,7 +23,7 @@ const testimonials = [
     name: "Sam Karu",
     position: "CEO",
     company: "Logical",
-    batch: "YC W25",
+    batch: "YC F25",
     image: "/testimonials/sam-karu.jpg",
   },
   {
