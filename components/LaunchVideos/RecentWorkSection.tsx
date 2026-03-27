@@ -37,7 +37,7 @@ const featuredProjects: FeaturedProject[] = [
   {
     name: "Logical",
     type: "Launch Video",
-    batch: "YC W25",
+    batch: "YC F25",
     timeline: "2 weeks",
     youtubeId: "W9gC1McdJMg",
     postUrl: "https://www.linkedin.com/posts/y-combinator_logical-yc-f25-is-a-proactive-desktop-copilot-activity-7393014457301417984-NV5G?utm_source=share&utm_medium=member_desktop&rcm=ACoAABcN1DsBRNShbfWWg8JLpN9N_b1Y8xHVcKw",
