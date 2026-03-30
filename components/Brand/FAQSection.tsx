@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -9,7 +9,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
-const faqs = [
+const faqs: { question: string; answer: ReactNode }[] = [
   {
     question: "What if I already have a logo?",
     answer:
@@ -21,38 +21,32 @@ const faqs = [
       "Pre-configured prompts for ChatGPT, Claude, and Midjourney that are trained on your brand voice and guidelines. Use them to draft copy, generate visuals, or stay consistent as you scale. They're yours to keep and share with your team.",
   },
   {
-    question: 'What are the "applications of choice"?',
+    question: "Can I choose which applications you design?",
     answer:
-      "After the core deliverables, you pick 2-3 extras: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. We've done this enough to know every founder has different needs.",
+      "Yes. After the core deliverables, you pick 2-3 applications: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. Every founder has different needs -- we've done enough to know that.",
   },
   {
-    question: "How many revisions are included?",
+    question: "How many rounds of revisions are included?",
     answer:
       "Two rounds of revisions at each phase. We've never needed more, but if scope expands significantly, we'll discuss.",
   },
   {
-    question: "What do you need from me to get started?",
+    question: "What do I need to provide to get started?",
     answer:
-      "A 1-hour kickoff call, access to any existing brand assets, examples of brands you admire, and quick responses when we have questions.",
+      "A 1-hour kickoff call, access to any existing brand assets, examples of brands you admire, and quick responses when we have questions. That's it.",
   },
   {
-    question: "What if I need a website too?",
+    question: "Can I add a website or pitch deck later?",
     answer: (
       <>
-        Check out our{" "}
-        <Link
-          href="/launch"
-          className="underline hover:text-neutral-900 transition-colors"
-        >
-          Launch Package
-        </Link>{" "}
-        — it includes brand identity plus website, pitch deck, and
-        launch video starting at $50K.
+        Absolutely. You can start with brand identity and add a website or pitch
+        deck at any point. The pricing stays the same whether you bundle or add
+        later.
       </>
     ),
   },
   {
-    question: "Do you offer ongoing support?",
+    question: "Do you offer ongoing brand support?",
     answer: (
       <>
         Yes. Many clients move to our{" "}
@@ -68,12 +62,13 @@ const faqs = [
   },
 ];
 
-interface FaqItemProps {
+function FaqItem({
+  question,
+  answer,
+}: {
   question: string;
   answer: ReactNode;
-}
-
-function FaqItem({ question, answer }: FaqItemProps) {
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -120,7 +115,6 @@ function FaqItem({ question, answer }: FaqItemProps) {
 export default function FAQSection() {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
-      {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
@@ -132,16 +126,12 @@ export default function FAQSection() {
 
       <SectionHeader leftText="FAQ" rightText="// clarity" />
 
-      {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 md:px-6 relative">
-          {/* Inner dashed vertical lines on desktop */}
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-          {/* FAQ Container */}
           <div className="max-w-3xl px-2 md:mx-auto">
-            {/* Title */}
             <div className="text-center mb-12">
               <h2
                 className="font-medium text-black mb-4 cursor-default"
@@ -156,10 +146,13 @@ export default function FAQSection() {
               </h2>
             </div>
 
-            {/* FAQ Items */}
             <div>
               {faqs.map((faq, index) => (
-                <FaqItem key={index} question={faq.question} answer={faq.answer} />
+                <FaqItem
+                  key={index}
+                  question={faq.question}
+                  answer={faq.answer}
+                />
               ))}
             </div>
           </div>
@@ -168,7 +161,6 @@ export default function FAQSection() {
 
       <div className="w-full line-dash-x" />
 
-      {/* Spacer to create double line effect */}
       <div className="bg-neutral-100 py-4 sm:py-6 lg:py-8">
         <div className="w-full line-dash-x" />
       </div>

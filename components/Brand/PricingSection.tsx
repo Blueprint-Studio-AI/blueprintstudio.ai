@@ -1,31 +1,59 @@
 "use client";
 
-import { useState } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight, Check } from "lucide-react";
 import SocialProof from "@/components/ui/SocialProof";
-import { FeatureRow, PricingContainer, PricingFooter } from "@/components/ui/PricingCard";
+import {
+  FeatureRow,
+  PricingContainer,
+  PricingFooter,
+} from "@/components/ui/PricingCard";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import {
+  useBrandPackage,
+  WEBSITE_PRICE,
+  DECK_PRICE,
+} from "./BrandPackageContext";
 
 const brandItems = [
   { title: "Logo System", desc: "Primary mark, word-mark, icon variations." },
-  { title: "Design System", desc: "Typography, color palette, visual language." },
-  { title: "Social Kit + Email Signature", desc: "Profile assets and templates for posts." },
-  { title: "AI Prompts", desc: "Custom guidelines for consistent AI generation." },
+  {
+    title: "Brand Guidelines",
+    desc: "Voice, tone, usage rules -- 20-30 page brand book.",
+  },
+  {
+    title: "Color & Typography",
+    desc: "Full palette, type hierarchy, usage guidelines.",
+  },
+  {
+    title: "Patterns & Motifs",
+    desc: "Custom textures and visual elements.",
+  },
+  {
+    title: "Social Kit + Email Signature",
+    desc: "Profile assets and templates for posts.",
+  },
+  {
+    title: "AI Prompts",
+    desc: "Custom guidelines for consistent AI generation.",
+  },
+  {
+    title: "Sample Applications",
+    desc: "Business cards, letterheads, slide templates.",
+  },
 ];
 
-const deckItems = [
-  { title: "Narrative & Structure", desc: "Layouts, charts, visual hierarchy" },
-  { title: "Slide Design", desc: "Formatted for presentations and downloads" },
-];
+function formatPrice(amount: number): string {
+  return `$${amount.toLocaleString()}`;
+}
 
 export default function PricingSection() {
-  const [deckAdded, setDeckAdded] = useState(false);
-  const total = deckAdded ? "$23,000" : "$18,000";
+  const { websiteAdded, deckAdded, toggleWebsite, toggleDeck, total } =
+    useBrandPackage();
 
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
@@ -75,85 +103,167 @@ export default function PricingSection() {
           </div>
 
           <PricingContainer>
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-6 sm:p-14 lg:p-[72px]">
+            <div className="p-6 sm:p-10 lg:p-14">
+              {/* Base Package */}
+              <div className="mb-8">
                 <h3 className="font-medium text-xl text-black mb-1 cursor-default">
-                  Launch Package
+                  Brand Identity
                 </h3>
                 <p className="text-neutral-500 text-sm cursor-default">
-                  Everything you need to go to market.
+                  Everything you need for a market-ready brand.
                 </p>
 
                 <div className="mt-6">
-                  <span className="text-xs text-neutral-500 block">Base Price</span>
+                  <span className="text-xs text-neutral-500 block">
+                    Base Price
+                  </span>
                   <span className="font-semibold text-black text-[clamp(32px,5vw,40px)] leading-tight">
                     $18,000
                   </span>
                 </div>
-
-                <p className="text-sm font-medium text-black mt-8 mb-4">Includes:</p>
-                <div className="space-y-6">
-                  {brandItems.map((item) => (
-                    <FeatureRow key={item.title} title={item.title} desc={item.desc} />
-                  ))}
-                </div>
               </div>
 
-              <div className="p-4 sm:p-8 lg:p-10">
-                <div className="relative rounded-[12px] h-full p-[2px]">
-                  <motion.div
-                    className="absolute inset-0 rounded-[12px]"
-                    style={{
-                      background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-                      backgroundSize: "300% 300%",
-                    }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: deckAdded ? 1 : 0, backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                    transition={{ opacity: { duration: 0.3 }, backgroundPosition: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
+              <p className="text-sm font-medium text-black mb-4">Includes:</p>
+              <div className="space-y-6 mb-8">
+                {brandItems.map((item) => (
+                  <FeatureRow
+                    key={item.title}
+                    title={item.title}
+                    desc={item.desc}
                   />
-                <div className={`relative rounded-[10px] p-6 sm:p-8 flex flex-col h-full transition-colors duration-300 ${deckAdded ? "bg-white" : "bg-neutral-50 line-dash-border"}`}>
-                  <h3 className="font-medium text-xl text-black mb-1 cursor-default">
-                    <span className="text-neutral-400">+</span> Pitch Deck
-                  </h3>
-                  <p className="text-neutral-500 text-sm cursor-default">
-                    Go to market with a working MVP.
-                  </p>
+                ))}
+              </div>
 
-                  <div className="mt-6">
-                    <span className="text-xs text-neutral-500 block">Plus Product</span>
-                    <span className="font-semibold text-black text-[clamp(32px,5vw,40px)] leading-tight">
-                      $5,000
-                    </span>
-                  </div>
-
-                  <p className="text-sm font-medium text-black mt-8 mb-4">Includes:</p>
-                  <div className="space-y-6">
-                    {deckItems.map((item) => (
-                      <FeatureRow key={item.title} title={item.title} desc={item.desc} />
-                    ))}
-                  </div>
-
-                  <div className="mt-auto pt-8">
-                    <button
-                      onClick={() => setDeckAdded(!deckAdded)}
-                      className={`w-full py-2.5 px-6 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-                        deckAdded
-                          ? "border-[#186FF5] text-[#186FF5]"
-                          : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
+              {/* Add-on toggles */}
+              <div className="border-t border-neutral-200 pt-8 mt-8">
+                <p className="text-sm font-medium text-black mb-4">Add-ons:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Website Add-on */}
+                  <div className="relative rounded-[12px] p-[2px]">
+                    <motion.div
+                      className="absolute inset-0 rounded-[12px]"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                        backgroundSize: "300% 300%",
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: websiteAdded ? 1 : 0,
+                        backgroundPosition: [
+                          "0% 50%",
+                          "100% 50%",
+                          "0% 50%",
+                        ],
+                      }}
+                      transition={{
+                        opacity: { duration: 0.3 },
+                        backgroundPosition: {
+                          duration: 6,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    />
+                    <div
+                      className={`relative rounded-[10px] p-4 sm:p-5 transition-colors duration-300 ${
+                        websiteAdded
+                          ? "bg-white"
+                          : "bg-neutral-50 line-dash-border"
                       }`}
                     >
-                      {deckAdded && <Check className="w-4 h-4" />}
-                      {deckAdded ? "Added" : "+ Add to Package"}
-                    </button>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-black text-sm cursor-default">
+                          <span className="text-neutral-400">+</span> Website
+                        </h4>
+                        <span className="text-sm font-medium text-neutral-600">
+                          {formatPrice(WEBSITE_PRICE)}
+                        </span>
+                      </div>
+                      <p className="text-neutral-500 text-xs mb-4 cursor-default">
+                        Custom design, development, responsive, CMS & SEO
+                      </p>
+                      <button
+                        onClick={toggleWebsite}
+                        className={`w-full py-2 px-4 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                          websiteAdded
+                            ? "border-[#186FF5] text-[#186FF5]"
+                            : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
+                        }`}
+                      >
+                        {websiteAdded && <Check className="w-4 h-4" />}
+                        {websiteAdded ? "Added" : "+ Add to Package"}
+                      </button>
+                    </div>
                   </div>
-                </div>
+
+                  {/* Pitch Deck Add-on */}
+                  <div className="relative rounded-[12px] p-[2px]">
+                    <motion.div
+                      className="absolute inset-0 rounded-[12px]"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                        backgroundSize: "300% 300%",
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: deckAdded ? 1 : 0,
+                        backgroundPosition: [
+                          "0% 50%",
+                          "100% 50%",
+                          "0% 50%",
+                        ],
+                      }}
+                      transition={{
+                        opacity: { duration: 0.3 },
+                        backgroundPosition: {
+                          duration: 6,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        },
+                      }}
+                    />
+                    <div
+                      className={`relative rounded-[10px] p-4 sm:p-5 transition-colors duration-300 ${
+                        deckAdded
+                          ? "bg-white"
+                          : "bg-neutral-50 line-dash-border"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-black text-sm cursor-default">
+                          <span className="text-neutral-400">+</span> Pitch Deck
+                        </h4>
+                        <span className="text-sm font-medium text-neutral-600">
+                          {formatPrice(DECK_PRICE)}
+                        </span>
+                      </div>
+                      <p className="text-neutral-500 text-xs mb-4 cursor-default">
+                        Narrative strategy, slide design, speaker notes, source
+                        files
+                      </p>
+                      <button
+                        onClick={toggleDeck}
+                        className={`w-full py-2 px-4 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                          deckAdded
+                            ? "border-[#186FF5] text-[#186FF5]"
+                            : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
+                        }`}
+                      >
+                        {deckAdded && <Check className="w-4 h-4" />}
+                        {deckAdded ? "Added" : "+ Add to Package"}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <PricingFooter total={total} />
+            <PricingFooter total={formatPrice(total)} />
           </PricingContainer>
 
+          {/* Upsell */}
           <div className="max-w-xl mx-auto mt-12 text-center">
             <h3
               className="font-medium text-black cursor-default mb-2"
@@ -166,17 +276,24 @@ export default function PricingSection() {
               Want the full launch?
             </h3>
             <p className="text-neutral-500 text-sm cursor-default mb-8">
-              Add website, pitch deck, and launch video.
+              Add launch video and get the complete startup package.
             </p>
 
             <motion.div
               className="inline-flex rounded-xl p-[2px]"
               style={{
-                background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                background:
+                  "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
                 backgroundSize: "300% 300%",
               }}
-              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             >
               <Link
                 href="/launch"

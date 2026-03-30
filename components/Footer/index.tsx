@@ -19,15 +19,16 @@ interface FooterSection {
 }
 
 const footerLinks: Record<string, FooterSection> = {
-  // services: {
-  //   title: 'Services',
-  //   links: [
-  //     { name: 'Web Design', href: '/web-design' },
-  //     { name: 'Service Design', href: '/service-design' },
-  //     { name: 'Small Business', href: '/small-business-web-design' },
-  //     { name: 'All Services', href: '/services-index' },
-  //   ]
-  // },
+  services: {
+    title: 'Services',
+    links: [
+      { name: 'Brand Identity', href: '/brand' },
+      { name: 'Launch Videos', href: '/launch-videos' },
+      { name: 'Launch Package', href: '/launch' },
+      { name: 'Web Design', href: '/work/web-design' },
+      { name: 'Pitch Decks', href: '/work/pitch-decks' },
+    ]
+  },
   company: {
     title: 'Company',
     links: [

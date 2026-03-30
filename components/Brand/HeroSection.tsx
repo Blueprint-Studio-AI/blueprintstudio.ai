@@ -8,19 +8,7 @@ import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import GradientButton from "@/components/ui/GradientButton";
-import GradientText from "@/components/ui/GradientText";
-import DeliverablePill from "@/components/ui/DeliverablePill";
 import SocialProof from "@/components/ui/SocialProof";
-import MarqueeGalleryRow from "@/components/ui/MarqueeGalleryRow";
-import { brandPortfolio } from "@/data/brandPortfolio";
-
-const deliverables = [
-  { num: "01", label: "Logo" },
-  { num: "02", label: "Guidelines" },
-  { num: "03", label: "AI Prompts" },
-];
-
-const allGalleryImages = brandPortfolio.flatMap((b) => b.gallery);
 
 export default function HeroSection() {
   return (
@@ -55,41 +43,40 @@ export default function HeroSection() {
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
-          <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
-            <h1 className="font-medium text-black cursor-default text-[clamp(32px,8vw,60px)] leading-[118%] tracking-[-2.5px]">
-              Your brand<br/>
-              <GradientText>3&nbsp;weeks</GradientText>
+          <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+            <h1
+              className="font-medium text-black cursor-default tracking-[-2.5px]"
+              style={{
+                fontSize: "clamp(32px, 7vw, 56px)",
+                lineHeight: "115%",
+              }}
+            >
+              480,000 new businesses launch every month.
+              <br className="hidden sm:block" />
+              <span className="text-neutral-400"> Most look the same.</span>
             </h1>
 
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-2 sm:gap-3">
-              {deliverables.map((item) => (
-                <DeliverablePill key={item.num} num={item.num} label={item.label} />
-              ))}
-            </div>
+            <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,18px)] leading-[150%] max-w-lg">
+              We build brand identities that make startups impossible to ignore.
+            </p>
 
-            <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
-              <SocialProof showDivider>
-                <span className="font-medium text-neutral-900">25+</span> startups launched
-              </SocialProof>
+            <SocialProof showDivider>
+              <span className="font-medium text-neutral-900">25+</span>{" "}
+              startups launched
+            </SocialProof>
 
-              <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,16px)] leading-[128%]">
-                Logo, guidelines, and AI prompts for on-brand content.
-                <br />
-                Built for founders who move fast.
-              </p>
-
-              <GradientButton
-                className="w-full"
-                onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
-              >
-                Book a Call
-                <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </GradientButton>
-            </div>
-          </div>
-
-          <div className="mt-16 sm:mt-24">
-            <MarqueeGalleryRow images={allGalleryImages} imageClassName="h-48 sm:h-72 w-[1150px]" imgClassName="object-contain" sizes="1150px" />
+            <GradientButton
+              className="w-full sm:w-auto"
+              onClick={() =>
+                window.open(
+                  "https://cal.com/blueprint-studio/intro-call",
+                  "_blank"
+                )
+              }
+            >
+              Book a Call
+              <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </GradientButton>
           </div>
         </InnerContainer>
       </OuterContainer>
