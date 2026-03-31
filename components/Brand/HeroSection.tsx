@@ -57,12 +57,12 @@ export default function HeroSection() {
             </h1>
 
             <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,18px)] leading-[150%] max-w-lg">
-              We build brand identities that make startups impossible to&nbsp;ignore.
+              We build brand identities that make companies impossible to&nbsp;ignore.
             </p>
 
             <SocialProof showDivider>
               <span className="font-medium text-neutral-900">25+</span>{" "}
-              startups launched
+              brands launched
             </SocialProof>
 
             <GradientButton

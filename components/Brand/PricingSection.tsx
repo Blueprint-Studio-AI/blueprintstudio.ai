@@ -180,7 +180,7 @@ export default function PricingSection() {
               Want the full launch?
             </h3>
             <p className="text-neutral-500 text-sm cursor-default mb-8">
-              Add launch video and get the complete startup&nbsp;package.
+              Add launch video and get the complete launch&nbsp;package.
             </p>
 
             <motion.div

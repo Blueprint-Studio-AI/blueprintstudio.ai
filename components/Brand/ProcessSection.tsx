@@ -133,7 +133,7 @@ export default function ProcessSection() {
           </div>
 
           <p className="text-center text-neutral-500 mt-10 sm:mt-14 cursor-default text-sm sm:text-base">
-            Tried and tested across 25+&nbsp;startups.
+            Tried and tested across 25+&nbsp;projects.
           </p>
         </InnerContainer>
       </OuterContainer>
