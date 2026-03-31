@@ -14,11 +14,11 @@ const blocks = [
   },
   {
     stat: "3x the sales volume.",
-    body: "Strong brands capture three times the sales of weak ones. Your brand should feel like your company, just more so. It amplifies who you already are -- your unique value made visible through personality, color, shape, and feeling.",
+    body: "Strong brands capture three times the sales of weak ones. Your brand should feel like your company, just more so. It amplifies who you already are\u2014your unique value made visible through personality, color, shape, and feeling.",
   },
   {
-    stat: "68% of businesses agree:",
-    body: "Brand consistency drives 10% or more revenue growth. Strategy made visible. Not a logo slapped on a slide deck -- a system that compounds every time someone encounters your company.",
+    stat: "10%+ revenue growth.",
+    body: "68% of businesses report it directly from brand consistency. Every touchpoint that looks and feels like you compounds over time\u2014strategy made visible, not a logo slapped on a slide deck.",
   },
 ];
 

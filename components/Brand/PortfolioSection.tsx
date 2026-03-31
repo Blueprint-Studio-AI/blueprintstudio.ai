@@ -18,7 +18,7 @@ const honeyBSpotlight = {
   logo: "/logos-match-height/honeyb.png",
   title: "Bitcoin yield platform",
   description:
-    "Full brand identity built from a blank slate. Logo system, color palette, guidelines, social kit, and website -- all delivered as one cohesive system.",
+    "Full brand identity built from a blank slate. Logo system, color palette, guidelines, social kit, and website\u2014all delivered as one cohesive system.",
   deliverables: [
     { num: "01", label: "Brand" },
     { num: "02", label: "Website" },
@@ -191,7 +191,7 @@ export default function PortfolioSection() {
                 </div>
 
                 <Link
-                  href="/work"
+                  href="/work/brand-identity"
                   className="group inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-700 transition-colors"
                 >
                   <span>View Full Project</span>

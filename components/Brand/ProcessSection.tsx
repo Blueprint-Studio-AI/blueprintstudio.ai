@@ -30,7 +30,7 @@ const steps = [
     number: "04",
     title: "Delivery",
     description:
-      "Brand book, social kit, application templates, and AI prompts -- everything you need to stay on-brand as you scale.",
+      "Brand book, social kit, application templates, and AI prompts\u2014everything you need to stay on-brand as you scale.",
   },
 ];
 

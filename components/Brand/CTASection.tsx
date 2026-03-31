@@ -41,7 +41,7 @@ export default function CTASection() {
   }, []);
 
   return (
-    <Section className="relative bg-[#fafaf9] overflow-hidden">
+    <Section className="relative bg-neutral-50 overflow-hidden">
       {/* Solid vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -91,7 +91,7 @@ export default function CTASection() {
 
             {/* Calendar embed container */}
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-4 md:p-8">
                 <Cal
                   namespace="brand-call"
                   calLink="blueprint-studio/intro-call"

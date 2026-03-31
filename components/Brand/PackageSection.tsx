@@ -5,9 +5,8 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import FeatureItem from "@/components/ui/FeatureItem";
+import GradientBorderCard from "@/components/ui/GradientBorderCard";
 import Image from "next/image";
-import { Check } from "lucide-react";
-import { motion } from "framer-motion";
 import { useBrandPackage } from "./BrandPackageContext";
 
 const baseFeatures = [
@@ -18,7 +17,7 @@ const baseFeatures = [
   {
     name: "Brand Guidelines",
     detail:
-      "Mission, voice & tone, usage rules -- a 20-30 page brand book your team can actually use",
+      "Mission, voice & tone, usage rules\u2014a 20-30 page brand book your team can actually use",
   },
   {
     name: "Color Palette",
@@ -51,7 +50,7 @@ const websiteFeatures = [
   { name: "Custom Design", detail: "Tailored to your new brand identity" },
   {
     name: "Development",
-    detail: "Built in Framer, Next.js, or Astro -- your call",
+    detail: "Built in Framer, Next.js, or Astro\u2014your call",
   },
   { name: "Responsive", detail: "Pixel-perfect across every screen size" },
   {
@@ -70,7 +69,7 @@ const deckFeatures = [
   { name: "Source Files", detail: "Figma files you own and can edit forever" },
 ];
 
-function AddOnCard({
+function AddOnCardWithPreview({
   title,
   price,
   description,
@@ -90,81 +89,35 @@ function AddOnCard({
   previewAlt: string;
 }) {
   return (
-    <div className="relative rounded-[12px] h-full p-[2px]">
-      <motion.div
-        className="absolute inset-0 rounded-[12px]"
-        style={{
-          background:
-            "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-          backgroundSize: "300% 300%",
-        }}
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: isAdded ? 1 : 0,
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-        }}
-        transition={{
-          opacity: { duration: 0.3 },
-          backgroundPosition: {
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-        }}
-      />
-      <div
-        className={`relative rounded-[10px] p-6 sm:p-8 flex flex-col h-full transition-colors duration-300 ${
-          isAdded ? "bg-white" : "bg-neutral-50 line-dash-border"
-        }`}
-      >
-        <h3 className="font-medium text-xl text-black mb-1 cursor-default">
-          <span className="text-neutral-400">+</span> {title}
-        </h3>
-        <p className="text-neutral-500 text-sm cursor-default">{description}</p>
-
-        <div className="mt-4">
-          <span className="text-xs text-neutral-500 block">Add-on</span>
-          <span className="font-semibold text-black text-[clamp(24px,4vw,32px)] leading-tight">
-            {price}
-          </span>
-        </div>
-
-        {/* Preview Image */}
-        <div className="relative w-full aspect-[16/10] mt-4 rounded-lg overflow-hidden bg-neutral-100">
-          <Image
-            src={previewImage}
-            alt={previewAlt}
-            fill
-            sizes="(max-width: 768px) 100vw, 400px"
-            className="object-cover"
-          />
-        </div>
-
-        <div className="mt-6 space-y-0">
-          {features.map((feature, i) => (
-            <FeatureItem
-              key={feature.name}
-              feature={feature}
-              isLast={i === features.length - 1}
-            />
-          ))}
-        </div>
-
-        <div className="mt-auto pt-6">
-          <button
-            onClick={onToggle}
-            className={`w-full py-2.5 px-6 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-              isAdded
-                ? "border-[#186FF5] text-[#186FF5]"
-                : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
-            }`}
-          >
-            {isAdded && <Check className="w-4 h-4" />}
-            {isAdded ? "Added" : "+ Add to Package"}
-          </button>
-        </div>
+    <GradientBorderCard
+      isActive={isAdded}
+      onToggle={onToggle}
+      title={title}
+      price={price}
+      description={description}
+      size="full"
+    >
+      {/* Preview Image */}
+      <div className="relative w-full aspect-[16/10] mt-4 rounded-lg overflow-hidden bg-neutral-100">
+        <Image
+          src={previewImage}
+          alt={previewAlt}
+          fill
+          sizes="(max-width: 768px) 100vw, 400px"
+          className="object-cover"
+        />
       </div>
-    </div>
+
+      <div className="mt-6 space-y-0">
+        {features.map((feature, i) => (
+          <FeatureItem
+            key={feature.name}
+            feature={feature}
+            isLast={i === features.length - 1}
+          />
+        ))}
+      </div>
+    </GradientBorderCard>
   );
 }
 
@@ -242,7 +195,7 @@ export default function PackageSection() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AddOnCard
+            <AddOnCardWithPreview
               title="Website"
               price="+$15,000"
               description="Custom website built on your new brand."
@@ -252,7 +205,7 @@ export default function PackageSection() {
               previewImage="/launch-assets/web-design_assets/desktop-honeyb.png"
               previewAlt="Website design example"
             />
-            <AddOnCard
+            <AddOnCardWithPreview
               title="Pitch Deck"
               price="+$5,000"
               description="Investor-ready deck designed to close."

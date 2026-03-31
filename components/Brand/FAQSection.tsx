@@ -23,7 +23,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
   {
     question: "Can I choose which applications you design?",
     answer:
-      "Yes. After the core deliverables, you pick 2-3 applications: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. Every founder has different needs -- we've done enough to know that.",
+      "Yes. After the core deliverables, you pick 2-3 applications: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. Every founder has different needs\u2014we've done enough to know that.",
   },
   {
     question: "How many rounds of revisions are included?",
@@ -65,14 +65,16 @@ const faqs: { question: string; answer: ReactNode }[] = [
 function FaqItem({
   question,
   answer,
+  isLast = false,
 }: {
   question: string;
   answer: ReactNode;
+  isLast?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div>
+    <div className={isLast ? "" : "border-b border-neutral-200"}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-start py-6 text-left group"
@@ -152,6 +154,7 @@ export default function FAQSection() {
                   key={index}
                   question={faq.question}
                   answer={faq.answer}
+                  isLast={index === faqs.length - 1}
                 />
               ))}
             </div>

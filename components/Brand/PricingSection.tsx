@@ -4,13 +4,16 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import SocialProof from "@/components/ui/SocialProof";
 import {
   FeatureRow,
   PricingContainer,
   PricingFooter,
 } from "@/components/ui/PricingCard";
+import GradientBorderCard, {
+  GRADIENT_BORDER_BG,
+} from "@/components/ui/GradientBorderCard";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -23,7 +26,7 @@ const brandItems = [
   { title: "Logo System", desc: "Primary mark, word-mark, icon variations." },
   {
     title: "Brand Guidelines",
-    desc: "Voice, tone, usage rules -- 20-30 page brand book.",
+    desc: "Voice, tone, usage rules\u201420-30 page brand book.",
   },
   {
     title: "Color & Typography",
@@ -139,123 +142,24 @@ export default function PricingSection() {
                 <p className="text-sm font-medium text-black mb-4">Add-ons:</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Website Add-on */}
-                  <div className="relative rounded-[12px] p-[2px]">
-                    <motion.div
-                      className="absolute inset-0 rounded-[12px]"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-                        backgroundSize: "300% 300%",
-                      }}
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: websiteAdded ? 1 : 0,
-                        backgroundPosition: [
-                          "0% 50%",
-                          "100% 50%",
-                          "0% 50%",
-                        ],
-                      }}
-                      transition={{
-                        opacity: { duration: 0.3 },
-                        backgroundPosition: {
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    />
-                    <div
-                      className={`relative rounded-[10px] p-4 sm:p-5 transition-colors duration-300 ${
-                        websiteAdded
-                          ? "bg-white"
-                          : "bg-neutral-50 line-dash-border"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-black text-sm cursor-default">
-                          <span className="text-neutral-400">+</span> Website
-                        </h4>
-                        <span className="text-sm font-medium text-neutral-600">
-                          {formatPrice(WEBSITE_PRICE)}
-                        </span>
-                      </div>
-                      <p className="text-neutral-500 text-xs mb-4 cursor-default">
-                        Custom design, development, responsive, CMS & SEO
-                      </p>
-                      <button
-                        onClick={toggleWebsite}
-                        className={`w-full py-2 px-4 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-                          websiteAdded
-                            ? "border-[#186FF5] text-[#186FF5]"
-                            : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
-                        }`}
-                      >
-                        {websiteAdded && <Check className="w-4 h-4" />}
-                        {websiteAdded ? "Added" : "+ Add to Package"}
-                      </button>
-                    </div>
-                  </div>
+                  <GradientBorderCard
+                    isActive={websiteAdded}
+                    onToggle={toggleWebsite}
+                    title="Website"
+                    price={formatPrice(WEBSITE_PRICE)}
+                    description="Custom design, development, responsive, CMS & SEO"
+                    size="compact"
+                  />
 
                   {/* Pitch Deck Add-on */}
-                  <div className="relative rounded-[12px] p-[2px]">
-                    <motion.div
-                      className="absolute inset-0 rounded-[12px]"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-                        backgroundSize: "300% 300%",
-                      }}
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: deckAdded ? 1 : 0,
-                        backgroundPosition: [
-                          "0% 50%",
-                          "100% 50%",
-                          "0% 50%",
-                        ],
-                      }}
-                      transition={{
-                        opacity: { duration: 0.3 },
-                        backgroundPosition: {
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        },
-                      }}
-                    />
-                    <div
-                      className={`relative rounded-[10px] p-4 sm:p-5 transition-colors duration-300 ${
-                        deckAdded
-                          ? "bg-white"
-                          : "bg-neutral-50 line-dash-border"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-black text-sm cursor-default">
-                          <span className="text-neutral-400">+</span> Pitch Deck
-                        </h4>
-                        <span className="text-sm font-medium text-neutral-600">
-                          {formatPrice(DECK_PRICE)}
-                        </span>
-                      </div>
-                      <p className="text-neutral-500 text-xs mb-4 cursor-default">
-                        Narrative strategy, slide design, speaker notes, source
-                        files
-                      </p>
-                      <button
-                        onClick={toggleDeck}
-                        className={`w-full py-2 px-4 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-                          deckAdded
-                            ? "border-[#186FF5] text-[#186FF5]"
-                            : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
-                        }`}
-                      >
-                        {deckAdded && <Check className="w-4 h-4" />}
-                        {deckAdded ? "Added" : "+ Add to Package"}
-                      </button>
-                    </div>
-                  </div>
+                  <GradientBorderCard
+                    isActive={deckAdded}
+                    onToggle={toggleDeck}
+                    title="Pitch Deck"
+                    price={formatPrice(DECK_PRICE)}
+                    description="Narrative strategy, slide design, speaker notes, source files"
+                    size="compact"
+                  />
                 </div>
               </div>
             </div>
@@ -282,8 +186,7 @@ export default function PricingSection() {
             <motion.div
               className="inline-flex rounded-xl p-[2px]"
               style={{
-                background:
-                  "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                background: GRADIENT_BORDER_BG,
                 backgroundSize: "300% 300%",
               }}
               animate={{
