@@ -23,30 +23,30 @@ import {
 } from "./BrandPackageContext";
 
 const brandItems = [
-  { title: "Logo System", desc: "Primary mark, word-mark, icon variations." },
+  { title: "Logo System", desc: "Primary mark, word-mark, icon\u00a0variations." },
   {
     title: "Brand Guidelines",
-    desc: "Voice, tone, usage rules\u201420-30 page brand book.",
+    desc: "Voice, tone, usage rules\u201420-30 page brand\u00a0book.",
   },
   {
     title: "Color & Typography",
-    desc: "Full palette, type hierarchy, usage guidelines.",
+    desc: "Full palette, type hierarchy, usage\u00a0guidelines.",
   },
   {
     title: "Patterns & Motifs",
-    desc: "Custom textures and visual elements.",
+    desc: "Custom textures and visual\u00a0elements.",
   },
   {
     title: "Social Kit + Email Signature",
-    desc: "Profile assets and templates for posts.",
+    desc: "Profile assets and templates for\u00a0posts.",
   },
   {
     title: "AI Prompts",
-    desc: "Custom guidelines for consistent AI generation.",
+    desc: "Custom guidelines for consistent AI\u00a0generation.",
   },
   {
     title: "Sample Applications",
-    desc: "Business cards, letterheads, slide templates.",
+    desc: "Business cards, letterheads, slide\u00a0templates.",
   },
 ];
 
@@ -113,7 +113,7 @@ export default function PricingSection() {
                   Brand Identity
                 </h3>
                 <p className="text-neutral-500 text-sm cursor-default">
-                  Everything you need for a market-ready brand.
+                  Everything you need for a market-ready&nbsp;brand.
                 </p>
 
                 <div className="mt-6">
@@ -147,7 +147,7 @@ export default function PricingSection() {
                     onToggle={toggleWebsite}
                     title="Website"
                     price={formatPrice(WEBSITE_PRICE)}
-                    description="Custom design, development, responsive, CMS & SEO"
+                    description="Custom design, development, responsive, email capture &\u00a0SEO"
                     size="compact"
                   />
 
@@ -180,7 +180,7 @@ export default function PricingSection() {
               Want the full launch?
             </h3>
             <p className="text-neutral-500 text-sm cursor-default mb-8">
-              Add launch video and get the complete startup package.
+              Add launch video and get the complete startup&nbsp;package.
             </p>
 
             <motion.div
@@ -209,7 +209,7 @@ export default function PricingSection() {
           </div>
 
           <p className="text-center text-neutral-500 text-sm mt-8 cursor-default">
-            Not sure which fits? Book a call and we&apos;ll scope it together.
+            Not sure which fits? Book a call and we&apos;ll scope it&nbsp;together.
           </p>
         </InnerContainer>
       </OuterContainer>

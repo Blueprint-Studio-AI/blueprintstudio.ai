@@ -13,35 +13,34 @@ const faqs: { question: string; answer: ReactNode }[] = [
   {
     question: "What if I already have a logo?",
     answer:
-      "We can work with what you have. If it's solid, we'll build the system around it. If it needs refinement, we'll propose updates. Either way, you'll get the full identity system.",
+      "We can work with what you have. If it\u2019s solid, we\u2019ll build the system around it. If it needs refinement, we\u2019ll propose updates. Either way, you\u2019ll get the full identity\u00a0system.",
   },
   {
     question: "What are the AI prompts?",
     answer:
-      "Pre-configured prompts for ChatGPT, Claude, and Midjourney that are trained on your brand voice and guidelines. Use them to draft copy, generate visuals, or stay consistent as you scale. They're yours to keep and share with your team.",
+      "Pre-configured prompts for ChatGPT, Claude, and Midjourney that are trained on your brand voice and guidelines. Use them to draft copy, generate visuals, or stay consistent as you scale. They\u2019re yours to keep and share with your\u00a0team.",
   },
   {
     question: "Can I choose which applications you design?",
     answer:
-      "Yes. After the core deliverables, you pick 2-3 applications: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. Every founder has different needs\u2014we've done enough to know that.",
+      "Yes. After the core deliverables, you pick 2\u20133 applications: pitch deck template, app icon, merch mockups, investor one-pager, event graphics, or something else. Every founder has different needs\u2014we\u2019ve done enough to know\u00a0that.",
   },
   {
     question: "How many rounds of revisions are included?",
     answer:
-      "Two rounds of revisions at each phase. We've never needed more, but if scope expands significantly, we'll discuss.",
+      "Two rounds of revisions at each phase. We\u2019ve never needed more, but if scope expands significantly, we\u2019ll\u00a0discuss.",
   },
   {
     question: "What do I need to provide to get started?",
     answer:
-      "A 1-hour kickoff call, access to any existing brand assets, examples of brands you admire, and quick responses when we have questions. That's it.",
+      "A 1-hour kickoff call, access to any existing brand assets, examples of brands you admire, and quick responses when we have questions. That\u2019s\u00a0it.",
   },
   {
     question: "Can I add a website or pitch deck later?",
     answer: (
       <>
         Absolutely. You can start with brand identity and add a website or pitch
-        deck at any point. The pricing stays the same whether you bundle or add
-        later.
+        deck at any point. The pricing stays the same whether you bundle or add&nbsp;later.
       </>
     ),
   },
@@ -56,7 +55,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
         >
           monthly partnership
         </Link>{" "}
-        after launch for ongoing design, development, and iteration.
+        after launch for ongoing design, development, and&nbsp;iteration.
       </>
     ),
   },

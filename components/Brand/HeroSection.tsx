@@ -57,7 +57,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="text-neutral-500 cursor-default text-[clamp(14px,2vw,18px)] leading-[150%] max-w-lg">
-              We build brand identities that make startups impossible to ignore.
+              We build brand identities that make startups impossible to&nbsp;ignore.
             </p>
 
             <SocialProof showDivider>

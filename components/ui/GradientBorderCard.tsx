@@ -30,7 +30,10 @@ export default function GradientBorderCard({
   const isCompact = size === "compact";
 
   return (
-    <div className="relative rounded-2xl h-full p-[2px]">
+    <div
+      className="relative rounded-2xl h-full p-[2px] cursor-pointer"
+      onClick={onToggle}
+    >
       <motion.div
         className="absolute inset-0 rounded-2xl"
         style={{
@@ -54,7 +57,7 @@ export default function GradientBorderCard({
       <div
         className={`relative rounded-[14px] flex flex-col h-full transition-colors duration-300 ${
           isCompact ? "p-4 sm:p-5" : "p-6 sm:p-8"
-        } ${isActive ? "bg-white" : "bg-neutral-50 line-dash-border"}`}
+        } ${isActive ? "bg-white" : "bg-neutral-50 line-dash-border hover:bg-neutral-100"}`}
       >
         <div className="flex items-center justify-between mb-2">
           <h4
@@ -96,7 +99,10 @@ export default function GradientBorderCard({
 
         <div className={isCompact ? "" : "mt-auto pt-6"}>
           <button
-            onClick={onToggle}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle();
+            }}
             className={`w-full rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
               isCompact ? "py-2 px-4" : "py-2.5 px-6"
             } ${

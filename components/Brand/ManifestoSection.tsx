@@ -9,16 +9,16 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 const blocks = [
   {
-    stat: "32% more revenue.",
-    body: "McKinsey studied 300 companies over five years. The ones in the top quartile of design outperformed their peers by a third. Brand is a growth engine. Treat it like one.",
+    stat: "56% higher returns.",
+    body: "McKinsey tracked 300 companies over five years. The ones that invested most in design delivered 56% higher total returns to shareholders. Brand\u00a0compounds.",
   },
   {
     stat: "3x the sales volume.",
-    body: "Strong brands capture three times the sales of weak ones. Your brand should feel like your company, just more so. It amplifies who you already are\u2014your unique value made visible through personality, color, shape, and feeling.",
+    body: "Strong brands capture three times the sales of weak ones. Your brand should feel like your company, just more so. It amplifies who you already are\u2014your unique value made visible through personality, color, shape, and\u00a0feeling.",
   },
   {
     stat: "10%+ revenue growth.",
-    body: "68% of businesses report it directly from brand consistency. Every touchpoint that looks and feels like you compounds over time\u2014strategy made visible, not a logo slapped on a slide deck.",
+    body: "68% of businesses report it directly from brand consistency. Every touchpoint that looks and feels like you compounds over time\u2014strategy made visible, not a logo slapped on a slide\u00a0deck.",
   },
 ];
 

@@ -12,25 +12,25 @@ const steps = [
     number: "01",
     title: "Discovery",
     description:
-      "We learn your market, your audience, and what makes you different. One call, one brief, zero fluff.",
+      "We learn your market, your audience, and what makes you different. One call, one brief, zero\u00a0fluff.",
   },
   {
     number: "02",
     title: "Strategy",
     description:
-      "Positioning, messaging, and a creative direction that translates your advantage into something people feel.",
+      "Positioning, messaging, and a creative direction that translates your advantage into something people\u00a0feel.",
   },
   {
     number: "03",
     title: "Identity",
     description:
-      "Logo system, color palette, typography, patterns. The visual building blocks of your brand, designed as a cohesive system.",
+      "Logo system, color palette, typography, patterns. The visual building blocks of your brand, designed as a cohesive\u00a0system.",
   },
   {
     number: "04",
     title: "Delivery",
     description:
-      "Brand book, social kit, application templates, and AI prompts\u2014everything you need to stay on-brand as you scale.",
+      "Brand book, social kit, application templates, and AI prompts\u2014everything you need to stay on-brand as you\u00a0scale.",
   },
 ];
 
@@ -99,7 +99,7 @@ export default function ProcessSection() {
         </div>
       </div>
 
-      <SectionHeader leftText="PROCESS" rightText="// 3 weeks" />
+      <SectionHeader leftText="PROCESS" rightText="// from 3 weeks" />
 
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
@@ -115,7 +115,7 @@ export default function ProcessSection() {
                 letterSpacing: "-1.5px",
               }}
             >
-              Four Steps. Three Weeks.
+              Four Steps. Starting at Three&nbsp;Weeks.
             </h2>
           </div>
 
@@ -133,7 +133,7 @@ export default function ProcessSection() {
           </div>
 
           <p className="text-center text-neutral-500 mt-10 sm:mt-14 cursor-default text-sm sm:text-base">
-            Tried and tested across 25+ startups.
+            Tried and tested across 25+&nbsp;startups.
           </p>
         </InnerContainer>
       </OuterContainer>

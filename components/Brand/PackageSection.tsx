@@ -12,61 +12,61 @@ import { useBrandPackage } from "./BrandPackageContext";
 const baseFeatures = [
   {
     name: "Logo System",
-    detail: "Primary, secondary, icon, and responsive versions",
+    detail: "Primary, secondary, icon, and responsive\u00a0versions",
   },
   {
     name: "Brand Guidelines",
     detail:
-      "Mission, voice & tone, usage rules\u2014a 20-30 page brand book your team can actually use",
+      "Mission, voice & tone, usage rules\u2014a 20-30 page brand book your team can actually\u00a0use",
   },
   {
     name: "Color Palette",
-    detail: "Primary, secondary, accent, and neutrals with usage guidelines",
+    detail: "Primary, secondary, accent, and neutrals with usage\u00a0guidelines",
   },
   {
     name: "Typography System",
-    detail: "Display, body, and UI type hierarchy with scale and pairings",
+    detail: "Display, body, and UI type hierarchy with scale and\u00a0pairings",
   },
   {
     name: "Patterns & Motifs",
-    detail: "Custom patterns, textures, and visual elements unique to your brand",
+    detail: "Custom patterns, textures, and visual elements unique to your\u00a0brand",
   },
   {
     name: "Social Kit",
-    detail: "Profile assets, post templates, and email signature",
+    detail: "Profile assets, post templates, and email\u00a0signature",
   },
   {
     name: "AI Asset Generator",
     detail:
-      "Custom-trained prompts for on-brand content generation across ChatGPT, Claude, and Midjourney",
+      "Custom-trained prompts for on-brand content generation across ChatGPT, Claude, and\u00a0Midjourney",
   },
   {
     name: "Sample Applications",
-    detail: "Business cards, letterheads, and slide templates",
+    detail: "Business cards, letterheads, and slide\u00a0templates",
   },
 ];
 
 const websiteFeatures = [
-  { name: "Custom Design", detail: "Tailored to your new brand identity" },
+  { name: "Custom Design", detail: "Tailored to your new brand\u00a0identity" },
   {
     name: "Development",
-    detail: "Built in Framer, Next.js, or Astro\u2014your call",
+    detail: "Built in Framer, Next.js, or Astro\u2014your\u00a0call",
   },
-  { name: "Responsive", detail: "Pixel-perfect across every screen size" },
+  { name: "Responsive", detail: "Pixel-perfect across every screen\u00a0size" },
   {
-    name: "CMS & SEO",
-    detail: "Content management and search optimization built in",
+    name: "Email Capture & SEO",
+    detail: "Lead capture forms and search optimization built\u00a0in",
   },
 ];
 
 const deckFeatures = [
-  { name: "Narrative Strategy", detail: "Story structure that moves investors" },
-  { name: "Slide Design", detail: "On-brand visuals, charts, and layouts" },
+  { name: "Narrative Strategy", detail: "Story structure that moves\u00a0investors" },
+  { name: "Slide Design", detail: "On-brand visuals, charts, and\u00a0layouts" },
   {
     name: "Speaker Notes",
-    detail: "Talking points that keep your pitch tight",
+    detail: "Talking points that keep your pitch\u00a0tight",
   },
-  { name: "Source Files", detail: "Figma files you own and can edit forever" },
+  { name: "Source Files", detail: "Figma files you own and can edit\u00a0forever" },
 ];
 
 function AddOnCardWithPreview({
@@ -155,8 +155,7 @@ export default function PackageSection() {
               What&apos;s Included
             </h2>
             <p className="text-neutral-500 mt-3 cursor-default text-sm sm:text-base">
-              The base package covers everything you need for a complete brand
-              identity.
+              The base package covers everything you need for a complete brand&nbsp;identity.
             </p>
           </div>
 
