@@ -61,7 +61,7 @@ const fadeUp = {
   },
 };
 
-function DevicePair({ project }: { project: WebProject }) {
+function DevicePair({ project, isFirst = false }: { project: WebProject; isFirst?: boolean }) {
   return (
     <motion.div
       initial="hidden"
@@ -107,12 +107,13 @@ function DevicePair({ project }: { project: WebProject }) {
               fill
               sizes="(max-width: 768px) 100vw, 900px"
               className="object-cover object-top"
+              {...(isFirst && { priority: true })}
             />
           </div>
         </div>
 
         {/* Mobile Device Frame — overlapping bottom-right */}
-        <div className="absolute -bottom-6 -right-2 sm:right-4 w-[90px] sm:w-[120px] md:w-[140px] z-10">
+        <div className="absolute -bottom-6 right-0 sm:-right-2 w-[90px] sm:w-[120px] md:w-[140px] z-10">
           <div className="bg-neutral-900 rounded-[12px] sm:rounded-[16px] p-1 sm:p-1.5 shadow-2xl">
             {/* Phone notch */}
             <div className="flex justify-center mb-0.5">
@@ -202,7 +203,7 @@ export default function WebDesignPortfolio() {
             {webProjects.map((project, i) => (
               <div key={project.id}>
                 {i > 0 && <div className="w-full line-dash-x my-12 sm:my-16" />}
-                <DevicePair project={project} />
+                <DevicePair project={project} isFirst={i === 0} />
               </div>
             ))}
           </div>

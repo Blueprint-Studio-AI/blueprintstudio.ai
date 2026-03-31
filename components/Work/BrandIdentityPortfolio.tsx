@@ -95,7 +95,7 @@ const fadeUp = {
 };
 
 function BrandCard({ project, index }: { project: BrandProject; index: number }) {
-  const isLarge = index === 0 || index === 3;
+  const isLarge = index === 0 || index === 3 || index === 4;
   const gridClass = isLarge
     ? "md:col-span-2"
     : "md:col-span-1";
@@ -118,6 +118,7 @@ function BrandCard({ project, index }: { project: BrandProject; index: number })
             fill
             sizes={isLarge ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
             className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            {...(index === 0 && { priority: true })}
           />
           {/* Accent color bar */}
           <div

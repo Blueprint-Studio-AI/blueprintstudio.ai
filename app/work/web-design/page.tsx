@@ -23,27 +23,19 @@ export const metadata: Metadata = {
     "next.js website",
   ],
   alternates: { canonical: "/work/web-design" },
+  // TODO: Create /public/og-web-design.png (1200x630) and add images back to openGraph/twitter
   openGraph: {
     type: "website",
     url: "https://blueprintstudio.ai/work/web-design",
     title: "Web Design Portfolio | Blueprint Studio",
     description:
       "Responsive websites and landing pages built by Blueprint Studio. Desktop and mobile, pixel-perfect.",
-    images: [
-      {
-        url: "/og-web-design.png",
-        width: 1200,
-        height: 630,
-        alt: "Blueprint Studio - Web Design Portfolio",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Web Design Portfolio | Blueprint Studio",
     description:
       "Responsive websites and landing pages built by Blueprint Studio. Desktop and mobile, pixel-perfect.",
-    images: ["/og-web-design.png"],
   },
 };
 

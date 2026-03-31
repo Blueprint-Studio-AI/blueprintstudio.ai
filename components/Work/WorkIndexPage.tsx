@@ -51,8 +51,8 @@ const categories: WorkCategory[] = [
     description:
       "Studio-quality launch videos in 7 days. Product demos, explainers, and show reels that generate millions of views.",
     href: "/work/launch-videos",
-    image: "/launch-assets/brand-picker-icons/honeyb.png",
-    imageAlt: "Launch video production",
+    image: "https://img.youtube.com/vi/aD9XnupXf_w/maxresdefault.jpg",
+    imageAlt: "Jinba launch video thumbnail",
     count: "100+ Videos",
   },
 ];

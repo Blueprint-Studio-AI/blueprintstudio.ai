@@ -23,27 +23,19 @@ export const metadata: Metadata = {
     "pitch deck agency",
   ],
   alternates: { canonical: "/work/pitch-decks" },
+  // TODO: Create /public/og-pitch-decks.png (1200x630) and add images back to openGraph/twitter
   openGraph: {
     type: "website",
     url: "https://blueprintstudio.ai/work/pitch-decks",
     title: "Pitch Deck Portfolio | Blueprint Studio",
     description:
       "Investor-ready pitch decks designed by Blueprint Studio. Designed to win meetings and close rounds.",
-    images: [
-      {
-        url: "/og-pitch-decks.png",
-        width: 1200,
-        height: 630,
-        alt: "Blueprint Studio - Pitch Deck Portfolio",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pitch Deck Portfolio | Blueprint Studio",
     description:
       "Investor-ready pitch decks designed by Blueprint Studio. Designed to win meetings and close rounds.",
-    images: ["/og-pitch-decks.png"],
   },
 };
 

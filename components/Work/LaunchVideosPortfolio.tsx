@@ -127,6 +127,7 @@ function VideoCard({ project, index }: { project: VideoProject; index: number })
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-500 scale-[1.01] group-hover:scale-105"
+              {...(index === 0 && { priority: true })}
             />
             <button
               onClick={() => setIsPlaying(true)}

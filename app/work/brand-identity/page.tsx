@@ -23,27 +23,19 @@ export const metadata: Metadata = {
     "creative studio portfolio",
   ],
   alternates: { canonical: "/work/brand-identity" },
+  // TODO: Create /public/og-brand-identity.png (1200x630) and add images back to openGraph/twitter
   openGraph: {
     type: "website",
     url: "https://blueprintstudio.ai/work/brand-identity",
     title: "Brand Identity Portfolio | Blueprint Studio",
     description:
       "Brand identities built by Blueprint Studio — logo systems, color palettes, typography, and guidelines for startups.",
-    images: [
-      {
-        url: "/og-brand-identity.png",
-        width: 1200,
-        height: 630,
-        alt: "Blueprint Studio - Brand Identity Portfolio",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Brand Identity Portfolio | Blueprint Studio",
     description:
       "Brand identities built by Blueprint Studio — logo systems, color palettes, typography, and guidelines for startups.",
-    images: ["/og-brand-identity.png"],
   },
 };
 

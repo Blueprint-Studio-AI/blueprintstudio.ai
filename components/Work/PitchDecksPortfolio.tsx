@@ -16,7 +16,6 @@ interface DeckProject {
   tagline: string;
   description: string;
   slides: string[];
-  slideCount: number;
 }
 
 const deckProjects: DeckProject[] = [
@@ -40,7 +39,6 @@ const deckProjects: DeckProject[] = [
       "/launch-assets/slide-deck_assets/friday-table_deck-assets/11  v3.jpg",
       "/launch-assets/slide-deck_assets/friday-table_deck-assets/12 v3.jpg",
     ],
-    slideCount: 12,
   },
   {
     id: "honeyb",
@@ -62,7 +60,6 @@ const deckProjects: DeckProject[] = [
       "/launch-assets/slide-deck_assets/honeyb_deck-assets/honeyb-11.jpg",
       "/launch-assets/slide-deck_assets/honeyb_deck-assets/honeyb-12.jpg",
     ],
-    slideCount: 12,
   },
   {
     id: "huch",
@@ -87,7 +84,6 @@ const deckProjects: DeckProject[] = [
       "/launch-assets/slide-deck_assets/huch_deck-assets/huch-14.jpg",
       "/launch-assets/slide-deck_assets/huch_deck-assets/huch-15.jpg",
     ],
-    slideCount: 15,
   },
 ];
 
@@ -100,7 +96,7 @@ const fadeUp = {
   },
 };
 
-function FeaturedDeck({ project }: { project: DeckProject }) {
+function FeaturedDeck({ project, isFirst = false }: { project: DeckProject; isFirst?: boolean }) {
   return (
     <motion.div
       initial="hidden"
@@ -117,7 +113,7 @@ function FeaturedDeck({ project }: { project: DeckProject }) {
           <span className="text-sm text-neutral-400">{project.tagline}</span>
         </div>
         <span className="text-xs text-neutral-400 uppercase tracking-wider">
-          {project.slideCount} slides
+          {project.slides.length} slides
         </span>
       </div>
       <p className="text-neutral-500 text-sm sm:text-base leading-relaxed mb-6 max-w-xl">
@@ -132,6 +128,7 @@ function FeaturedDeck({ project }: { project: DeckProject }) {
           fill
           sizes="(max-width: 768px) 100vw, 900px"
           className="object-cover"
+          {...(isFirst && { priority: true })}
         />
       </div>
 
@@ -139,7 +136,7 @@ function FeaturedDeck({ project }: { project: DeckProject }) {
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
         {project.slides.slice(1, 9).map((slide, i) => (
           <div
-            key={i}
+            key={slide}
             className="relative aspect-video rounded-lg overflow-hidden bg-neutral-200"
           >
             <Image
@@ -210,7 +207,7 @@ export default function PitchDecksPortfolio() {
 
       {/* Marquee row of slides */}
       <div className="w-full line-dash-x" />
-      <div className="py-6 sm:py-8">
+      <div className="py-6 sm:py-8 bg-neutral-50">
         <MarqueeGalleryRow
           images={allSlides}
           imageClassName="w-52 sm:w-64 aspect-video"
@@ -228,7 +225,7 @@ export default function PitchDecksPortfolio() {
             {deckProjects.map((project, i) => (
               <div key={project.id}>
                 {i > 0 && <div className="w-full line-dash-x my-12 sm:my-16" />}
-                <FeaturedDeck project={project} />
+                <FeaturedDeck project={project} isFirst={i === 0} />
               </div>
             ))}
           </div>

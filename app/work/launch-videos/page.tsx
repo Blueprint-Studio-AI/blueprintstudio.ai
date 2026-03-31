@@ -24,27 +24,19 @@ export const metadata: Metadata = {
     "startup video examples",
   ],
   alternates: { canonical: "/work/launch-videos" },
+  // TODO: Create /public/og-launch-videos.png (1200x630) and add images back to openGraph/twitter
   openGraph: {
     type: "website",
     url: "https://blueprintstudio.ai/work/launch-videos",
     title: "Launch Videos Portfolio | Blueprint Studio",
     description:
       "100+ launch videos delivered. Studio quality, startup speed. See our work.",
-    images: [
-      {
-        url: "/og-launch-videos.png",
-        width: 1200,
-        height: 630,
-        alt: "Blueprint Studio - Launch Videos Portfolio",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Launch Videos Portfolio | Blueprint Studio",
     description:
       "100+ launch videos delivered. Studio quality, startup speed. See our work.",
-    images: ["/og-launch-videos.png"],
   },
 };
 
