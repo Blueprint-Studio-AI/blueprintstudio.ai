@@ -54,7 +54,8 @@ export function BrandHeader({ clientName, bannerSrc, logoSrc, subtitle, pdfHref 
         <div className="absolute bottom-7 left-0 right-0 flex justify-center lg:hidden">
           <a
             href={pdfHref}
-            download
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-[11px] text-white/80 hover:text-white border border-white/30 hover:border-white/60 rounded-full px-4 py-2 transition-colors duration-150 backdrop-blur-sm"
           >
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none">

@@ -123,14 +123,14 @@ export default function JinbaPage() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] max-w-[1800px] mx-auto lg:pl-[10rem]">
       <BrandNav clientName="Jinba" logoSrc="/brands/jinba/dl/lockup-small-dark.png" />
-      <BrandToC chapters={TOC_CHAPTERS} pdfHref="/brands/jinba/jinba-brand-deck.pdf" />
+      <BrandToC chapters={TOC_CHAPTERS} pdfHref="https://drive.google.com/file/d/1zZaz_NnLIcT-b2WeNSgJn1VO9Nry83dx/view?usp=sharing" />
 
       <BrandHeader
         clientName="Jinba"
         bannerSrc="/brands/jinba/header-banner.png"
         logoSrc="/brands/jinba/dl/lockup-light.png"
         subtitle="Brand Identity · Design System · Logo System · 2026"
-        pdfHref="/brands/jinba/jinba-brand-deck.pdf"
+        pdfHref="https://drive.google.com/file/d/1zZaz_NnLIcT-b2WeNSgJn1VO9Nry83dx/view?usp=sharing"
       />
 
       {/* Narrative */}

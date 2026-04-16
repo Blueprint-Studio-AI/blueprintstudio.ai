@@ -80,7 +80,8 @@ export function BrandToC({ chapters, pdfHref }: BrandToCProps) {
       {pdfHref && (
         <a
           href={pdfHref}
-          download
+          target="_blank"
+          rel="noopener noreferrer"
           className="mt-6 inline-flex items-center gap-2 text-[11px] text-neutral-600 hover:text-neutral-900 border border-neutral-300 hover:border-neutral-500 rounded-full px-3 py-1.5 transition-colors duration-150"
         >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
