@@ -11,8 +11,19 @@ import { ColorPaletteSection } from "./ColorPaletteSection";
 import { ColorScalesSection } from "./ColorScalesSection";
 
 export const metadata: Metadata = {
-  title: "Jinba — Brand Identity",
-  description: "Brand identity for Jinba, crafted by Blueprint Studio.",
+  title: "Jinba — Brand Identity & Design System",
+  description: "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
+  openGraph: {
+    title: "Jinba — Brand Identity & Design System",
+    description: "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
+    images: [{ url: "/brands/jinba/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jinba — Brand Identity & Design System",
+    description: "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
+    images: ["/brands/jinba/og-image.png"],
+  },
 };
 
 // ─── ToC config ─────────────────────────────────────────────────────────────
@@ -110,7 +121,7 @@ function LinkedInDownloadRow() {
 
 export default function JinbaPage() {
   return (
-    <div className="min-h-screen bg-[#F5F5F5] max-w-[1800px] mx-auto lg:pl-48">
+    <div className="min-h-screen bg-[#F5F5F5] max-w-[1800px] mx-auto lg:pl-[10rem]">
       <BrandNav clientName="Jinba" logoSrc="/brands/jinba/dl/lockup-small-dark.png" />
       <BrandToC chapters={TOC_CHAPTERS} pdfHref="/brands/jinba/jinba-brand-deck.pdf" />
 
