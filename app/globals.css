@@ -1,6 +1,15 @@
 /* app/globals.css */
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
+/* Tiempos Text — used on /brands/jinba brand kit page only */
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("/fonts/tiempos-text-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
