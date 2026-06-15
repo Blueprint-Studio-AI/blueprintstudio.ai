@@ -1,196 +1,184 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Section from "@/components/ui/Section";
-import OuterContainer from "@/components/ui/OuterContainer";
-import InnerContainer from "@/components/ui/InnerContainer";
+import { useEffect, useRef } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight, LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import CaseStudyCard, { CaseStudy } from "./CaseStudyCard";
 
-const BWB = "/brand-assets/brands-weve-built";
-
-const brandProjects = [
-  { id: "uni", name: "UNI", image: `${BWB}/uni_brands-we-built.png` },
-  { id: "autara", name: "Autara", image: `${BWB}/autara_brands-we-built.png` },
-  { id: "huch", name: "Huch", image: `${BWB}/huch_brands-we-built.png` },
-  { id: "honeyb", name: "HoneyB", image: `${BWB}/honeyb_brands-we-built.png` },
-  { id: "breeze", name: "Breeze", image: `${BWB}/breeze_brands-we-built.png` },
+// Case studies shown in the stacking scroll. Each renders as a CaseStudyCard.
+// `color` is the accent the section's bottom colour band fades to while that
+// card is active; `accent` is the solid placeholder colour for the card's
+// visual panel (swap for a real image per brand later). Add more entries and
+// the stack grows automatically.
+const projects: (CaseStudy & { id: number; color: string })[] = [
+  {
+    id: 1,
+    color: "#F0831F", // honey
+    accent: "#F4A93C",
+    name: "HoneyB",
+    logo: "/logos/HoneyB-Logo.png",
+    logoHeight: 26,
+    title: "Bitcoin yield platform",
+    description:
+      "From blank slate to market-ready in one package. We built HoneyB’s entire brand presence as a single cohesive system.",
+    deliverables: [
+      { num: "01", label: "Brand" },
+      { num: "02", label: "Website" },
+      { num: "03", label: "Deck" },
+    ],
+    image: "/media/recent-work/honeyb-desktop.webp",
+    imageMobile: "/media/recent-work/honeyb-mobile.webp",
+    href: "/work",
+  },
+  {
+    id: 2,
+    color: "#A8763E", // warm brown
+    accent: "#B98A55",
+    name: "Jinba",
+    logo: "/brands/jinba/dl/lockup-black.png",
+    logoHeight: 30,
+    title: "Bitcoin Stablecoin",
+    description:
+      "Complete brand identity for a Bitcoin stablecoin. Logo system, brand narrative, type & palette, and visual language.",
+    deliverables: [
+      { num: "01", label: "Brand" },
+      { num: "02", label: "Website" },
+    ],
+    image: "/media/recent-work/jinba-desktop.webp",
+    imageMobile: "/media/recent-work/jinba-mobile.webp",
+    href: "/work",
+  },
+  {
+    id: 3,
+    color: "#731416", // autara maple red
+    accent: "#F0ECE8", // cream panel bg (behind the mockup)
+    name: "Autara",
+    logo: "/logos/autara.png",
+    logoHeight: 30,
+    title: "Defi on Arch Network",
+    description:
+      "Logo system, type palette, social kit, brand deck, and Framer landing page.",
+    deliverables: [
+      { num: "01", label: "Brand" },
+      { num: "02", label: "Website" },
+    ],
+    image: "/media/projects/autara/recent-work-card.webp",
+    imageMobile: "/media/recent-work/autara-mobile.webp",
+    href: "/work",
+  },
 ];
 
-const MAX_CARD_WIDTH = 480;
-const CARD_GAP = -120;
-
-function CircularButton({
-  onClick,
-  icon: Icon,
-  className,
-}: {
-  onClick?: () => void;
-  icon: LucideIcon;
-  className?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label="Navigate brand"
-      className={cn(
-        "shrink-0 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 transition-all duration-300",
-        className
-      )}
-      style={{
-        boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
-      }}
-    >
-      <Icon className="w-5 h-5" color="black" />
-    </button>
-  );
-}
+const PARALLAX_DISTANCE = 400;
+// DESKTOP (lg+) ONLY: every card pins at the SAME spot and fully covers the
+// previous, with a uniform scroll gap below each card so it sits alone before
+// the next rises to cover it. Keeping the gap uniform lets the stack exit as one
+// piece. Below lg the cards are a plain vertical list (see the mobile
+// early-return in handleScroll).
 
 export default function RecentWorkSection() {
-  const total = brandProjects.length;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [cardWidth, setCardWidth] = useState(MAX_CARD_WIDTH);
-  const [position, setPosition] = useState(total);
-  const [skipTransition, setSkipTransition] = useState(false);
-  const isTransitioning = useRef(false);
-
-  const activeIndex = ((position % total) + total) % total;
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      const w = entry.contentRect.width;
-      const isMobile = w < 640;
-      setCardWidth(Math.min(MAX_CARD_WIDTH, w - (isMobile ? 48 : 120)));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const handleScroll = () => {
+      // Below lg the cards are a plain vertical list — no pin, no parallax, no
+      // colour band. Clear any transforms a previous desktop frame applied.
+      if (window.innerWidth < 1024) {
+        section.style.transform = "";
+        section.style.marginBottom = "";
+        if (headerRef.current) headerRef.current.style.top = "";
+        return;
+      }
+      const rect = section.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      // Read the last card's position BEFORE mutating this frame's transform,
+      // so it reflects the transform that's currently applied (reading it after
+      // the mutation returns a stale value, esp. with smooth-scroll).
+      const lastCardEl = cardRefs.current[cardRefs.current.length - 1];
+      const lastCardTopNow = lastCardEl
+        ? lastCardEl.getBoundingClientRect().top
+        : Infinity;
+
+      const raw = (viewportHeight - rect.top) / viewportHeight;
+      const progress = Math.max(0, Math.min(1, raw));
+      const shift = progress * PARALLAX_DISTANCE;
+      section.style.transform = `translateY(${-shift}px)`;
+      // Pull the next section up by the same amount the parallax transform
+      // shifts this one, keeping the seam closed with no dead gap.
+      section.style.marginBottom = `${-shift}px`;
+      // The sticky header lives inside the transformed section, so its `top`
+      // must cancel the current transform to pin at the viewport top. BUT once
+      // the last card starts scrolling away (exiting), let the header ride UP
+      // with the stack at the same rate — otherwise the cards slide underneath
+      // it on the way out. (headerRelease ≤ 0 = how far the last card has risen
+      // past its centered position.)
+      const headerRelease = Math.min(0, lastCardTopNow - 0.23 * viewportHeight);
+      if (headerRef.current) {
+        headerRef.current.style.top = `${shift + headerRelease}px`;
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
-  const navigate = (newPos: number) => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
-    setPosition(newPos);
-    setTimeout(() => {
-      const realIndex = ((newPos % total) + total) % total;
-      const middlePos = realIndex + total;
-      if (newPos !== middlePos) {
-        setSkipTransition(true);
-        setPosition(middlePos);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setSkipTransition(false);
-            isTransitioning.current = false;
-          });
-        });
-      } else {
-        isTransitioning.current = false;
-      }
-    }, 500);
-  };
-
-  const prev = () => navigate(position - 1);
-  const next = () => navigate(position + 1);
-
   return (
-    <Section
+    <section
+      ref={sectionRef}
       id="portfolio"
-      className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden"
+      // z-[15] sits ABOVE the section this one parallax-covers (z-10) but BELOW
+      // the testimonials section that follows (z-20), so the testimonials'
+      // opaque background cleanly masks the seam as the stack exits.
+      className="relative z-[15] bg-neutral-50 will-change-transform"
     >
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
+      {/* Sticky section header — stays pinned to the top of the viewport while
+          the cards scroll through. The +PARALLAX_DISTANCE in `top` compensates
+          for the section's upward parallax transform (same trick the cards use)
+          so it pins at the real viewport top, not 400px down. The opaque bg
+          hides the cards scrolling underneath it. */}
+      <div
+        ref={headerRef}
+        className="z-[20] bg-neutral-50 lg:sticky"
+        style={{ top: `${PARALLAX_DISTANCE}px` }}
+      >
+        <SectionHeader leftText="RECENT LAUNCHED" rightText="// FOR FOUNDERS" />
       </div>
 
-      <SectionHeader leftText="PORTFOLIO" rightText="// recent brands" />
+      <div className="relative">
+        <div className="px-2.5 sm:px-6 relative z-10">
+          <div className="h-[18vh]" />
 
-      <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-
-          <div className="text-center mb-4 sm:mb-6">
-            <h2 className="font-medium text-black cursor-default text-[clamp(32px,6vw,48px)] leading-[110%] tracking-[-1.5px]">
-              Brands we&apos;ve<br/>built&nbsp;to&nbsp;last
-            </h2>
-            <p className="text-neutral-500 mt-3 cursor-default">
-              Each delivered in 3 weeks or less
-            </p>
-          </div>
-
-          <div className="mx-auto flex flex-col gap-4">
-            <div className="relative">
-              <CircularButton icon={ChevronLeft} onClick={prev} className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20" />
-              <CircularButton icon={ChevronRight} onClick={next} className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20" />
-
-              <div ref={containerRef} className="overflow-x-clip relative py-6">
-                <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-r from-neutral-100 to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-l from-neutral-100 to-transparent z-10 pointer-events-none" />
-
-                <div
-                  ref={trackRef}
-                  className={`flex ${skipTransition ? "" : "transition-transform duration-500 ease-in-out"}`}
-                  style={{
-                    transform: `translateX(calc(50% - ${position * (cardWidth + CARD_GAP) + cardWidth / 2}px))`,
-                  }}
-                >
-                  {[...brandProjects, ...brandProjects, ...brandProjects].map((project, i) => {
-                    const isActive = i === position;
-                    return (
-                      <div
-                        key={`${project.id}-${i}`}
-                        onClick={() => navigate(i)}
-                        className={`flex-shrink-0 rounded-2xl overflow-hidden cursor-pointer drop-shadow-xl ${
-                          skipTransition ? "" : "transition-all duration-500 ease-in-out"
-                        } ${isActive ? "" : "scale-[65%] opacity-50 blur-[2px] hover:opacity-75"}`}
-                        style={{ width: cardWidth, marginRight: i < total * 3 - 1 ? `${CARD_GAP}px` : 0 }}
-                      >
-                        <div className="relative w-full aspect-[4/3]">
-                          <Image
-                            src={project.image}
-                            alt={project.name}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 512px"
-                            className="object-contain"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+          <div className="relative max-w-5xl mx-auto pb-[8vh]">
+            {projects.map((project, i) => (
+              <div
+                key={project.id}
+                ref={(el) => { cardRefs.current[i] = el; }}
+                // Sticky-stack on EVERY breakpoint so the interaction is
+                // consistent: each card pins and the next rises to cover it.
+                // Mobile pins near the top; lg+ pins so the card's CENTER lands
+                // at mid-viewport: the card is vertically centered in a 54vh
+                // wrapper, so pinning the wrapper top at 23vh puts the card
+                // center at 23 + 27 = 50vh. (400px = PARALLAX_DISTANCE cancels
+                // the section's upward parallax; the JS parallax stays
+                // desktop-only — see handleScroll.)
+                className="sticky top-4 mb-[20vh] lg:top-[calc(23vh+400px)] lg:mb-[28vh]"
+              >
+                <div className="flex items-center lg:min-h-[46vh] lg:h-[54vh]">
+                  <CaseStudyCard {...project} />
                 </div>
               </div>
-            </div>
-
-            <div className="flex sm:hidden justify-center gap-3">
-              <CircularButton icon={ChevronLeft} onClick={prev} />
-              <CircularButton icon={ChevronRight} onClick={next} />
-            </div>
-
-            <div className="flex items-center justify-center gap-2">
-              {brandProjects.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => navigate(i + total)}
-                  className={`w-2.5 h-2.5 rounded-full transition-colors cursor-pointer ${
-                    i === activeIndex ? "bg-neutral-900" : "bg-neutral-300 hover:bg-neutral-400"
-                  }`}
-                  aria-label={`View ${brandProjects[i].name}`}
-                />
-              ))}
-            </div>
+            ))}
           </div>
-        </InnerContainer>
-      </OuterContainer>
-
-      <div className="w-full line-dash-x" />
-    </Section>
+        </div>
+      </div>
+    </section>
   );
 }

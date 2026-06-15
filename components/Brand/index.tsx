@@ -1,12 +1,13 @@
 "use client";
 
 import { Footer } from "@/components/Footer/index";
+import { PackageProvider } from "./PackageContext";
 import HeroSection from "./HeroSection";
-import ProblemSection from "./ProblemSection";
+import DepthSection from "./DepthSection";
 import RecentWorkSection from "./RecentWorkSection";
 import ProcessSection from "./ProcessSection";
-import DeliverablesSection from "./DeliverablesSection";
 import TestimonialTicker from "@/components/LaunchVideos/TestimonialTicker";
+import WhatsIncludedSection from "./WhatsIncludedSection";
 import PricingSection from "./PricingSection";
 import FoundersSection from "./FoundersSection";
 import CTASection from "./CTASection";
@@ -14,18 +15,20 @@ import FAQSection from "./FAQSection";
 
 export default function BrandPage() {
   return (
+    <PackageProvider>
     <div>
       <HeroSection />
-      <ProblemSection />
-      <DeliverablesSection />
+      <DepthSection />
       <ProcessSection />
       <RecentWorkSection />
-      <TestimonialTicker />
+      <WhatsIncludedSection />
       <PricingSection />
       <FoundersSection />
+      <TestimonialTicker />
       <CTASection />
       <FAQSection />
       <Footer />
     </div>
+    </PackageProvider>
   );
 }

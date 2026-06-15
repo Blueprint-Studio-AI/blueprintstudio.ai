@@ -1,34 +1,40 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 
 interface GradientButtonProps {
   onClick?: () => void;
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
-export default function GradientButton({ onClick, children, className = "" }: GradientButtonProps) {
+export default function GradientButton({ onClick, children, className = "", style }: GradientButtonProps) {
   return (
     <motion.button
       onClick={onClick}
-      className={`relative w-fit py-2.5 px-5 sm:py-3.5 sm:px-7 font-medium flex items-center justify-center text-white rounded-lg text-sm sm:text-md cursor-pointer overflow-hidden group ${className}`}
+      // Figma primary-button spec (keep in sync with GradientCTAButton):
+      // 52px tall, 12px radius, 16px text, 3-stop gradient, and an inner
+      // white sheen (X100 / Y-11 / blur 40 / 25%).
+      className={`relative w-fit h-[52px] px-7 font-medium flex items-center justify-center text-white rounded-[12px] text-base cursor-pointer overflow-hidden group ${className}`}
       style={{
-        background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(96,174,238,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset, 0 1px 0 rgba(255,255,255,0.2) inset",
+        background: "linear-gradient(95deg, #33A6F7 0%, #1472F6 52%, #444DEB 89%)",
+        boxShadow:
+          "0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(51,166,247,0.3), inset 100px -11px 40px rgba(255,255,255,0.25)",
+        ...style,
       }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
     >
-      <motion.div
+      {/* Static sheen — animating backgroundPosition here was a no-op (no
+          backgroundSize set, so nothing moved) yet repainted every frame. */}
+      <div
         className="absolute inset-0"
         style={{
           background: "radial-gradient(ellipse 50% 80% at 30% 50%, rgba(147,197,253,0.4) 0%, transparent 50%), radial-gradient(ellipse 40% 70% at 70% 50%, rgba(96,174,238,0.35) 0%, transparent 50%)",
           filter: "blur(1px)",
         }}
-        animate={{ backgroundPosition: ["0% 0%, 100% 0%", "100% 0%, 0% 0%", "0% 0%, 100% 0%"] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute inset-0"

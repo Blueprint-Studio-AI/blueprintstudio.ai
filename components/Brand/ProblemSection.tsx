@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
@@ -18,6 +19,10 @@ const comparison = [
 ];
 
 export default function ProblemSection() {
+  // The comparison ring's gradient drift repaints every frame (CPU-bound
+  // backgroundPosition), so it only runs while the ring is on screen.
+  const ringRef = useRef<HTMLDivElement>(null);
+  const ringInView = useInView(ringRef);
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
@@ -84,12 +89,17 @@ export default function ProblemSection() {
                 style={{ width: "calc(50% - 0.75rem)" }}
               >
                 <motion.div
+                  ref={ringRef}
                   className="absolute inset-0 rounded-2xl"
                   style={{
                     background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
                     backgroundSize: "300% 300%",
                   }}
-                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  animate={
+                    ringInView
+                      ? { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
+                      : { backgroundPosition: "0% 50%" }
+                  }
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <div className="absolute inset-0.5 rounded-[calc(1rem-1px)] bg-white" />

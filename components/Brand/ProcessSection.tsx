@@ -1,381 +1,249 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Section from "@/components/ui/Section";
+import Image from "next/image";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import {
-  Search,
-  Palette,
-  Layers,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  LucideIcon,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronLeft } from "lucide-react";
 
-interface Workstream {
-  id: string;
-  name: string;
-  start: number;
-  duration: number;
-  icon: LucideIcon;
-  description: string;
-}
-
-const workstreams: Workstream[] = [
+const steps = [
   {
-    id: "discovery",
-    name: "Discovery",
-    start: 0,
-    duration: 1,
-    icon: Search,
+    number: "01",
+    title: "Discover",
     description:
-      "We learn your market, audience, and ambition. Define positioning and messaging that sets you apart.",
+      "We learn your market, your audience, and what makes you different. One call, one brief, no fluff.",
   },
   {
-    id: "identity",
-    name: "Identity",
-    start: 0.5,
-    duration: 1.5,
-    icon: Palette,
+    number: "02",
+    title: "Strategy",
     description:
-      "Logo system, color palette, typography. We design the core elements that make you recognizable.",
+      "Positioning, messaging, and a creative direction that translates your advantage into something people feel.",
   },
   {
-    id: "system",
-    name: "System",
-    start: 1.5,
-    duration: 1.5,
-    icon: Layers,
+    number: "03",
+    title: "Identity",
     description:
-      "Brand guidelines, social kit, email signature, and 2-3 applications of your choice. Everything you need to stay consistent.",
+      "Logo system, color palette, typography, patterns. The visual building blocks of your brand, designed as a cohesive system.",
   },
   {
-    id: "delivery",
-    name: "Delivery",
-    start: 2.5,
-    duration: 0.5,
-    icon: CheckCircle2,
+    number: "04",
+    title: "Delivery",
     description:
-      "You receive the full brand package plus AI prompts configured for your voice and guidelines — so you stay on-brand as you scale.",
+      "Brand book, social kit, application templates, and AI prompts—everything you need to stay on-brand as you scale.",
   },
 ];
 
-const weeks = [1, 2, 3];
-const TOTAL_WEEKS = 3;
-
-const MAX_CARD_WIDTH = 340;
-const CARD_GAP = 12;
-
-function getWeekLabel(ws: Workstream) {
-  const startWeek = Math.floor(ws.start) + 1;
-  const endWeek = Math.ceil(ws.start + ws.duration);
-  return startWeek === endWeek
-    ? `WEEK ${startWeek}`
-    : `WEEK ${startWeek} - ${endWeek}`;
-}
-
-function WorkstreamCarouselCard({
-  workstream: ws,
-  isActive,
-  cardWidth,
-  onClick,
-}: {
-  workstream: Workstream;
-  isActive: boolean;
-  cardWidth: number;
-  onClick?: () => void;
-}) {
-  const Icon = ws.icon;
-
-  return (
-    <div
-      key={ws.id}
-      onClick={onClick}
-      className={`bg-white border border-neutral-200 shadow-sm flex-shrink-0 flex flex-col p-5 rounded-2xl cursor-pointer transition-all duration-500 ease-in-out ${
-        isActive ? "" : "scale-90 opacity-50 hover:opacity-75"
-      }`}
-      style={{ width: cardWidth }}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex flex-row items-center gap-3">
-          <Icon className="w-5 h-5 text-neutral-800" />
-          <p className="font-medium text-lg text-neutral-800 tracking-tight">
-            {ws.name}
-          </p>
-        </div>
-        <span className="text-xs font-medium text-neutral-500 uppercase">
-          {getWeekLabel(ws)}
-        </span>
-      </div>
-
-      <p className="mt-4 text-sm text-neutral-500 leading-[128%]">{ws.description}</p>
-    </div>
-  );
-}
-
-function CircularButton({
-  onClick,
-  icon: Icon,
-  className,
-}: {
-  onClick?: () => void;
-  icon: LucideIcon;
-  className?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label="Navigate workstream"
-      className={cn(
-        "shrink-0 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 hover:text-black hover:border-neutral-400 transition-all duration-300",
-        className
-      )}
-      style={{
-        boxShadow: "0 2px 8.7px 0 rgba(0, 0, 0, 0.10)",
-      }}
-    >
-      <Icon className="w-5 h-5" color="black" />
-    </button>
-  );
-}
-
-function WorkstreamCarousel({
-  activeWorkstream,
-  setActiveWorkstream,
-}: {
-  activeWorkstream: number;
-  setActiveWorkstream: (i: number) => void;
-}) {
-  const total = workstreams.length;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [cardWidth, setCardWidth] = useState(MAX_CARD_WIDTH);
-  const isTransitioning = useRef(false);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      const w = entry.contentRect.width;
-      const isMobile = w < 640;
-      setCardWidth(Math.min(MAX_CARD_WIDTH, w - (isMobile ? 48 : 120)));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const navigate = (index: number) => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
-    setActiveWorkstream(index);
-    setTimeout(() => { isTransitioning.current = false; }, 500);
-  };
-
-  const prev = () => navigate((activeWorkstream - 1 + total) % total);
-  const next = () => navigate((activeWorkstream + 1) % total);
-
-  return (
-    <div className="mx-auto mt-8 flex flex-col gap-4">
-      <div className="relative">
-        <CircularButton icon={ChevronLeft} onClick={prev} className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20" />
-        <CircularButton icon={ChevronRight} onClick={next} className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20" />
-
-        <div ref={containerRef} className="overflow-hidden relative">
-          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none" />
-
-          <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{
-              gap: `${CARD_GAP}px`,
-              transform: `translateX(calc(50% - ${activeWorkstream * (cardWidth + CARD_GAP) + cardWidth / 2}px))`,
-            }}
-          >
-            {workstreams.map((ws, i) => (
-              <WorkstreamCarouselCard
-                key={ws.id}
-                workstream={ws}
-                isActive={i === activeWorkstream}
-                cardWidth={cardWidth}
-                onClick={() => setActiveWorkstream(i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex sm:hidden justify-center gap-3">
-        <CircularButton icon={ChevronLeft} onClick={prev} />
-        <CircularButton icon={ChevronRight} onClick={next} />
-      </div>
-    </div>
-  );
-}
-
-function GanttBar({
-  workstream,
-  isVisible,
-  isActive,
-  onClick,
-}: {
-  workstream: Workstream;
-  isVisible: boolean;
-  isActive: boolean;
-  onClick?: () => void;
-}) {
-  const startPercent = (workstream.start / TOTAL_WEEKS) * 100;
-  const widthPercent = (workstream.duration / TOTAL_WEEKS) * 100;
-  const Icon = workstream.icon;
-  const isDelivery = workstream.id === "delivery";
-
-  return (
-    <div onClick={onClick} className="flex items-center gap-3 sm:gap-4 group">
-      <div className={cn("text-neutral-500 w-32 sm:w-36 shrink-0 flex items-center gap-2", {
-        "text-green-600": isDelivery && isActive,
-        "text-green-500": isDelivery && !isActive,
-        "text-neutral-800": isActive && !isDelivery,
-      })}>
-        <Icon
-          className={cn(
-            "hidden sm:block w-3.5 h-3.5 transition-colors",
-            isDelivery ? "text-green-600 group-hover:text-green-500" : "group-hover:text-black"
-          )}
-        />
-        <span
-          className={`text-sm ${isDelivery ? "text-green-600 font-medium group-hover:text-green-500" : isActive ? "text-neutral-700" : "text-neutral-500"} group-hover:text-black transition-colors`}
-        >
-          {workstream.name}
-        </span>
-      </div>
-
-      <div className="flex-1 h-8 relative">
-        <div className="absolute inset-0 bg-neutral-100/80 rounded-[4px]" />
-
-        <div
-          className={`absolute top-1 bottom-1 rounded-[4px] transition-all duration-300 ease-out ${
-            isDelivery
-              ? isActive ? "bg-green-500 group-hover:bg-green-600" : "bg-green-400/40 group-hover:bg-green-500/40"
-              : isActive ? "bg-neutral-700 group-hover:bg-neutral-600" : "bg-neutral-400/60 group-hover:bg-neutral-400"
-          }`}
-          style={{
-            left: `${startPercent}%`,
-            width: isVisible ? `${widthPercent}%` : "0%",
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function ProcessSection() {
-  const chartRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeWorkstream, setActiveWorkstream] = useState<number>(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
+    const observers: IntersectionObserver[] = [];
 
-    if (chartRef.current) {
-      observer.observe(chartRef.current);
-    }
+    stepRefs.current.forEach((ref, index) => {
+      if (!ref) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveStep(index);
+            setHasScrolled(true);
+          }
+        },
+        { threshold: 0.6 }
+      );
+      observer.observe(ref);
+      observers.push(observer);
+    });
 
-    return () => observer.disconnect();
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
-      </div>
+    <>
+      {/* Steps */}
+      <section className="flex-1 flex justify-center items-center flex-col px-2.5 sm:px-[60px] relative z-20 bg-neutral-50">
+        <SectionHeader leftText="LAUNCH PACKAGE" rightText="// FOR FOUNDERS" />
 
-      <SectionHeader leftText="PROCESS" rightText="// 3 weeks" />
-
-      <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-
-          <div className="text-center mb-10 sm:mb-14">
+        <OuterContainer className="flex-1 flex items-center">
+          <InnerContainer className="pt-16 sm:pt-24 lg:pt-28 pb-16 sm:pb-24 lg:pb-28 px-2.5 sm:px-6 relative">
             <h2
-              className="font-medium text-black cursor-default mb-3"
+              className="font-medium text-black cursor-default mb-16 sm:mb-20"
               style={{
-                fontSize: "clamp(28px, 6vw, 48px)",
+                fontSize: "clamp(28px, 5vw, 44px)",
                 lineHeight: "110%",
                 letterSpacing: "-1.5px",
               }}
             >
-              How It Works
+              Four steps,
+              <br />
+              <span className="text-neutral-300">starting at </span>
+              three weeks
             </h2>
-            <p className="text-neutral-500 max-w-md mx-auto cursor-default text-sm sm:text-base">
-              We don&apos;t work sequentially. Multiple workstreams run
-              simultaneously, so you get everything in 3 weeks.
-            </p>
-          </div>
 
-          <div ref={chartRef} className="max-w-3xl mx-auto">
-            <div className="flex items-end gap-3 sm:gap-4 mb-2">
-              <div className="w-32 sm:w-36 shrink-0" />
-              <div className="flex-1 flex relative">
-                {weeks.map((week) => (
-                  <div key={week} className="flex-1 flex flex-col items-center">
-                    <span className="text-[10px] sm:text-xs text-neutral-500 cursor-default">
-                      {week}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {workstreams.map((ws, index) => (
-                <GanttBar
-                  key={ws.id}
-                  workstream={ws}
-                  isVisible={isVisible}
-                  onClick={() => setActiveWorkstream(index)}
-                  isActive={index === activeWorkstream}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-3 sm:gap-4 mt-3">
-              <div className="w-32 sm:w-36 shrink-0" />
-              <div className="flex-1 h-px bg-neutral-200 relative">
-                {[...Array(4)].map((_, i) => (
+            <div className="flex flex-col relative px-[48px]">
+              <div
+                className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
+                style={{
+                  maskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+                }}
+              />
+              <div
+                className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
+                style={{
+                  maskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+                }}
+              />
+              {steps.map((step, index) => {
+                const isActive = hasScrolled
+                  ? index === activeStep
+                  : index === 0;
+                const isLast = index === steps.length - 1;
+                return (
                   <div
-                    key={i}
-                    className="absolute top-0 w-px h-1.5 bg-neutral-300"
-                    style={{ left: `${(i / TOTAL_WEEKS) * 100}%` }}
-                  />
-                ))}
-              </div>
+                    key={step.number}
+                    ref={(el) => { stepRefs.current[index] = el; }}
+                    onMouseEnter={() => setActiveStep(index)}
+                    className="cursor-default"
+                  >
+                    <div
+                      className="transition-opacity duration-300 ease-out py-6 sm:py-8"
+                      style={{ opacity: isActive ? 1 : 0.2 }}
+                    >
+                      <div className="flex items-start sm:items-center gap-3 sm:gap-0">
+                        <div className="flex items-baseline gap-3 sm:gap-4 shrink-0 sm:w-[280px]">
+                          <span
+                            className="text-neutral-400 font-medium"
+                            style={{
+                              fontSize: "clamp(14px, 2vw, 18px)",
+                              letterSpacing: "-0.5px",
+                            }}
+                          >
+                            {step.number}
+                          </span>
+                          <span
+                            className="font-semibold text-black"
+                            style={{
+                              fontSize: "clamp(18px, 3vw, 24px)",
+                              letterSpacing: "-0.5px",
+                            }}
+                          >
+                            {step.title}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 flex items-center justify-between gap-4">
+                          <p className="text-neutral-500 text-sm sm:text-base leading-relaxed max-w-lg">
+                            {step.description}
+                          </p>
+                          <ChevronLeft
+                            className="w-5 h-5 shrink-0 text-neutral-400 transition-opacity duration-300"
+                            style={{ opacity: isActive ? 1 : 0 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {!isLast && (
+                      <div className="border-t border-neutral-200" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
+          </InnerContainer>
+        </OuterContainer>
+      </section>
+
+      {/* Thumbprint transition */}
+      <div className="relative w-full z-10 overflow-visible bg-neutral-50">
+        <div className="relative w-full overflow-visible" style={{ aspectRatio: "1440 / 500" }}>
+          {/* Blue gradient BEHIND thumbprints — bottom 50% */}
+          <div
+            className="absolute bottom-0 left-0 right-0 z-0"
+            style={{
+              height: "50%",
+              background:
+                "linear-gradient(to bottom, rgba(51,166,247,0) 0%, rgba(51,166,247,0.14) 10%, rgba(51,166,247,0.35) 25%, rgba(51,166,247,1) 45%, rgba(20,114,246,1) 65%, rgba(68,77,235,1) 100%)",
+            }}
+          />
+
+          {/* Thumbprint image — extends 20% above container */}
+          <div
+            className="absolute left-0 right-0 bottom-0 select-none pointer-events-none z-[1]"
+            style={{
+              height: "120%",
+              mixBlendMode: "multiply",
+              opacity: 0.85,
+              maskImage:
+                "linear-gradient(to bottom, transparent 0%, transparent 15%, black 70%, black 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, transparent 0%, transparent 15%, black 70%, black 100%)",
+            }}
+          >
+            <Image
+              src="/images/thumbprints.webp"
+              alt=""
+              fill
+              className="object-cover object-bottom"
+              draggable={false}
+              sizes="100vw"
+              quality={100}
+              unoptimized
+              priority
+            />
           </div>
 
-          <WorkstreamCarousel
-            activeWorkstream={activeWorkstream}
-            setActiveWorkstream={setActiveWorkstream}
-          />
-        </InnerContainer>
-      </OuterContainer>
+          {/* Single curved path with vertical Gaussian blur creates a smooth gradient
+              that perfectly follows the curve contour — no banding, no rings. */}
+          <svg
+            viewBox="-100 0 1640 600"
+            preserveAspectRatio="none"
+            className="absolute bottom-0 left-0 right-0 w-full block pointer-events-none z-[2]"
+            style={{ height: "60%", overflow: "visible" }}
+          >
+            <defs>
+              <filter id="softCurve" x="-20%" y="-50%" width="140%" height="200%">
+                <feGaussianBlur stdDeviation="15 70" />
+              </filter>
+            </defs>
+            {/* Blurred curve — extends past viewBox so vertical edges are off-screen */}
+            <g filter="url(#softCurve)">
+              <path
+                d="M-200,500 C480,260 960,260 1640,500 L1640,800 L-200,800 Z"
+                fill="white"
+              />
+            </g>
+            {/* Solid curve at the bottom — also extends past viewBox to avoid edge artifacts */}
+            <path
+              d="M-200,600 C480,470 960,470 1640,600 L1640,600 L-200,600 Z"
+              fill="white"
+            />
+          </svg>
+        </div>
 
-      <div className="w-full line-dash-x" />
-    </Section>
+        {/* Text */}
+        <div className="w-full bg-white flex justify-center px-2.5 sm:px-[60px] pt-12 sm:pt-20 pb-36 sm:pb-48">
+          <h2
+            className="text-center font-medium cursor-default"
+            style={{
+              fontSize: "clamp(26px, 5vw, 44px)",
+              lineHeight: "130%",
+              letterSpacing: "-1px",
+            }}
+          >
+            <span className="text-neutral-400">We&apos;re not just talk,</span>
+            <br />
+            <span className="text-black">we let our work speak for itself.</span>
+          </h2>
+        </div>
+      </div>
+    </>
   );
 }

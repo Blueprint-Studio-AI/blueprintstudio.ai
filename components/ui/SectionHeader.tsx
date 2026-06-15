@@ -6,9 +6,11 @@ interface SectionHeaderProps {
   leftText: string | ReactNode;
   rightText: string | ReactNode;
   centerContent?: ReactNode;
+  /** Set false to drop the dashed divider under the header (default keeps it). */
+  divider?: boolean;
 }
 
-export default function SectionHeader({ leftText, rightText, centerContent }: SectionHeaderProps) {
+export default function SectionHeader({ leftText, rightText, centerContent, divider = true }: SectionHeaderProps) {
   return (
     <div className="w-full">
       <OuterContainer>
@@ -26,7 +28,7 @@ export default function SectionHeader({ leftText, rightText, centerContent }: Se
           </div>
         </div>
       </OuterContainer>
-      <div className="w-full line-dash-x"/>
+      {divider && <div className="w-full line-dash-x" />}
     </div>
   );
 }

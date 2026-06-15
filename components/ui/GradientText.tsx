@@ -1,15 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { type ReactNode } from "react";
+import { motion, useInView } from "framer-motion";
+import { useRef, type ReactNode } from "react";
 
 interface GradientTextProps {
   children: ReactNode;
 }
 
 export default function GradientText({ children }: GradientTextProps) {
+  // backgroundPosition animates on the CPU (repaints the text every frame),
+  // so the drift only runs while the text is actually on screen.
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref);
   return (
     <motion.span
+      ref={ref}
       className="px-1 -mx-1"
       style={{
         backgroundImage:
@@ -21,7 +26,11 @@ export default function GradientText({ children }: GradientTextProps) {
         color: "transparent",
         display: "inline-block",
       }}
-      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+      animate={
+        inView
+          ? { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
+          : { backgroundPosition: "0% 50%" }
+      }
       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
     >
       {children}

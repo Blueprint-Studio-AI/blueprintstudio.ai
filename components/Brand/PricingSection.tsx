@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight, Check } from "lucide-react";
 import SocialProof from "@/components/ui/SocialProof";
-import { FeatureRow, PricingContainer, PricingFooter } from "@/components/ui/PricingCard";
-import { motion } from "framer-motion";
+import { PricingContainer, GradientCTAButton } from "@/components/ui/PricingCard";
+import GreenCheckmark from "@/components/ui/GreenCheckmark";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import Link from "next/link";
+import { usePackage, formatUSD, type AddonId } from "./PackageContext";
 
 const brandItems = [
   { title: "Logo System", desc: "Primary mark, word-mark, icon variations." },
@@ -18,40 +20,44 @@ const brandItems = [
   { title: "AI Prompts", desc: "Custom guidelines for consistent AI generation." },
 ];
 
-const deckItems = [
-  { title: "Narrative & Structure", desc: "Layouts, charts, visual hierarchy" },
-  { title: "Slide Design", desc: "Formatted for presentations and downloads" },
+// Compact add-on cards (right column) — selections are shared with the
+// Add-ons section above via PackageContext, so adding in either place
+// updates the total here.
+const addonCards: { id: AddonId; title: string; price: string; desc: string }[] = [
+  {
+    id: "website",
+    title: "Website",
+    price: "$15,000",
+    desc: "Design, development, responsive, email capture and SEO.",
+  },
+  {
+    id: "pitchDeck",
+    title: "Pitch Deck",
+    price: "$5,000",
+    desc: "Narrative strategy, slide design, speaker notes, and source files.",
+  },
 ];
 
 export default function PricingSection() {
-  const [deckAdded, setDeckAdded] = useState(false);
-  const total = deckAdded ? "$23,000" : "$18,000";
+  const { selected, toggleAddon, total } = usePackage();
+  // The launch-CTA ring's gradient drift repaints every frame (CPU-bound
+  // backgroundPosition), so it only runs while the ring is on screen.
+  const launchRingRef = useRef<HTMLDivElement>(null);
+  const launchRingInView = useInView(launchRingRef);
 
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
-      </div>
-
-      <SectionHeader leftText="PRICING" rightText="// investment" />
+      <SectionHeader leftText="PRICING" rightText="// investment" divider={false} />
 
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-
           <div className="text-center mb-10 sm:mb-14">
             <h2
-              className="font-medium text-black cursor-default mb-4"
+              className="font-medium text-[#252525] cursor-default mb-3"
               style={{
-                fontSize: "clamp(36px, 7vw, 56px)",
-                lineHeight: "100%",
-                letterSpacing: "-2px",
+                fontSize: "clamp(32px, 4.5vw, 42px)",
+                lineHeight: "1.18",
+                letterSpacing: "-0.84px",
               }}
             >
               Ready to launch?
@@ -61,8 +67,8 @@ export default function PricingSection() {
               <strong
                 className="font-semibold"
                 style={{
-                  background:
-                    "linear-gradient(92deg, #60AEEE -1.22%, #2563EB 18.8%, #3B82F6 38.82%, #60AEEE 69.04%, #3B82F6 87.52%, #2563EB 98.88%)",
+                  backgroundImage:
+                    "linear-gradient(90deg, #33A6F7 0%, #1472F6 51.923%, #444DEB 88.942%)",
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -74,84 +80,151 @@ export default function PricingSection() {
             </SocialProof>
           </div>
 
-          <PricingContainer>
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-6 sm:p-14 lg:p-[72px]">
-                <h3 className="font-medium text-xl text-black mb-1 cursor-default">
+          <PricingContainer maxWidth="max-w-[1000px]" rounded="rounded-[24px]">
+            {/* Card body — one shared 48px inset (per Figma) and one shared
+                [1fr, 412px] grid; the footer reuses the same inset + grid so
+                the Total aligns with this column and Book-a-Call spans exactly
+                the add-ons column. */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_412px] gap-10 lg:gap-8 p-6 sm:p-10 lg:p-12">
+              <div>
+                <h3
+                  className="font-medium text-[26px] sm:text-[32px] text-black mb-1 cursor-default"
+                  style={{ letterSpacing: "-0.5px" }}
+                >
                   Launch Package
                 </h3>
-                <p className="text-neutral-500 text-sm cursor-default">
+                <p className="text-[#8D929C] text-base cursor-default">
                   Everything you need to go to market.
                 </p>
 
-                <div className="mt-6">
-                  <span className="text-xs text-neutral-500 block">Base Price</span>
-                  <span className="font-semibold text-black text-[clamp(32px,5vw,40px)] leading-tight">
+                <div className="mt-8">
+                  <span className="text-sm text-[#8D929C] block">Base Price</span>
+                  <span
+                    className="font-semibold text-black text-[32px] leading-[1.28]"
+                    style={{ letterSpacing: "-0.64px" }}
+                  >
                     $18,000
                   </span>
                 </div>
 
-                <p className="text-sm font-medium text-black mt-8 mb-4">Includes:</p>
+                <p className="text-[18px] font-medium text-black mt-9 mb-5">Includes:</p>
                 <div className="space-y-6">
                   {brandItems.map((item) => (
-                    <FeatureRow key={item.title} title={item.title} desc={item.desc} />
+                    <div key={item.title} className="flex items-center gap-4">
+                      <GreenCheckmark />
+                      <div>
+                        <span
+                          className="block text-[18px] font-medium text-[#252525]"
+                          style={{ letterSpacing: "-0.36px" }}
+                        >
+                          {item.title}
+                        </span>
+                        <p
+                          className="mt-1.5 text-[16px] text-[#8D929C]"
+                          style={{ letterSpacing: "-0.32px" }}
+                        >
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              <div className="p-4 sm:p-8 lg:p-10">
-                <div className="relative rounded-[12px] h-full p-[2px]">
-                  <motion.div
-                    className="absolute inset-0 rounded-[12px]"
-                    style={{
-                      background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
-                      backgroundSize: "300% 300%",
-                    }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: deckAdded ? 1 : 0, backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                    transition={{ opacity: { duration: 0.3 }, backgroundPosition: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
-                  />
-                <div className={`relative rounded-[10px] p-6 sm:p-8 flex flex-col h-full transition-colors duration-300 ${deckAdded ? "bg-white" : "bg-neutral-50 line-dash-border"}`}>
-                  <h3 className="font-medium text-xl text-black mb-1 cursor-default">
-                    <span className="text-neutral-400">+</span> Pitch Deck
-                  </h3>
-                  <p className="text-neutral-500 text-sm cursor-default">
-                    Go to market with a working MVP.
-                  </p>
+              <div className="flex flex-col gap-8">
+                {addonCards.map((card) => {
+                  const added = selected[card.id];
+                  return (
+                    <div key={card.id} className="relative rounded-[14px] p-[2px]">
+                      {/* Animated gradient ring while the add-on is in the package */}
+                      <motion.div
+                        className="absolute inset-0 rounded-[14px]"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
+                          backgroundSize: "300% 300%",
+                        }}
+                        initial={{ opacity: 0 }}
+                        animate={{
+                          opacity: added ? 1 : 0,
+                          // Only loop the drift while the ring is visible —
+                          // otherwise it repaints every frame at opacity 0.
+                          backgroundPosition: added
+                            ? ["0% 50%", "100% 50%", "0% 50%"]
+                            : "0% 50%",
+                        }}
+                        transition={{
+                          opacity: { duration: 0.3 },
+                          backgroundPosition: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+                        }}
+                      />
+                      <div
+                        className={`relative flex flex-col rounded-[12px] p-6 sm:p-8 transition-colors duration-300 ${
+                          added ? "bg-white" : "bg-[#FBFBFB] line-dash-border"
+                        }`}
+                      >
+                        {/* Title + price on one row */}
+                        <div className="flex items-start justify-between gap-4">
+                          <h3 className="font-medium text-[18px] text-black cursor-default">
+                            <span className="text-[#8D929C]">+</span> {card.title}
+                          </h3>
+                          <span
+                            className="font-medium text-black text-[24px] cursor-default"
+                            style={{ letterSpacing: "-0.48px" }}
+                          >
+                            {card.price}
+                          </span>
+                        </div>
 
-                  <div className="mt-6">
-                    <span className="text-xs text-neutral-500 block">Plus Product</span>
-                    <span className="font-semibold text-black text-[clamp(32px,5vw,40px)] leading-tight">
-                      $5,000
-                    </span>
-                  </div>
+                        {/* Summary with the blue check */}
+                        <div className="mt-8 flex items-center gap-4">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500">
+                            <Check className="h-3.5 w-3.5" strokeWidth={3.5} />
+                          </span>
+                          <p
+                            className="text-[16px] font-medium text-[#8D929C] cursor-default"
+                            style={{ letterSpacing: "-0.32px", lineHeight: "1.3" }}
+                          >
+                            {card.desc}
+                          </p>
+                        </div>
 
-                  <p className="text-sm font-medium text-black mt-8 mb-4">Includes:</p>
-                  <div className="space-y-6">
-                    {deckItems.map((item) => (
-                      <FeatureRow key={item.title} title={item.title} desc={item.desc} />
-                    ))}
-                  </div>
-
-                  <div className="mt-auto pt-8">
-                    <button
-                      onClick={() => setDeckAdded(!deckAdded)}
-                      className={`w-full py-2.5 px-6 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-                        deckAdded
-                          ? "border-[#186FF5] text-[#186FF5]"
-                          : "border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-800"
-                      }`}
-                    >
-                      {deckAdded && <Check className="w-4 h-4" />}
-                      {deckAdded ? "Added" : "+ Add to Package"}
-                    </button>
-                  </div>
-                </div>
-                </div>
+                        <button
+                          onClick={() => toggleAddon(card.id)}
+                          className={`mt-8 flex w-full items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] py-4 text-[16px] font-medium tracking-[-0.32px] transition-colors cursor-pointer ${
+                            added
+                              ? "border-[#186FF5] bg-white text-[#186FF5]"
+                              : "border-[#DFDFE1] bg-[#FBFBFB] text-[#111] hover:bg-white"
+                          }`}
+                        >
+                          {added && <Check className="w-4 h-4" />}
+                          {added ? "Added" : "+ Add to Package"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            <PricingFooter total={total} />
+            {/* Footer — same inset + same [1fr, 412px] grid as the body, so the
+                Total left-aligns with "Launch Package" and Book-a-Call spans
+                exactly the add-on boxes' column. */}
+            <div className="h-px bg-neutral-200 mx-6 sm:mx-10 lg:mx-12" />
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_412px] items-center gap-6 lg:gap-8 px-6 sm:px-10 lg:px-12 pt-6 sm:pt-8 pb-6 sm:pb-10 lg:pb-12">
+              <div className="flex flex-col gap-3">
+                <span className="text-sm text-[#8D929C] block">Total:</span>
+                <span
+                  className="font-semibold text-black text-[48px] leading-[50px]"
+                  style={{ letterSpacing: "-0.96px" }}
+                >
+                  {formatUSD(total)}
+                </span>
+              </div>
+              <div>
+                <GradientCTAButton />
+              </div>
+            </div>
           </PricingContainer>
 
           <div className="max-w-xl mx-auto mt-12 text-center">
@@ -163,19 +236,24 @@ export default function PricingSection() {
                 letterSpacing: "-1px",
               }}
             >
-              Want the full launch?
+              Want the full launch package?
             </h3>
             <p className="text-neutral-500 text-sm cursor-default mb-8">
               Add website, pitch deck, and launch video.
             </p>
 
             <motion.div
+              ref={launchRingRef}
               className="inline-flex rounded-xl p-[2px]"
               style={{
                 background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%, #60AEEE 100%)",
                 backgroundSize: "300% 300%",
               }}
-              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              animate={
+                launchRingInView
+                  ? { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
+                  : { backgroundPosition: "0% 50%" }
+              }
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
               <Link
@@ -193,8 +271,6 @@ export default function PricingSection() {
           </p>
         </InnerContainer>
       </OuterContainer>
-
-      <div className="w-full line-dash-x" />
     </Section>
   );
 }
