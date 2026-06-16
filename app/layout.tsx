@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { FloatingNavNew } from "@/components/FloatingNavNew";
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -7,6 +8,12 @@ import Background from "@/components/ui/Background";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://blueprintstudio.ai'),
@@ -118,8 +125,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
+    <html 
+      lang="en" 
+      className={`${inter.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -136,7 +144,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="relative min-h-screen overflow-x-hidden antialiased font-sans">
+      <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
         <SmoothScrollProvider>
           <Background />
           <FloatingNavNew />

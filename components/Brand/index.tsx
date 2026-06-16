@@ -16,7 +16,8 @@ import FAQSection from "./FAQSection";
 export default function BrandPage() {
   return (
     <PackageProvider>
-    <div>
+    {/* Helvetica Neue is scoped to the brand page via font-sans; the rest of the site stays on Inter (set globally in app/layout.tsx). */}
+    <div className="font-sans">
       <HeroSection />
       <DepthSection />
       <ProcessSection />
