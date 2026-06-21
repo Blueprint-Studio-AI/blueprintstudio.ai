@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-brand.png",
-        width: 1200,
-        height: 630,
+        width: 2400,
+        height: 1260,
         alt: "Blueprint Studio - Brand Identity",
       },
     ],
