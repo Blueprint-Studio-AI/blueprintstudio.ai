@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import BrandPage from "@/components/Brand/index";
 
 export const metadata: Metadata = {
   // Layout applies the template "%s | Blueprint Studio", so keep this bare to
@@ -43,4 +44,39 @@ export const metadata: Metadata = {
   },
 };
 
-export { default } from "@/components/Brand/index";
+// Page-specific structured data (the layout already provides WebSite +
+// Organization). Describes the Brand Identity service and its starting price.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Brand Identity",
+  serviceType: "Brand identity design",
+  description:
+    "Your brand in 3 weeks. Logo, guidelines, and a custom AI trained on your brand. Built for founders moving fast.",
+  url: "https://blueprintstudio.ai/brand",
+  areaServed: "Worldwide",
+  provider: {
+    "@type": "Organization",
+    name: "Blueprint Studio",
+    url: "https://blueprintstudio.ai",
+  },
+  offers: {
+    "@type": "Offer",
+    priceCurrency: "USD",
+    price: "18000",
+    url: "https://blueprintstudio.ai/brand",
+    availability: "https://schema.org/InStock",
+  },
+};
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BrandPage />
+    </>
+  );
+}
