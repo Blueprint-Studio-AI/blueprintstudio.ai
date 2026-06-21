@@ -19,15 +19,21 @@ interface FooterSection {
 }
 
 const footerLinks: Record<string, FooterSection> = {
-  // services: {
-  //   title: 'Services',
-  //   links: [
-  //     { name: 'Web Design', href: '/web-design' },
-  //     { name: 'Service Design', href: '/service-design' },
-  //     { name: 'Small Business', href: '/small-business-web-design' },
-  //     { name: 'All Services', href: '/services-index' },
-  //   ]
-  // },
+  services: {
+    title: 'Services',
+    links: [
+      { name: 'Brand Identity', href: '/brand' },
+      { name: 'Launch Package', href: '/launch' },
+      { name: 'Launch Videos', href: '/launch-videos' },
+    ]
+  },
+  tools: {
+    title: 'Tools',
+    links: [
+      // Lives in the separate tools monorepo, served from the tools subdomain.
+      { name: 'Asset Generator', href: 'https://tools.blueprintstudio.ai/asset-generator', external: true },
+    ]
+  },
   company: {
     title: 'Company',
     links: [
@@ -37,13 +43,6 @@ const footerLinks: Record<string, FooterSection> = {
       // { name: 'Careers', href: '/careers' },
     ]
   },
-  // tools: {
-  //   title: 'Tools',
-  //   links: [
-  //     { name: 'Roast My Site', href: '/tools/roast-my-site' },
-  //     // { name: 'All Tools', href: '/tools' },
-  //   ]
-  // },
   resources: {
     title: 'Resources',
     links: [
