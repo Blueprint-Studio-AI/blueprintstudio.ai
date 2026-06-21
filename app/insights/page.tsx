@@ -3,7 +3,8 @@ import { getAllPosts } from "@/lib/blog";
 import BlogIndex from "@/components/Blog/BlogIndex";
 
 export const metadata: Metadata = {
-  title: "Insights | Blueprint Studio",
+  // Layout template appends " | Blueprint Studio" — keep this bare to avoid doubling.
+  title: "Insights",
   description:
     "Thinking on product, design, and building things that work. Insights from Blueprint Studio.",
   alternates: {

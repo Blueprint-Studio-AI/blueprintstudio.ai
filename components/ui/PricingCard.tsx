@@ -16,9 +16,21 @@ export function FeatureRow({ title, desc }: { title: string; desc: string }) {
   );
 }
 
-export function PricingContainer({ children }: { children: React.ReactNode }) {
+export function PricingContainer({
+  children,
+  maxWidth = "max-w-4xl",
+  rounded = "rounded-3xl sm:rounded-[48px]",
+}: {
+  children: React.ReactNode;
+  maxWidth?: string;
+  /** Corner radius classes — defaults to the Launch-page card; the Brand
+      pricing card overrides to the Figma's 24px. */
+  rounded?: string;
+}) {
   return (
-    <div className="max-w-4xl mx-auto rounded-3xl sm:rounded-[48px] border border-neutral-200 bg-white overflow-hidden">
+    <div
+      className={`${maxWidth} mx-auto ${rounded} border border-neutral-200 bg-white overflow-hidden`}
+    >
       {children}
     </div>
   );
@@ -27,14 +39,21 @@ export function PricingContainer({ children }: { children: React.ReactNode }) {
 export function PricingFooter({
   total,
   children,
+  dividerClassName = "mx-6 sm:mx-10",
+  rowClassName = "gap-4 py-6 sm:py-8 px-6 sm:px-10",
 }: {
   total: string;
   children?: React.ReactNode;
+  /** Horizontal inset of the divider — match the card body's padding so it aligns. */
+  dividerClassName?: string;
+  /** Grid gap + padding of the total/CTA row — match the card body's grid so the
+      total and the button align with the columns above. */
+  rowClassName?: string;
 }) {
   return (
     <>
-      <div className="h-px bg-neutral-200 mx-6 sm:mx-10" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-4 py-6 sm:py-8 px-6 sm:px-10">
+      <div className={`h-px bg-neutral-200 ${dividerClassName}`} />
+      <div className={`grid grid-cols-1 lg:grid-cols-2 items-center ${rowClassName}`}>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-neutral-500 block">Total:</span>
           <span className="font-semibold text-black text-[clamp(32px,5vw,44px)] leading-tight">
@@ -54,16 +73,14 @@ export function PricingFooter({
 export function GradientCTAButton() {
   return (
     <motion.button
-      className="group relative w-full py-3 px-8 font-medium flex items-center justify-center text-white rounded-xl text-sm overflow-hidden"
+      // Figma primary-button spec (keep in sync with ui/GradientButton):
+      // 52px tall, 12px radius, 16px text, 3-stop gradient, and an inner
+      // white sheen (X100 / Y-11 / blur 40 / 25%).
+      className="group relative w-full h-[52px] px-8 font-medium flex items-center justify-center text-white rounded-[12px] text-base overflow-hidden"
       style={{
-        background:
-          "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
-        boxShadow: `
-          0 1px 2px rgba(0, 0, 0, 0.1),
-          0 2px 8px rgba(96, 174, 238, 0.3),
-          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-          0 1px 0 rgba(255, 255, 255, 0.2) inset
-        `,
+        background: "linear-gradient(95deg, #33A6F7 0%, #1472F6 52%, #444DEB 89%)",
+        boxShadow:
+          "0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(51,166,247,0.3), inset 100px -11px 40px rgba(255,255,255,0.25)",
       }}
       whileTap={{ scale: 0.97 }}
       transition={{
@@ -78,7 +95,9 @@ export function GradientCTAButton() {
         )
       }
     >
-      <motion.div
+      {/* Static sheen — animating backgroundPosition here was a no-op (no
+          backgroundSize set, so nothing moved) yet repainted every frame. */}
+      <div
         className="absolute inset-0"
         style={{
           background: `
@@ -86,18 +105,6 @@ export function GradientCTAButton() {
             radial-gradient(ellipse 40% 70% at 70% 50%, rgba(96, 174, 238, 0.35) 0%, transparent 50%)
           `,
           filter: "blur(1px)",
-        }}
-        animate={{
-          backgroundPosition: [
-            "0% 0%, 100% 0%",
-            "100% 0%, 0% 0%",
-            "0% 0%, 100% 0%",
-          ],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
         }}
       />
       <motion.div
@@ -129,7 +136,7 @@ export function GradientCTAButton() {
       >
         Book a Call
       </span>
-      <ArrowUpRight className="w-4 h-4 ml-2 relative z-10 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      <ArrowUpRight className="w-4 h-4 ml-3 relative z-10 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
     </motion.button>
   );
 }

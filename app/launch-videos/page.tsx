@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Launch Videos | Blueprint Studio",
+  // Layout template appends " | Blueprint Studio" — keep this bare to avoid doubling.
+  title: "Launch Videos",
   description:
     "Get your launch video in 7 days. Studio quality, startup speed. You focus on shipping. We'll handle the video.",
   keywords: [

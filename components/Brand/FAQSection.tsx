@@ -83,12 +83,12 @@ function FaqItem({ question, answer }: FaqItemProps) {
         className="w-full flex justify-between items-start py-6 text-left group"
         aria-expanded={isOpen}
       >
-        <h4
+        <h3
           className="font-medium text-lg pr-8 text-black group-hover:text-neutral-600 transition-colors"
           style={{ textWrap: "balance" }}
         >
           {question}
-        </h4>
+        </h3>
         <motion.div
           className="shrink-0"
           animate={{ rotate: isOpen ? 180 : 0 }}
@@ -107,8 +107,11 @@ function FaqItem({ question, answer }: FaqItemProps) {
         className="overflow-hidden"
       >
         <div
+          // While collapsed, take the answer (and any links inside it) out of the
+          // tab order + a11y tree — otherwise they're focusable while invisible.
+          inert={!isOpen}
           className="text-neutral-600 leading-relaxed pb-6"
-          style={{ textWrap: "balance" }}
+          style={{ textWrap: "pretty" }}
         >
           {answer}
         </div>
@@ -120,24 +123,14 @@ function FaqItem({ question, answer }: FaqItemProps) {
 export default function FAQSection() {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
-      {/* Vertical lines */}
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
-      </div>
-
       <SectionHeader leftText="FAQ" rightText="// clarity" />
 
       {/* Main Content */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 md:px-6 relative">
-          {/* Inner dashed vertical lines on desktop */}
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+          {/* Partial construction lines — faded top & bottom (new design). */}
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
 
           {/* FAQ Container */}
           <div className="max-w-3xl px-2 md:mx-auto">

@@ -22,22 +22,14 @@ const founders = [
 export default function FoundersSection() {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
-      {/* Vertical lines */}
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
-      </div>
-
       <SectionHeader leftText="TEAM" rightText="// who's behind this" />
 
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+          {/* Partial construction lines — faded top & bottom, matching the new
+              design (process / depth sections). */}
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
 
           {/* Section Title */}
           <div className="text-center mb-12 sm:mb-16">

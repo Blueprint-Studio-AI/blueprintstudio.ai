@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Full Launch Package | Blueprint Studio",
+  // Layout template appends " | Blueprint Studio" — keep this bare to avoid doubling.
+  title: "Full Launch Package",
   description:
     "Everything you need to launch. Brand identity, website, pitch deck, launch video. One team, one price, six weeks. Starting at $50K.",
   keywords: [
@@ -26,8 +27,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-launch.png",
-        width: 1200,
-        height: 630,
+        width: 2400,
+        height: 1260,
         alt: "Blueprint Studio - Full Launch Package",
       },
     ],
