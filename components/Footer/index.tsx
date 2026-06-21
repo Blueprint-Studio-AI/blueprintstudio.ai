@@ -197,7 +197,7 @@ export function Footer() {
       <Section semantic="div" className="flex-none">
         <OuterContainer>
           <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 px-6 pb-7 pt-20">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-neutral-600 text-sm tracking-[-0.02em]">
+            <div className="flex flex-col md:flex-row md:flex-wrap items-start md:items-center gap-2 md:gap-x-5 md:gap-y-2 text-neutral-600 text-sm tracking-[-0.02em]">
               <span>Copyright © Blueprint Studio 2026</span>
               <Link href="/terms" className="hover:text-neutral-400 transition-colors duration-200">Terms of Service</Link>
               <Link href="/privacy-policy" className="hover:text-neutral-400 transition-colors duration-200">Privacy Policy</Link>
