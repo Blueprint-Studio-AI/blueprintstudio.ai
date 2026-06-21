@@ -19,6 +19,16 @@ interface FooterSection {
 }
 
 const footerLinks: Record<string, FooterSection> = {
+  company: {
+    title: 'Company',
+    links: [
+      { name: 'Tyler Stupart', href: 'https://www.linkedin.com/in/tylerstupart/', external: true },
+      { name: 'Jaidon Lalor', href: 'https://www.linkedin.com/in/jaidonlalor/', external: true },
+      { name: 'Insights', href: '/insights' },
+      { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
+      // { name: 'Careers', href: '/careers' },
+    ]
+  },
   services: {
     title: 'Services',
     links: [
@@ -27,35 +37,14 @@ const footerLinks: Record<string, FooterSection> = {
       { name: 'Launch Videos', href: '/launch-videos' },
     ]
   },
-  tools: {
-    title: 'Tools',
+  products: {
+    title: 'Products',
     links: [
       // Lives in the separate tools monorepo, served from the tools subdomain.
       { name: 'Asset Generator', href: 'https://tools.blueprintstudio.ai/asset-generator', external: true },
     ]
   },
-  company: {
-    title: 'Company',
-    links: [
-      { name: 'Tyler Stupart', href: 'https://www.linkedin.com/in/tylerstupart/', external: true },
-      { name: 'Jaidon Lalor', href: 'https://www.linkedin.com/in/jaidonlalor/', external: true },
-      { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
-      // { name: 'Careers', href: '/careers' },
-    ]
-  },
-  resources: {
-    title: 'Resources',
-    links: [
-      { name: 'Insights', href: '/insights' },
-    ]
-  },
-  legal: {
-    title: 'Legal',
-    links: [
-      { name: 'Terms of Service', href: '/terms' },
-      { name: 'Privacy Policy', href: '/privacy-policy' },
-    ]
-  }
+  // Terms/Privacy now sit inline with the copyright (see bottom bar), not a column.
 };
 
 export function Footer() {
@@ -106,7 +95,7 @@ export function Footer() {
         <div className="w-full px-2.5 py-16 md:py-28 md:px-0 ">
           <div className="flex flex-col md:flex-row gap-10 md:gap-12 w-full md:px-6">
             {Object.entries(footerLinks).map(([key, section]) => (
-              <div key={key} className="flex flex-col min-w-0">
+              <div key={key} className="flex flex-col min-w-0 md:w-[120px]">
                 <h3 className="text-neutral-400 text-sm font-medium mb-4 md:mb-6">{section.title}</h3>
                 <ul className="flex flex-col gap-4 md:gap-4">
                   {section.links.map((link) => (
@@ -207,9 +196,13 @@ export function Footer() {
       {/* Bottom */}
       <Section semantic="div" className="flex-none">
         <OuterContainer>
-          <div className="w-full flex flex-col md:flex-row md:justify-between gap-4 md:gap-0 px-6 pb-7 pt-20">
-            <h1 className="text-neutral-600 text-sm tracking-[-0.02em]">Copyright © Blueprint Studio 2025</h1>
-            <h1 className="text-neutral-600 text-[12px] tracking-[-0.02em]">33°59&apos;19.0&quot;N 118°28&apos;33.8&quot;W</h1>
+          <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 px-6 pb-7 pt-20">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-neutral-600 text-sm tracking-[-0.02em]">
+              <span>Copyright © Blueprint Studio 2026</span>
+              <Link href="/terms" className="hover:text-neutral-400 transition-colors duration-200">Terms of Service</Link>
+              <Link href="/privacy-policy" className="hover:text-neutral-400 transition-colors duration-200">Privacy Policy</Link>
+            </div>
+            <span className="text-neutral-600 text-[12px] tracking-[-0.02em]">33°59&apos;19.0&quot;N 118°28&apos;33.8&quot;W</span>
           </div>
         </OuterContainer>
       </Section>
