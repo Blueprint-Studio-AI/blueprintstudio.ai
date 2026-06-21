@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { BrandNav } from "@/components/brands/BrandNav";
 import { BrandHeader } from "@/components/brands/BrandHeader";
 import { BrandToC } from "@/components/brands/BrandToC";
@@ -215,7 +216,9 @@ export default function JinbaPage() {
 
       {/* Footer */}
       <div className="mx-6 sm:mx-10 py-6 border-t border-neutral-200 flex items-center justify-between">
-        <span className="text-[11px] text-neutral-400">Blueprint Studio</span>
+        <Link href="/" className="text-[11px] text-neutral-400 hover:text-neutral-600 transition-colors duration-200">
+          Blueprint Studio
+        </Link>
         <span className="text-[11px] text-neutral-400">2026</span>
       </div>
     </div>
