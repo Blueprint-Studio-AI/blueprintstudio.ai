@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowUpRight } from "lucide-react";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -93,6 +93,23 @@ export default function WhatsIncludedSection() {
   const active = deliverables[activeIndex];
   // Shared with the Ready-to-launch pricing card: adding here updates there.
   const { selected, toggleAddon } = usePackage();
+
+  // Below-the-fold demo video: don't load it (preload="none") until it scrolls
+  // near view, then play; pause when it leaves so it isn't decoding off-screen.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) vid.play().catch(() => {});
+        else vid.pause();
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(vid);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <section className="flex flex-col items-center px-2.5 sm:px-[60px] relative z-20 bg-white">
@@ -305,6 +322,7 @@ export default function WhatsIncludedSection() {
                   />
                   {/* Screen content, locked to the display's screen area */}
                   <video
+                    ref={videoRef}
                     className="absolute z-20 rounded-[4px] object-cover"
                     style={{
                       left: "2.52%",
@@ -313,7 +331,8 @@ export default function WhatsIncludedSection() {
                       height: "69.21%",
                     }}
                     src="/media/Screen-Content.mp4"
-                    autoPlay
+                    poster="/media/screen-content-poster.jpg"
+                    preload="none"
                     loop
                     muted
                     playsInline

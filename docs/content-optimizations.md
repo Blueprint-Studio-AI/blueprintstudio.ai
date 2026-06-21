@@ -5,11 +5,15 @@ Running list of **media-weight** optimizations intentionally deferred from the
 (image + video tooling), not code changes, so they're batched into a dedicated
 pass rather than mixed into the review fixes.
 
-_Last updated: 2026-06-20. Sizes measured from the working tree._
+_Last updated: 2026-06-21. Sizes measured from the working tree._
+
+## ✅ Done
+- **`Screen-Content.mp4`** — re-encoded **4.92 MB → 324 KB** (720p H.264, audio stripped), added a 16 KB poster (`screen-content-poster.jpg`), and gated with `preload="none"` + an IntersectionObserver so it only loads/plays when scrolled near view, pausing off-screen. (`WhatsIncludedSection`)
+
+## Still deferred
 
 | Asset | Size | Referenced at | Action | Est. savings |
 |---|---|---|---|---|
-| `public/media/Screen-Content.mp4` | **4.92 MB** | `WhatsIncludedSection.tsx:319` (autoplay loop, below fold) | `preload="none"` + poster frame + re-encode (H.265/VP9), optional mobile variant + IntersectionObserver gate | 1.5–2.5 MB |
 | `public/media/hero/uni_brands-we-built.png` | 1.44 MB | `HeroCardCarousel.tsx:9` | → WebP/AVIF (keep `priority` preload) | 360–580 KB |
 | `public/media/hero/autara_brands-we-built.png` | 1.34 MB | `HeroCardCarousel.tsx:12` | → WebP/AVIF | 330–540 KB |
 | `public/media/hero/breeze_brands-we-built.png` | 1.09 MB | `HeroCardCarousel.tsx:11` | → WebP/AVIF | 270–440 KB |
@@ -24,4 +28,4 @@ _Last updated: 2026-06-20. Sizes measured from the working tree._
 - Carousel `priority` preload is **intentional / keep** (user wants all cards visible immediately) — only the PNG → WebP/AVIF format swap is the optimization.
 - The hero PNGs total ~5.6 MB; WebP/AVIF alone could cut that to ~3–3.5 MB.
 - `thumbprints.webp` is a code-attribute change (`unoptimized` removal) but is parked here with the rest of the media work since it changes how the image is served.
-- **Rough total potential savings: ~3.5–5 MB.**
+- **Rough remaining potential savings: ~1.5–3 MB** (the 5 MB video is already done — saved ~4.6 MB).
