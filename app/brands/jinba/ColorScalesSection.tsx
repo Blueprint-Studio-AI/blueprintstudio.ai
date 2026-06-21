@@ -46,7 +46,9 @@ const PRODUCT_COLORS = [
   { name: "Toolbox", hex: "#7D95A1" },
 ];
 const COLS = 11;
-const FILLER_COUNT = COLS - PRODUCT_COLORS.length;
+// Accent swatches span 2 columns each so longer names (e.g. "Toolbox") aren't clipped.
+const PRODUCT_SPAN = 2;
+const FILLER_COUNT = COLS - PRODUCT_COLORS.length * PRODUCT_SPAN;
 
 // ─── Flat row list ────────────────────────────────────────────────────────────
 // All rows in display order. groupLabel only on the first row of each group.
@@ -126,10 +128,10 @@ function ProductCell({ color }: { color: typeof PRODUCT_COLORS[0] }) {
     <button
       onClick={copy}
       title={`Copy ${color.hex}`}
-      className="relative flex flex-col justify-between overflow-hidden p-1 sm:p-2.5 w-full aspect-[1/2] cursor-pointer group"
-      style={{ backgroundColor: color.hex }}
+      className="relative flex flex-col justify-between overflow-hidden px-0.5 py-1 sm:p-2.5 w-full aspect-[1/1] cursor-pointer group"
+      style={{ backgroundColor: color.hex, gridColumn: `span ${PRODUCT_SPAN}` }}
     >
-      <span className="text-[8px] sm:text-[10px] leading-none font-mono" style={{ color: fg }}>{color.name}</span>
+      <span className="text-[7px] sm:text-[10px] leading-none font-mono" style={{ color: fg }}>{color.name}</span>
       <span className="text-[9px] leading-none font-mono opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: fg }}>
         {copied ? "✓" : color.hex}
       </span>
