@@ -322,7 +322,8 @@ export default function DepthSection() {
                     arrives). Inner: per-letter blur stagger, triggered on scroll. */}
                 <motion.span style={{ opacity: line1Dim }} className="block text-white">
                   <BlurLine
-                    text="Your product does the work."
+                    // nbsp binds "the work." so "work." never widows on its own line (mobile wrap).
+                    text={"Your product does the\u00A0work."}
                     on={line1On}
                     reduce={!!reduce}
                     stagger={0.014}
@@ -331,7 +332,7 @@ export default function DepthSection() {
                 </motion.span>
                 <span className="block text-white">
                   <BlurLine
-                    text="Your brand gets you in the room"
+                    text={"Your brand gets you in the\u00A0room"}
                     on={line2On}
                     reduce={!!reduce}
                     stagger={0.014}
