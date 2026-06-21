@@ -53,7 +53,7 @@ export default function PricingSection() {
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
           <div className="text-center mb-10 sm:mb-14">
             <h2
-              className="font-medium text-[#252525] cursor-default mb-3"
+              className="font-medium text-neutral-800 cursor-default mb-3"
               style={{
                 fontSize: "clamp(32px, 4.5vw, 42px)",
                 lineHeight: "1.18",
@@ -93,12 +93,12 @@ export default function PricingSection() {
                 >
                   Launch Package
                 </h3>
-                <p className="text-[#8D929C] text-base cursor-default">
+                <p className="text-neutral-500 text-base cursor-default">
                   Everything you need to go to market.
                 </p>
 
                 <div className="mt-8">
-                  <span className="text-sm text-[#8D929C] block">Base Price</span>
+                  <span className="text-sm text-neutral-500 block">Base Price</span>
                   <span
                     className="font-semibold text-black text-[32px] leading-[1.28]"
                     style={{ letterSpacing: "-0.64px" }}
@@ -114,13 +114,13 @@ export default function PricingSection() {
                       <GreenCheckmark />
                       <div>
                         <span
-                          className="block text-[18px] font-medium text-[#252525]"
+                          className="block text-[18px] font-medium text-neutral-800"
                           style={{ letterSpacing: "-0.36px" }}
                         >
                           {item.title}
                         </span>
                         <p
-                          className="mt-1.5 text-[16px] text-[#8D929C]"
+                          className="mt-1.5 text-[16px] text-neutral-500"
                           style={{ letterSpacing: "-0.32px" }}
                         >
                           {item.desc}
@@ -166,7 +166,7 @@ export default function PricingSection() {
                         {/* Title + price on one row */}
                         <div className="flex items-start justify-between gap-4">
                           <h3 className="font-medium text-[18px] text-black cursor-default">
-                            <span className="text-[#8D929C]">+</span> {card.title}
+                            <span className="text-neutral-500">+</span> {card.title}
                           </h3>
                           <span
                             className="font-medium text-black text-[24px] cursor-default"
@@ -182,7 +182,7 @@ export default function PricingSection() {
                             <Check className="h-3.5 w-3.5" strokeWidth={3.5} />
                           </span>
                           <p
-                            className="text-[16px] font-medium text-[#8D929C] cursor-default"
+                            className="text-[16px] font-medium text-neutral-500 cursor-default"
                             style={{ letterSpacing: "-0.32px", lineHeight: "1.3" }}
                           >
                             {card.desc}
@@ -213,7 +213,7 @@ export default function PricingSection() {
             <div className="h-px bg-neutral-200 mx-6 sm:mx-10 lg:mx-12" />
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_412px] items-center gap-6 lg:gap-8 px-6 sm:px-10 lg:px-12 pt-6 sm:pt-8 pb-6 sm:pb-10 lg:pb-12">
               <div className="flex flex-col gap-3">
-                <span className="text-sm text-[#8D929C] block">Total:</span>
+                <span className="text-sm text-neutral-500 block">Total:</span>
                 <span
                   className="font-semibold text-black text-[48px] leading-[50px]"
                   style={{ letterSpacing: "-0.96px" }}

@@ -78,28 +78,16 @@ export default function ProcessSection() {
             >
               Four steps,
               <br />
-              <span className="text-neutral-300">starting at </span>
+              <span className="text-neutral-400">starting at </span>
               three weeks
             </h2>
 
             <div className="flex flex-col relative px-[48px]">
               <div
-                className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-                }}
+                className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
               />
               <div
-                className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-                }}
+                className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
               />
               {steps.map((step, index) => {
                 const isActive = hasScrolled
@@ -238,7 +226,7 @@ export default function ProcessSection() {
               letterSpacing: "-1px",
             }}
           >
-            <span className="text-neutral-400">We&apos;re not just talk,</span>
+            <span className="text-neutral-500">We&apos;re not just talk,</span>
             <br />
             <span className="text-black">we let our work speak for itself.</span>
           </h2>

@@ -165,23 +165,6 @@ html.lenis body {
     );
   }
 
-  /* Transparent-white dashes for dark sections (e.g. the sea-floor steps). */
-  .line-dash-y.dash-light {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.16) 0 6px,
-      transparent 6px 12px
-    );
-  }
-
-  .line-dash-x.dash-light {
-    background-image: repeating-linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.16) 0 6px,
-      transparent 6px 12px
-    );
-  }
-
   /* Button construction-style dashed borders */
   .btn-construction {
     position: relative;
@@ -334,6 +317,44 @@ html.lenis body {
   /* New background blend utilities */
   .bg-blend-nav {
     background-blend-mode: luminosity;
+  }
+
+  /* Vertical fade mask — fades content out across the top & bottom 15%. Shared
+     by the brand-page construction lines (replaces the inline maskImage copies
+     in WhatsIncludedSection / FAQSection / FoundersSection / ProcessSection /
+     TestimonialTicker). */
+  .mask-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  }
+
+  /* Staggered blur-in for the hero brand cards (per-card delay set inline).
+     Mirrors the home splash recipe: blur(10px) + fade, cubic-bezier(.16,1,.3,1). */
+  @keyframes hero-card-blur-in {
+    from { opacity: 0; filter: blur(14px); }
+    to   { opacity: 1; filter: blur(0); }
+  }
+  .hero-card-intro {
+    opacity: 0;
+    animation: hero-card-blur-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Forced-colors / high-contrast: the clipped gradient text renders
+     transparent (invisible), so restore a solid system color. */
+  @media (forced-colors: active) {
+    .gradient-text {
+      -webkit-text-fill-color: currentColor !important;
+      color: currentColor !important;
+      background: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Cards: keep a gentle fade, drop the blur + stagger feel. */
+    @keyframes hero-card-blur-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
   }
 }
 

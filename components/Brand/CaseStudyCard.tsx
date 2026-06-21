@@ -1,7 +1,5 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
-
 export interface CaseStudy {
   /** Brand logo lockup. */
   logo: string;
@@ -42,16 +40,12 @@ export default function CaseStudyCard({
   title,
   description,
   deliverables,
-  href,
   accent,
   image,
   imageMobile,
 }: CaseStudy) {
   return (
-    <a
-      href={href}
-      className="group block w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-colors hover:border-neutral-300 sm:rounded-3xl"
-    >
+    <div className="group block w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white sm:rounded-3xl">
       <div className="flex flex-col lg:flex-row">
         {/* Visual panel — a tall mockup on top when stacked (mobile/tablet), the
             right-hand column when side-by-side (lg+). `accent` is the background;
@@ -113,18 +107,12 @@ export default function CaseStudyCard({
                 className="flex items-center gap-2 rounded-full bg-[#f6f6f6] px-3.5 py-2 text-sm"
               >
                 <span className="text-[#c2c6cc]">{d.num}</span>
-                <span className="text-[#252525]">{d.label}</span>
+                <span className="text-neutral-800">{d.label}</span>
               </div>
             ))}
           </div>
-
-          {/* View Full Project — darkens on hover */}
-          <div className="flex items-center gap-2 text-[#8d929c] transition-colors group-hover:text-[#252525]">
-            <span className="text-sm font-medium">View Full Project</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </div>
         </div>
       </div>
-    </a>
+    </div>
   );
 }

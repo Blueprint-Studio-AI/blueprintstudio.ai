@@ -149,7 +149,7 @@ export default function RecentWorkSection() {
         className="z-[20] bg-neutral-50 lg:sticky"
         style={{ top: `${PARALLAX_DISTANCE}px` }}
       >
-        <SectionHeader leftText="RECENT LAUNCHED" rightText="// FOR FOUNDERS" />
+        <SectionHeader leftText="RECENTLY LAUNCHED" rightText="// FOR FOUNDERS" />
       </div>
 
       <div className="relative">

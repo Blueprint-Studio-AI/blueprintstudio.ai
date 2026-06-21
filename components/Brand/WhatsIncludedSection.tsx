@@ -55,11 +55,6 @@ const deliverables = [
   },
 ];
 
-// Same fade as the Process section: the dashed line ramps in over the first
-// item and fades out over the last, so it spans first → last deliverable.
-const LINE_MASK =
-  "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)";
-
 const addons: {
   id: AddonId;
   title: string;
@@ -129,12 +124,10 @@ export default function WhatsIncludedSection() {
               gradient spans the list from the first to the last item. */}
           <div className="relative custom:px-[48px] mt-12 sm:mt-16">
             <div
-              className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
-              style={{ maskImage: LINE_MASK, WebkitMaskImage: LINE_MASK }}
+              className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
             />
             <div
-              className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
-              style={{ maskImage: LINE_MASK, WebkitMaskImage: LINE_MASK }}
+              className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
             />
 
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
@@ -145,8 +138,11 @@ export default function WhatsIncludedSection() {
                   return (
                     <li
                       key={item.title}
+                      tabIndex={0}
                       onMouseEnter={() => setActiveIndex(index)}
-                      className="relative cursor-default pl-6"
+                      onFocus={() => setActiveIndex(index)}
+                      onClick={() => setActiveIndex(index)}
+                      className="relative cursor-default pl-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1472F6]/40 rounded-lg"
                     >
                       {/* Black active bar — rounded ends, spans only the
                           checkmark + text height and sits in the gutter to the
@@ -263,7 +259,7 @@ export default function WhatsIncludedSection() {
                     <Check className="h-3.5 w-3.5" strokeWidth={3.5} />
                   </span>
                   <h3
-                    className="font-medium text-[#252525]"
+                    className="font-medium text-neutral-800"
                     style={{ fontSize: "24px", letterSpacing: "-0.48px" }}
                   >
                     AI Asset Generator
@@ -347,9 +343,11 @@ export default function WhatsIncludedSection() {
                   key={addon.title}
                   className="relative w-full lg:flex-1 lg:max-w-[452px] rounded-2xl p-8"
                 >
-                  {/* Dashed outline drawn as SVG so the dash spacing is exact:
-                      1.5px stroke, 8px dash + 8px gap, 16px corner radius.
-                      (CSS border-dashed can't control dash length.) */}
+                  {/* Outline drawn as SVG so the dash spacing is exact (8px dash +
+                      8px gap, 16px corner radius — CSS border-dashed can't control
+                      dash length). Goes SOLID blue while the add-on is in the
+                      package, so the whole card reflects the selected state (matches
+                      the pricing-section cards), not just the button. */}
                   <svg
                     className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
                     aria-hidden="true"
@@ -362,9 +360,10 @@ export default function WhatsIncludedSection() {
                       rx="16"
                       ry="16"
                       fill="none"
-                      stroke="#d4d4d4"
-                      strokeWidth="1.5"
-                      strokeDasharray="8 8"
+                      stroke={selected[addon.id] ? "#186FF5" : "#d4d4d4"}
+                      strokeWidth={selected[addon.id] ? "2" : "1.5"}
+                      strokeDasharray={selected[addon.id] ? undefined : "8 8"}
+                      style={{ transition: "stroke 0.3s ease" }}
                     />
                   </svg>
 
@@ -381,7 +380,7 @@ export default function WhatsIncludedSection() {
                   </div>
 
                   {/* Price */}
-                  <p className="mt-8 text-sm text-[#8D929C]">Add-on Price</p>
+                  <p className="mt-8 text-sm text-neutral-500">Add-on Price</p>
                   <p
                     className="mt-1 font-bold text-black"
                     style={{
@@ -406,7 +405,7 @@ export default function WhatsIncludedSection() {
 
                   {/* Description */}
                   <p
-                    className="mt-3 text-sm sm:text-base text-[#8D929C] max-w-xs"
+                    className="mt-3 text-sm sm:text-base text-neutral-500 max-w-xs"
                     style={{ lineHeight: "130%" }}
                   >
                     {addon.description}
@@ -455,7 +454,7 @@ export default function WhatsIncludedSection() {
                   className="flex flex-col items-center gap-3 text-center cursor-default"
                 >
                   <p
-                    className="font-medium text-[#252525]"
+                    className="font-medium text-neutral-800"
                     style={{
                       fontSize: "clamp(18px, 2.4vw, 24px)",
                       lineHeight: "1.18",
@@ -464,7 +463,7 @@ export default function WhatsIncludedSection() {
                   >
                     {stat.value}
                   </p>
-                  <p className="text-[11px] font-semibold uppercase leading-[18px] text-[#8D929C] sm:text-base">
+                  <p className="text-[11px] font-semibold uppercase leading-[18px] text-neutral-500 sm:text-base">
                     {stat.label}
                   </p>
                 </div>

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion, useInView } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 // Sea-floor color — this section is where the page "reaches the bottom of the
@@ -78,6 +78,61 @@ const STEPS = [
   },
 ];
 
+// One headline line revealed letter-by-letter: each glyph blur-fades in on a
+// quick stagger once `on` flips true. The whole string is exposed to screen
+// readers via aria-label; the per-letter spans are aria-hidden. Letters stay
+// display:inline (opacity + filter only) so the line still wraps word-by-word.
+function BlurLine({
+  text,
+  on,
+  reduce,
+  stagger = 0.022,
+  dur = 0.4,
+}: {
+  text: string;
+  on: boolean;
+  reduce: boolean;
+  stagger?: number;
+  dur?: number;
+}) {
+  if (reduce) {
+    return (
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: on ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        {text}
+      </motion.span>
+    );
+  }
+  return (
+    <motion.span
+      aria-label={text}
+      initial="hidden"
+      animate={on ? "visible" : "hidden"}
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: stagger } } }}
+    >
+      {text.split("").map((ch, i) => (
+        <motion.span
+          key={i}
+          aria-hidden
+          variants={{
+            hidden: { opacity: 0, filter: "blur(8px)" },
+            visible: {
+              opacity: 1,
+              filter: "blur(0px)",
+              transition: { duration: dur, ease: [0.16, 1, 0.3, 1] },
+            },
+          }}
+        >
+          {ch}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+}
+
 export default function DepthSection() {
   // Scroll-driven reveal (Apple MacBook-Pro style): the copy stage pins to the
   // viewport while the user scrolls through the tall track below; progress 0→1
@@ -97,21 +152,20 @@ export default function DepthSection() {
     offset: ["start start", "end end"],
   });
 
-  // 1. "Your product does the work." appears only once the screen is fully dark
-  //    (just past the pin), then fades in on its own time with a soft blue pulse.
-  const [line1On, setLine1On] = useState(false);
+  const reduce = useReducedMotion();
+  // Line 1 fires the moment the headline scrolls into view (NOT gated on the pin),
+  // so the first words are already arriving as the screen goes dark — there's no
+  // stretch of empty black before any text appears.
+  const headlineRef = useRef<HTMLDivElement>(null);
+  const line1On = useInView(headlineRef, { once: true, margin: "0px 0px -20% 0px" });
+  // Line 2 arrives only deep into the pinned track, so the two reveals never
+  // overlap: line 1 in → long readable hold → line 2 in → hold.
+  const [line2On, setLine2On] = useState(false);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (v >= 0.015 && !line1On) setLine1On(true);
+    if (v >= 0.45 && !line2On) setLine2On(true);
   });
-  //    Scroll only drives its later settle back to a dim gray as line 2 arrives.
-  const line1Dim = useTransform(scrollYProgress, [0.3, 0.45], [1, 0.35]);
-  // 2. "Your Brand gets you in the room" fades in white, drifting up slightly.
-  const line2Opacity = useTransform(scrollYProgress, [0.3, 0.45], [0, 1]);
-  const line2Y = useTransform(scrollYProgress, [0.3, 0.45], [24, 0]);
-  // 3. Subcopy arrives last — timed near the end of the track so there's only a
-  //    short beat before the steps begin (less dead scroll between them).
-  const subOpacity = useTransform(scrollYProgress, [0.6, 0.8], [0, 1]);
-  const subY = useTransform(scrollYProgress, [0.6, 0.8], [20, 0]);
+  // Line 1 holds fully white/readable, then settles to a dim gray as line 2 arrives.
+  const line1Dim = useTransform(scrollYProgress, [0.45, 0.6], [1, 0.4]);
   // The whole block gently expands as the story unfolds.
   const blockScale = useTransform(scrollYProgress, [0, 1], [0.96, 1.02]);
   // Scroll hint at the entry of the dark reveal — a brief "keep going" nudge
@@ -252,6 +306,7 @@ export default function DepthSection() {
         <div ref={trackRef} className="relative h-[160vh]">
           <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
             <motion.div
+              ref={headlineRef}
               style={{ scale: blockScale }}
               className="mx-auto max-w-5xl px-6 text-center"
             >
@@ -263,34 +318,27 @@ export default function DepthSection() {
                   letterSpacing: "-1px",
                 }}
               >
-                {/* Outer span: scroll-driven dim. Inner span: one-time fade-in,
-                    triggered only once the screen is fully dark. The two
-                    opacities multiply, so the dim still works afterwards. */}
+                {/* Outer span: scroll-driven dim (line 1 fades to gray as line 2
+                    arrives). Inner: per-letter blur stagger, triggered on scroll. */}
                 <motion.span style={{ opacity: line1Dim }} className="block text-white">
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={line1On ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="block"
-                  >
-                    Your product does the work.
-                  </motion.span>
+                  <BlurLine
+                    text="Your product does the work."
+                    on={line1On}
+                    reduce={!!reduce}
+                    stagger={0.014}
+                    dur={0.34}
+                  />
                 </motion.span>
-                <motion.span
-                  style={{ opacity: line2Opacity, y: line2Y }}
-                  className="block text-white"
-                >
-                  Your Brand gets you in the room
-                </motion.span>
+                <span className="block text-white">
+                  <BlurLine
+                    text="Your brand gets you in the room"
+                    on={line2On}
+                    reduce={!!reduce}
+                    stagger={0.014}
+                    dur={0.34}
+                  />
+                </span>
               </h2>
-              <motion.p
-                style={{ opacity: subOpacity, y: subY, lineHeight: "160%" }}
-                className="mx-auto mt-6 max-w-xl text-neutral-400 text-sm sm:text-base"
-              >
-                The best brands don&apos;t need to be explained, they are intuitively
-                understood. They get felt. People choose who to trust, who to buy from,
-                and who to ignore before they read a single word.
-              </motion.p>
             </motion.div>
 
             {/* Scroll signifier — a soft "Scroll" + bouncing chevron at the

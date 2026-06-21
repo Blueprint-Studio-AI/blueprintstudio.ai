@@ -184,22 +184,10 @@ export default function TestimonialTicker() {
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-16 sm:pb-20 lg:pb-28 px-0 relative">
           {/* Partial construction lines — faded top & bottom (new design). */}
           <div
-            className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
+            className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
           />
           <div
-            className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
+            className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
           />
 
           {/* Section Title */}

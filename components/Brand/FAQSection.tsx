@@ -83,12 +83,12 @@ function FaqItem({ question, answer }: FaqItemProps) {
         className="w-full flex justify-between items-start py-6 text-left group"
         aria-expanded={isOpen}
       >
-        <h4
+        <h3
           className="font-medium text-lg pr-8 text-black group-hover:text-neutral-600 transition-colors"
           style={{ textWrap: "balance" }}
         >
           {question}
-        </h4>
+        </h3>
         <motion.div
           className="shrink-0"
           animate={{ rotate: isOpen ? 180 : 0 }}
@@ -126,24 +126,8 @@ export default function FAQSection() {
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 md:px-6 relative">
           {/* Partial construction lines — faded top & bottom (new design). */}
-          <div
-            className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
-          />
-          <div
-            className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
-          />
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
 
           {/* FAQ Container */}
           <div className="max-w-3xl px-2 md:mx-auto">

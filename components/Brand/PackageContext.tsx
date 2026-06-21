@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import { createContext, useContext, useCallback, useMemo, useState, ReactNode } from "react";
 
 // Shared "build your package" state: the Add-ons cards (What's included
 // section) and the Ready-to-launch pricing card both read and toggle the same
@@ -31,7 +31,10 @@ export function PackageProvider({ children }: { children: ReactNode }) {
     pitchDeck: false,
   });
 
-  const toggleAddon = (id: AddonId) => setSelected((s) => ({ ...s, [id]: !s[id] }));
+  const toggleAddon = useCallback(
+    (id: AddonId) => setSelected((s) => ({ ...s, [id]: !s[id] })),
+    []
+  );
 
   const total = useMemo(
     () =>
@@ -43,8 +46,13 @@ export function PackageProvider({ children }: { children: ReactNode }) {
     [selected]
   );
 
+  const value = useMemo(
+    () => ({ selected, toggleAddon, total }),
+    [selected, toggleAddon, total]
+  );
+
   return (
-    <PackageContext.Provider value={{ selected, toggleAddon, total }}>
+    <PackageContext.Provider value={value}>
       {children}
     </PackageContext.Provider>
   );

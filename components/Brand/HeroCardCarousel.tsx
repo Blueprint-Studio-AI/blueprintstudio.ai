@@ -587,6 +587,20 @@ export default function HeroCardCarousel() {
     [easeTo]
   );
 
+  // Keyboard: ←/→ glide one card at a time, reusing the same stepCards path as a
+  // swipe so the motion is identical. Other keys fall through (↑/↓ still scroll the
+  // page). Lets keyboard users operate the strip — the visuals are unchanged.
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      userMovedRef.current = true;
+      pauseAuto();
+      stepCards(e.key === "ArrowRight" ? 1 : -1);
+    },
+    [pauseAuto, stepCards]
+  );
+
   // Mouse drag-to-scroll: connected 1:1 while dragging, then settle onto the
   // nearest card on release. A press that doesn't move past a small threshold is
   // a click (handled by the card's onClick), so we only snap on a real drag.
@@ -656,13 +670,18 @@ export default function HeroCardCarousel() {
 
       <div
         ref={scrollerRef}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Brands we've built — use the arrow keys to browse"
+        tabIndex={0}
+        onKeyDown={onKeyDown}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className="relative z-10 flex cursor-grab items-center gap-5 overflow-x-auto overscroll-x-contain py-10 select-none active:cursor-grabbing sm:gap-[32px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative z-10 flex cursor-grab items-center gap-5 overflow-x-auto overscroll-x-contain py-10 select-none active:cursor-grabbing focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-[#1472F6] sm:gap-[32px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: "none" }}
       >
         {loopCards.map((card, i) => {
@@ -671,6 +690,10 @@ export default function HeroCardCarousel() {
           return (
             <div
               key={i}
+              // Only the middle set is "real" to assistive tech; the two cloned
+              // sets exist purely for the seamless loop, so hide them from AT to
+              // avoid announcing the 7 cards three times over.
+              aria-hidden={i < N || i >= N * 2}
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
@@ -679,8 +702,17 @@ export default function HeroCardCarousel() {
                 // are handled in endDrag. Guard against drags either way.
                 if (!drag.current.moved) selectCard(i);
               }}
-              className="hero-card shrink-0 origin-center cursor-pointer will-change-transform"
-              style={{ transform: `scale(${initialScale})` }}
+              // hero-card-intro = staggered blur-in on load (opacity + filter only,
+              // so it never fights the transform paint() drives). Delay fans out
+              // from the centred card so the reveal radiates outward.
+              className="hero-card hero-card-intro shrink-0 origin-center cursor-pointer will-change-transform"
+              style={{
+                transform: `scale(${initialScale})`,
+                // Base delay lets the headline land first; the cards then reveal
+                // outward from the centre on a deliberate ~90ms cadence so the
+                // sequence reads as intentional rather than all-at-once.
+                animationDelay: `${0.4 + Math.min(Math.abs(i - CENTER), 8) * 0.09}s`,
+              }}
             >
               {/* Explicit width + height (matching the 1080×985 art) so the box
                   is a fixed size in every browser — no aspect-ratio / h-auto for

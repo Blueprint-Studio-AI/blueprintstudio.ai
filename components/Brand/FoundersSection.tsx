@@ -28,24 +28,8 @@ export default function FoundersSection() {
         <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16 px-2.5 sm:px-6 relative">
           {/* Partial construction lines — faded top & bottom, matching the new
               design (process / depth sections). */}
-          <div
-            className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
-          />
-          <div
-            className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-            }}
-          />
+          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
+          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y" />
 
           {/* Section Title */}
           <div className="text-center mb-12 sm:mb-16">
