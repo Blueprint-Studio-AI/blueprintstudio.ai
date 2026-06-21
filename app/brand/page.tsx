@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Brand Identity | Blueprint Studio",
+  // Layout applies the template "%s | Blueprint Studio", so keep this bare to
+  // avoid a doubled "... | Blueprint Studio | Blueprint Studio" <title>.
+  title: "Brand Identity",
   description:
     "Your brand in 3 weeks. Logo, guidelines, and a custom AI trained on your brand. Built for founders moving fast. Starting at $18K.",
   keywords: [

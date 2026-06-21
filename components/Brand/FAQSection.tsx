@@ -107,8 +107,11 @@ function FaqItem({ question, answer }: FaqItemProps) {
         className="overflow-hidden"
       >
         <div
+          // While collapsed, take the answer (and any links inside it) out of the
+          // tab order + a11y tree — otherwise they're focusable while invisible.
+          inert={!isOpen}
           className="text-neutral-600 leading-relaxed pb-6"
-          style={{ textWrap: "balance" }}
+          style={{ textWrap: "pretty" }}
         >
           {answer}
         </div>

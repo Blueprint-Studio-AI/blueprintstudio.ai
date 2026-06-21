@@ -44,7 +44,7 @@ export default function HeroSection() {
       >
         <SectionHeader
           divider={false}
-          leftText="BRAND IDENTITY"
+          leftText=""
           centerContent={
             <Link href="/" className="hover:opacity-70 transition-opacity">
               <Image
@@ -57,7 +57,7 @@ export default function HeroSection() {
               />
             </Link>
           }
-          rightText="// in three weeks"
+          rightText=""
         />
       </motion.div>
 
