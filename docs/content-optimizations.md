@@ -12,20 +12,33 @@ _Last updated: 2026-06-21. Sizes measured from the working tree._
 
 ## Still deferred
 
-| Asset | Size | Referenced at | Action | Est. savings |
-|---|---|---|---|---|
-| `public/media/hero/uni_brands-we-built.png` | 1.44 MB | `HeroCardCarousel.tsx:9` | → WebP/AVIF (keep `priority` preload) | 360–580 KB |
-| `public/media/hero/autara_brands-we-built.png` | 1.34 MB | `HeroCardCarousel.tsx:12` | → WebP/AVIF | 330–540 KB |
-| `public/media/hero/breeze_brands-we-built.png` | 1.09 MB | `HeroCardCarousel.tsx:11` | → WebP/AVIF | 270–440 KB |
-| `public/media/hero/kind_brands-we-built.png` | 624 KB | `HeroCardCarousel.tsx:14` | → WebP/AVIF | 156–250 KB |
-| `public/media/hero/huch_brands-we-built.png` | 621 KB | `HeroCardCarousel.tsx:13` | → WebP/AVIF | 155–250 KB |
-| `public/media/hero/honeyb_brands-we-built.png` | 447 KB | `HeroCardCarousel.tsx:10` | → WebP/AVIF | 110–180 KB |
-| `public/media/hero/autara_brands-we-built-1.png` | 80 KB | `HeroCardCarousel.tsx:15` | → WebP/AVIF | 20–32 KB |
-| `public/media/Background-Asset-Gen.png` | 566 KB | `WhatsIncludedSection.tsx:243` (raw CSS bg) | → WebP (sibling `depth-bg.webp` is 28 KB) | 140–460 KB |
-| `public/images/thumbprints.webp` | 695 KB | `ProcessSection.tsx:191`, `DepthSection.tsx:186` | Drop `unoptimized`/`quality={100}` so Next serves AVIF + auto-sizes | 140–280 KB |
+### Context — how these are actually served (verified 2026-06-21)
+`next/image` optimization is **on** (no `unoptimized` globally, no static export;
+default formats = WebP only). So any `<Image>` *without* `unoptimized` is already
+delivered to browsers as a **resized WebP** (per its `sizes`) — the large source
+file never reaches the visitor. That reframes the priority below: the hero PNGs
+are **not** a real runtime cost; the raw CSS background and the `unoptimized`
+texture are.
 
-**Notes**
-- Carousel `priority` preload is **intentional / keep** (user wants all cards visible immediately) — only the PNG → WebP/AVIF format swap is the optimization.
-- The hero PNGs total ~5.6 MB; WebP/AVIF alone could cut that to ~3–3.5 MB.
-- `thumbprints.webp` is a code-attribute change (`unoptimized` removal) but is parked here with the rest of the media work since it changes how the image is served.
-- **Rough remaining potential savings: ~1.5–3 MB** (the 5 MB video is already done — saved ~4.6 MB).
+**Scope:** all of this only affects `/brand`'s load — JS is route-split and
+`public/` assets are fetched on-demand, so other pages are unaffected.
+
+### Highest leverage — one line, whole site
+- Add `images.formats: ['image/avif', 'image/webp']` to `next.config.mjs`. Makes
+  `next/image` serve **AVIF** (10–30% smaller than WebP) for **every** optimized
+  image site-wide — bigger payoff than converting any source file. Trade-off:
+  AVIF encode is slower on Vercel's optimizer.
+
+### High value — actually downloaded raw on `/brand`
+| Asset | Size | Referenced at | Why it's raw | Action |
+|---|---|---|---|---|
+| `public/media/Background-Asset-Gen.png` | 566 KB | `WhatsIncludedSection.tsx` (CSS `background-image`) | CSS bg → `next/image` can't touch it | → WebP (sibling `depth-bg.webp` is 28 KB) |
+| `public/images/thumbprints.webp` | 695 KB | `ProcessSection.tsx:179`, `DepthSection.tsx:240` | rendered with `unoptimized` (+`quality={100}`) → bypasses Next | drop `unoptimized` so Next resizes/serves it small — *but eyeball first, may be intentional for texture crispness* |
+
+### Low priority — hygiene only (already optimized for browsers)
+The 7 hero carousel PNGs (~5.6 MB of **source** files, `HeroCardCarousel.tsx`)
+are served to visitors as resized WebP via `next/image` — the big PNGs don't
+reach the browser. Converting the sources only shrinks the repo + Vercel's
+first-request optimization work; it does **not** change what users download.
+Keep the `priority` preload (intentional). Convert someday for repo cleanliness,
+low urgency.
