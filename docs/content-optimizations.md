@@ -8,7 +8,7 @@ pass rather than mixed into the review fixes.
 _Last updated: 2026-06-21. Sizes measured from the working tree._
 
 ## ✅ Done
-- **`Screen-Content.mp4`** — re-encoded **4.92 MB → 324 KB** (720p H.264, audio stripped), added a 16 KB poster (`screen-content-poster.jpg`), and gated with `preload="none"` + an IntersectionObserver so it only loads/plays when scrolled near view, pausing off-screen. (`WhatsIncludedSection`)
+- **`Screen-Content.mp4`** — re-encoded **4.92 MB → 324 KB** (720p H.264, audio stripped) + a 16 KB poster (`screen-content-poster.jpg`). Kept native `autoPlay` (a lazy IntersectionObserver gate proved unreliable; at 324 KB autoplay is fine, and Chrome already defers off-screen autoplay). (`WhatsIncludedSection`)
 
 ## Still deferred
 
