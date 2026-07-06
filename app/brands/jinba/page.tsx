@@ -14,6 +14,18 @@ import { ColorScalesSection } from "./ColorScalesSection";
 export const metadata: Metadata = {
   title: "Jinba — Brand Identity & Design System",
   description: "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
+  keywords: [
+    "brand identity case study",
+    "design system",
+    "logo system",
+    "color palette",
+    "typography",
+    "brand guidelines",
+    "Jinba",
+  ],
+  alternates: {
+    canonical: "/brands/jinba",
+  },
   openGraph: {
     title: "Jinba — Brand Identity & Design System",
     description: "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
@@ -120,9 +132,31 @@ function LinkedInDownloadRow() {
   );
 }
 
+// Page-specific structured data (the layout already provides WebSite +
+// Organization). Describes the Jinba brand-identity case study.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: "Jinba — Brand Identity & Design System",
+  description:
+    "Brand identity, logo system, color palette, typography, and design system for Jinba — crafted by Blueprint Studio.",
+  url: "https://blueprintstudio.ai/brands/jinba",
+  image: "https://blueprintstudio.ai/brands/jinba/og-image.png",
+  about: "Jinba",
+  creator: {
+    "@type": "Organization",
+    name: "Blueprint Studio",
+    url: "https://blueprintstudio.ai",
+  },
+};
+
 export default function JinbaPage() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] max-w-[1800px] mx-auto lg:pl-[10rem]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <BrandNav clientName="Jinba" logoSrc="/brands/jinba/dl/lockup-small-dark.png" />
       <BrandToC chapters={TOC_CHAPTERS} pdfHref="https://drive.google.com/file/d/1zZaz_NnLIcT-b2WeNSgJn1VO9Nry83dx/view?usp=sharing" />
 

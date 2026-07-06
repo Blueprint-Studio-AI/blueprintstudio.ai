@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import LaunchVideosComponent from "@/components/LaunchVideos/index";
 
 export const metadata: Metadata = {
   // Layout template appends " | Blueprint Studio" — keep this bare to avoid doubling.
@@ -45,4 +46,32 @@ export const metadata: Metadata = {
   },
 };
 
-export { default } from "@/components/LaunchVideos/index";
+// Page-specific structured data (the layout already provides WebSite +
+// Organization). Describes the Launch Videos production service.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Launch Videos",
+  serviceType: "Launch video production",
+  description:
+    "Get your launch video in 7 days. Studio quality, startup speed. You focus on shipping. We'll handle the video.",
+  url: "https://blueprintstudio.ai/launch-videos",
+  areaServed: "Worldwide",
+  provider: {
+    "@type": "Organization",
+    name: "Blueprint Studio",
+    url: "https://blueprintstudio.ai",
+  },
+};
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <LaunchVideosComponent />
+    </>
+  );
+}
