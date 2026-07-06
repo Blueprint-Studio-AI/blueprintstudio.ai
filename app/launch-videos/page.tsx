@@ -47,7 +47,8 @@ export const metadata: Metadata = {
 };
 
 // Page-specific structured data (the layout already provides WebSite +
-// Organization). Describes the Launch Videos production service.
+// Organization). Describes the Launch Videos production service and its two
+// pricing tiers (see components/LaunchVideos/PricingSection.tsx).
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
@@ -62,6 +63,24 @@ const jsonLd = {
     name: "Blueprint Studio",
     url: "https://blueprintstudio.ai",
   },
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Fast",
+      priceCurrency: "USD",
+      price: "8000",
+      url: "https://blueprintstudio.ai/launch-videos",
+      availability: "https://schema.org/InStock",
+    },
+    {
+      "@type": "Offer",
+      name: "Studio",
+      priceCurrency: "USD",
+      price: "15000",
+      url: "https://blueprintstudio.ai/launch-videos",
+      availability: "https://schema.org/InStock",
+    },
+  ],
 };
 
 export default function Page() {
@@ -69,7 +88,7 @@ export default function Page() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <LaunchVideosComponent />
     </>
