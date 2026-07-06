@@ -155,7 +155,7 @@ export default function JinbaPage() {
     <div className="min-h-screen bg-[#F5F5F5] max-w-[1800px] mx-auto lg:pl-[10rem]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <BrandNav clientName="Jinba" logoSrc="/brands/jinba/dl/lockup-small-dark.png" />
       <BrandToC chapters={TOC_CHAPTERS} pdfHref="https://drive.google.com/file/d/1zZaz_NnLIcT-b2WeNSgJn1VO9Nry83dx/view?usp=sharing" />
