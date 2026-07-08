@@ -1,0 +1,27 @@
+<svg width="538" height="538" viewBox="0 0 538 538" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sheen" x1="269" y1="-40" x2="269" y2="538" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="ring" clipRule="evenodd">
+      <path d="M7,269 a262,262 0 1,0 524,0 a262,262 0 1,0 -524,0 Z M119,269 a150,150 0 1,0 300,0 a150,150 0 1,0 -300,0 Z"/>
+    </clipPath>
+  </defs>
+  <!-- soft base disc grounding the hole -->
+  <circle cx="269" cy="269" r="152" fill="#E4EEF0" opacity="0.5"/>
+  <!-- ring body -->
+  <path d="M7,269 a262,262 0 1,0 524,0 a262,262 0 1,0 -524,0 Z M119,269 a150,150 0 1,0 300,0 a150,150 0 1,0 -300,0 Z" fill="#CCDFE3" fill-rule="evenodd"/>
+  <!-- four wrap bands, clipped to the ring -->
+  <g clip-path="url(#ring)" fill="#97BCC5">
+    <rect x="240" y="-4" width="58" height="140" rx="6"/>
+    <g transform="rotate(90 269 269)"><rect x="240" y="-4" width="58" height="140" rx="6"/></g>
+    <g transform="rotate(180 269 269)"><rect x="240" y="-4" width="58" height="140" rx="6"/></g>
+    <g transform="rotate(270 269 269)"><rect x="240" y="-4" width="58" height="140" rx="6"/></g>
+  </g>
+  <!-- edge highlights -->
+  <circle cx="269" cy="269" r="262" fill="none" stroke="#EAF2F4" stroke-width="3" opacity="0.8"/>
+  <circle cx="269" cy="269" r="150" fill="none" stroke="#B4D0D8" stroke-width="2" opacity="0.7"/>
+  <!-- top-down sheen over the ring -->
+  <g clip-path="url(#ring)"><rect x="0" y="0" width="538" height="538" fill="url(#sheen)"/></g>
+</svg>

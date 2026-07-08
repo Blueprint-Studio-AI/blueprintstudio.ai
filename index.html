@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Double Digit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Inter:wght@400;500;600&family=Poly:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1E2028;
+    --paper:#FDFCFB;
+    --coral:#FF3200;
+    --muted:#747474;
+    --muted-2:#5E5E5E;
+    --line:#DCDCDC;
+    --panel:#EBF3F5;
+    /* app-like horizontal margins: content maxes ~1312 wide, 64px min gutter */
+    --pad-x:max(64px, calc((100vw - 1312px) / 2));
+
+    --f-sans:"Hiragino Sans","Hiragino Kaku Gothic ProN",-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --f-gb:"Hiragino Sans GB","Hiragino Sans",-apple-system,sans-serif;
+    --f-geist:"Geist",-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --f-inter:"Inter",-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --f-sf:-apple-system,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    --f-poly:"Poly","Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  /* iOS Safari: stop text auto-inflation on rotate + kill the grey tap-flash on interactive elements */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--paper);overflow-x:clip;}
+  /* NO CSS scroll-snap anywhere: it fights JS-animated scrolling (Safari resolves the fight by
+     teleporting to the snap point — that's the "skips straight to the text" bug). Snapping is done
+     the way Ondo does it: JS glides the scroll AFTER it settles (ScrollTrigger snap, below). */
+  body{font-family:var(--f-sans);color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  img{display:block;}
+  p{margin:0;}
+  button{font:inherit;border:none;background:none;cursor:pointer;}
+
+  /* overflow-x:clip contains horizontal bleed WITHOUT creating a scroll container (which would break the hero-pin sticky) */
+  .page{width:100%;background:var(--paper);position:relative;overflow-x:clip;}
+  /* ============ HERO — pinned; the content slides UP OVER it (Saturn-style overlap) ============
+     The ocean is a sticky full-screen hero. Everything after it lives in .overlap — a rounded-top paper
+     panel that rides up over the hero as you scroll. The hero recedes (scale down + darken, scrubbed by
+     ScrollTrigger) while it's being covered → depth/parallax. Buttery momentum = Lenis smooth-scroll (JS). */
+  /* hero is a plain full-screen section now (parallax/overlap removed — moved to the pillars) */
+  .hero-pin{position:relative;height:100svh;overflow:hidden;}
+  @supports not (height:100svh){ .hero-pin{height:100vh;} }
+  .hero{position:relative;height:100%;display:flex;flex-direction:column;color:var(--paper);padding-top:88px;}
+  .overlap{position:relative;background:var(--paper);}
+  /* vessel lede — normal centred section now the overlap effect is gone */
+  .vessel{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    padding:clamp(120px,18vh,220px) var(--pad-x) clamp(80px,12vh,140px);}
+  .hero-bg{position:absolute;inset:0;pointer-events:none;}
+  .hero-bg .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:bottom;}
+  /* layered translucent washes (Ondo-style depth): each an absolute full-bleed pane at a different
+     opacity / blend so the ocean reads deeper and more fluid */
+  .hero-bg .g1{position:absolute;inset:0;background:linear-gradient(0deg, rgba(102,102,102,0) 34%, rgba(28,34,65,0.15) 100%);}
+  .hero-bg .g2{position:absolute;inset:0;background:linear-gradient(180deg, rgba(114,159,195,0.55) 0%, rgba(114,159,195,0) 82%);mix-blend-mode:soft-light;}
+  .hero-bg .g3,.hero-bg .g5,.hero-bg .g6{will-change:transform;}
+  .hero-bg .g3{position:absolute;inset:0;background:radial-gradient(135% 108% at 50% 30%, rgba(9,20,36,0) 48%, rgba(9,20,36,0.46) 100%);}
+  .hero-bg .g4{position:absolute;inset:0;background:linear-gradient(180deg, rgba(8,16,28,0.42) 0%, rgba(8,16,28,0) 17%, rgba(8,16,28,0) 78%, rgba(8,16,28,0.34) 100%);}
+  .hero-bg .g5{position:absolute;inset:0;background:linear-gradient(152deg, rgba(58,112,146,0.22) 0%, rgba(10,26,46,0.30) 100%);mix-blend-mode:soft-light;}
+  .hero-bg .g6{position:absolute;inset:0;background:linear-gradient(180deg, rgba(120,170,205,0.14) 0%, rgba(120,170,205,0) 40%);mix-blend-mode:overlay;}
+
+  /* NAV — borderless, no pill. TRANSPARENT over the hero (white logo + links + a light CTA on the dark
+     ocean); scrolling past the hero fades in a full-width frosted bar with dark content + a soft shadow
+     (no hard border). `.at-hero` (JS-toggled while the hero is under the nav) = the transparent state;
+     default (no class) = frosted, so no-JS stays readable. Content aligns to the 1248 page width. */
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 var(--pad-x);
+    background:rgba(253,252,251,0.72);
+    -webkit-backdrop-filter:saturate(160%) blur(20px);backdrop-filter:saturate(160%) blur(20px);
+    box-shadow:0 6px 24px rgba(18,30,45,0.06);
+    transition:background .35s ease, box-shadow .35s ease, -webkit-backdrop-filter .35s ease, backdrop-filter .35s ease;}
+  .site-nav.at-hero{background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;}
+  .nav-bar{max-width:1248px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;
+    padding:15px 0;transition:padding .35s ease;}
+  .site-nav.at-hero .nav-bar{padding:24px 0;}
+  .nav-left{display:flex;align-items:center;text-decoration:none;}
+  .nav-logo{height:26px;width:auto;display:block;transition:filter .35s ease;}
+  .site-nav.at-hero .nav-logo{filter:brightness(0) invert(1);}       /* white logo on the dark hero */
+  .nav-links{display:flex;align-items:center;gap:6px;}
+  .nav-links a{padding:8px 16px;border-radius:9px;font-family:var(--f-geist);font-weight:500;font-size:15px;line-height:1;letter-spacing:-0.02em;
+    color:var(--ink);text-decoration:none;transition:color .25s ease, background-color .25s ease;}
+  .nav-links a:hover{background-color:rgba(18,30,45,0.05);}
+  .site-nav.at-hero .nav-links a{color:rgba(255,255,255,0.9);}
+  .site-nav.at-hero .nav-links a:hover{color:#fff;background-color:rgba(255,255,255,0.14);}
+  .site-nav.at-hero .btn-launch{background:var(--paper);color:var(--ink);}   /* CTA inverts: light on the hero */
+  /* hamburger + dropdown — only shown <=768 (see the mobile block); the X-morph lives here */
+  .nav-toggle{display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    width:44px;height:44px;margin-right:-10px;border:none;background:transparent;cursor:pointer;border-radius:10px;}
+  .nav-toggle span{display:block;width:20px;height:2px;border-radius:2px;background:var(--ink);
+    transition:transform .3s ease, opacity .2s ease, background-color .35s ease;}
+  .site-nav.at-hero .nav-toggle span{background:#fff;}
+  .site-nav.nav-open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .site-nav.nav-open .nav-toggle span:nth-child(2){opacity:0;}
+  .site-nav.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .nav-menu{display:none;}
+  /* ---- BUTTONS: one consistent system (Geist 600, radius 10, translateY hover). Colour role varies:
+     dark (launch/hb), light (signup/launch2), muted-grey (partner); nav is the compact 14px variant. ---- */
+  .btn-launch{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);font-family:var(--f-geist);font-weight:600;font-size:14px;line-height:1;letter-spacing:-0.01em;padding:12px 22px;border-radius:10px;cursor:pointer;transition:opacity .2s ease,transform .2s ease;}
+  .btn-launch:hover{opacity:.9;transform:translateY(-1px);}
+
+  .hero-copy{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 var(--pad-x) 64px;}
+  /* hero intro is JS-timed: chip fades up + tickers 0→10, then the title wipes/fades in
+     (the row stays centred, so the chip slides left as the title expands) */
+  .hero-reveal{position:relative;}
+  .hero-row{display:flex;gap:16px;align-items:center;}
+  .pct{background:var(--coral);border-radius:2px;padding:20px 16px 24px;font-family:var(--f-sans);font-weight:600;font-size:64px;letter-spacing:-0.035em;color:var(--paper);line-height:76px;white-space:nowrap;opacity:0;}
+  .hero-title{font-family:var(--f-sans);font-weight:500;font-size:64px;letter-spacing:-0.035em;color:var(--paper);line-height:1.1;white-space:nowrap;text-shadow:0 2px 24px rgba(8,20,30,.28);opacity:0;width:0;overflow:hidden;}
+
+  .partners{position:relative;z-index:2;padding:32px 0;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
+  .partners-track{display:flex;width:max-content;align-items:center;animation:marquee 42s linear infinite;}
+  .p-item{flex:none;height:86px;display:flex;align-items:center;justify-content:center;padding:0 clamp(28px, 2.2vw, 52px);}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .partners .name{font-family:var(--f-inter);font-weight:500;font-size:16.125px;letter-spacing:-0.645px;color:var(--paper);white-space:nowrap;}
+  .honeyb{display:flex;align-items:center;gap:3.881px;padding:7.164px;}
+  .honeyb img{width:15.672px;height:15.672px;}
+  .honeyb span{font-family:var(--f-poly);font-size:23.912px;letter-spacing:-0.96px;color:var(--paper);line-height:1;}
+  .honeyb span i{font-style:italic;}
+
+  /* ============ VESSEL LEDE — "We built the vessel. / You steer it." ============ */
+  .vessel-line{font-family:var(--f-sans);font-weight:500;font-size:48px;letter-spacing:-0.03em;line-height:1.1;color:var(--ink);}
+  .vessel-line.grey{color:#BEBFC2;}
+  /* lede lines appear ONE AT A TIME: a timed, staggered entrance fired when the vessel scrolls into
+     view (JS toggles .lede-in on .vessel) — not scrubbed, so it plays the same at any scroll speed */
+  .vessel .vessel-line{opacity:0;transform:translateY(26px);will-change:opacity,transform;
+    transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1);}
+  .vessel.lede-in .vessel-line{opacity:1;transform:none;}
+  .vessel.lede-in .vessel-line:nth-child(2){transition-delay:.42s;}
+
+  /* ============ REAL PILLARS — 3 columns, one expands at a time (Figma 220:77) ============ */
+  .pillars{padding:0 var(--pad-x) clamp(88px,12vh,128px);}
+  .pillars-row{max-width:1248px;margin:0 auto;display:flex;gap:24px;height:368px;}
+  .pillar{position:relative;flex:1 1 0%;min-width:0;border-radius:24px;overflow:hidden;cursor:pointer;
+    background:var(--pill-bg);   /* Figma 246:1176 — one theme colour per card, identical collapsed + expanded */
+    transition:flex-grow .75s cubic-bezier(.4,0,.2,1),background-color .4s ease,border-radius .5s ease;}
+  .pillar.active{flex-grow:11.6;border-radius:32px;cursor:default;}
+  .pillar-body{position:absolute;inset:0;display:flex;gap:48px;align-items:stretch;padding:42px;width:100%;min-width:1032px;
+    opacity:0;transition:opacity .3s ease;pointer-events:none;}
+  .pillar.active .pillar-body{opacity:1;transition:opacity .45s ease .22s;pointer-events:auto;}
+  .pillar-img{flex:1 1 0%;min-width:0;border-radius:8px;background:#CCDFE3;overflow:hidden;}
+  .pillar-media{display:block;width:100%;height:100%;object-fit:cover;}
+  .pillar-copy{flex:1 1 0%;min-width:0;display:flex;flex-direction:column;gap:clamp(40px,4.5vw,64px);}
+  .pillar-eyebrow{font-family:var(--f-geist);font-weight:600;font-size:16px;letter-spacing:-0.32px;line-height:1.2;color:#8C8C8C;}
+  .pillar-text{display:flex;flex-direction:column;gap:24px;}
+  .pillar-text h3{font-family:var(--f-sans);font-weight:500;font-size:32px;letter-spacing:-0.03em;line-height:1.2;color:#2D2E36;}
+  .pillar-text p{font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.36px;line-height:1.4;color:#5E5E5E;}
+  /* appear animation for the panel contents when a pillar opens */
+  .pillar.active .pillar-img{animation:ddSlideIn .55s cubic-bezier(.22,1,.36,1) .18s both;}
+  .pillar.active .pillar-copy > *{opacity:0;animation:ddSlideIn .5s cubic-bezier(.22,1,.36,1) both;}
+  .pillar.active .pillar-copy > *:nth-child(1){animation-delay:.26s}
+  .pillar.active .pillar-copy > *:nth-child(2){animation-delay:.34s}
+  @keyframes ddSlideIn{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+  /* countdown ring (top-right of the active card). Driven ENTIRELY by JS (rAF sets stroke-dashoffset).
+     The old CSS-animation + animationend + inline-restart fought its own pause state (esp. Safari) —
+     that's what made hover sometimes not pause / freeze on a card / keep running. */
+  /* doughnut sits in the kicker row (Figma 223:740): flex justify-between, top-aligned with the eyebrow, 18px */
+  .pillar-kicker{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;width:100%;}
+  .pill-timer{flex:none;width:18px;height:18px;}
+  .pill-timer svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible;}
+  .pill-ring-track,.pill-ring-arc{fill:none;stroke-width:3.5;}
+  .pill-ring-track{stroke:#C4D4D5;}                        /* full doughnut — always visible on the card */
+  .pill-ring-arc{stroke:#3F6B66;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;}
+
+  /* wave band resting after How-it-Works (Figma 196:92 treatment, hard bottom edge) */
+  .rest-wave{position:relative;height:239px;width:100%;overflow:hidden;background:var(--paper);}
+  .rest-wave .w-tint{position:absolute;inset:0;background:
+      linear-gradient(180deg, rgba(242,242,243,.72) 0%, rgba(242,242,243,0) 100%),
+      linear-gradient(90deg, rgba(0,170,255,.08) 0%, rgba(0,170,255,.08) 100%);}
+  .rest-wave .w-img{position:absolute;left:0.02%;top:-223.87%;width:100%;height:336.28%;max-width:none;opacity:.33;}
+  .rest-wave .w-fade{position:absolute;inset:0;background:linear-gradient(180deg, #FDFCFB 0%, rgba(253,252,251,0.67) 42%, rgba(253,252,251,0) 100%);}
+
+  /* ============ HOW IT WORKS ============ */
+  .hiw{padding:clamp(80px,14vh,144px) var(--pad-x) clamp(88px,12vh,128px);}
+  .hiw-inner{max-width:1248px;margin:0 auto;display:flex;align-items:flex-start;gap:120px;}
+  .hiw-left{width:402px;flex:none;}
+  .hiw-left h3{font-family:var(--f-sans);font-weight:500;font-size:32px;letter-spacing:-0.03em;color:#000;line-height:1.2;}
+  .hiw-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:32px;}
+  .hiw-bars{display:flex;gap:32px;}
+  /* the active step's bar wipes in (scaleX from the left). Driven by TRANSFORM, not opacity — Safari
+     leaves stale pixels ("ghost" bars) when transitioning an opacity:0 gradient, but composites a
+     transform cleanly. transform-origin:left + backface-visibility keeps the collapsed bar truly gone. */
+  .hiw-bar{flex:1;height:4px;border-radius:2px;background:linear-gradient(90deg, #D9E3E6 0%, #AAC7CF 40%, #D9E3E6 100%);
+    transform:scaleX(0);transform-origin:left center;-webkit-backface-visibility:hidden;backface-visibility:hidden;
+    transition:transform .4s cubic-bezier(.4,0,.2,1);}
+  .hiw-bar.on{transform:scaleX(1);}
+  .hiw-steps{display:flex;gap:32px;}
+  .hiw-step{flex:1;min-width:0;display:flex;flex-direction:column;gap:clamp(40px,5vw,64px);padding:24px;cursor:pointer;}
+  .hiw-num{font-family:var(--f-sans);font-weight:500;font-size:clamp(64px,7vw,96px);letter-spacing:-3.84px;line-height:1;color:rgba(0,0,0,0.05);transition:color .4s ease;}
+  .hiw-step.active .hiw-num{color:var(--ink);}
+  .hiw-copy{display:flex;flex-direction:column;gap:16px;opacity:.45;transition:opacity .4s ease;}
+  .hiw-step.active .hiw-copy{opacity:1;}
+  .hiw-title{font-family:var(--f-geist);font-weight:500;font-size:24px;line-height:1.2;letter-spacing:-0.02em;color:#000;}
+  .hiw-desc{font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.02em;color:var(--muted-2);line-height:1.4;}
+
+  /* ============ GUIDED BY — cycling principle (Figma 220:115) ============ */
+  /* section fills the viewport so the row CENTRES while pinned; pills float near the top */
+  .guided{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad-x);}
+  @supports not (min-height:100svh){ .guided{min-height:100vh;} }
+  .guided-pills{position:absolute;top:clamp(100px,15vh,150px);left:50%;transform:translateX(-50%);
+    width:min(1248px, calc(100vw - 2 * var(--pad-x)));display:flex;gap:14px;}
+  .gpill{width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.36px;
+    background:#F8FAFA;border:1px solid rgba(204,223,227,0.66);color:#BEBFC2;cursor:pointer;
+    transition:background .35s ease,color .35s ease,border-color .35s ease;}
+  .gpill.on{background:#CCDFE3;border-color:#CCDFE3;color:#2D2E36;cursor:default;}
+  .guided-row{max-width:1248px;margin:0 auto;width:100%;display:flex;gap:64px;align-items:center;justify-content:center;}
+  /* "Guided by ___" — bumped to H2 (48px) */
+  .guided-word{flex:1;min-width:0;font-family:var(--f-sans);font-weight:500;font-size:48px;letter-spacing:-0.03em;line-height:1.1;display:flex;flex-direction:column;}
+  .gw-static{color:#BEBFC2;}
+  /* word + desc SLIDE up on change (opacity + translateY driven inline by JS) */
+  /* padding-bottom keeps the "y"/"g" descenders inside the will-change compositing layer (Safari clips
+     them to the box otherwise); negative margin cancels the extra height so the layout is unchanged. */
+  .gw-word{color:var(--ink);transition:opacity .32s ease, transform .32s cubic-bezier(.22,1,.36,1);will-change:opacity,transform;padding-bottom:0.18em;margin-bottom:-0.18em;}
+  /* circle: grey disc placeholder for states without art yet; graphic (helm) spins in + steers on hover/tap */
+  .guided-circle{flex:none;position:relative;width:clamp(300px,37vw,538px);aspect-ratio:1;}
+  .guided-disc{position:absolute;inset:0;border-radius:50%;background:#C7CDCF;opacity:.35;transition:opacity .6s ease;}
+  .gspin{position:absolute;inset:0;opacity:0;transform:rotate(-150deg) scale(.8);
+    transition:opacity .55s ease, transform .8s cubic-bezier(.2,.85,.25,1);pointer-events:none;}
+  .gspin.in{opacity:1;transform:rotate(0deg) scale(1);}
+  .gspin img{display:block;width:100%;height:100%;transition:transform .45s cubic-bezier(.22,1,.36,1);}
+  .guided-desc{flex:1;min-width:0;font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.36px;line-height:1.4;color:#5E5E5E;transition:opacity .32s ease, transform .32s cubic-bezier(.22,1,.36,1);will-change:opacity,transform;}
+
+  /* ============ HONEYB CARD (Figma 243:1075) — sailboat photo band + heading + 3-fact accordion ============ */
+  .hbcard{position:relative;padding:86px var(--pad-x) 128px;display:flex;flex-direction:column;gap:64px;isolation:isolate;}
+  .hb-band{position:absolute;inset:0;overflow:hidden;background:#1f2526;z-index:0;}
+  .hb-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+  .hb-photo-ov{position:absolute;inset:0;background:linear-gradient(179deg, rgba(0,0,0,0) 1%, rgba(4,5,5,0.13) 19%, rgba(31,37,38,0.7) 99%), rgba(0,0,0,0.1);}
+  .hb-head{position:relative;z-index:1;width:100%;max-width:1248px;margin:0 auto;display:flex;flex-direction:column;gap:24px;align-items:flex-start;}
+  .hb-eyebrow{font-family:var(--f-geist);font-weight:600;font-size:16px;letter-spacing:-0.32px;line-height:1.2;color:rgba(253,252,251,0.66);}
+  .hb-title{font-family:var(--f-sans);font-weight:500;font-size:48px;letter-spacing:-0.03em;line-height:1.13;color:var(--paper);}
+  .hb-card{position:relative;z-index:1;width:100%;max-width:1248px;margin:0 auto;padding:24px;border-radius:32px;
+    background:rgba(244,248,248,0.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+  .hb-panel{position:relative;min-height:506px;border-radius:12px;overflow:hidden;background:#fff;display:flex;align-items:stretch;}
+  .hb-left{flex:1;min-width:0;display:flex;align-items:center;padding:42px 64px;}
+  .hb-copy{width:443px;max-width:100%;display:flex;flex-direction:column;gap:64px;}
+  .hb-logo{display:flex;align-items:center;gap:4.66px;height:36px;}
+  .hb-logo img{width:18.8px;height:18.8px;}
+  .hb-wordmark{font-family:var(--f-poly);font-size:27.2px;letter-spacing:-1.09px;color:#5E5E5E;line-height:1;}
+  .hb-wordmark i{font-style:italic;}
+  .hb-text{display:flex;flex-direction:column;gap:24px;}
+  .hb-h{font-family:var(--f-sans);font-weight:500;font-size:48px;letter-spacing:-0.03em;line-height:1.13;color:#1E2028;}
+  .hb-h .grey{color:#BEBFC2;}
+  .hb-p{font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.02em;line-height:1.4;color:#5E5E5E;}
+  .hb-btn{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);
+    border-radius:10px;padding:16px 34px;font-family:var(--f-geist);font-weight:600;font-size:16px;line-height:1;letter-spacing:-0.01em;
+    text-decoration:none;cursor:pointer;transition:opacity .2s ease,transform .2s ease;}
+  .hb-btn:hover{opacity:.9;transform:translateY(-1px);}
+  /* 3-step segmented progress (right half): the ACTIVE segment fills L->R, then advances; a single content
+     block below slide-swaps. Bars are DISPLAY-ONLY (past stays full); the arrows step through the facts. */
+  .hb-facts{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:40px;padding:38px 64px;}
+  .hb-seg-track{display:flex;gap:14px;width:100%;}
+  .hb-seg{flex:1;height:6px;border-radius:6px;background:rgba(70,100,110,0.13);position:relative;overflow:hidden;}
+  .hb-seg-fill{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);border-radius:6px;
+    background:linear-gradient(90deg,#AAC7CF 0%,#D9E3E6 100%);}
+  .hb-fact-single{display:flex;flex-direction:column;gap:16px;}
+  .hb-fact-title{font-family:var(--f-geist);font-weight:500;font-size:30px;letter-spacing:-0.03em;line-height:1.13;color:#2D2E36;
+    transition:opacity .3s ease, transform .32s cubic-bezier(.22,1,.36,1);will-change:opacity,transform;}
+  .hb-fact-desc{font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.02em;line-height:1.4;color:#5E5E5E;
+    transition:opacity .3s ease, transform .32s cubic-bezier(.22,1,.36,1);will-change:opacity,transform;}
+  .hb-fact-nav{display:flex;gap:12px;}
+  .hb-fact-arrow{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;
+    border:1px solid rgba(30,32,40,0.16);background:transparent;color:#2D2E36;cursor:pointer;
+    transition:background .2s ease, border-color .2s ease, color .2s ease;}
+  .hb-fact-arrow:hover{background:rgba(30,32,40,0.05);border-color:rgba(30,32,40,0.3);}
+  .hb-fact-arrow svg{width:20px;height:20px;display:block;}
+
+  /* ============ PARTNERSHIP (Figma 243:1107) — decorative arc + two logos, centred text ============ */
+  .partner{position:relative;overflow:hidden;background:var(--paper);padding:128px var(--pad-x);display:flex;flex-direction:column;align-items:center;gap:72px;}
+  /* subtle water-caustics reflection (Figma 245:1142): caustics img in DARKEN blend over white, a teal
+     OVERLAY-blend tint, then gradient fades to white top & bottom so the copy stays clean. */
+  .partner-bg{position:absolute;inset:0;z-index:0;pointer-events:none;background:var(--paper);isolation:isolate;}
+  .partner-bg .pw-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;mix-blend-mode:darken;opacity:0.5;}
+  .partner-bg .pw-tint{position:absolute;inset:0;background:#85ACB9;mix-blend-mode:overlay;}
+  /* Figma 249:1242 fade: a RADIAL vignette — caustics show in a soft central circle behind the arc, fading
+     to white all around (transparent centre → 86% white at 78% radius → white at edge; centre ~50%/37%). */
+  .partner-bg .pw-fade{position:absolute;inset:0;background:radial-gradient(ellipse 33% 40% at 50.7% 37.5%, rgba(253,252,251,0) 0%, rgba(253,252,251,0.86) 78.2%, #FDFCFB 100%);}
+  .partner-arc{position:relative;z-index:1;width:min(820px,100%);aspect-ratio:820/440;}
+  .partner-arc-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  .partner-logos-row{position:absolute;left:50%;top:64%;transform:translate(-50%,-50%);display:flex;align-items:center;width:min(500px,84%);}
+  /* arc draws IN from both bottom ends, meeting at the apex where the dot then forms. Transition lives on
+     the `.in` state ONLY so arming snaps (no half-drawn flash) and only the draw animates. */
+  html.reveal-ready .partner-arc .arc-half{stroke-dasharray:640;stroke-dashoffset:640;}
+  html.reveal-ready .partner-arc.in .arc-half{stroke-dashoffset:0;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1);}
+  html.reveal-ready .partner-arc .arc-dot{opacity:0;}
+  html.reveal-ready .partner-arc.in .arc-dot{opacity:1;transition:opacity .45s ease 1.05s;}
+  .partner-textc{position:relative;z-index:1;width:610px;max-width:100%;display:flex;flex-direction:column;align-items:center;gap:32px;text-align:center;}
+  .partner-eyebrow{font-family:var(--f-geist);font-weight:600;font-size:16px;letter-spacing:-0.32px;line-height:1.2;color:#8C8C8C;}
+  .partner-h{font-family:var(--f-sans);font-weight:500;font-size:48px;letter-spacing:-0.03em;line-height:1.13;color:#1E2028;}
+  .partner-h .grey{color:#BEBFC2;}
+  .partner-p{font-family:var(--f-geist);font-weight:400;font-size:24px;letter-spacing:-0.02em;line-height:1.4;color:#AEAEAE;}
+  .partner-btn{display:inline-flex;align-items:center;justify-content:center;background:#F2F2F2;color:#8C8C8C;
+    border-radius:10px;padding:16px 34px;font-family:var(--f-geist);font-weight:600;font-size:16px;line-height:1;letter-spacing:-0.01em;
+    text-decoration:none;cursor:pointer;transition:background .2s ease,transform .2s ease;}
+  .partner-btn:hover{background:#EAEAEA;transform:translateY(-1px);}
+  .pl-cell{flex:1;min-width:0;height:77px;display:flex;align-items:center;justify-content:center;padding:0 10px;opacity:.75;}
+  .pl-honeyb{display:flex;align-items:flex-end;gap:6.14px;}
+  .pl-honeyb img{width:24px;height:24px;}
+  .pl-honeyb .wm{font-family:var(--f-poly);font-size:34.7px;letter-spacing:-1.39px;color:#1E2028;line-height:1;}
+  .pl-honeyb .wm i{font-style:italic;}
+  .pl-divider{width:1px;align-self:stretch;background:linear-gradient(180deg, rgba(30,32,40,0) 0%, rgba(30,32,40,.2) 50%, rgba(30,32,40,0) 100%);}
+  .pl-dd{display:flex;align-items:center;gap:16px;}
+  .pl-dd img{width:27.17px;height:32px;}
+  .pl-dd .wm{font-family:var(--f-sans);font-weight:500;font-size:21.44px;letter-spacing:-1.07px;color:#1E2028;line-height:22.5px;padding-top:2.38px;}
+
+  /* ============ NEWSLETTER CTA ============ */
+  .cta{display:flex;flex-direction:column;align-items:center;padding:86px var(--pad-x) 144px;}
+  /* stage = the final card footprint; it centres the card so the card grows from its CENTRE (circle -> full card) */
+  .cta-stage{width:100%;max-width:1248px;height:658px;display:flex;align-items:center;justify-content:center;}
+  .cta-card{width:100%;height:658px;border-radius:24px;padding-top:128px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden;color:var(--paper);}
+  /* boat layer — default fills the card (no-JS / reduced-motion fallback: boat in the lower third).
+     For the animation JS turns this into a taller layer and drifts it (parallax) as the card opens. */
+  .cta-bg{position:absolute;inset:0;pointer-events:none;}
+  .cta-bg .photo{position:absolute;inset:0;background:url('assets/newsletter-bg.png') center 70% / cover no-repeat;}
+  .cta-ov{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgb(94,152,176) 10%, rgba(94,152,176,0) 30%),linear-gradient(0deg, rgba(28,34,65,0) 67%, rgba(28,34,65,0.15) 100%);}
+  /* Figma 228:779 — gap 64 between the two-line lede and the form */
+  .cta-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:64px;align-items:center;}
+  /* Figma 228:780 — both lines Hiragino W5 32px / -0.96px / 1.13, tight (no gap), 612 wide; line 2 @ 50% */
+  .cta-text{display:flex;flex-direction:column;gap:0;align-items:center;text-align:center;width:612px;max-width:100%;
+    font-family:var(--f-sans);font-weight:500;font-size:32px;letter-spacing:-0.03em;line-height:1.13;}
+  .cta-text .sub{color:rgba(253,252,251,0.5);}
+  .cta-form{display:flex;flex-direction:column;gap:24px;align-items:center;}
+  .cta-fields{display:flex;gap:24px;width:504px;max-width:100%;}
+  /* border:none + appearance:none strip the native input chrome (that 2px inset border + iOS inner shadow);
+     the Figma field is just the translucent fill, no border/outline. */
+  .cta-email{flex:1;min-width:0;height:48px;background:rgba(253,252,251,0.33);border:none;outline:none;-webkit-appearance:none;appearance:none;border-radius:10px;padding:16px;
+    font-family:var(--f-sans);font-weight:400;font-size:16px;line-height:1.4;letter-spacing:-0.04em;color:var(--paper);}
+  .cta-email::placeholder{color:rgba(30,32,40,0.66);}
+  /* subtle focus cue that isn't a border — just a touch more fill (keeps a11y without the outline) */
+  .cta-email:focus{background:rgba(253,252,251,0.45);}
+  .btn-signup{display:inline-flex;align-items:center;justify-content:center;height:48px;background:var(--paper);color:var(--ink);border-radius:10px;padding:0 28px;
+    font-family:var(--f-geist);font-weight:600;font-size:16px;line-height:1;letter-spacing:-0.01em;cursor:pointer;transition:opacity .2s ease,transform .2s ease;}
+  .btn-signup:hover{opacity:.9;transform:translateY(-1px);}
+  .socials{display:flex;gap:30px;align-items:center;}
+
+  /* ============ FOOTER ============ */
+  .footer{position:relative;overflow:hidden;background:var(--ink);color:var(--paper);padding:112px var(--pad-x) 48px;}
+  /* nautical "horizon" — a hairline + a soft glow bleeding from the top edge (replaces the old water photo) */
+  .footer::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(170,199,207,0.45), transparent);}
+  .footer::after{content:"";position:absolute;top:-220px;left:50%;transform:translateX(-50%);
+    width:min(1100px,130%);height:420px;pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(63,107,102,0.22), rgba(63,107,102,0) 68%);}
+  .footer-inner{position:relative;z-index:1;width:100%;max-width:1248px;margin:0 auto;display:flex;flex-direction:column;gap:56px;}
+  .footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:64px;flex-wrap:wrap;}
+  .footer-brandblock{max-width:400px;display:flex;flex-direction:column;gap:24px;}
+  .footer-brand{display:flex;gap:12px;align-items:center;}
+  .footer-brand img{width:30px;height:36px;}
+  .footer-brand span{font-family:var(--f-sans);font-weight:400;font-size:24px;letter-spacing:-0.05em;color:var(--paper);}
+  .footer-tag{font-family:var(--f-geist);font-weight:400;font-size:18px;letter-spacing:-0.02em;color:#AEAEAE;line-height:1.5;}
+  .btn-launch2{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;background:var(--paper);color:var(--ink);border-radius:10px;padding:16px 34px;
+    font-family:var(--f-geist);font-weight:600;font-size:16px;line-height:1;letter-spacing:-0.01em;cursor:pointer;
+    transition:opacity .2s ease, transform .2s ease;}
+  .btn-launch2:hover{opacity:.9;transform:translateY(-1px);}
+  .footer-partner{display:flex;align-items:center;gap:7px;font-family:var(--f-geist);font-size:14px;color:#8A8D94;letter-spacing:-0.01em;margin-top:2px;}
+  .footer-partner a{display:inline-flex;align-items:center;gap:5px;color:rgba(253,252,251,0.92);text-decoration:none;
+    border-bottom:1px solid rgba(253,252,251,0.28);padding-bottom:1px;transition:border-color .2s ease;}
+  .footer-partner a:hover{border-color:var(--paper);}
+  .footer-partner a svg{width:12px;height:12px;}
+  .footer-cols{display:flex;gap:clamp(40px,5vw,72px);}
+  .footer-col{display:flex;flex-direction:column;gap:15px;min-width:100px;}
+  .footer-col .h{font-family:var(--f-geist);font-weight:600;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(253,252,251,0.42);margin-bottom:2px;}
+  .footer-col a{font-family:var(--f-geist);font-weight:400;font-size:15px;letter-spacing:-0.01em;color:rgba(253,252,251,0.80);line-height:1.2;text-decoration:none;transition:color .18s ease;}
+  .footer-col a:hover{color:var(--paper);}
+  .footer-bar{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    border-top:1px solid rgba(253,252,251,0.10);padding-top:36px;}
+  .footer-bar-left{display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+  .footer-brand-sm{display:flex;gap:9px;align-items:center;}
+  .footer-brand-sm img{width:18px;height:21px;}
+  .footer-brand-sm span{font-family:var(--f-sans);font-weight:400;font-size:15px;letter-spacing:-0.04em;color:rgba(253,252,251,0.9);}
+  .footer-copy{font-family:var(--f-geist);font-weight:400;font-size:14px;color:#8A8D94;}
+  .footer-legal{font-family:var(--f-geist);font-size:14px;color:#8A8D94;text-decoration:none;transition:color .18s ease;}
+  .footer-legal:hover{color:var(--paper);}
+  .socials{display:flex;gap:18px;align-items:center;}
+  .socials a{display:inline-flex;opacity:.65;transition:opacity .2s ease, transform .2s ease;}
+  .socials a:hover{opacity:1;transform:translateY(-2px);}
+
+  /* ===== APPEAR ON SCROLL ===== elements tagged .reveal (or the children of a .reveal-group) start
+     shifted-down + faded and ease UP into place when they scroll into view. The hidden state only applies
+     once JS adds `reveal-ready` to <html>, so if JS fails the content is still visible (progressive
+     enhancement). CSS transitions do the motion (robust — not tied to the gsap ticker). */
+  /* the transition lives on the `.in` state ONLY, so arming the hidden state SNAPS (no fade-out flash as
+     JS hides below-fold blocks); the slide-up animates only when `.in` is added on scroll. */
+  html.reveal-ready .reveal{opacity:0;transform:translateY(30px);will-change:opacity,transform;}
+  html.reveal-ready .reveal.in{opacity:1;transform:none;transition:opacity .8s ease, transform .8s cubic-bezier(.22,1,.36,1);}
+  /* .reveal-scale: fades in while ENLARGING slightly (starts a touch smaller, grows to full) */
+  html.reveal-ready .reveal-scale{opacity:0;transform:scale(.92);will-change:opacity,transform;}
+  html.reveal-ready .reveal-scale.in{opacity:1;transform:scale(1);transition:opacity .8s ease, transform .95s cubic-bezier(.22,1,.36,1);}
+  html.reveal-ready .reveal-group > *{opacity:0;transform:translateY(38px);will-change:opacity,transform;}
+  html.reveal-ready .reveal-group.in > *{opacity:1;transform:none;transition:opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1);}
+  html.reveal-ready .reveal-group.in > *:nth-child(1){transition-delay:.04s;}
+  html.reveal-ready .reveal-group.in > *:nth-child(2){transition-delay:.17s;}
+  html.reveal-ready .reveal-group.in > *:nth-child(3){transition-delay:.30s;}
+  html.reveal-ready .reveal-group.in > *:nth-child(4){transition-delay:.43s;}
+
+  /* ===== PILLARS: TABLET + MOBILE (<=1024px) — the desktop 3-col layout needs ~1200px (the absolutely-
+     positioned .pillar-body is min-width:1032px and clips the copy column below that). So below 1024px the
+     row stacks into a vertical accordion: active card = image over text, the others collapse to thin bars. */
+  @media (max-width:1024px){
+    .pillars{ padding:0 var(--pad-x) clamp(56px,8vh,88px); }
+    .pillars-row{ flex-direction:column; height:auto; gap:12px; max-width:100%; }
+    .pillar{ width:100%; flex:none; max-height:56px; overflow:hidden; border-radius:20px;
+      transition:max-height .55s cubic-bezier(.4,0,.2,1), background-color .4s ease, border-radius .4s ease; }
+    .pillar.active{ max-height:760px; border-radius:22px; }
+    .pillar-body{ position:relative; inset:auto; width:auto; min-width:0; flex-direction:column; align-items:stretch; gap:20px; padding:28px; opacity:1; pointer-events:auto; }
+    .pillar-img{ width:100%; height:auto; aspect-ratio:294/184; max-height:320px; flex:none; }
+    .pillar-copy{ gap:20px; }
+    .pillar-text{ gap:12px; }
+    /* stacked: no horizontal slide-in choreography */
+    .pillar.active .pillar-img,.pillar.active .pillar-copy>*{ animation:none; opacity:1; transform:none; }
+
+    /* --- TABLET stacking (769–1024 was cramping): these sections' desktop layouts need ~1100px+ --- */
+    /* HOW IT WORKS — intro over steps; each step becomes number-left / copy-right */
+    .hiw-inner{ flex-direction:column; gap:40px; }
+    .hiw-left{ width:auto; }
+    .hiw-bars{ display:none; }
+    .hiw-right{ gap:0; }
+    .hiw-steps{ flex-direction:column; gap:28px; }
+    .hiw-step{ flex-direction:row; align-items:flex-start; gap:24px; padding:0; }
+    .hiw-num{ font-size:64px; flex:none; position:relative; }
+    .hiw-step.active .hiw-num::before{ content:""; position:absolute; top:-14px; left:6px; width:60px; height:4px; border-radius:2px; background:linear-gradient(90deg,#D9E3E6 0%,#AAC7CF 45%,#D9E3E6 100%); }
+    .hiw-copy{ gap:10px; padding-top:26px; }
+    /* GUIDED BY — un-pinned (JS auto-cycles at ≤1024), stacked & centred, pills below the copy */
+    .guided{ min-height:auto; padding:88px var(--pad-x) 96px; }
+    .guided-pills{ position:static; transform:none; width:auto; justify-content:center; order:2; margin-top:32px; }
+    .guided-row{ flex-direction:column; gap:36px; align-items:center; text-align:center; order:1; }
+    .guided-word{ align-items:center; text-align:center; font-size:40px; }
+    .guided-circle{ width:min(56vw,360px); }
+    .guided-desc{ text-align:center; max-width:460px; font-size:18px; }
+    /* HONEYB CARD — stack the copy over the facts */
+    .hb-panel{ flex-direction:column; min-height:0; }
+    .hb-left{ padding:40px 44px 14px; }
+    .hb-copy{ width:auto; max-width:100%; }
+    .hb-facts{ padding:8px 44px 40px; justify-content:center; gap:32px; }
+  }
+
+  /* ===== MOBILE TYPE SCALE (<=768px) — type sizes only; full mobile LAYOUT is a later pass ===== */
+  @media (max-width:768px){
+    .pct,.hero-title{font-size:32px;letter-spacing:-0.03em;line-height:1.1;}
+    .pct{padding:12px 12px 14px;}
+    .vessel-line,.hb-h,.cta-text{font-size:24px;letter-spacing:-0.025em;line-height:1.2;}
+    .pillar-text h3,.hiw-left h3,.guided-word,.partner-h{font-size:24px;letter-spacing:-0.025em;line-height:1.2;}
+    .pillar-eyebrow,.partner-eyebrow,.footer-col .h{font-size:14px;}
+    .nav-links a{font-size:15px;}
+    .footer-copy{font-size:12px;}
+  }
+
+  /* ===================== MOBILE LAYOUT (<=768px) — Figma 229-803, 393px stacked ===================== */
+  @media (max-width:768px){
+    :root{ --pad-x:24px; }
+
+    /* NAV — logo + hamburger; links + CTA collapse into a dropdown panel */
+    .nav-links, .nav-cta{ display:none; }
+    .nav-toggle{ display:flex; }
+    .nav-logo{ height:22px; }
+    .nav-bar{ padding:12px 0; }
+    .site-nav.at-hero .nav-bar{ padding:16px 0; }
+    /* an OPEN menu forces the solid, readable nav (even over the hero) */
+    .site-nav.nav-open{ background:rgba(253,252,251,0.97);
+      -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px); box-shadow:0 14px 30px rgba(18,30,45,0.10); }
+    .site-nav.nav-open .nav-logo{ filter:none; }
+    .site-nav.nav-open .nav-toggle span{ background:var(--ink); }
+    /* the dropdown panel (max-height morph) */
+    .nav-menu{ display:flex; flex-direction:column; padding:0 var(--pad-x);
+      max-height:0; overflow:hidden; opacity:0;
+      transition:max-height .32s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .32s ease; }
+    .site-nav.nav-open .nav-menu{ max-height:340px; opacity:1; padding-top:6px; padding-bottom:22px; }
+    .nav-menu a{ padding:16px 4px; font-family:var(--f-geist); font-weight:500; font-size:17px; letter-spacing:-0.02em;
+      color:var(--ink); text-decoration:none; border-bottom:1px solid rgba(18,30,45,0.06); }
+    .nav-menu .btn-launch{ margin-top:16px; width:100%; padding:16px; font-size:15px; }
+
+    /* HERO — chip stacks above the title, centred */
+    .hero{ padding-top:80px; }
+    .hero-copy{ padding:0 var(--pad-x) 44px; }
+    .hero-row{ flex-direction:column; gap:12px; }
+    .pct{ font-size:32px; padding:8px 14px 10px; line-height:1.05; }
+    .hero-title{ font-size:32px; line-height:1.1; text-align:center; }
+    .p-item{ padding:0 22px; height:60px; }
+    .partners .name{ font-size:13.5px; }
+
+    /* VESSEL lede — tighter */
+    .vessel{ padding:clamp(120px,24vh,200px) var(--pad-x) 48px; }
+
+    /* PILLARS — accordion layout is handled at <=1024px (below); here just the phone-tight overrides */
+    .pillars{ padding:0 var(--pad-x) 56px; }
+    .pillar{ max-height:48px; }
+    .pillar-text p{ font-size:16px; letter-spacing:-0.02em; }
+
+    /* HOW IT WORKS — three stacked rows (number left, copy right); bar above the active number */
+    .hiw{ padding:56px var(--pad-x); }
+    .hiw-inner{ flex-direction:column; gap:36px; }
+    .hiw-left{ width:auto; }
+    .hiw-bars{ display:none; }
+    .hiw-right{ gap:0; }
+    .hiw-steps{ flex-direction:column; gap:28px; }
+    .hiw-step{ flex-direction:row; align-items:flex-start; gap:20px; padding:0; }
+    .hiw-num{ font-size:64px; flex:none; position:relative; }
+    .hiw-step.active .hiw-num::before{ content:""; position:absolute; top:-14px; left:6px; width:60px; height:4px; border-radius:2px; background:linear-gradient(90deg,#D9E3E6 0%,#AAC7CF 45%,#D9E3E6 100%); }
+    .hiw-copy{ gap:8px; padding-top:26px; }
+    .hiw-title{ font-size:20px; }
+    .hiw-desc{ font-size:16px; letter-spacing:-0.02em; }
+
+    /* GUIDED BY — stacked & centred, pills below the description */
+    .guided{ min-height:auto; padding:72px var(--pad-x) 88px; }
+    .guided-pills{ position:static; transform:none; width:auto; justify-content:center; order:2; margin-top:28px; }
+    .guided-row{ flex-direction:column; gap:28px; align-items:center; text-align:center; order:1; }
+    .guided-word{ align-items:center; text-align:center; font-size:32px; }
+    .guided-circle{ width:min(70vw,300px); }
+    .guided-desc{ text-align:center; max-width:340px; font-size:16px; letter-spacing:-0.02em; }
+
+    /* HONEYB CARD — photo band + stacked card (copy over the fact accordion) */
+    .hbcard{ padding:56px var(--pad-x) 72px; gap:36px; }
+    .hb-title{ font-size:32px; }
+    .hb-card{ padding:12px; border-radius:24px; }
+    .hb-panel{ flex-direction:column; min-height:0; }
+    .hb-left{ padding:28px 22px 8px; }
+    .hb-copy{ width:auto; max-width:100%; gap:28px; }
+    .hb-h{ font-size:32px; }
+    .hb-facts{ padding:4px 22px 28px; justify-content:center; gap:28px; }
+    .hb-fact-title{ font-size:24px; }
+
+    /* PARTNERSHIP — arc scales down, everything centred */
+    .partner{ padding:56px var(--pad-x); gap:32px; }
+    .partner-h{ font-size:32px; }
+    .partner-p{ font-size:18px; }
+    .partner-logos-row{ width:92%; }
+    .pl-honeyb .wm{ font-size:26px; }
+    .pl-dd .wm{ font-size:16px; }
+
+    /* NEWSLETTER CTA — shorter, stacked card */
+    .cta{ padding:40px var(--pad-x) 72px; }
+    .cta-stage{ height:auto; max-width:100%; }
+    .cta-card{ height:auto; min-height:500px; padding-top:72px; border-radius:20px; }
+    .cta-inner{ gap:40px; }
+    .cta-text{ width:auto; max-width:100%; font-size:24px; }
+    .cta-fields{ width:100%; max-width:320px; }
+    .btn-signup{ padding:0 16px; }
+
+    /* FOOTER — stacked */
+    .footer{ padding:64px var(--pad-x) 40px; }
+    .footer-inner{ gap:48px; }
+    .footer-top{ flex-direction:column; gap:44px; }
+    .footer-brandblock{ max-width:100%; }
+    .footer-cols{ width:100%; gap:32px; flex-wrap:wrap; }
+    .footer-bar{ flex-direction:column; align-items:flex-start; gap:20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .partners-track{animation:none;}
+    .pct{opacity:1;}
+    .hero-title{opacity:1;width:auto;overflow:visible;}
+    /* no parallax: hero is a plain block, overlap just flows beneath it, nav stays a static pill */
+    .hero-pin{position:static;height:auto;}
+    .hero{height:100svh;transform:none!important;}
+    .overlap{box-shadow:none;}
+    .vessel .vessel-line{opacity:1!important;transform:none!important;}
+    /* nav no longer animates size, so no reduced-motion override needed */
+    /* no auto-advance carousel — hide the countdown ring, hover still works */
+    .pill-timer{display:none;}
+    .pillar.active .pill-ring-arc{animation:none;}
+    /* appear-on-scroll off: everything visible, no slide/scale/draw */
+    html.reveal-ready .reveal,html.reveal-ready .reveal-scale,html.reveal-ready .reveal-group > *{opacity:1;transform:none;transition:none;}
+    html.reveal-ready .partner-arc .arc-half{stroke-dashoffset:0;transition:none;}
+    html.reveal-ready .partner-arc .arc-dot{opacity:1;transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================== NAV — borderless: transparent over the hero, frosted on scroll ===================== -->
+  <nav class="site-nav at-hero" id="siteNav">
+    <div class="nav-bar">
+      <a class="nav-left" href="#" aria-label="Double Digit — home">
+        <img class="nav-logo" src="assets/dd-nav-logo.svg" alt="Double Digit" />
+      </a>
+      <div class="nav-links">
+        <a href="#">About</a>
+        <a href="#">Insights</a>
+        <a href="#">Doc</a>
+      </div>
+      <button class="btn-launch nav-cta">Launch App</button>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-menu" id="navMenu">
+      <a href="#">About</a>
+      <a href="#">Insights</a>
+      <a href="#">Doc</a>
+      <button class="btn-launch">Launch App</button>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO (plain full-screen section) ===================== -->
+  <div class="hero-pin">
+    <div class="hero" id="hero">
+      <div class="hero-bg">
+        <img class="photo" src="assets/hero.png" alt="" />
+        <div class="g1"></div>
+        <div class="g2"></div>
+        <div class="g3"></div>
+        <div class="g4"></div>
+        <div class="g5"></div>
+        <div class="g6"></div>
+      </div>
+      <div class="hero-copy">
+        <div class="hero-reveal">
+          <div class="hero-row">
+            <div class="pct">+10%</div>
+            <div class="hero-title">Yield on&nbsp;Ethereum.</div>
+          </div>
+        </div>
+      </div>
+      <div class="partners">
+        <div class="partners-track" id="partnersTrack">
+          <div class="p-item"><span class="name">Alphaledger.</span></div>
+          <div class="p-item"><img src="assets/partner-1.svg" style="width:110.691px;height:14.964px" alt="" /></div>
+          <div class="p-item"><img src="assets/partner-2.svg" style="width:119.993px;height:27.127px" alt="" /></div>
+          <div class="p-item"><div class="honeyb"><img src="assets/honeyb-brandmark.svg" alt="" /><span>Honey<i>B</i></span></div></div>
+          <div class="p-item"><img src="assets/partner-anchorage.svg" style="width:83.379px;height:31.764px" alt="" /></div>
+          <div class="p-item"><img src="assets/partner-kaimeta.svg" style="width:113.211px;height:22.642px" alt="" /></div>
+          <div class="p-item"><img src="assets/partner-maple.svg" style="width:83.984px;height:27.995px" alt="" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OVERLAP — rounded-top panel that slides up over the hero ===================== -->
+  <div class="overlap" id="overlap">
+
+  <!-- ===================== VESSEL LEDE ===================== -->
+  <section class="vessel" id="vessel">
+    <h2 class="vessel-line grey">We built the&nbsp;vessel.</h2>
+    <h2 class="vessel-line">You steer&nbsp;it.</h2>
+  </section>
+
+  <!-- ===================== REAL PILLARS (3-col: one expands at a time) ===================== -->
+  <section class="pillars" id="pillars">
+    <div class="pillars-row" id="pillarsRow">
+      <div class="pillar active" data-pillar="0" style="--pill-bg:#F2F6F7">
+        <div class="pillar-body">
+          <div class="pillar-img"><img class="pillar-media" src="assets/pillar-strategies.jpg" alt="Ship's compass on deck" /></div>
+          <div class="pillar-copy">
+            <div class="pillar-kicker">
+              <div class="pillar-eyebrow">Real&nbsp;Strategies</div>
+              <div class="pill-timer" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="pill-ring-track" cx="18" cy="18" r="15.915"/><circle class="pill-ring-arc" cx="18" cy="18" r="15.915"/></svg></div>
+            </div>
+            <div class="pillar-text">
+              <h3>Charted by the people institutions already&nbsp;trust.</h3>
+              <p>Multi-strategy income portfolios plotted and run by SEC-registered managers. Not emissions. Not points. The strategies institutions actually allocate&nbsp;to.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pillar" data-pillar="1" style="--pill-bg:#EEF2F1">
+        <div class="pillar-body">
+          <div class="pillar-img"><img class="pillar-media" src="assets/pillar-infrastructure.jpg" alt="Rigging block and line on deck" /></div>
+          <div class="pillar-copy">
+            <div class="pillar-kicker">
+              <div class="pillar-eyebrow">Real&nbsp;Infrastructure</div>
+              <div class="pill-timer" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="pill-ring-track" cx="18" cy="18" r="15.915"/><circle class="pill-ring-arc" cx="18" cy="18" r="15.915"/></svg></div>
+            </div>
+            <div class="pillar-text">
+              <h3>Anchored by banks, auditors, and daily&nbsp;NAV.</h3>
+              <p>Bank custody. Independent daily NAV. Annual audits. The same service stack as a traditional institutional fund, because it is&nbsp;one.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pillar" data-pillar="2" style="--pill-bg:#E9F0F2">
+        <div class="pillar-body">
+          <div class="pillar-img"><img class="pillar-media" src="assets/pillar-ownership.jpg" alt="Sailboat mast and furled sail" /></div>
+          <div class="pillar-copy">
+            <div class="pillar-kicker">
+              <div class="pillar-eyebrow">Real&nbsp;Ownership</div>
+              <div class="pill-timer" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="pill-ring-track" cx="18" cy="18" r="15.915"/><circle class="pill-ring-arc" cx="18" cy="18" r="15.915"/></svg></div>
+            </div>
+            <div class="pillar-text">
+              <h3>Steered by no one but the wallet&nbsp;holder.</h3>
+              <p>Tokenized units in your own wallet. Hold it, verify it, redeem at NAV, on your schedule. The position answers only to&nbsp;you.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="hiw" id="hiw">
+    <div class="hiw-inner">
+    <div class="hiw-left"><h3>How it Works</h3></div>
+    <div class="hiw-right">
+      <div class="hiw-bars">
+        <span class="hiw-bar on"></span>
+        <span class="hiw-bar"></span>
+        <span class="hiw-bar"></span>
+      </div>
+      <div class="hiw-steps reveal-group">
+        <div class="hiw-step active">
+          <div class="hiw-num">01</div>
+          <div class="hiw-copy"><div class="hiw-title">Verify</div><p class="hiw-desc">Permissions set, your custody stays&nbsp;put.</p></div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">02</div>
+          <div class="hiw-copy"><div class="hiw-title">Allocate</div><p class="hiw-desc">Pick a strategy; mint your on-chain&nbsp;position.</p></div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">03</div>
+          <div class="hiw-copy"><div class="hiw-title">Earn</div><p class="hiw-desc">Earn yield, monitor your position,&nbsp;redeem.</p></div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ===================== BOTTOM WAVE (moved here, after How it Works) ===================== -->
+  <div class="rest-wave" aria-hidden="true">
+    <div class="w-tint"></div>
+    <img class="w-img" src="assets/wave-figma.png" alt="" />
+    <div class="w-fade"></div>
+  </div>
+
+  <!-- ===================== GUIDED BY (Clarity -> Security -> Autonomy) ===================== -->
+  <section class="guided" id="guided">
+    <div class="guided-pills" role="tablist" aria-label="Guiding principles">
+      <button class="gpill on" data-g="0">01</button>
+      <button class="gpill" data-g="1">02</button>
+      <button class="gpill" data-g="2">03</button>
+    </div>
+    <div class="guided-row">
+      <div class="guided-word">
+        <span class="gw-static">Guided&nbsp;by</span>
+        <span class="gw-word" id="gWord">Clarity</span>
+      </div>
+      <div class="guided-circle" id="gCircle" aria-hidden="true">
+        <div class="guided-disc" id="gDisc"></div>
+        <div class="gspin" data-art="0"><img src="assets/guided-compass.svg" alt="" /></div>
+        <div class="gspin" data-art="1"><img src="assets/guided-preserver.svg" alt="" /></div>
+        <div class="gspin" data-art="2"><img src="assets/guided-helm.svg" alt="" /></div>
+      </div>
+      <p class="guided-desc" id="gDesc">Every position, every fee, every NAV published on-chain. No fog between you and your&nbsp;money.</p>
+    </div>
+  </section>
+
+  <!-- ===== HONEYB CARD (Figma 243:1075) — sailboat photo band + heading + auto-advancing 3-fact accordion ===== -->
+  <section class="hbcard">
+    <div class="hb-band" aria-hidden="true">
+      <img class="hb-photo" src="assets/honeyb-sail-bg.jpg" alt="" />
+      <div class="hb-photo-ov"></div>
+    </div>
+    <div class="hb-head reveal">
+      <div class="hb-eyebrow">Same Institutional&nbsp;Strategies</div>
+      <h2 class="hb-title">Want to&nbsp;earn<br />on&nbsp;Bitcoin?</h2>
+    </div>
+    <div class="hb-card reveal-scale">
+      <div class="hb-panel">
+        <div class="hb-left">
+          <div class="hb-copy">
+            <div class="hb-logo">
+              <img src="assets/honeyb-brandmark-muted.svg" alt="" />
+              <span class="hb-wordmark">Honey<i>B</i></span>
+            </div>
+            <div class="hb-text">
+              <h2 class="hb-h"><span class="grey">Honey&nbsp;from</span><br />real&nbsp;money.</h2>
+              <p class="hb-p">We believe you should be at the helm of your own finance. Your wallet, your course to&nbsp;chart.</p>
+            </div>
+            <a class="hb-btn" href="https://www.honeybtc.com" target="_blank" rel="noopener">Visit HoneyB</a>
+          </div>
+        </div>
+        <!-- 3-step segmented progress: the active segment fills L->R, then advances; the single content
+             block below slide-swaps to the next fact. Bars are display-only; the arrows step through. -->
+        <div class="hb-facts" id="hbFacts">
+          <div class="hb-seg-track" id="hbSegs" aria-hidden="true">
+            <div class="hb-seg"><span class="hb-seg-fill"></span></div>
+            <div class="hb-seg"><span class="hb-seg-fill"></span></div>
+            <div class="hb-seg"><span class="hb-seg-fill"></span></div>
+          </div>
+          <div class="hb-fact-single">
+            <h3 class="hb-fact-title" id="hbFactTitle">$100T+ Fixed-Income&nbsp;Market</h3>
+            <p class="hb-fact-desc" id="hbFactDesc">Access tokenized treasuries and&nbsp;credit.</p>
+          </div>
+          <div class="hb-fact-nav">
+            <button class="hb-fact-arrow" id="hbFactPrev" type="button" aria-label="Previous fact">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="hb-fact-arrow" id="hbFactNext" type="button" aria-label="Next fact">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PARTNERSHIP (Figma 243:1107) — arc + logos, centred ===================== -->
+  <section class="partner">
+    <div class="partner-bg" aria-hidden="true">
+      <img class="pw-img" src="assets/partner-caustics.jpg" alt="" />
+      <div class="pw-tint"></div>
+      <div class="pw-fade"></div>
+    </div>
+    <div class="partner-arc reveal-arc">
+      <svg class="partner-arc-svg" viewBox="0 0 820 440" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="pArc" x1="410" y1="36" x2="410" y2="440" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#6E9BB8"/>
+            <stop offset="1" stop-color="#6E9BB8" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- two halves draw from the bottom ends UP to the apex, meeting where the dot forms -->
+        <path class="arc-half arc-l" d="M10 436 A400 400 0 0 1 410 36" stroke="url(#pArc)" stroke-width="1.4"/>
+        <path class="arc-half arc-r" d="M810 436 A400 400 0 0 0 410 36" stroke="url(#pArc)" stroke-width="1.4"/>
+        <circle class="arc-dot" cx="410" cy="36" r="9" fill="#FDFCFB" stroke="#5B87A3" stroke-width="1.6"/>
+      </svg>
+      <div class="partner-logos-row">
+        <div class="pl-cell">
+          <div class="pl-honeyb">
+            <img src="assets/honeyb-brandmark-ink.svg" alt="" />
+            <span class="wm">Honey<i>B</i></span>
+          </div>
+        </div>
+        <div class="pl-divider"></div>
+        <div class="pl-cell">
+          <div class="pl-dd">
+            <img src="assets/dd-mark-ink.svg" alt="" />
+            <span class="wm">Double Digit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="partner-textc reveal">
+      <div class="partner-eyebrow">Same Institutional&nbsp;Strategies</div>
+      <h3 class="partner-h"><span class="grey">Same&nbsp;harbor,</span><br />different&nbsp;vessel.</h3>
+      <p class="partner-p">HoneyB, the platform behind Double Digit, opens institutional yield strategies to long-term BTC holders. No selling, no wrapping your thesis around someone&nbsp;else&rsquo;s.</p>
+      <a class="partner-btn" href="https://www.honeybtc.com" target="_blank" rel="noopener">Learn More</a>
+    </div>
+  </section>
+
+  <!-- ===================== NEWSLETTER CTA ===================== -->
+  <section class="cta">
+   <div class="cta-stage">
+    <div class="cta-card">
+      <div class="cta-bg">
+        <div class="photo"></div>
+      </div>
+      <div class="cta-ov"></div>
+      <div class="cta-inner">
+        <div class="cta-text">
+          <div>Yield that&rsquo;s yours to&nbsp;steer.</div>
+          <div class="sub">Subscribe for the latest&nbsp;updates,<br />news, and&nbsp;more.</div>
+        </div>
+        <div class="cta-form">
+          <div class="cta-fields">
+            <input class="cta-email" placeholder="Email" />
+            <button class="btn-signup">Sign Up</button>
+          </div>
+          <div class="socials">
+            <img src="assets/twitter-fill.svg" style="width:18px;height:18px" alt="X" />
+            <img src="assets/linkedin.svg" style="width:20px;height:20px" alt="LinkedIn" />
+            <img src="assets/telegram.svg" style="width:24px;height:24px" alt="Telegram" />
+          </div>
+        </div>
+      </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brandblock reveal">
+          <div class="footer-brand">
+            <img src="assets/footer-dd-logo.svg" alt="" />
+            <span>Double Digit</span>
+          </div>
+          <p class="footer-tag">Institutional yield, charted on-chain &mdash; and yours to&nbsp;steer.</p>
+          <button class="btn-launch2">Launch App</button>
+          <div class="footer-partner">In partnership with
+            <a href="https://www.honeybtc.com" target="_blank" rel="noopener">HoneyB<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+          </div>
+        </div>
+        <nav class="footer-cols reveal" aria-label="Footer">
+          <div class="footer-col">
+            <div class="h">Invest</div>
+            <a href="#">T-12 Fund</a>
+            <a href="#">ddDigit</a>
+            <a href="#">ddUSD</a>
+          </div>
+          <div class="footer-col">
+            <div class="h">Company</div>
+            <a href="#">About</a>
+            <a href="#">Insights</a>
+            <a href="#">Docs</a>
+          </div>
+          <div class="footer-col">
+            <div class="h">Trust</div>
+            <a href="#">Trust &amp; Security</a>
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+          </div>
+        </nav>
+      </div>
+      <div class="footer-bar">
+        <div class="footer-bar-left">
+          <span class="footer-brand-sm"><img src="assets/footer-dd-logo.svg" alt="" /></span>
+          <div class="footer-copy">Copyright &copy; 2026 Double&nbsp;Digit</div>
+        </div>
+        <div class="socials">
+          <a href="#" aria-label="X (Twitter)"><img src="assets/twitter-fill.svg" style="width:18px;height:18px" alt="" /></a>
+          <a href="#" aria-label="LinkedIn"><img src="assets/linkedin.svg" style="width:20px;height:20px" alt="" /></a>
+          <a href="#" aria-label="Telegram"><img src="assets/telegram.svg" style="width:22px;height:22px" alt="" /></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  </div><!-- /.overlap -->
+
+</div>
+
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script>
+  // Always start at the top on (re)load so scroll-triggered intros — incl. the CTA porthole —
+  // replay every refresh instead of the browser restoring a scroll position past their triggers.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  // NAV — transparent (.at-hero) while the hero is under it, frosted once you scroll past it; + mobile menu.
+  (function(){
+    var nav = document.getElementById('siteNav');
+    if (!nav) return;
+    var heroPin = document.querySelector('.hero-pin');
+    function atHero(){
+      var limit = (heroPin ? heroPin.offsetHeight : window.innerHeight) - nav.offsetHeight - 8;
+      nav.classList.toggle('at-hero', (window.scrollY || window.pageYOffset || 0) < limit);
+    }
+    atHero();
+    window.addEventListener('scroll', atHero, { passive: true });
+    window.addEventListener('resize', atHero);
+    var toggle = document.getElementById('navToggle');
+    if (toggle){
+      function setOpen(open){ nav.classList.toggle('nav-open', open); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+      toggle.addEventListener('click', function(){ setOpen(!nav.classList.contains('nav-open')); });
+      [].forEach.call(nav.querySelectorAll('#navMenu a, #navMenu button'), function(el){ el.addEventListener('click', function(){ setOpen(false); }); });
+      window.addEventListener('keydown', function(e){ if (e.key === 'Escape') setOpen(false); });
+      window.addEventListener('resize', function(){ if (window.innerWidth > 768) setOpen(false); });
+    }
+  })();
+
+  // Hero + page scroll: the hero is now a plain full-screen section (the pin-cycle parallax moved to the
+  // pillars). This block runs Lenis buttery smooth-scroll and the vessel lede that fades in one line at a time.
+  (function(){
+    var vessel = document.getElementById('vessel');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // (nav is now a static frosted pill — no scroll-toggle needed)
+
+    if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ---- Lenis smooth scroll, synced to GSAP's ticker so ScrollTrigger stays in lockstep ----
+    if (typeof Lenis !== 'undefined'){
+      var lenis = new Lenis({
+        duration: 1.15,
+        easing: function(t){ return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+        smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.6
+      });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+      window.__lenis = lenis;   // exposed so other sections (e.g. Guided-by pills) can scroll smoothly
+    }
+
+    // (hero parallax/overlap removed — hero is a plain full-screen section; the pin+cycle now lives on the pillars)
+
+    // ---- vessel lede: one line at a time, when it scrolls into view ----
+    if (vessel){
+      ScrollTrigger.create({
+        trigger: vessel, start: 'top 80%', end: 'bottom top',
+        onEnter:     function(){ vessel.classList.add('lede-in'); },
+        onEnterBack: function(){ vessel.classList.add('lede-in'); },
+        onLeaveBack: function(){ vessel.classList.remove('lede-in'); }
+      });
+    }
+  })();
+
+  // Sponsor marquee: repeat the logos until one "unit" is at least a viewport wide, then duplicate
+  // that unit so the translateX(-50%) loop is always gap-free (fully spans the screen on first load).
+  (function(){
+    var track = document.getElementById('partnersTrack');
+    if(!track) return;
+    var wrap = track.closest('.partners');
+    var base = track.innerHTML;
+    var guard = 0;
+    while (track.scrollWidth < wrap.offsetWidth + 120 && guard < 24){ track.innerHTML += base; guard++; }
+    var unit = track.innerHTML;
+    track.innerHTML = unit + unit; // two identical units → seamless loop
+    [...track.children].slice(track.children.length/2).forEach(function(el){ el.setAttribute('aria-hidden','true'); });
+  })();
+
+  // Hero intro: the +% chip fades up and tickers 0→10, then the title wipes in
+  // (the row stays centred, so the chip slides left as the title expands).
+  (function(){
+    var pct = document.querySelector('.pct'), title = document.querySelector('.hero-title');
+    if (!pct || !title) return;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof gsap === 'undefined'){
+      pct.style.opacity = '1'; pct.textContent = '+10%';
+      title.style.opacity = '1'; title.style.width = 'auto'; title.style.overflow = 'visible';
+      return;
+    }
+    pct.textContent = '+0%';
+    gsap.set(pct, { opacity: 0, y: 26 });
+    gsap.set(title, { opacity: 0, width: 0, overflow: 'hidden' });
+    var count = { n: 0 };
+    gsap.timeline({ delay: 0.4 })
+      .to(pct, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' })
+      .to(count, { n: 10, duration: 0.75, ease: 'power1.out',
+          onUpdate: function(){ pct.textContent = '+' + Math.round(count.n) + '%'; },
+          onComplete: function(){ pct.textContent = '+10%'; } }, '-=0.15')
+      .to(title, { opacity: 1, width: 'auto', duration: 0.85, ease: 'power3.inOut',
+          onComplete: function(){ title.style.overflow = 'visible'; title.style.width = 'auto'; } }, '+=0.08');
+  })();
+
+  // Appear-on-scroll: reveal `.reveal` blocks (and stagger the children of `.reveal-group`, e.g. the
+  // How-it-Works steps — each slides up one at a time) as they enter the viewport. CSS does the motion
+  // (transitions), JS just toggles `.in` on first intersection. `reveal-ready` on <html> arms the hidden
+  // state (so no-JS keeps content visible); reduced-motion reveals everything at once.
+  (function(){
+    var els = [].slice.call(document.querySelectorAll('.reveal, .reveal-group, .reveal-scale, .reveal-arc'));
+    if (!els.length) return;
+    document.documentElement.classList.add('reveal-ready');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function reveal(el){ el.classList.add('in'); }
+    if (reduce){ els.forEach(reveal); return; }
+    // Prefer ScrollTrigger (already loaded, fires reliably every scroll frame); reveal each block once it's
+    // ~20% into view. Fall back to IntersectionObserver, then to just showing everything.
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined'){
+      gsap.registerPlugin(ScrollTrigger);
+      els.forEach(function(el){
+        var done = false;
+        ScrollTrigger.create({ trigger: el, start: 'top bottom', end: 'top top',
+          onUpdate: function(self){ if (!done && self.progress > 0.2){ done = true; reveal(el); } } });
+      });
+    } else if ('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if (e.isIntersecting){ reveal(e.target); io.unobserve(e.target); } });
+      }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+      els.forEach(function(el){ io.observe(el); });
+    } else { els.forEach(reveal); }
+  })();
+
+  // How it Works — hover/tap to reveal a step. It STAYS on the last hovered step after the cursor
+  // leaves the section; it only falls back to step 1 when the section scrolls out of frame.
+  (function(){
+    var section = document.getElementById('hiw');
+    if (!section) return;
+    var steps = [].slice.call(section.querySelectorAll('.hiw-step'));
+    var bars  = [].slice.call(section.querySelectorAll('.hiw-bar'));
+    if (!steps.length) return;
+    var DEFAULT = 0;
+    function activate(i){
+      steps.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+      bars.forEach(function(b, idx){ b.classList.toggle('on', idx === i); });
+    }
+    steps.forEach(function(s, idx){
+      s.addEventListener('mouseenter', function(){ activate(idx); });
+      s.addEventListener('click',      function(){ activate(idx); }); // touch fallback
+    });
+    // reset to step 1 only when the whole section has left the viewport (so it's back to default next time)
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if (!e.isIntersecting) activate(DEFAULT); });
+      }, { threshold: 0 }).observe(section);
+    }
+  })();
+
+  // Newsletter card: a round "porthole" that grows into the full card, then the text rises up.
+  // The card itself animates from a circle → full rounded rect (overflow:hidden, so the shape is
+  // always clean — no clip-path artifacts). Inside it, the boat layer is a tall parallax plane that
+  // drifts DOWN as the card opens: boat centred in the porthole → lower third in the expanded card.
+  // Timing is the original: fires early as the card scrolls in, plays ONCE, and stays expanded.
+  (function(){
+    var cta   = document.querySelector('.cta');
+    var stage = document.querySelector('.cta-stage');
+    var card  = document.querySelector('.cta-card');
+    var bg    = document.querySelector('.cta-bg');
+    var ov    = document.querySelector('.cta-ov');
+    var photo = document.querySelector('.cta-bg .photo');
+    if (!card || !cta || !stage) return;
+    var textEls = card.querySelectorAll('.cta-text > div, .cta-form');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var mobile = window.matchMedia('(max-width:768px)').matches;   // porthole math is desktop-sized → show the full card on mobile
+    if (reduce || mobile || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return; // full card, no anim
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    var fullW = stage.clientWidth;                    // the card's final (full) width
+    var Hc    = 658;                                  // final card height
+    var D     = Math.min(470, Math.round(fullW*0.44));// porthole diameter
+    var BG_H  = Hc;                                   // plane = card height, so the boat keeps its natural crop when expanded
+    var fMid  = 0.62;                                 // boat's visual mid-point in newsletter-bg.png (sail-top ~0.42 → reflection ~0.82)
+    var yPort = Math.round(BG_H * (0.5 - fMid));      // porthole: boat's mid-point at the circle centre → visually centred (~ -79)
+    var yExp  = 0;                                    // expanded: boat at its natural ~72% (lower third) — matches Figma 2087329484
+
+    // turn the boat layer into a tall cover plane centred on the card
+    photo.style.background = "url('assets/newsletter-bg.png') center / cover no-repeat";
+    gsap.set(bg, { top:'50%', left:'50%', right:'auto', bottom:'auto',
+                   width: fullW, height: BG_H, xPercent:-50, yPercent:-50, y: yPort });
+
+    // start as a porthole; overlay + text hidden
+    gsap.set(card, { width: D, height: D, borderRadius: D/2 });
+    gsap.set(ov, { opacity: 0 });
+    gsap.set(textEls, { opacity: 0, y: 34 });
+
+    // Play the porthole grow ONCE when the card comes into frame, then STAY expanded (it never reverses —
+    // the user explores the rest of the page with the card open). Paused timeline played on a flag, driven
+    // by onUpdate (fires reliably every scroll frame; onEnter/IntersectionObserver fire unreliably here).
+    // Anchored on .cta-stage (fixed 658px — the card itself resizes). The guided pin's refreshPriority keeps
+    // this trigger's start correct; without it the card grew ~185px below the fold ("out of frame").
+    var tl = gsap.timeline({ paused: true })
+      .to(card, { width: fullW, height: Hc, borderRadius: 24, duration: 1.15, ease: 'power3.inOut' }, 0)
+      .to(bg,   { y: yExp, duration: 1.15, ease: 'power3.inOut' }, 0)      // boat drifts down (parallax)
+      .to(ov,   { opacity: 1, duration: 0.9, ease: 'power2.inOut' }, 0.25)
+      .to(textEls, { opacity: 1, y: 0, stagger: 0.15, duration: 0.7, ease: 'power2.out' }, 0.7);
+    var played = false;
+    ScrollTrigger.create({
+      trigger: stage, start: 'center bottom', end: 'center top',
+      onUpdate: function(self){ if (!played && self.progress > 0.32){ played = true; tl.play(); } }   // fires once ~stage-center at 68% down
+    });
+  })();
+
+  // Real pillars — 3 columns, one expands at a time. Auto-advances on a rAF timer that OWNS the ring's
+  // stroke-dashoffset directly, so "paused" is just a boolean the loop checks — it can't fight a CSS
+  // animation's play-state (the old approach did, which is why hover sometimes didn't pause / froze /
+  // kept running). Hover anywhere in the row pauses + reveals; leaving resumes. When the section leaves
+  // frame it resets to the FIRST card, so it always re-enters on card 1 (like How-it-Works).
+  (function(){
+    var section = document.getElementById('pillars');
+    var row = document.getElementById('pillarsRow');
+    if (!section || !row) return;
+    var pillars = [].slice.call(row.querySelectorAll('.pillar'));
+    if (!pillars.length) return;
+    var arcs = pillars.map(function(p){ return p.querySelector('.pill-ring-arc'); });
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var INTERVAL = 6500, C = 100;                       // dwell per card (ms); ring stroke-dasharray
+    var cur = 0, elapsed = 0, last = 0, hovering = false, onScreen = false;
+
+    function render(){
+      pillars.forEach(function(p, i){ p.classList.toggle('active', i === cur); });
+      arcs.forEach(function(a, i){
+        if (a) a.style.strokeDashoffset = (i === cur) ? (C * (1 - Math.min(1, elapsed / INTERVAL))).toFixed(2) : C;
+      });
+    }
+    function open(i){ cur = (i + pillars.length) % pillars.length; elapsed = 0; render(); }
+
+    function tick(ts){
+      requestAnimationFrame(tick);
+      var dt = last ? ts - last : 0; last = ts;
+      if (reduce || hovering || !onScreen) return;      // frozen: ring holds, no advance
+      elapsed += dt;
+      if (elapsed >= INTERVAL) open(cur + 1);           // advance
+      else render();
+    }
+
+    // hover anywhere in the row PAUSES the auto-advance; a card opens only on CLICK (no hover-open). touch-safe.
+    row.addEventListener('mouseenter', function(){ hovering = true; });
+    row.addEventListener('mouseleave', function(){ hovering = false; last = 0; });
+    pillars.forEach(function(p, idx){
+      p.addEventListener('click', function(){ if (idx !== cur) open(idx); });
+    });
+
+    // pause off-screen; reset to the first card when it leaves frame
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if (e.isIntersecting){ onScreen = true; hovering = false; last = 0; }
+          else { onScreen = false; hovering = false; open(0); }
+        });
+      }, { threshold: 0.35 }).observe(section);
+    } else { onScreen = true; }
+
+    render();
+    if (!reduce) requestAnimationFrame(tick);
+  })();
+
+  // HoneyB facts — a 3-step segmented progress bar: the ACTIVE segment fills L->R over INTERVAL, then the
+  // single title/desc slide-swaps to the next fact and the next segment starts (past segments stay full).
+  // Hover pauses; click a segment to jump; off-screen resets to the first fact.
+  (function(){
+    var wrap = document.getElementById('hbFacts');
+    if (!wrap) return;
+    var segs = [].slice.call(wrap.querySelectorAll('.hb-seg'));
+    var fills = segs.map(function(s){ return s.querySelector('.hb-seg-fill'); });
+    var titleEl = document.getElementById('hbFactTitle'), descEl = document.getElementById('hbFactDesc');
+    if (!segs.length || !titleEl || !descEl) return;
+    var FACTS = [
+      { t: '$100T+ Fixed-Income Market', d: 'Access tokenized treasuries and credit.' },
+      { t: '2.5–5% Target APY', d: 'Backed by predictable cash flows.' },
+      { t: 'Bank-Grade Custody', d: 'Held by regulated custodians, audited, daily NAV.' }
+    ];
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var INTERVAL = 7000, cur = 0, elapsed = 0, last = 0, hovering = false, onScreen = false;
+    // slide a line up-and-out, swap the text, then up-and-in from below
+    function slide(el, txt){
+      el.style.opacity = '0'; el.style.transform = 'translateY(-14px)';
+      clearTimeout(el._st);
+      el._st = setTimeout(function(){
+        el.style.transition = 'none';
+        el.style.transform = 'translateY(14px)'; el.textContent = txt;
+        void el.offsetWidth;
+        el.style.transition = '';
+        el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+      }, 260);
+    }
+    function paint(){
+      fills.forEach(function(fl, i){
+        var v = i < cur ? 1 : (i === cur ? Math.min(1, elapsed / INTERVAL) : 0);
+        if (fl) fl.style.transform = 'scaleX(' + v.toFixed(3) + ')';
+      });
+    }
+    function show(i){
+      cur = (i + FACTS.length) % FACTS.length; elapsed = 0;
+      paint(); slide(titleEl, FACTS[cur].t); slide(descEl, FACTS[cur].d);
+    }
+    function tick(ts){
+      requestAnimationFrame(tick);
+      var dt = last ? ts - last : 0; last = ts;
+      if (reduce || hovering || !onScreen) return;      // frozen: segment holds, no advance
+      elapsed += dt;
+      if (elapsed >= INTERVAL) show(cur + 1); else paint();
+    }
+    // arrows step through the facts (the bars are display-only); auto-advance continues from there
+    var prevBtn = document.getElementById('hbFactPrev'), nextBtn = document.getElementById('hbFactNext');
+    if (nextBtn) nextBtn.addEventListener('click', function(){ show(cur + 1); last = 0; });
+    if (prevBtn) prevBtn.addEventListener('click', function(){ show(cur - 1); last = 0; });
+    wrap.addEventListener('mouseenter', function(){ hovering = true; });
+    wrap.addEventListener('mouseleave', function(){ hovering = false; last = 0; });
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){ entries.forEach(function(e){
+        if (e.isIntersecting){ onScreen = true; hovering = false; last = 0; }
+        else { onScreen = false; hovering = false; if (cur !== 0) show(0); }
+      }); }, { threshold: 0.3 }).observe(wrap);
+    } else { onScreen = true; }
+    paint();
+    if (!reduce) requestAnimationFrame(tick);
+  })();
+
+  // Guided by — PIN the section and advance Clarity -> Security -> Autonomy AS YOU SCROLL (snapped).
+  // Word + desc SLIDE up on change. The circle shows a grey disc for states without art yet; the
+  // Autonomy helm SPINS in and STEERS a few degrees on hover (desktop) / nudges on tap (touch) —
+  // subtle "hands on the wheel", never pulling focus from the message.
+  (function(){
+    var pills = [].slice.call(document.querySelectorAll('.gpill'));
+    var word = document.getElementById('gWord'), desc = document.getElementById('gDesc');
+    var circle = document.getElementById('gCircle'), disc = document.getElementById('gDisc');
+    var spins = [].slice.call(document.querySelectorAll('.guided-circle .gspin'));
+    var section = document.getElementById('guided');
+    if (!pills.length || !word || !desc || !circle || !section) return;
+    var STATES = [
+      { word: 'Clarity',  desc: 'Every position, every fee, every NAV published on-chain. No fog between you and your money.', art: 0 },
+      { word: 'Security', desc: 'Bank custody, independent audits, and daily NAV. Institutional rails at every layer of the stack.', art: 1 },
+      { word: 'Autonomy', desc: 'We believe you should be at the helm of your own finance. Your wallet, your course to chart.', art: 2 }
+    ];
+    var cur = -1;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // slide a line up-and-out, swap the text, then up-and-in from below
+    function slide(el, txt){
+      el.style.opacity = '0'; el.style.transform = 'translateY(-16px)';
+      clearTimeout(el._st);
+      el._st = setTimeout(function(){
+        el.style.transition = 'none';
+        el.style.transform = 'translateY(16px)'; el.textContent = txt;
+        void el.offsetWidth;                       // commit the jump-below with no transition
+        el.style.transition = '';                  // restore the CSS transition
+        el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+      }, 300);
+    }
+    function apply(i, instant){
+      if (i === cur) return;
+      cur = i;
+      var s = STATES[i];
+      pills.forEach(function(p, idx){ p.classList.toggle('on', idx === i); });
+      spins.forEach(function(sp){
+        var on = (+sp.dataset.art === s.art);
+        sp.classList.toggle('in', on);
+        var im = sp.querySelector('img'); if (im && !on) im.style.transform = '';   // clear stale steer on hidden layers
+      });
+      if (disc) disc.style.opacity = '0';       // every state now has its own icon; the disc is just the no-JS base
+      if (instant || reduce){ word.textContent = s.word; desc.textContent = s.desc;
+        word.style.opacity = desc.style.opacity = '1'; word.style.transform = desc.style.transform = 'none'; return; }
+      slide(word, s.word); slide(desc, s.desc);
+    }
+    apply(0, true);
+
+    // First-frame entrance: hold Clarity + its paragraph hidden, then SLIDE them up into view when the
+    // section first scrolls into frame — so state 0 animates in like states 1 & 2 do on change.
+    var animated = !reduce && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+    function revealIn(el){
+      el.style.transition = 'none';
+      el.style.opacity = '0'; el.style.transform = 'translateY(18px)';
+      void el.offsetWidth;                       // commit the hidden-below state with no transition
+      el.style.transition = '';                  // restore the CSS transition, then slide up in
+      el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+    }
+    function firstReveal(){ apply(0, true); revealIn(word); revealIn(desc); }   // ensure state 0, then slide it in
+    if (animated){ word.style.opacity = desc.style.opacity = '0'; word.style.transform = desc.style.transform = 'translateY(18px)'; }
+
+    // subtle steering of whichever icon is showing: follow the cursor a few degrees (desktop), nudge on tap (touch)
+    function activeArt(){ return circle.querySelector('.gspin.in img'); }
+    if (!reduce){
+      var MAX = 7;
+      if (window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+        circle.addEventListener('mousemove', function(e){
+          var g = activeArt(); if (!g) return;
+          var r = circle.getBoundingClientRect();
+          var dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+          g.style.transform = 'rotate(' + (Math.max(-1, Math.min(1, dx)) * MAX).toFixed(2) + 'deg)';
+        });
+        circle.addEventListener('mouseleave', function(){ var g = activeArt(); if (g) g.style.transform = 'rotate(0deg)'; });
+      } else {
+        var dir = 1;
+        circle.addEventListener('click', function(){
+          var g = activeArt(); if (!g) return;
+          g.style.transform = 'rotate(' + (dir * 12) + 'deg)'; dir *= -1;
+          clearTimeout(g._nt);
+          g._nt = setTimeout(function(){ g.style.transform = 'rotate(0deg)'; }, 480);
+        });
+      }
+    }
+
+    if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined'){
+      pills.forEach(function(p, idx){ p.addEventListener('click', function(){ apply(idx, true); }); });
+      return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+    // Slide state-0 (Clarity) + its paragraph in the first time the section comes into frame. Driven by
+    // onUpdate (fires reliably on every scroll frame — onEnter/IntersectionObserver both fired unreliably)
+    // over the range from "section entering the bottom" to "section at the top", gated to fire once at ~20%.
+    var revealedFirst = false;
+    ScrollTrigger.create({
+      trigger: section, start: 'top bottom', end: 'top top',
+      onUpdate: function(self){ if (!revealedFirst && self.progress > 0.2){ revealedFirst = true; firstReveal(); } }
+    });
+    // Tablet + mobile (<=1024px): no pin (the 3-col row doesn't fit, and scroll-pinning is janky on touch).
+    // Auto-cycle on a timer while on screen; tap pills. Desktop (>1024) keeps the pinned scroll-cycle below.
+    if (window.matchMedia('(max-width:1024px)').matches){
+      var mt = null;
+      function cycle(){ clearInterval(mt); mt = setInterval(function(){ apply((cur + 1) % STATES.length); }, 5000); }
+      pills.forEach(function(p, idx){ p.addEventListener('click', function(){ apply(idx); cycle(); }); });
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(function(entries){ entries.forEach(function(e){ if (e.isIntersecting) cycle(); else clearInterval(mt); }); }, { threshold: 0.4 }).observe(section);
+      } else { cycle(); }
+      return;
+    }
+    var st = ScrollTrigger.create({
+      trigger: section, start: 'top top', end: '+=200%', pin: true, anticipatePin: 1,
+      refreshPriority: 1,   // this pin adds 200vh of spacer — refresh it FIRST so triggers below it (CTA porthole) measure with that space accounted for
+      onUpdate: function(self){ apply(Math.min(STATES.length - 1, Math.floor(self.progress * STATES.length))); },
+      snap: { snapTo: 1 / (STATES.length - 1), duration: { min: 0.2, max: 0.6 }, delay: 0.04, ease: 'power1.inOut' }
+    });
+    pills.forEach(function(p, idx){
+      p.addEventListener('click', function(){
+        var y = st.start + (idx / (STATES.length - 1)) * (st.end - st.start);
+        if (window.__lenis) window.__lenis.scrollTo(y, { duration: 0.8 });
+        else window.scrollTo({ top: y, behavior: 'smooth' });
+      });
+    });
+  })();
+</script>
+</body>
+</html>
