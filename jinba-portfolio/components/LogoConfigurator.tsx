@@ -1,10 +1,12 @@
 "use client";
 
-// Logo configurator — family / mark / style / format / size, live SVG recolour,
-// PNG pre-rasterisation (keeps the download click synchronous for Safari), and
-// real file downloads. Ported from the prototype's app.js.
+// Logo configurator (Figma 296:865) — family / mark / style / format+size,
+// live SVG recolour, PNG pre-rasterisation (keeps the download click synchronous
+// for Safari), and real file downloads.
 import { useEffect, useRef, useState } from "react";
 import { FAMILIES, stylesFor, type MarkKey } from "@/lib/data";
+import Tag from "@/components/ui/Tag";
+import { DownloadIcon } from "@/components/ui/icons";
 
 const svgCache: Record<string, Promise<string>> = {};
 function getSvg(src: string): Promise<string> {
@@ -37,6 +39,12 @@ function saveBlob(blob: Blob, name: string) {
 
 const MARK_LABELS: Record<MarkKey, string> = { glyph: "Glyph", lockup: "Lockup", compact: "Compact" };
 const MARK_ORDER: MarkKey[] = ["glyph", "lockup", "compact"];
+const SIZES = [512, 1024, 2048];
+
+/** Control group label — 12px uppercase (Figma). */
+const CtlLabel = ({ children }: { children: React.ReactNode }) => (
+  <span className="text-label uppercase text-muted-2">{children}</span>
+);
 
 export default function LogoConfigurator() {
   const [fam, setFam] = useState("jinba");
@@ -44,7 +52,10 @@ export default function LogoConfigurator() {
   const [styleKey, setStyleKey] = useState("color");
   const [format, setFormat] = useState<"svg" | "png">("svg");
   const [size, setSize] = useState(1024);
+  const [sizeOpen, setSizeOpen] = useState(false);
   const [markHtml, setMarkHtml] = useState("");
+  const sizeRef = useRef<HTMLDivElement>(null);
+  const sizeBtn = useRef<HTMLButtonElement>(null);
 
   const family = FAMILIES[fam];
   const styles = stylesFor(fam);
@@ -94,6 +105,27 @@ export default function LogoConfigurator() {
     };
   }, [format, fileName, md.src, family.fill, st.hex, size]);
 
+  // close the size menu on outside click / Escape
+  useEffect(() => {
+    if (!sizeOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (sizeRef.current && !sizeRef.current.contains(e.target as Node)) setSizeOpen(false);
+    };
+    // Escape hands focus back to the trigger — closing unmounts the list, and
+    // without this the focused option vanishes and focus drops to <body>.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setSizeOpen(false);
+      sizeBtn.current?.focus();
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [sizeOpen]);
+
   function pickFam(k: string) {
     setFam(k);
     if (!FAMILIES[k].marks[mark]) setMark("glyph");
@@ -107,7 +139,6 @@ export default function LogoConfigurator() {
       } else if (pngReady.current.key === fileName && pngReady.current.blob) {
         saveBlob(pngReady.current.blob, fileName); // synchronous path
       } else {
-        // fall back: rasterise now, save when ready
         const raw = recolor(await getSvg(md.src), family.fill, st.hex);
         const url = URL.createObjectURL(new Blob([raw], { type: "image/svg+xml" }));
         const img = new Image();
@@ -127,19 +158,30 @@ export default function LogoConfigurator() {
     }
   }
 
+  const pillBase =
+    "inline-flex h-[42px] cursor-pointer items-center justify-center gap-2.5 rounded-full px-[18px] text-meta font-medium tracking-snug transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
+
   return (
-    <section className="px-edge py-16">
+    <section className="px-edge pb-section pt-16">
       <div className="statement">
         <div className="flex items-start gap-gutter max-[1200px]:gap-16 max-[1024px]:flex-col max-[1024px]:gap-11">
-          {/* left — filename + artboard */}
+          {/* left — tag + artboard */}
           <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[1200px]:w-[48%] max-[1024px]:w-full max-[1024px]:max-w-[596px] max-[860px]:max-w-none">
-            <span className="self-start rounded bg-chip px-[13.33px] py-2 font-mono text-meta font-medium text-muted-1">
-              {fileName}
-            </span>
+            <Tag>{fileName}</Tag>
             <div
-              className={`flex aspect-[596/532] w-full items-center justify-center overflow-hidden rounded-3xl transition-colors ${
+              className={`flex h-[532px] w-full items-center justify-center overflow-hidden rounded-3xl transition-colors max-[860px]:h-[380px] ${
                 st.dark ? "bg-[#252525]" : "bg-[#fafafa]"
               }`}
+              // dot grid — the artboard's resting surface (Figma)
+              style={
+                st.dark
+                  ? undefined
+                  : {
+                      backgroundImage: "radial-gradient(circle, #e3e3e3 1.5px, transparent 1.5px)",
+                      backgroundSize: "66px 66px",
+                      backgroundPosition: "center",
+                    }
+              }
             >
               <div
                 className="transition-[width] [&_img]:block [&_img]:h-auto [&_img]:w-full [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
@@ -151,42 +193,50 @@ export default function LogoConfigurator() {
 
           {/* right — controls */}
           <div className="flex min-w-0 flex-1 flex-col gap-16 max-[860px]:w-full">
-            {/* family tiles */}
-            <div className="flex flex-col gap-3.5">
-              <span className="text-label uppercase text-muted-2">Logo</span>
-              <div className="flex gap-6 max-[860px]:gap-3.5">
-                {Object.entries(FAMILIES).map(([k, f]) => (
-                  <button
-                    key={k}
-                    onClick={() => pickFam(k)}
-                    className="flex flex-col items-center gap-3 max-[860px]:min-w-0 max-[860px]:flex-1"
-                  >
-                    <span
-                      className={`flex h-[76px] w-[76px] items-center justify-center overflow-hidden rounded-lg border bg-white transition-shadow max-[860px]:h-auto max-[860px]:aspect-square max-[860px]:w-full max-[860px]:max-w-[76px] ${
-                        k === fam ? "border-ink shadow-[inset_0_0_0_1px_theme(colors.ink)]" : "border-line"
-                      }`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={f.thumb} alt={f.label} className="max-h-[66%] max-w-[66%] object-contain" />
-                    </span>
-                    <span className="text-body-sm font-light tracking-snug text-black">{f.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div className="flex flex-col gap-8">
-              {/* mark */}
+              {/* family tiles — 64px, fluid so they fit any column */}
               <div className="flex flex-col gap-3.5">
-                <span className="text-label uppercase text-muted-2">Mark</span>
-                <div className="flex w-full overflow-hidden rounded-lg border border-line">
-                  {MARK_ORDER.filter((m) => family.marks[m]).map((m) => (
+                <CtlLabel>Logo</CtlLabel>
+                <div className="flex gap-6 max-[860px]:gap-3.5">
+                  {Object.entries(FAMILIES).map(([k, f]) => (
+                    <button
+                      key={k}
+                      onClick={() => pickFam(k)}
+                      aria-pressed={k === fam}
+                      className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3"
+                    >
+                      <span
+                        className={`flex aspect-square w-full max-w-[64px] items-center justify-center overflow-hidden rounded-lg border bg-white transition-shadow ${
+                          k === fam ? "border-ink shadow-[inset_0_0_0_1px_theme(colors.ink)]" : "border-line"
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={f.thumb} alt={f.label} className="max-h-[46%] max-w-[46%] object-contain" />
+                      </span>
+                      <span className="text-body-sm font-light tracking-snug text-black">{f.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* mark — segmented */}
+              <div className="flex flex-col gap-3.5">
+                <CtlLabel>Brand Logo</CtlLabel>
+                {/* Segments hug their own label rather than splitting the row.
+                    Jinba has three formats and the sub-brands have two — with
+                    flex-1 the same "Glyph" segment was a third wide on one family
+                    and half on the next, so it resized under the cursor when you
+                    switched. Hugging keeps each label a fixed width across every
+                    family; only the control's overall length changes. */}
+                <div className="flex w-fit max-w-full overflow-hidden rounded-lg border border-line">
+                  {MARK_ORDER.filter((m) => family.marks[m]).map((m, i) => (
                     <button
                       key={m}
                       onClick={() => setMark(m)}
-                      className={`flex-1 border-0 px-[13.77px] py-4 text-meta font-medium tracking-snug transition-colors ${
-                        m === mark ? "bg-seg-on text-black" : "bg-white text-muted-1"
-                      }`}
+                      aria-pressed={m === mark}
+                      className={`shrink-0 cursor-pointer px-6 py-4 text-meta font-medium tracking-snug transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink ${
+                        i > 0 ? "border-l border-line" : ""
+                      } ${m === mark ? "bg-seg-on text-black" : "bg-white text-muted-3"}`}
                     >
                       {MARK_LABELS[m]}
                     </button>
@@ -196,14 +246,16 @@ export default function LogoConfigurator() {
 
               {/* styles */}
               <div className="flex flex-col gap-3.5">
-                <span className="text-label uppercase text-muted-2">Styles</span>
-                <div className="flex gap-2">
+                <CtlLabel>Styles</CtlLabel>
+                <div role="group" aria-label="Logo style" className="flex gap-2">
                   {styles.map((s) => (
                     <button
                       key={s.key}
                       onClick={() => setStyleKey(s.key)}
+                      aria-pressed={s.key === styleKey}
+                      aria-label={s.key === "color" ? `${family.label} brand color` : `${s.key} logo`}
                       title={s.key === "color" ? `${family.label} brand color` : s.key}
-                      className={`flex h-[42px] w-[42px] items-center justify-center rounded-full ${
+                      className={`flex h-[42px] w-[42px] cursor-pointer items-center justify-center rounded-full ${
                         s.key === styleKey ? "shadow-[inset_0_0_0_1.5px_theme(colors.ink)]" : ""
                       }`}
                     >
@@ -213,67 +265,98 @@ export default function LogoConfigurator() {
                 </div>
               </div>
 
-              {/* format */}
+              {/* format — SVG | PNG(size dropdown) */}
               <div className="flex flex-col gap-3.5">
-                <span className="text-label uppercase text-muted-2">Format</span>
-                <div className="flex flex-wrap gap-[11.65px]">
-                  {(["svg", "png"] as const).map((f) => (
+                <CtlLabel>Brand Logo</CtlLabel>
+                <div className="flex flex-wrap items-start gap-3">
+                  <button
+                    onClick={() => setFormat("svg")}
+                    aria-pressed={format === "svg"}
+                    className={`${pillBase} ${
+                      format === "svg" ? "bg-seg-on text-black" : "border border-line bg-white text-muted-3"
+                    }`}
+                  >
+                    SVG
+                  </button>
+
+                  <div ref={sizeRef} className="relative">
                     <button
-                      key={f}
-                      onClick={() => setFormat(f)}
-                      className={`rounded-full border px-[18px] py-3 text-meta font-medium tracking-snug transition-colors ${
-                        f === format ? "border-transparent bg-seg-on text-black" : "border-line bg-white text-muted-1"
+                      ref={sizeBtn}
+                      onClick={() => {
+                        setFormat("png");
+                        setSizeOpen((o) => !o);
+                      }}
+                      aria-pressed={format === "png"}
+                      aria-expanded={sizeOpen}
+                      aria-haspopup="listbox"
+                      className={`${pillBase} ${
+                        format === "png" ? "bg-seg-on text-black" : "border border-line bg-white text-muted-3"
                       }`}
                     >
-                      {f.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* size — png only */}
-              {format === "png" && (
-                <div className="flex flex-col gap-3.5">
-                  <span className="text-label uppercase text-muted-2">Size</span>
-                  <div className="flex flex-wrap gap-[11.65px]">
-                    {[
-                      [512, "S · 512"],
-                      [1024, "M · 1024"],
-                      [2048, "L · 2048"],
-                    ].map(([v, label]) => (
-                      <button
-                        key={v}
-                        onClick={() => setSize(v as number)}
-                        className={`rounded-full border px-[18px] py-3 text-meta font-medium tracking-snug transition-colors ${
-                          v === size ? "border-transparent bg-seg-on text-black" : "border-line bg-white text-muted-1"
-                        }`}
+                      PNG
+                      {format === "png" && <span className="font-mono text-label">{size}</span>}
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        fill="none"
+                        aria-hidden
+                        className={`transition-transform ${sizeOpen ? "rotate-180" : ""}`}
                       >
-                        {label}
-                      </button>
-                    ))}
+                        <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                      </svg>
+                    </button>
+
+                    {sizeOpen && (
+                      <ul
+                        role="listbox"
+                        aria-label="PNG size"
+                        className="absolute left-0 top-[calc(100%+6px)] z-20 min-w-[140px] overflow-hidden rounded-lg border border-line bg-white py-1 shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
+                      >
+                        {SIZES.map((v) => (
+                          <li key={v}>
+                            <button
+                              role="option"
+                              aria-selected={v === size}
+                              onClick={() => {
+                                setSize(v);
+                                setSizeOpen(false);
+                                sizeBtn.current?.focus();
+                              }}
+                              className={`flex w-full cursor-pointer items-center justify-between gap-4 px-3 py-2 text-left text-meta transition-colors hover:bg-chip ${
+                                v === size ? "font-medium text-ink" : "text-muted-1"
+                              }`}
+                            >
+                              {v} px
+                              {v === size && (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                                  <path
+                                    d="M2.4 6.3l2.4 2.3 4.8-5"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* download */}
-            <div className="flex gap-4">
-              <button
-                onClick={download}
-                className="flex flex-1 items-center justify-center gap-3 rounded-lg bg-ink px-10 py-5 text-[16px] font-medium tracking-snug text-white/90 transition-colors hover:bg-black"
-              >
-                Download
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="rotate-90">
-                  <path
-                    d="M2 5h6M5 2l3 3-3 3"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
+            {/* download — full-width dark pill */}
+            <button
+              onClick={download}
+              className="flex h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-nav-surface px-8 text-label text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            >
+              Download
+              <DownloadIcon />
+            </button>
           </div>
         </div>
       </div>

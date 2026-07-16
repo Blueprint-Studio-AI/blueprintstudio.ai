@@ -6,6 +6,8 @@ import { useState } from "react";
 import { PRIMARY, SECONDARY, type Swatch } from "@/lib/data";
 import { rgbStr, hslStr, contrast, bestInk, grade } from "@/lib/color";
 import { copyText } from "@/lib/clipboard";
+import ColorLineup from "@/components/ColorLineup";
+import Tag from "@/components/ui/Tag";
 
 const ALL = [...PRIMARY, ...SECONDARY];
 
@@ -40,16 +42,17 @@ export default function ColorSystem() {
     return (
       <div className="flex min-w-0 flex-1 flex-col gap-6">
         <div className="flex h-[108px] items-center justify-center overflow-hidden rounded-3xl border border-line-soft" style={{ background: bg }}>
-          <span className="font-serif text-[48px] leading-[1.13] tracking-snug" style={{ color: hex }}>
+          <span className="font-serif text-headline" style={{ color: hex }}>
             Aa
           </span>
         </div>
-        <div className="flex items-center justify-between gap-2.5">
+        {/* wraps rather than overflowing when the column is narrow */}
+        <div className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-1">
           <span className="whitespace-nowrap text-label uppercase text-muted-2">{label}</span>
           <span className="flex items-center gap-3">
             <span className="font-mono text-meta font-medium text-muted-1">{ratio.toFixed(2)}</span>
             <span
-              className={`rounded-md p-1 text-[12px] font-medium uppercase leading-[1.4] ${
+              className={`rounded-md p-1 text-label font-medium uppercase ${
                 g.pass ? "bg-grade-pass-bg text-grade-pass-fg" : "bg-grade-fail-bg text-grade-fail-fg"
               }`}
             >
@@ -62,14 +65,15 @@ export default function ColorSystem() {
   };
 
   return (
-    <section id="color-config" className="px-edge py-section">
-      <div className="statement">
-        <div className="flex items-start gap-gutter max-[860px]:flex-col max-[860px]:gap-10">
+    <section id="color-config" className="px-edge pb-section pt-16">
+      {/* 64px stack — Figma's auto-layout gap on this frame */}
+      <div className="statement !gap-16">
+        {/* 596 + a 128 gutter needs ~724px; below that the columns must give way
+            or the right one collapses to zero (same ladder as TypeSystem). */}
+        <div className="flex items-start gap-gutter max-[1200px]:gap-14 max-[1024px]:flex-col max-[1024px]:gap-11">
           {/* left */}
-          <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[860px]:w-full">
-            <span className="self-start rounded bg-chip px-[13.33px] py-2 font-mono text-meta font-medium text-muted-1">
-              jinba-{selected.name.toLowerCase()}
-            </span>
+          <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[1200px]:w-[46%] max-[1024px]:w-full">
+            <Tag>jinba-{selected.name.toLowerCase()}</Tag>
 
             <div
               className="flex h-[227px] flex-col items-end justify-between rounded-3xl p-8 transition-colors"
@@ -79,10 +83,10 @@ export default function ColorSystem() {
               }}
             >
               <div className="flex w-full flex-col leading-[1.4]">
-                <span className="text-[17.25px] tracking-[-0.345px]" style={{ color: roleInk }}>
+                <span className="text-body-lg" style={{ color: roleInk }}>
                   {selected.role}
                 </span>
-                <span className="font-serif text-[34.5px] tracking-[-0.69px]" style={{ color: nameInk }}>
+                <span className="font-serif text-display-sm" style={{ color: nameInk }}>
                   {selected.name}
                 </span>
               </div>
@@ -105,7 +109,7 @@ export default function ColorSystem() {
                     >
                       {sel && <span className="absolute inset-[3.5px] rounded-[18px]" style={bg} />}
                     </span>
-                    <span className="pl-1 text-[11px] leading-[1.2] text-[#2d2e36]">{s.name}</span>
+                    <span className="pl-1 text-micro text-[#2d2e36]">{s.name}</span>
                   </button>
                 );
               })}
@@ -113,7 +117,7 @@ export default function ColorSystem() {
           </div>
 
           {/* right */}
-          <div className="flex min-w-0 flex-1 flex-col gap-8">
+          <div className="flex min-w-0 flex-1 flex-col gap-8 max-[1024px]:w-full">
             <div className="flex flex-col gap-8">
               {values.map(([k, v]) => (
                 <div key={k} className="flex flex-col gap-3.5">
@@ -122,7 +126,7 @@ export default function ColorSystem() {
                     onClick={(e) => copyText(v, e.currentTarget)}
                     className="group inline-flex w-fit items-center gap-3"
                   >
-                    <span className="text-[18px] leading-[1.13] tracking-[-0.54px] text-ink group-hover:underline group-hover:underline-offset-[3px]">
+                    <span className="text-value text-ink group-hover:underline group-hover:underline-offset-[3px]">
                       {v}
                     </span>
                     <LinkIcon />
@@ -131,12 +135,17 @@ export default function ColorSystem() {
               ))}
             </div>
 
-            <div className="flex gap-6 max-[860px]:gap-4">
-              {contrastCard("On Light", "#fafafa", contrast(hex, "#FFFFFF"))}
-              {contrastCard("On Dark", "#1a1a1a", contrast(hex, "#1A1A1A"))}
+            {/* Ratio is measured against the swatch actually painted behind it —
+                these were reading #FFFFFF while showing #fafafa. */}
+            <div className="flex gap-6 max-[860px]:flex-col max-[860px]:gap-4">
+              {contrastCard("On Light", "#FAFAFA", contrast(hex, "#FAFAFA"))}
+              {contrastCard("On Dark", "#1A1A1A", contrast(hex, "#1A1A1A"))}
             </div>
           </div>
         </div>
+
+        {/* full token ramps — collapsible, inside the same construction lines */}
+        <ColorLineup />
       </div>
     </section>
   );

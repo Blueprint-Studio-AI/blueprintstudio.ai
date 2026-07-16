@@ -2,11 +2,10 @@
 
 export default function Overview() {
   return (
-    <section id="overview" className="flex flex-col gap-16 px-edge py-section">
-      <p className="text-eyebrow uppercase text-muted-2">Overview</p>
+    <section id="overview" className="px-edge py-section">
       <div className="flex items-start gap-gutter max-[1360px]:gap-24 max-[860px]:flex-col max-[860px]:gap-10">
         <div className="w-[596px] shrink-0 max-[1360px]:w-[45%] max-[1200px]:w-1/2 max-[860px]:w-full">
-          <h1 className="text-headline font-medium text-ink max-[860px]:text-[36px]">
+          <h1 className="text-headline font-medium text-ink max-[860px]:text-headline-mobile">
             One body, one mind.
             <br />
             <span className="text-faint">Horse and rider move as a single form.</span>

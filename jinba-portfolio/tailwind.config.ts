@@ -25,6 +25,7 @@ const config: Config = {
         chip: "#f5f5f5", // grey fill (filename tags, impl bg)
         "seg-on": "#e7e7e7", // active segment / inline-code bg
         signup: "#171717", // dark CTA
+        "nav-surface": "#353535", // dark pill fill (logo kit download)
         urushi: "#322014", // Jinba brand brown
         // sub-brand marks
         flow: "#2C50B5",
@@ -42,16 +43,24 @@ const config: Config = {
         serif: ['"Tiempos Text"', "Georgia", "serif"],
       },
       fontSize: {
-        // semantic scale — one source of truth for the whole page
-        eyebrow: ["13.5px", { lineHeight: "17.5px" }], // uppercase labels, numbers
-        label: ["12px", { lineHeight: "1.4" }], // control labels
-        meta: ["14px", { lineHeight: "1.4" }], // nav, tabs, pills, filenames, counts
-        "body-sm": ["13px", { lineHeight: "1.5" }],
+        // ── Semantic type scale — the ONLY sizes used on the page. ──────────
+        // Each step owns its leading + tracking so callers never hand-tune.
+        micro: ["11px", { lineHeight: "1.4", letterSpacing: "0.02em" }], // chip hex, asset meta
+        label: ["12px", { lineHeight: "1.4" }], // uppercase control labels
+        eyebrow: ["13.5px", { lineHeight: "17.5px" }], // section eyebrows + numbers
+        "body-sm": ["13px", { lineHeight: "1.5" }], // captions, small links
+        meta: ["14px", { lineHeight: "1.4", letterSpacing: "-0.01em" }], // tabs, buttons, counts
+        nav: ["16px", { lineHeight: "1.2", letterSpacing: "-0.04em" }], // nav links (Figma 296:829)
         body: ["16px", { lineHeight: "1.5", letterSpacing: "-0.02em" }],
-        "body-lg": ["18px", { lineHeight: "1.4", letterSpacing: "-0.02em" }],
+        "body-lg": ["18px", { lineHeight: "1.4", letterSpacing: "-0.02em" }], // lead copy
+        value: ["18px", { lineHeight: "1.13", letterSpacing: "-0.03em" }], // readouts (metrics, hex/rgb/hsl)
         "title-sm": ["20px", { lineHeight: "1.28", letterSpacing: "0.02em" }], // hero sub
+        "display-sm": ["34px", { lineHeight: "1.13", letterSpacing: "-0.02em" }], // colour name
+        promo: ["42px", { lineHeight: "1.13", letterSpacing: "-0.04em" }], // generator card (Figma 303:1204)
         title: ["32px", { lineHeight: "1.13", letterSpacing: "-0.03em" }], // section + impl titles
-        headline: ["48px", { lineHeight: "1.13", letterSpacing: "-0.01em" }], // overview
+        "title-mobile": ["30px", { lineHeight: "1.13", letterSpacing: "-0.03em" }],
+        headline: ["48px", { lineHeight: "1.13", letterSpacing: "-0.01em" }], // overview, contrast Aa
+        "headline-mobile": ["36px", { lineHeight: "1.13", letterSpacing: "-0.01em" }],
         specimen: ["64px", { lineHeight: "1.1" }], // type specimens / big Aa
       },
       letterSpacing: {

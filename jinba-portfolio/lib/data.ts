@@ -72,7 +72,7 @@ export const stylesFor = (famKey: string): StyleDot[] => [
 ];
 
 // Logo kit totals (the file manifest UI was retired; the count is fixed).
-export const KIT = { logoFiles: 30, logoZip: "228 KB", texZip: "50 MB" } as const;
+export const KIT = { logoFiles: 30, logoZip: "228 KB" } as const;
 
 /* ── Colour system ──────────────────────────────────────────────────── */
 export interface Swatch {
@@ -123,12 +123,15 @@ export const ACCENTS: Step[] = [["Flow", "#2C50B5"], ["App", "#A22727"], ["Toolb
 export type TypeRow = [label: string, size: number, lh: number, ls: string];
 export interface TypeFace {
   css: string;
+  /** who made the face — credited under the specimen (Figma 298:936) */
+  foundry: { name: string; href: string };
   base: { size: number; lh: number; ls: string };
   rows: TypeRow[];
 }
 export const TYPE: Record<"display" | "text", TypeFace> = {
   display: {
     css: '"Tiempos Text", serif',
+    foundry: { name: "Klim Type Foundry", href: "https://klim.co.nz/fonts/tiempos-text/" },
     base: { size: 64, lh: 1.1, ls: "-0.025em" },
     rows: [
       ["Headline", 60, 1.22, "-0.025em"],
@@ -140,6 +143,7 @@ export const TYPE: Record<"display" | "text", TypeFace> = {
   },
   text: {
     css: '"Geist", sans-serif',
+    foundry: { name: "Vercel", href: "https://vercel.com/font" },
     base: { size: 64, lh: 1.1, ls: "-0.025em" },
     rows: [
       ["Body Large", 18, 1.5, "0em"],
@@ -152,7 +156,7 @@ export const TYPE: Record<"display" | "text", TypeFace> = {
 };
 export const TYPE_DEFAULTS = { display: "Tiempos Text", text: "Geist Regular" } as const;
 
-/* ── Textures ───────────────────────────────────────────────────────── */
+/* ── Brand assets ───────────────────────────────────────────────────── */
 export type Texture = [name: string, file: string, dims: string, size: string];
 export const TEXTURES: Texture[] = [
   ["Brush 1", "brush-1.png", "2752×1536", "6.4 MB"],
@@ -166,13 +170,72 @@ export const TEXTURES: Texture[] = [
   ["Field 5", "field-5.png", "2752×1536", "6.9 MB"],
 ];
 
+export interface AssetCategory {
+  id: string;
+  label: string;
+  /** where the files live — empty categories have nothing to point at yet */
+  dir: string;
+  items: Texture[];
+}
+
+// Every category is drawn from work that already exists elsewhere on the page —
+// the sub-brand surfaces, the application samples, the product screens. The tab
+// still reads its own state from items[]: an empty category would mark itself
+// "Soon" rather than opening onto an empty panel.
+export const ASSET_CATEGORIES: AssetCategory[] = [
+  {
+    id: "textures",
+    label: "Textures",
+    dir: "/assets/textures/dl",
+    items: TEXTURES,
+  },
+  {
+    id: "materials",
+    label: "Materials",
+    dir: "/assets/textures",
+    items: [
+      ["Golden Turrell Field", "texture-1.png", "1920×1080", "146 KB"],
+      ["Brushed Grain", "texture-3.png", "3840×2160", "4.1 MB"],
+    ],
+  },
+  {
+    id: "mockups",
+    label: "Mockups",
+    dir: "/assets/samples",
+    items: [
+      ["Business Cards", "business-cards.png", "3840×2160", "8.5 MB"],
+      ["Stationery", "stationary.png", "3840×2160", "9.1 MB"],
+      ["Social Banners", "linkedin-banners.png", "3840×2160", "2.7 MB"],
+      ["Social Posts", "linkedin-posts.png", "3840×2160", "3.5 MB"],
+      ["Soft-focus Glyph", "logo-blur.png", "3840×2160", "91 KB"],
+    ],
+  },
+  {
+    id: "ui",
+    label: "UI Design",
+    dir: "/assets/samples",
+    items: [
+      ["Bento Grid", "website-bento.png", "3840×2160", "630 KB"],
+      ["Product Grid", "website-products-short.png", "2314×2160", "359 KB"],
+      ["Site Menu", "website-menu-short.png", "2314×2160", "350 KB"],
+      ["Article Page", "website-article.png", "3840×2160", "4.1 MB"],
+      ["Blog Index", "website-blog.png", "3840×2160", "6.4 MB"],
+    ],
+  },
+];
+
+/** Base for the generator hand-off; the section appends the brand + category. */
+export const ASSET_GEN = "https://blueprintstudio.ai/asset-generator";
+
 /* ── Design Applications galleries ──────────────────────────────────── */
 export interface Sample {
   src: string;
   alt: string;
   caption: string;
 }
-export const GALLERIES: Record<"logo" | "type" | "textures", Sample[]> = {
+// Brand Assets has no rail of its own — the grid already shows every asset in
+// full, so a second scroller of the same work was redundant.
+export const GALLERIES: Record<"logo" | "type", Sample[]> = {
   logo: [
     { src: "/assets/samples/business-cards.png", alt: "Business cards", caption: "Compact lockup on business cards" },
     { src: "/assets/samples/stationary.png", alt: "Stationery", caption: "Lockup on letterhead and stationery" },
@@ -183,25 +246,23 @@ export const GALLERIES: Record<"logo" | "type" | "textures", Sample[]> = {
     { src: "/assets/samples/website-bento.png", alt: "Product overview", caption: "The scale at work in product marketing" },
     { src: "/assets/samples/website-products-short.png", alt: "Product grid", caption: "Geist carrying dense product UI" },
   ],
-  textures: [
-    { src: "/assets/samples/linkedin-posts.png", alt: "Social posts", caption: "Fields behind social storytelling" },
-    { src: "/assets/samples/website-menu-short.png", alt: "Site menu", caption: "Texture grounding the site menu" },
-  ],
 };
 
 /* ── Section nav ────────────────────────────────────────────────────── */
+// Short labels per Figma 300:1072 — the nav says Type/Assets/Doc even though the
+// sections themselves are titled Type System / Texture System / Implementation.
 export const SECTIONS = [
   { id: "logo", label: "Logo" },
   { id: "color", label: "Color" },
-  { id: "type", label: "Typography" },
-  { id: "textures", label: "Textures" },
-  { id: "implementation", label: "Implementation" },
+  { id: "type", label: "Type" },
+  { id: "assets", label: "Assets" },
+  { id: "implementation", label: "Doc" },
 ] as const;
 
 // Derived counts (single source of truth).
 export const META = {
   logo: `${KIT.logoFiles} files · ${KIT.logoZip}`,
   color: `${PRIMARY.length + SECONDARY.length} colors · ${LINEUP.light.Brand.length} steps`,
-  type: `${Object.keys(TYPE).length} typefaces`,
-  textures: `${TEXTURES.length} textures · ${KIT.texZip}`,
+  type: `${Object.keys(TYPE).length} Fonts · ${Object.values(TYPE).reduce((n, f) => n + f.rows.length, 0)} Styles`,
+  assets: `${ASSET_CATEGORIES.reduce((n, c) => n + c.items.length, 0)} Assets · ${ASSET_CATEGORIES.length} Asset Styles`,
 };

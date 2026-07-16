@@ -79,7 +79,7 @@ export default function Implementation() {
             <li key={s.num} className="flex gap-6 border-b border-line pb-6 pt-8">
               <span className="w-4 shrink-0 text-eyebrow text-muted-2">{s.num}</span>
               <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-                <h3 className="text-[18px] font-medium leading-[1.13] tracking-heading text-ink">{s.title}</h3>
+                <h3 className="text-value font-medium text-ink">{s.title}</h3>
                 {s.body}
               </div>
             </li>

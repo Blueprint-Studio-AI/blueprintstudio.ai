@@ -32,18 +32,45 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    scroll-behavior: smooth;
+  }
+  /* Smooth anchor jumps are a long travel on a page this tall — only for people
+     who haven't asked the OS to stop moving things. */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
   body {
     @apply bg-white text-ink font-sans;
   }
-  /* anchor offset so sticky tabbar never covers a section heading */
-  section[id] { scroll-margin-top: 72px; }
+  /* anchor offset so the sticky tabbar never covers a section heading */
+  section[id] { scroll-margin-top: 100px; }
+
+  /* One focus ring for every interactive element — including the custom-shaped
+     ones (paint chips, ramp rows, swatches, style dots) that don't route
+     through the Button primitive. Keyboard users get a consistent target.
+     The type specimens are the exception: a ring around a 64px headline reads
+     as a border, so they highlight like selected text instead (TypeSystem). */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid theme(colors.ink);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
   /* Construction lines — dashed vertical rules with gradient-faded ends and a
-     42px content inset. Wraps every interactive block ("pull assets here"). */
+     42px content inset. Wraps every interactive block ("pull assets here").
+     Stroke is 1:1 with Figma 296:865: 0.971px inside, dashed, painted with a
+     linear gradient (transparent → #9E9E9E at 20% → #9E9E9E at 80% →
+     transparent) at 33% opacity. The dash comes from the background, the fade
+     from the mask, and `opacity` stands in for Figma's stroke opacity. */
   .statement {
     @apply relative flex flex-col;
     padding: 24px 42px;
@@ -55,16 +82,21 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 1px;
+    width: 0.971px;
     pointer-events: none;
-    background: repeating-linear-gradient(to bottom, rgba(56, 56, 56, 0.42) 0 4px, transparent 4px 9px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    opacity: 0.33;
+    background: repeating-linear-gradient(to bottom, #9e9e9e 0 4px, transparent 4px 9px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
   }
   .statement::before { left: 0; }
   .statement::after { right: 0; }
+  /* Mobile: drop the construction lines and their inset — screen real estate
+     matters more there than the "pull assets here" framing. */
   @media (max-width: 860px) {
-    .statement { padding: 20px 24px; }
+    .statement { padding: 20px 0; }
+    .statement::before,
+    .statement::after { display: none; }
   }
 
   /* Blinking fake caret on the editable type specimens (hidden while focused). */
@@ -92,6 +124,7 @@
   .px-edge { padding-left: var(--edge); padding-right: var(--edge); }
   .px-edge-nav { padding-left: var(--edge-nav); padding-right: var(--edge-nav); }
   .pl-edge { padding-left: var(--edge); }
+  .ml-edge { margin-left: var(--edge); }
 
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
