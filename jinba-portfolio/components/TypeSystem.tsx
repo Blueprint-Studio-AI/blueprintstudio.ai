@@ -85,8 +85,8 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
         specRef.current.textContent = t.slice(0, -1);
         setTimeout(del, ERASE_MS);
       } else {
-        setApplied(face.base);
-        setActiveRow(null);
+        // Restore the TEXT only. Size belongs to the ramp — resetting it here is
+        // what used to clobber a row pick a beat after the user made it.
         typeIn(0);
       }
     };
@@ -111,11 +111,11 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
   ];
 
   const pickRow = (row: TypeRow, i: number) => {
-    // Cancel any running auto-rewrite. Without this its delete phase finishes and
-    // resets applied/activeRow to the base size, silently throwing away the row
-    // the user just clicked.
+    // Cancel any running auto-rewrite so the pick isn't clobbered mid-animation,
+    // then RE-arm the idle timer (a bare clearTimeout here permanently disarmed
+    // the text restore). Safe now that the restore no longer touches size.
     animTok.current = {};
-    clearTimeout(idleTimer.current);
+    armIdle();
     const [, size, lh, ls] = row;
     setApplied({ size, lh, ls });
     setActiveRow(i);

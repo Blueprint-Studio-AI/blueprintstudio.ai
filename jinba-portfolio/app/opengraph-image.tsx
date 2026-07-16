@@ -9,14 +9,15 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Jinba — Brand Identity, Design System, Logo System, 2026";
 
-const dataUri = async (rel: string, mime: string) =>
-  `data:${mime};base64,${(await readFile(join(process.cwd(), "public", rel))).toString("base64")}`;
-
+// Literal paths at the readFile call sites — a path built from a function
+// parameter can evade Vercel's file tracing if this route ever goes dynamic.
 export default async function Image() {
-  const [bg, lockup] = await Promise.all([
-    dataUri("assets/hero.jpg", "image/jpeg"),
-    dataUri("assets/dl/lockup-white.png", "image/png"),
+  const [heroBytes, lockupBytes] = await Promise.all([
+    readFile(join(process.cwd(), "public/assets/hero.jpg")),
+    readFile(join(process.cwd(), "public/assets/dl/lockup-white.png")),
   ]);
+  const bg = `data:image/jpeg;base64,${heroBytes.toString("base64")}`;
+  const lockup = `data:image/png;base64,${lockupBytes.toString("base64")}`;
 
   return new ImageResponse(
     (

@@ -80,30 +80,22 @@ export interface Swatch {
   name: string;
   bg: string;
   inspect: string;
-  labelInk: string;
-  hexInk: string;
-  hexes: string[];
-  grad?: boolean;
 }
 
 export const PRIMARY: Swatch[] = [
-  { role: "Primary", name: "Urushi", bg: "#322014", inspect: "#322014", labelInk: "#F4F1EB", hexInk: "#F4F1EB", hexes: ["#322014"] },
-  { role: "Primary", name: "Kuri", bg: "#5A3921", inspect: "#5A3921", labelInk: "#FAF8F3", hexInk: "#FAF8F3", hexes: ["#5A3921"] },
+  { role: "Primary", name: "Urushi", bg: "#322014", inspect: "#322014" },
+  { role: "Primary", name: "Kuri", bg: "#5A3921", inspect: "#5A3921" },
   {
     role: "Primary",
     name: "Haku",
     bg: "linear-gradient(180deg,#B78D62 0%,#C5A681 43.75%,#7E4E2D 80.3%,#52321B 100%)",
     inspect: "#7E4E2D",
-    labelInk: "#322014",
-    hexInk: "#FAF8F3",
-    hexes: ["#52321B", "#7E4E2D", "#B78D62", "#C5A681"],
-    grad: true,
   },
 ];
 export const SECONDARY: Swatch[] = [
-  { role: "Secondary", name: "Tsuchi", bg: "#C5A681", inspect: "#C5A681", labelInk: "#322014", hexInk: "#322014", hexes: ["#C5A681"] },
-  { role: "Secondary", name: "Suna", bg: "#EFEEE8", inspect: "#EFEEE8", labelInk: "#5A3921", hexInk: "#5A3921", hexes: ["#EFEEE8"] },
-  { role: "Secondary", name: "Kami", bg: "#F5F4F2", inspect: "#F5F4F2", labelInk: "#5A3921", hexInk: "#5A3921", hexes: ["#F5F4F2"] },
+  { role: "Secondary", name: "Tsuchi", bg: "#C5A681", inspect: "#C5A681" },
+  { role: "Secondary", name: "Suna", bg: "#EFEEE8", inspect: "#EFEEE8" },
+  { role: "Secondary", name: "Kami", bg: "#F5F4F2", inspect: "#F5F4F2" },
 ];
 
 export type Step = [string, string]; // [label, hex]

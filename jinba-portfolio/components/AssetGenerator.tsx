@@ -1,3 +1,5 @@
+"use client";
+
 // The generator hand-off (Figma 303:1204) — the one place the page points off
 // itself.
 //
@@ -6,12 +8,32 @@
 // whose bugs land in the pitch, and a prospect who generated something here
 // would have no reason to click through. The video shows the real product doing
 // the real thing; the only live control on the card is the CTA.
+import { useEffect, useRef, useState } from "react";
 import { ASSET_GEN, type AssetCategory } from "@/lib/data";
 import Button from "@/components/ui/Button";
 
 export default function AssetGenerator({ category }: { category: AssetCategory }) {
   // hand the platform the context the visitor already chose
   const href = `${ASSET_GEN}?brand=jinba&category=${category.id}`;
+
+  // Mount the <video> only once the card approaches the viewport. autoplay
+  // overrides preload="none" — the browser starts range-fetching the 4.1MB file
+  // on page load even with the card far below the fold (verified in the network
+  // log). An element that doesn't exist can't be fetched.
+  const stage = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || near) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) setNear(true);
+      },
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
 
   return (
     <div
@@ -57,21 +79,24 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
 
       {/* The product, recorded. Square source in a shorter frame, so it crops top
           and bottom rather than letterboxing — same as the Figma. */}
-      <div className="flex h-[551px] min-w-0 basis-1/2 items-center overflow-hidden py-[42px] max-[1024px]:order-1 max-[1024px]:h-auto max-[1024px]:w-full max-[1024px]:basis-auto max-[860px]:py-6">
-        {/* preload="none": 4.1MB near the bottom of a page most visitors never
-            reach. Browsers hold autoplay until the element is near the viewport,
-            so the fetch rides that rather than the initial load. A poster frame
-            would make the placeholder nicer — needs an ffmpeg export. */}
-        <video
-          src="/assets/video/jinba-assetgen.mp4"
-          preload="none"
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden
-          className="aspect-square w-full min-w-0 flex-1 object-cover"
-        />
+      <div
+        ref={stage}
+        className="flex h-[551px] min-w-0 basis-1/2 items-center overflow-hidden py-[42px] max-[1024px]:order-1 max-[1024px]:h-auto max-[1024px]:w-full max-[1024px]:basis-auto max-[860px]:py-6"
+      >
+        {near ? (
+          <video
+            src="/assets/video/jinba-assetgen.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            aria-hidden
+            className="aspect-square w-full min-w-0 flex-1 object-cover"
+          />
+        ) : (
+          // same footprint as the video, so nothing shifts when it mounts
+          <div aria-hidden className="aspect-square w-full min-w-0 flex-1" />
+        )}
       </div>
     </div>
   );

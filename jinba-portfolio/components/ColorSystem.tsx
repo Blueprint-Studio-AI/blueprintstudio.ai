@@ -75,12 +75,13 @@ export default function ColorSystem() {
           <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[1200px]:w-[46%] max-[1024px]:w-full">
             <Tag>jinba-{selected.name.toLowerCase()}</Tag>
 
+            {/* One property, not two. `background` takes a hex and a
+                linear-gradient() alike, so branching to backgroundImage only
+                meant React rewrote a shorthand and a longhand against each other
+                on every swatch change. */}
             <div
               className="flex h-[227px] flex-col items-end justify-between rounded-3xl p-8 transition-colors"
-              style={{
-                background: selected.grad ? undefined : selected.bg,
-                backgroundImage: selected.grad ? selected.bg : undefined,
-              }}
+              style={{ background: selected.bg }}
             >
               <div className="flex w-full flex-col leading-[1.4]">
                 <span className="text-body-lg" style={{ color: roleInk }}>
@@ -98,7 +99,7 @@ export default function ColorSystem() {
             <div className="flex gap-3">
               {ALL.map((s) => {
                 const sel = s.name === selected.name;
-                const bg = s.grad ? { backgroundImage: s.bg } : { background: s.bg };
+                const bg = { background: s.bg };
                 return (
                   <button key={s.name} onClick={() => setSelected(s)} className="flex min-w-0 flex-1 flex-col gap-3.5 text-left">
                     <span

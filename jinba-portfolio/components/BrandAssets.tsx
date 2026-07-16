@@ -70,7 +70,9 @@ export default function BrandAssets() {
                 alt={name}
                 width={816}
                 height={510}
-                sizes="(max-width: 860px) 100vw, 33vw"
+                // 360px, not 33vw: the frame caps at 1440, so a grid column never
+                // exceeds ~350px CSS no matter how wide the monitor is
+                sizes="(max-width: 860px) 100vw, 360px"
                 className="aspect-[16/10] w-full rounded-lg bg-[#f4f1eb] object-cover"
               />
               <figcaption className="flex items-baseline justify-between gap-2.5">
