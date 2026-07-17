@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
  * The single button primitive for the page.
  *
  * Role → variant (never pick a style for looks, pick it for the job):
- *   solid    primary action           Download
+ *   solid    primary action           Download, Get Access
+ *   soft     secondary beside a solid light-grey fill, lower emphasis (Learn More)
  *   glass    CTA on a dark surface    nav CTA over the hero art
  *   pill     selectable / section CTA format + size filters, Download Zip, Get Tiempos
  *   ghost    low-emphasis navigation  nav links, inline text actions
@@ -14,7 +15,7 @@ import type { ReactNode } from "react";
  * Size → sm 32px · md 40px · lg 56px · xl 62px. Radius is a property of the
  * variant, never chosen ad-hoc. Every variant gets the same focus-visible ring.
  */
-export type ButtonVariant = "solid" | "glass" | "pill" | "ghost" | "chip" | "segment";
+export type ButtonVariant = "solid" | "soft" | "glass" | "pill" | "ghost" | "chip" | "segment";
 export type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 const BASE =
@@ -24,6 +25,8 @@ const BASE =
 
 const VARIANT: Record<ButtonVariant, string> = {
   solid: "rounded-lg bg-ink font-medium text-white/90 hover:bg-black",
+  // light-grey secondary that pairs beside a solid without competing (Figma 305:1273)
+  soft: "rounded-lg bg-[#e4e4e4] font-medium text-[#707070] hover:bg-[#d8d8d8] hover:text-ink",
   // translucent — reads on dark/photographic surfaces without punching a hole
   // in them (Figma 300:1072)
   glass: "rounded-full bg-white/10 font-medium text-white hover:bg-white/20 focus-visible:outline-white",

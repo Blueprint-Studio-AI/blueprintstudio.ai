@@ -125,6 +125,7 @@
   .px-edge-nav { padding-left: var(--edge-nav); padding-right: var(--edge-nav); }
   .pl-edge { padding-left: var(--edge); }
   .ml-edge { margin-left: var(--edge); }
+  .mx-edge { margin-left: var(--edge); margin-right: var(--edge); }
 
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }

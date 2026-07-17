@@ -7,14 +7,14 @@
 // would mean a second surface to keep alive (auth, quota, queue, failure states)
 // whose bugs land in the pitch, and a prospect who generated something here
 // would have no reason to click through. The video shows the real product doing
-// the real thing; the only live control on the card is the CTA.
+// the real thing; the only live controls are the two CTAs (request / learn more).
 import { useEffect, useRef, useState } from "react";
-import { ASSET_GEN, type AssetCategory } from "@/lib/data";
+import { ASSET_GEN, ASSET_GEN_REQUEST, type AssetCategory } from "@/lib/data";
 import Button from "@/components/ui/Button";
 
 export default function AssetGenerator({ category }: { category: AssetCategory }) {
-  // hand the platform the context the visitor already chose
-  const href = `${ASSET_GEN}?brand=jinba&category=${category.id}`;
+  // learn-more carries the context the visitor already chose
+  const learnMore = `${ASSET_GEN}?brand=jinba&category=${category.id}`;
 
   // Mount the <video> only once the card approaches the viewport. autoplay
   // overrides preload="none" — the browser starts range-fetching the 4.1MB file
@@ -62,18 +62,25 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
 
             <div className="flex w-full flex-col gap-6">
               <h3 className="text-promo font-medium text-ink max-[860px]:text-title">
-                <span className="text-faint">Elevate your brand with</span> high quality assets.
+                <span className="text-faint">Elevate your brand with</span>{" "}
+                high quality assets.
               </h3>
               <p className="text-body-lg text-body">
-                Every brand we build comes with access to our asset generator, trained on your palette, type, and
-                textures.
+                These styles come from a model trained on your palette, type, and textures. Built for the whole team,
+                request access to your company account and start generating.
               </p>
             </div>
           </div>
 
-          <Button variant="solid" size="xl" href={href} external className="!rounded self-start">
-            Visit Asset Generator
-          </Button>
+          {/* Two doors, equal halves: teammates get access, everyone else reads on. */}
+          <div className="flex w-full gap-[23px] max-[860px]:flex-col">
+            <Button variant="solid" size="xl" href={ASSET_GEN_REQUEST} className="!rounded flex-1">
+              Get Access
+            </Button>
+            <Button variant="soft" size="xl" href={learnMore} external className="!rounded flex-1">
+              Learn More
+            </Button>
+          </div>
         </div>
       </div>
 

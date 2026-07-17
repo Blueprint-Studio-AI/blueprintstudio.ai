@@ -216,8 +216,13 @@ export const ASSET_CATEGORIES: AssetCategory[] = [
   },
 ];
 
-/** Base for the generator hand-off; the section appends the brand + category. */
-export const ASSET_GEN = "https://blueprintstudio.ai/asset-generator";
+// Generator hand-off. Two audiences, two doors: teammates request access to the
+// shared account (a real V0 mailto — no access backend to fake), prospects read
+// on. The section appends the brand + category the visitor already chose.
+export const ASSET_GEN = "https://tools.blueprintstudio.ai/asset-generator";
+export const ASSET_GEN_REQUEST =
+  "mailto:blueprint.dao@gmail.com?subject=Asset%20Generator%20access%20%E2%80%94%20Jinba" +
+  "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Jinba%20asset%20generator%20account.%0A%0AName%3A%0ATeam%20(Jinba%20%2F%20HoneyB)%3A%0AWork%20email%3A%0A";
 
 /* ── Design Applications galleries ──────────────────────────────────── */
 export interface Sample {
