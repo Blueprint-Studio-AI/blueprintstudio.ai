@@ -53,9 +53,12 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-, "app/tools/roast-my-site/layout.tsx", "app/tools/roast-my-site/page.tsx"  ],
+    ".next/dev/types/**/*.ts",
+    "app/tools/roast-my-site/layout.tsx",
+    "app/tools/roast-my-site/page.tsx"
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "jinba-portfolio"
   ]
 }
