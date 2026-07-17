@@ -2,6 +2,7 @@
 // (components/Footer) for the standalone review app. When this page becomes a
 // route in the main site, swap this file for a direct import of that component.
 import Newsletter from "@/components/footer/Newsletter";
+import BlueprintWordmark from "@/components/ui/BlueprintWordmark";
 
 // The footer keeps the main site's own spacing, not the portfolio's --edge
 // frame: full width, content at 84px (60px section + 24px inner) on desktop and
@@ -108,8 +109,7 @@ export default function Footer() {
       {/* wordmark — natural height, as the site renders it */}
       <div className={`${PAD} pt-16 md:pt-28`}>
         <a href="https://blueprintstudio.ai" aria-label="Blueprint Studio" className="inline-block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/blueprint-logo.svg" alt="Blueprint Studio" className="h-[46px] w-auto grayscale md:h-[84px]" />
+          <BlueprintWordmark className="h-[46px] md:h-[84px]" />
         </a>
       </div>
 

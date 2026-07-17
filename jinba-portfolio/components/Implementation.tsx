@@ -71,7 +71,7 @@ export default function Implementation() {
   const panelId = useId();
 
   return (
-    <section id="implementation" className="bg-chip px-edge pt-section pb-40">
+    <section id="implementation" className="bg-chip px-edge py-section">
       <div className="flex max-w-measure flex-col gap-10">
         <div className="flex flex-col gap-7">
           <h2 className="text-title font-medium text-ink">Implementation</h2>

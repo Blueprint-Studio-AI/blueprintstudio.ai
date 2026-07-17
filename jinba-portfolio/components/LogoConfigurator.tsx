@@ -197,13 +197,16 @@ export default function LogoConfigurator() {
               {/* family tiles — 64px, fluid so they fit any column */}
               <div className="flex flex-col gap-3.5">
                 <CtlLabel>Logo</CtlLabel>
-                <div className="flex gap-6 max-[860px]:gap-3.5">
+                {/* fixed 24px gap between fixed-width tiles (was flex-1, which
+                    auto-distributed them across the column). Tiles drop to 56px
+                    on phones so the 24px gap still fits. */}
+                <div className="flex gap-6">
                   {Object.entries(FAMILIES).map(([k, f]) => (
                     <button
                       key={k}
                       onClick={() => pickFam(k)}
                       aria-pressed={k === fam}
-                      className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3"
+                      className="flex w-16 shrink-0 flex-col items-center justify-center gap-3 max-[600px]:w-14"
                     >
                       <span
                         className={`flex aspect-square w-full max-w-[64px] items-center justify-center overflow-hidden rounded-lg border bg-white transition-shadow ${

@@ -91,12 +91,10 @@
   }
   .statement::before { left: 0; }
   .statement::after { right: 0; }
-  /* Mobile: drop the construction lines and their inset — screen real estate
-     matters more there than the "pull assets here" framing. */
+  /* Mobile keeps the construction lines but tightens the inset to 16px (vs 42
+     on desktop) so the interactive content keeps its width on a narrow screen. */
   @media (max-width: 860px) {
-    .statement { padding: 20px 0; }
-    .statement::before,
-    .statement::after { display: none; }
+    .statement { padding: 20px 16px; }
   }
 
   /* Blinking fake caret on the editable type specimens (hidden while focused). */

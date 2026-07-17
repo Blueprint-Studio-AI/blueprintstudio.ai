@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { SECTIONS } from "@/lib/data";
 import Button from "@/components/ui/Button";
 import { DownloadIcon } from "@/components/ui/icons";
+import BlueprintWordmark from "@/components/ui/BlueprintWordmark";
 
 const SITE = "https://blueprintstudio.ai";
 const KIT = "/downloads/jinba-brand-kit.zip";
@@ -69,7 +70,7 @@ export default function Nav() {
         <div
           // py is symmetric so the row sits on the bar's true centre — the Figma's
           // 32/24 split pushed the logo and CTA visibly low
-          className="pointer-events-auto flex items-center justify-between gap-6 rounded-3xl border border-solid px-8 py-5 max-[860px]:flex-wrap max-[860px]:gap-x-3 max-[860px]:gap-y-2 max-[860px]:px-4 max-[860px]:py-3"
+          className="pointer-events-auto flex items-center justify-between gap-6 rounded-3xl border border-solid px-8 py-5 max-[860px]:flex-wrap max-[860px]:gap-x-3 max-[860px]:gap-y-3 max-[860px]:px-4 max-[860px]:py-3.5"
           style={{
             // every surface property rides the same progress value.
             // 0.76 is the glass: dark enough to hold white text at ~8.9:1 even
@@ -82,14 +83,8 @@ export default function Nav() {
             WebkitBackdropFilter: "blur(calc(24px * var(--nav-p, 0)))",
           }}
         >
-          <a
-            href={SITE}
-            aria-label="Blueprint Studio"
-            className="flex h-[18px] w-[136px] shrink-0 items-center max-[860px]:order-1"
-          >
-            {/* the lockup is dark artwork — force it white for the hero + dark bar */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/blueprint-studio-nav.png" alt="" className="h-[18px] w-auto brightness-0 invert" />
+          <a href={SITE} aria-label="Blueprint Studio" className="flex h-[18px] shrink-0 items-center max-[860px]:order-1">
+            <BlueprintWordmark className="h-[18px]" />
           </a>
 
           {/* Even 112px segments with a continuous rule beneath; active turns

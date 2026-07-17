@@ -53,9 +53,10 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
                 the client's voice, so it wears the studio's name rather than
                 borrowing the brand's — which is what lets the copy speak
                 generally enough for a prospect to see themselves in it. */}
-            <div className="flex items-center gap-[18px]">
+            <div className="flex items-center gap-[14px]">
+              {/* color wordmark SVG — the card sits on a light surface */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/blueprint-studio-nav.png" alt="Blueprint Studio" className="h-[18px] w-auto" />
+              <img src="/assets/blueprint-logo-color.svg" alt="Blueprint Studio" className="h-[18px] w-auto" />
               <span aria-hidden className="h-[18px] w-[1.5px] shrink-0 bg-[rgba(230,230,230,0.8)]" />
               <span className="whitespace-nowrap text-label uppercase text-muted-1">Asset Generator</span>
             </div>
@@ -72,12 +73,26 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
             </div>
           </div>
 
-          {/* Two doors, equal halves: teammates get access, everyone else reads on. */}
-          <div className="flex w-full gap-[23px] max-[860px]:flex-col">
-            <Button variant="solid" size="xl" href={ASSET_GEN_REQUEST} className="!rounded flex-1">
+          {/* Two doors, equal halves on desktop; full-width stacked on mobile.
+              flex-none on mobile is load-bearing: flex-1 in the column collapses
+              each button to its text height (~25px) because flex-basis:0 beats
+              the h-[62px]. flex-none restores the natural height, w-full the width. */}
+          <div className="flex w-full gap-[23px] max-[860px]:flex-col max-[860px]:gap-3">
+            <Button
+              variant="solid"
+              size="xl"
+              href={ASSET_GEN_REQUEST}
+              className="!rounded flex-1 max-[860px]:w-full max-[860px]:flex-none"
+            >
               Get Access
             </Button>
-            <Button variant="soft" size="xl" href={learnMore} external className="!rounded flex-1">
+            <Button
+              variant="soft"
+              size="xl"
+              href={learnMore}
+              external
+              className="!rounded flex-1 max-[860px]:w-full max-[860px]:flex-none"
+            >
               Learn More
             </Button>
           </div>
