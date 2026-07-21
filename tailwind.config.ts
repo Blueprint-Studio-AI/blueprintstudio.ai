@@ -28,6 +28,10 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        // /brands/jinba: Geist gets scoped onto the page via .jinba-root; mono
+        // and serif are safe to add globally (nothing else uses them)
+        mono: ["var(--font-geist-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
+        serif: ['"Tiempos Text"', "Georgia", "serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -62,6 +66,40 @@ const config: Config = {
         "logo-scroll-reverse": "logo-scroll-reverse 60s linear infinite",
         "gallery-scroll": "gallery-scroll 80s linear infinite",
         "gallery-scroll-reverse": "gallery-scroll-reverse 80s linear infinite",
+        caret: "caret 1.1s steps(1) infinite",
+      },
+      // ── /brands/jinba type scale + spacing (additive) ──
+      fontSize: {
+        micro: ["11px", { lineHeight: "1.4", letterSpacing: "0.02em" }],
+        label: ["12px", { lineHeight: "1.4" }],
+        eyebrow: ["13.5px", { lineHeight: "17.5px" }],
+        "body-sm": ["13px", { lineHeight: "1.5" }],
+        meta: ["14px", { lineHeight: "1.4", letterSpacing: "-0.01em" }],
+        nav: ["16px", { lineHeight: "1.2", letterSpacing: "-0.04em" }],
+        body: ["16px", { lineHeight: "1.5", letterSpacing: "-0.02em" }],
+        "body-lg": ["18px", { lineHeight: "1.4", letterSpacing: "-0.02em" }],
+        value: ["18px", { lineHeight: "1.13", letterSpacing: "-0.03em" }],
+        "title-sm": ["20px", { lineHeight: "1.28", letterSpacing: "0.02em" }],
+        "display-sm": ["34px", { lineHeight: "1.13", letterSpacing: "-0.02em" }],
+        promo: ["42px", { lineHeight: "1.13", letterSpacing: "-0.04em" }],
+        title: ["32px", { lineHeight: "1.13", letterSpacing: "-0.03em" }],
+        "title-mobile": ["30px", { lineHeight: "1.13", letterSpacing: "-0.03em" }],
+        headline: ["48px", { lineHeight: "1.13", letterSpacing: "-0.01em" }],
+        "headline-mobile": ["36px", { lineHeight: "1.13", letterSpacing: "-0.01em" }],
+        specimen: ["64px", { lineHeight: "1.1" }],
+      },
+      letterSpacing: {
+        heading: "-0.03em",
+        snug: "-0.02em",
+        title: "-0.01em",
+      },
+      spacing: {
+        section: "86px",
+        gutter: "128px",
+      },
+      maxWidth: {
+        frame: "1440px",
+        measure: "582px",
       },
       colors: {
         neutral: {
@@ -100,6 +138,10 @@ const config: Config = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
+          // /brands/jinba scale (merged, not overriding the site's muted)
+          1: "#737373",
+          2: "#808080",
+          3: "#8c8c8c",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
@@ -113,6 +155,23 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // ── /brands/jinba brand-kit tokens (additive; only used on that route) ──
+        ink: "#252525",
+        body: "#5e5e5e",
+        faint: "#bebfc2",
+        line: { DEFAULT: "#dfdfdf", soft: "#ececec" },
+        chip: "#f5f5f5",
+        "seg-on": "#e7e7e7",
+        signup: "#171717",
+        "nav-surface": "#353535",
+        urushi: "#322014",
+        flow: "#2C50B5",
+        toolbox: "#7D95A1",
+        app: "#A22727",
+        "grade-pass-bg": "#e5f1e8",
+        "grade-pass-fg": "#066d3f",
+        "grade-fail-bg": "#f5ecec",
+        "grade-fail-fg": "#a4575a",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
