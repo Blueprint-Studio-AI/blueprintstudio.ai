@@ -24,16 +24,21 @@ export const honeyb: BrandConfig = {
   name: "HoneyB",
   brandInk: "#14161F", // Neutral 500
 
+  // Figma 316:27 — the comb is a horizon along the bottom that dissolves up into
+  // a flat cream field, so the lockup reads on colour, not on artwork.
   hero: {
     image: `${B}/hero/honeyb-hero-background.png`,
     lockup: `${B}/logos/honeyb-lockup.svg`,
-    tagline: "Brand Identity · Design System · Logo System · 2026",
-    // Light honeycomb art — no dark scrim, and the tagline takes a grey ink.
     overlay: null,
-    taglineColor: "#64656A", // Neutral 300
+    background: "#F8F8F5",
+    art: "band",
+    artHeight: "46%", // 334 of the 730 frame
+    lockupWidth: "402px", // brandmark + gap + wordmark, measured off 316:27
   },
-  // …which also means the nav keeps its dark surface from the top.
-  navAlwaysSolid: true,
+  // The cream field means the nav can start as dark ink on nothing and cross to
+  // white as the bar materialises — the Jinba morph, rather than a black bar
+  // pinned on from the first pixel.
+  navOnLight: true,
 
   overview: {
     headline: "Bitcoin, made approachable.",
@@ -43,6 +48,8 @@ export const honeyb: BrandConfig = {
       "Gold carries the value, grey carries the hierarchy. The palette balances the technical nature of Bitcoin with approachability, and the system is built to stay legible across digital and print alike.",
     ],
   },
+
+  links: [{ label: "honeybtc.com", href: "https://www.honeybtc.com" }],
 
   // Dashed rules measured off each mark, rather than a static dot grid.
   logoGrid: "construction",
@@ -172,6 +179,18 @@ export const honeyb: BrandConfig = {
       ],
     },
     {
+      id: "social",
+      label: "Social",
+      dir: `${B}/social`,
+      // Source filenames kept verbatim so re-copying from the brand-kit folder
+      // is a straight overwrite with no rename step to forget.
+      items: [
+        ["Banner Artwork", "HoneyB-LinkedIn-banners.png", "3840×2160", "877 KB"],
+        ["LinkedIn Page", "HoneyB-LinkedIn-banner-mockup.png", "1920×1080", "471 KB"],
+        ["X Profile", "HoneyB-X-banner-mockup.png", "1920×1080", "592 KB"],
+      ],
+    },
+    {
       id: "ui",
       label: "UI Design",
       dir: `${B}/ui`,
@@ -189,6 +208,11 @@ export const honeyb: BrandConfig = {
   // screen reader) ever gets from these — it carries the asset's name.
   galleries: {
     logo: [
+      // Social leads. This is where the mark works hardest AS a mark — cropped to
+      // an avatar tile at the smallest size anyone will ever see it — so it makes
+      // the better opening argument than another screen with the logo on it.
+      { src: `${B}/social/HoneyB-LinkedIn-banners.png`, alt: "Social banner artwork, two treatments", caption: "The glyph as an avatar tile" },
+      { src: `${B}/social/HoneyB-LinkedIn-banner-mockup.png`, alt: "HoneyB LinkedIn company page", caption: "The banner in place on LinkedIn" },
       { src: `${B}/mockups/honeyb-mockup-1.png`, alt: "Homepage on a desktop display", caption: "The lockup in context" },
       { src: `${B}/mockups/honeyb-mockup-2.png`, alt: "Vault dashboard on an iMac", caption: "The mark inside the product" },
       { src: `${B}/mockups/honeyb-mockup-4.png`, alt: "Homepage on a laptop", caption: "The lockup at reading distance" },
@@ -211,42 +235,14 @@ export const honeyb: BrandConfig = {
     ],
   },
 
-  implementation: {
-    intro: [
-      "The system ships as tokens: `Shades of Gold` for value, `Shades of Grey` for hierarchy.",
-      "New surfaces integrate the palette and type scale manually until the shared package lands.",
-    ],
-    steps: [
-      {
-        title: "Adopt the palette",
-        body: [
-          "Define the six golds and five neutrals as CSS custom properties. `Liquid-Gold` (#F47000) is the brand's single accent — everything else supports it.",
-        ],
-      },
-      {
-        title: "Load the typefaces",
-        body: [
-          "Both faces are on Google Fonts: `Poly` for display and `Inter` for text. Load them once at the app root and expose them as `--font-display` and `--font-text`.",
-        ],
-      },
-      {
-        title: "Apply the type scale",
-        body: [
-          "Headings 1–3 use Poly at 68 / 48 / 30px. Body Large through Link Text use Inter at 26 / 18 / 15 / 16px. Line heights are baked into the scale — don't hand-tune them per surface.",
-        ],
-      },
-      {
-        title: "Use the logo correctly",
-        body: [
-          "The glyph, lockup and compact marks are single-fill SVGs, so they recolour cleanly to black, light or white. Never re-draw the mark or apply effects to it.",
-        ],
-      },
-    ],
-    roadmapTitle: "Toward a shared package",
-    roadmap: [
-      "The mature form is a published package — `@honeyb/design-system` — that any surface installs as a dependency, shipping tokens, scale and primitives as one versioned artifact.",
-      "Because the tokens are plain CSS custom properties, they drop into any system that consumes CSS variables — no Tailwind requirement, no framework lock-in.",
-    ],
+
+  // Public build of HoneyB's DESIGN.md — generated by scripts/build-agent-doc.mjs
+  // from the brand-kit repo. Regenerate whenever the source doc changes.
+  agentDoc: {
+    file: `${B}/design/honeyb-design.md`,
+    title: "Design system for coding agents",
+    blurb:
+      "The whole system as one Markdown file — tokens, type scale, component specs, motion and voice, per surface. Paste it into your coding agent and prompt “build X following this”.",
   },
 
   generator: {
@@ -256,17 +252,19 @@ export const honeyb: BrandConfig = {
       "mailto:blueprint.dao@gmail.com?subject=Asset%20Generator%20access%20%E2%80%94%20HoneyB" +
       "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20HoneyB%20asset%20generator%20account.%0A%0AName%3A%0ATeam%3A%0AWork%20email%3A%0A",
   },
+  // Only the bundles that exist. The all-assets and full-kit zips would be
+  // ~38 MB each of binaries in git, so they're deliberately not built yet —
+  // omitting them hides their buttons rather than shipping 404s.
   downloads: {
     logos: `${B}/downloads/honeyb-logos.zip`,
     tokens: `${B}/downloads/honeyb-tokens.css`,
-    assets: `${B}/downloads/honeyb-assets.zip`,
-    kit: `${B}/downloads/honeyb-brand-kit.zip`,
   },
+  downloadLabels: { logos: "Logo system", tokens: "Design tokens (CSS)" },
   sections: [
     { id: "logo", label: "Logo" },
     { id: "color", label: "Color" },
     { id: "type", label: "Type" },
     { id: "assets", label: "Assets" },
-    { id: "implementation", label: "Doc" },
+    { id: "downloads", label: "Files" },
   ],
 };

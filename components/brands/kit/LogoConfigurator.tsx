@@ -7,6 +7,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 import { stylesFor, type MarkKey } from "@/components/brands/kit/types";
 import Tag from "@/components/brands/kit/ui/Tag";
+import { useToast } from "@/components/brands/kit/ui/Toast";
 import { DownloadIcon } from "@/components/brands/kit/ui/icons";
 
 const svgCache: Record<string, Promise<string>> = {};
@@ -205,6 +206,7 @@ const CtlLabel = ({ children }: { children: React.ReactNode }) => (
 
 export default function LogoConfigurator() {
   const brand = useBrand();
+  const toast = useToast();
   const FAMILIES = brand.families;
   const [fam, setFam] = useState(() => Object.keys(brand.families)[0]);
   const [mark, setMark] = useState<MarkKey>("glyph");
@@ -330,6 +332,7 @@ export default function LogoConfigurator() {
   }
 
   async function download() {
+    toast(`Downloading ${fileName}`);
     try {
       if (format === "svg") {
         const raw = await getSvg(md.src);
@@ -434,8 +437,11 @@ export default function LogoConfigurator() {
             </div>
           </div>
 
-          {/* right — controls */}
-          <div className="flex min-w-0 flex-1 flex-col gap-16 max-[860px]:w-full">
+          {/* right — controls. self-center, not items-center on the row: the
+              artboard is 532px and the controls ~380px, so top-aligning them
+              left a column of dead space under the Download button. Centring
+              the stack against the artboard closes it. */}
+          <div className="flex min-w-0 flex-1 flex-col gap-16 self-center max-[1024px]:self-stretch max-[860px]:w-full">
             <div className="flex flex-col gap-8">
               {/* family tiles — 64px, fluid so they fit any column.
                   A single-family brand (HoneyB) has nothing to choose between,

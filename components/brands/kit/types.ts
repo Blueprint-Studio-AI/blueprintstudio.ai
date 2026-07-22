@@ -80,7 +80,8 @@ export interface BrandConfig {
   hero: {
     image: string;
     lockup: string;
-    tagline: string;
+    /** Optional line under the lockup. Omit for a lockup-only hero. */
+    tagline?: string;
     /**
      * Scrim over the art. Dark heroes need one so the nav's white text has a
      * floor; light heroes (e.g. HoneyB's honeycomb) pass null.
@@ -88,6 +89,22 @@ export interface BrandConfig {
     overlay?: string | null;
     /** tagline ink — light heroes need a dark one */
     taglineColor?: string;
+    /** The field the art sits on. Defaults to `brandInk`. */
+    background?: string;
+    /**
+     * "cover" (default) — art fills the hero, Jinba-style.
+     * "band"  — art sits along the bottom and fades up into the field, so the
+     *           lockup reads on flat colour rather than on the artwork.
+     */
+    art?: "cover" | "band";
+    /** band only: how much of the hero's height the art occupies */
+    artHeight?: string;
+    /** lockup width at desktop */
+    lockupWidth?: string;
+    /** hero height, e.g. "75vh" or "730px". Defaults to the original 730px. */
+    height?: string;
+    /** floor for a viewport-relative height, so it can't collapse */
+    minHeight?: string;
   };
   /**
    * Light-hero brands keep the nav's dark surface from the top, because white
@@ -95,6 +112,13 @@ export interface BrandConfig {
    * let the bar materialise on scroll.
    */
   navAlwaysSolid?: boolean;
+  /**
+   * The other answer for a light hero: instead of pinning the dark bar on, the
+   * nav starts as DARK ink on no surface and its ink, rules and CTA all cross
+   * over to white as the bar materialises. Lets a pale hero keep the Jinba
+   * morph rather than wearing a black bar from the first pixel.
+   */
+  navOnLight?: boolean;
   overview: {
     /** first line, full-strength */
     headline: string;
@@ -111,6 +135,12 @@ export interface BrandConfig {
    *   They re-derive whenever the mark changes, so nothing is hand-placed.
    */
   logoGrid?: "dots" | "construction";
+
+  /**
+   * Where the brand lives in the wild — live site now, product surfaces later.
+   * Rendered under the overview copy; omit and nothing shows.
+   */
+  links?: { label: string; href: string }[];
 
   families: Record<string, Family>;
   /** monochrome treatments shared by every family */
@@ -137,13 +167,13 @@ export interface BrandConfig {
   /** Design-in-context rails. `color` is optional — omit it and none renders. */
   galleries: Record<"logo" | "type", Sample[]> & { color?: Sample[] };
 
-  /** Text may use `backticks` for inline code. */
-  implementation: {
-    intro: string[];
-    steps: { title: string; body: string[] }[];
-    roadmapTitle: string;
-    roadmap: string[];
-  };
+
+  /**
+   * A machine-readable design system a coding agent can be handed directly.
+   * `file` MUST be a public build — see scripts/build-agent-doc.mjs. Brands
+   * without one simply omit this and the block doesn't render.
+   */
+  agentDoc?: { file: string; title: string; blurb: string };
 
   generator: {
     learnMore: string;
@@ -151,7 +181,14 @@ export interface BrandConfig {
     /** screen recording of the generator; omitted brands render copy-only */
     video?: string;
   };
-  downloads: { logos: string; tokens: string; assets: string; kit: string };
+  /**
+   * Only the bundles that actually exist. A missing key hides its control
+   * everywhere — section pill, Downloads list, and the nav's "Download All" —
+   * rather than shipping a button that 404s.
+   */
+  downloads: Partial<Record<"logos" | "tokens" | "assets" | "kit", string>>;
+  /** Human labels for the Downloads list, keyed the same as `downloads`. */
+  downloadLabels?: Partial<Record<"logos" | "tokens" | "assets" | "kit", string>>;
   sections: { id: string; label: string }[];
 }
 

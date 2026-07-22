@@ -6,8 +6,16 @@ export function flash(el: HTMLElement) {
   setTimeout(() => el.classList.remove("copied"), 700);
 }
 
-export function copyText(text: string, el?: HTMLElement | null) {
-  const done = () => el && flash(el);
+/**
+ * Resolves true only if the text actually reached the clipboard. Callers that
+ * just want the flash can ignore the result; a caller showing a "Copied"
+ * confirmation should await it, so a blocked write doesn't report success.
+ */
+export function copyText(text: string, el?: HTMLElement | null): Promise<boolean> {
+  const done = () => {
+    if (el) flash(el);
+    return true;
+  };
   const fallback = () => {
     const ta = document.createElement("textarea");
     ta.value = text;
@@ -15,17 +23,17 @@ export function copyText(text: string, el?: HTMLElement | null) {
     ta.style.opacity = "0";
     document.body.appendChild(ta);
     ta.select();
+    let ok = false;
     try {
-      document.execCommand("copy");
-      done();
+      ok = document.execCommand("copy");
     } catch {
-      /* ignore */
+      ok = false;
     }
     ta.remove();
+    return ok ? done() : false;
   };
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(done).catch(fallback);
-  } else {
-    fallback();
+    return navigator.clipboard.writeText(text).then(done).catch(fallback);
   }
+  return Promise.resolve(fallback());
 }

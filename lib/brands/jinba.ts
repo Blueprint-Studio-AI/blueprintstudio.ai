@@ -23,7 +23,6 @@ export const jinba: BrandConfig = {
   hero: {
     image: "/brands/jinba/card-bg.png",
     lockup: "/brands/jinba/dl/lockup-white.png",
-    tagline: "Brand Identity · Design System · Logo System · 2026",
   },
   overview: {
     headline: "One body, one mind.",
@@ -191,43 +190,14 @@ export const jinba: BrandConfig = {
     ],
   },
 
-  implementation: {
-    intro: [
-      "The system is live in `jinba-landing`.",
-      "New surfaces (Flow, App, Toolbox) need to integrate the design system manually.",
-    ],
-    steps: [
-      {
-        title: "Copy the style files",
-        body: [
-          "From `jinba-landing/apps/landing/src/styles/`, copy `scales.css` · `tokens.css` · `theme.css`. Import them in order in the global CSS entry point.",
-        ],
-      },
-      {
-        title: "Load the fonts",
-        body: [
-          "Add the Google Fonts import for `Geist`: `fonts.googleapis.com/css2?family=Geist:wght@100..900`",
-          "Copy `/fonts/tiempos-text-*.woff2` into the new repo's public folder and add the `@font-face` blocks from `global.css`.",
-        ],
-      },
-      {
-        title: "Apply heading defaults",
-        body: [
-          "Copy the `@layer base` block from `global.css` that sets h1–h4 sizing, tracking, and font-family, plus the line-height overrides below it.",
-        ],
-      },
-      {
-        title: "Wire Tailwind",
-        body: [
-          "Reference `theme.css` with `@theme inline`. This exposes `bg-background`, `text-foreground`, `text-sand-*`, etc. as utilities that adapt to light and dark mode automatically.",
-        ],
-      },
-    ],
-    roadmapTitle: "Toward a shared package",
-    roadmap: [
-      "The current setup copies files between repos. The mature form is a published NPM package — `@jinba/design-system` — that any surface installs as a dependency. Tokens, scales, and component primitives ship as one versioned artifact. New products get the full system with a single `npm install`.",
-      "The token files are plain CSS custom properties, which makes them compatible with any design system that consumes CSS variables. Teams using Radix Themes, Primer, or Carbon can remap those systems' theme variables to Jinba's tokens — or ignore the Tailwind wiring entirely and reference the tokens directly in their own setup.",
-    ],
+
+  // Generated from this config by lib/brands/doc.ts — see the route at
+  // app/brands/jinba/jinba-design.md. Derived, so it can't drift from the page.
+  agentDoc: {
+    file: "/brands/jinba/jinba-design.md",
+    title: "Design system for coding agents",
+    blurb:
+      "The system as one Markdown file — colour tokens, the type scale and the logo rules, generated from this page. Paste it into your coding agent and prompt \u201cbuild X following this\u201d.",
   },
 
   generator: {
@@ -237,17 +207,17 @@ export const jinba: BrandConfig = {
       "mailto:blueprint.dao@gmail.com?subject=Asset%20Generator%20access%20%E2%80%94%20Jinba" +
       "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Jinba%20asset%20generator%20account.%0A%0AName%3A%0ATeam%3A%0AWork%20email%3A%0A",
   },
+  // Textures and full-kit zips aren't built yet — omitted so they don't 404.
   downloads: {
     logos: "/downloads/jinba-logos.zip",
     tokens: "/downloads/jinba-tokens.css",
-    assets: "/downloads/jinba-textures.zip",
-    kit: "/downloads/jinba-brand-kit.zip",
   },
+  downloadLabels: { logos: "Logo system", tokens: "Design tokens (CSS)" },
   sections: [
     { id: "logo", label: "Logo" },
     { id: "color", label: "Color" },
     { id: "type", label: "Type" },
     { id: "assets", label: "Assets" },
-    { id: "implementation", label: "Doc" },
+    { id: "downloads", label: "Files" },
   ],
 };

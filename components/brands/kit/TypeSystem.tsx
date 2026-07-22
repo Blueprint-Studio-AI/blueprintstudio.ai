@@ -160,7 +160,7 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
                 // the edge and you were typing blind. `auto` lets the browser
                 // keep the caret in view (and scroll back), and no-scrollbar
                 // keeps the specimen looking like type rather than a form field.
-                className={`caret no-scrollbar w-fit max-w-full cursor-text overflow-x-auto whitespace-nowrap pr-0.5 leading-[1.1] outline-none max-[860px]:!text-headline-mobile ${
+                className={`caret no-scrollbar -my-3 w-fit max-w-full cursor-text overflow-x-auto whitespace-nowrap py-3 pr-0.5 leading-[1.1] outline-none max-[860px]:!text-headline-mobile ${
                   serif ? "font-serif" : "font-sans font-normal"
                 }`}
                 style={{
@@ -199,8 +199,11 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
             </p>
           </div>
 
-          {/* right — size ramp (click a row to apply it to the specimen) */}
-          <div className="min-w-0 flex-1">
+          {/* right — size ramp (click a row to apply it to the specimen).
+              self-center, not items-center on the row: the left column is a
+              top-aligned stack (specimen → metrics → credit) and should stay
+              that way, while the ramp centres against it. */}
+          <div className="min-w-0 flex-1 self-center max-[1024px]:self-stretch">
             <p className="mb-3 flex items-center gap-1.5 text-micro uppercase text-muted-3">
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden className="shrink-0">
                 <path d="M3.5 2.2l9 5-3.9 1.15L6.6 13 3.5 2.2z" fill="currentColor" />

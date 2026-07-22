@@ -68,6 +68,9 @@ export interface ButtonProps {
   /** only meaningful without href — lets callers flash the copy confirmation */
   ref?: React.Ref<HTMLButtonElement>;
   className?: string;
+  /** escape hatch for values that can't be a class — e.g. a colour that
+      interpolates on a CSS variable (see the nav's light-hero morph) */
+  style?: React.CSSProperties;
   children: ReactNode;
   "aria-label"?: string;
   "aria-pressed"?: boolean;
@@ -83,6 +86,7 @@ export default function Button({
   onClick,
   ref,
   className = "",
+  style,
   children,
   ...aria
 }: ButtonProps) {
@@ -94,13 +98,13 @@ export default function Button({
   if (href) {
     const extra = external ? { target: "_blank", rel: "noopener noreferrer" } : download ? { download: true } : {};
     return (
-      <a href={href} onClick={onClick} className={cls} {...extra} {...aria}>
+      <a href={href} onClick={onClick} className={cls} style={style} {...extra} {...aria}>
         {children}
       </a>
     );
   }
   return (
-    <button ref={ref} onClick={onClick} className={cls} {...aria}>
+    <button ref={ref} onClick={onClick} className={cls} style={style} {...aria}>
       {children}
     </button>
   );

@@ -22,6 +22,24 @@ export default function Gallery({ items }: { items: Sample[] }) {
     rail.current?.scrollBy({ left: dir * (682 + 64), behavior: "smooth" });
   };
 
+  /**
+   * Scroll card `i` to the rail's leading edge.
+   *
+   * Deliberately NOT scrollIntoView: that scrolls every scrollable ancestor,
+   * so clicking a card would also yank the PAGE to centre the rail. Setting
+   * scrollLeft on the rail alone moves the card and nothing else.
+   */
+  const bring = (i: number) => {
+    const el = rail.current;
+    const card = el?.children[i] as HTMLElement | undefined;
+    if (!el || !card) return;
+    // offsetLeft is relative to the rail's padding box, and the rail's left
+    // padding is the deliberate inset — subtracting it keeps the card sitting
+    // where the first card sits at rest, rather than jammed against the edge.
+    const inset = parseFloat(getComputedStyle(el).paddingLeft) || 0;
+    el.scrollTo({ left: Math.max(0, card.offsetLeft - inset), behavior: "smooth" });
+  };
+
   // Rewind the rail once it's fully out of frame, so scrolling back to a section
   // finds it at the start with its caret restored — rather than parked wherever
   // it was left, which reads as a half-used control.
@@ -56,19 +74,38 @@ export default function Gallery({ items }: { items: Sample[] }) {
           role="group"
           aria-label="Design in context — use arrow keys to scroll"
           onScroll={(e) => setScrolled(e.currentTarget.scrollLeft > 8)}
-          className="no-scrollbar flex items-center gap-16 overflow-x-auto scroll-smooth pl-[calc(var(--edge)_+_128px)] pr-[calc(var(--edge)_+_184px)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink max-[860px]:gap-6 max-[860px]:pl-edge max-[860px]:pr-12"
+          // py-7/-my-7 is a clipping fix, not spacing: setting overflow-x makes
+          // overflow-y compute to auto, so a card's hover lift and shadow would
+          // be cropped by the rail (and could trip a vertical scrollbar). The
+          // padding gives them room inside the scroll box; the equal negative
+          // margin pulls the box back so the section's rhythm is untouched.
+          className="no-scrollbar -my-7 flex items-center gap-16 overflow-x-auto scroll-smooth py-7 pl-[calc(var(--edge)_+_128px)] pr-[calc(var(--edge)_+_184px)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink max-[860px]:gap-6 max-[860px]:pl-edge max-[860px]:pr-12"
         >
-          {items.map((s) => (
+          {items.map((s, i) => (
             <figure key={s.src} className="m-0 shrink-0">
-              {/* the samples are 3840x2160 originals — resize/re-encode them */}
-              <Image
-                src={s.src}
-                alt={s.alt}
-                width={1364}
-                height={766}
-                sizes="(max-width: 860px) 82vw, 682px"
-                className="h-[383px] w-[682px] max-w-[82vw] rounded-2xl bg-[#f4f1eb] object-cover max-[860px]:h-[240px] max-[860px]:w-[82vw]"
-              />
+              {/* Clicking a card pulls it into frame. Scrolling was the only way
+                  to reach the rail's tail, which meant a half-visible card at the
+                  edge looked interactive but wasn't. A real <button> keeps it on
+                  the keyboard path and gives it a name. */}
+              <button
+                type="button"
+                onClick={() => bring(i)}
+                aria-label={`Show ${s.alt}`}
+                // Same gesture as the paint chips, scaled to the object: a chip
+                // is 149px and lifts 16, a card is 383px and lifts 6. Any more
+                // and a frame this size reads as floating rather than nudged.
+                className="block cursor-pointer rounded-2xl transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1.5 hover:shadow-[0_16px_36px_-14px_rgba(20,22,31,0.30)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink max-[860px]:hover:translate-y-0 max-[860px]:hover:shadow-none"
+              >
+                {/* the samples are 3840x2160 originals — resize/re-encode them */}
+                <Image
+                  src={s.src}
+                  alt={s.alt}
+                  width={1364}
+                  height={766}
+                  sizes="(max-width: 860px) 82vw, 682px"
+                  className="h-[383px] w-[682px] max-w-[82vw] rounded-2xl bg-[#f4f1eb] object-cover max-[860px]:h-[240px] max-[860px]:w-[82vw]"
+                />
+              </button>
             </figure>
           ))}
         </div>

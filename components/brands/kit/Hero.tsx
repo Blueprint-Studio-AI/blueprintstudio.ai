@@ -16,10 +16,18 @@ import { useBrand } from "@/components/brands/kit/BrandContext";
 const DARK_SCRIM =
   "linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(23,23,23,0.63) 15.129%, rgba(102,102,102,0) 50%)";
 
+/**
+ * Band art fades out toward its top edge. Figma models this as a near-white veil
+ * over the art (transparent at the art's foot, opaque by 98% up); a mask is the
+ * same result without hard-coding a veil colour that has to match the field.
+ */
+const MASK = "linear-gradient(to top, #000 0%, #000 25%, transparent 97%)";
+
 export default function Hero() {
   const { hero, name, brandInk } = useBrand();
   // `overlay` defaults to the dark scrim; pass null for a light hero.
   const overlay = hero.overlay === undefined ? DARK_SCRIM : hero.overlay;
+  const band = hero.art === "band";
   const section = useRef<HTMLElement>(null);
   const inner = useRef<HTMLDivElement>(null);
 
@@ -64,26 +72,61 @@ export default function Hero() {
       ref={section}
       // sticky, not fixed: it keeps its place in flow, so the sheet below starts
       // exactly where the hero ends and no spacer is needed.
-      className="sticky top-0 z-0 h-[730px] w-full overflow-hidden motion-reduce:relative max-[860px]:h-[560px]"
-      style={{ backgroundColor: brandInk }}
+      // Height is per-brand: a viewport-relative hero scales with the window,
+      // a fixed one stays a slab. minHeight is the floor that stops a vh value
+      // collapsing on a short laptop screen.
+      className="sticky top-0 z-0 w-full overflow-hidden motion-reduce:relative"
+      style={{
+        backgroundColor: hero.background ?? brandInk,
+        height: hero.height ?? "730px",
+        minHeight: hero.minHeight,
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={hero.image}
-        alt=""
-        aria-hidden
-        className="absolute left-0 top-[-7.82%] h-[111.01%] w-full max-w-none object-cover"
-      />
+      {band ? (
+        // Band: the art is a horizon along the bottom that dissolves upward into
+        // the flat field, so the lockup sits on colour rather than on artwork.
+        // multiply + 66% is what keeps the comb from reading as a photograph
+        // pasted on — it tints the field instead of covering it.
+        <img
+          src={hero.image}
+          alt=""
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 w-full max-w-none object-cover object-bottom"
+          style={{
+            height: hero.artHeight ?? "46%",
+            filter: "blur(2.3px)",
+            mixBlendMode: "multiply",
+            opacity: 0.66,
+            maskImage: MASK,
+            WebkitMaskImage: MASK,
+          }}
+        />
+      ) : (
+        <img
+          src={hero.image}
+          alt=""
+          aria-hidden
+          className="absolute left-0 top-[-7.82%] h-[111.01%] w-full max-w-none object-cover"
+        />
+      )}
       {overlay && <div aria-hidden className="absolute inset-0" style={{ background: overlay }} />}
       <div ref={inner} className="relative flex h-full flex-col items-center justify-center gap-8 will-change-[transform,opacity]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={hero.lockup} alt={name} className="w-[373px] max-w-[78%] max-[860px]:w-[260px]" />
-        <p
-          className="max-w-[575px] text-balance px-6 text-center text-title-sm font-light"
-          style={{ color: hero.taglineColor ?? "#faf8f3" }}
-        >
-          {hero.tagline}
-        </p>
+        <img
+          src={hero.lockup}
+          alt={name}
+          className="max-w-[78%] max-[860px]:!w-[280px]"
+          style={{ width: hero.lockupWidth ?? "373px" }}
+        />
+        {hero.tagline && (
+          <p
+            className="max-w-[575px] text-balance px-6 text-center text-title-sm font-light"
+            style={{ color: hero.taglineColor ?? "#faf8f3" }}
+          >
+            {hero.tagline}
+          </p>
+        )}
       </div>
     </section>
   );

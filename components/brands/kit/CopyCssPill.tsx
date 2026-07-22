@@ -7,6 +7,7 @@ import { useRef } from "react";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 import type { BrandConfig } from "@/components/brands/kit/types";
 import { copyText } from "@/components/brands/kit/lib/clipboard";
+import { useToast } from "@/components/brands/kit/ui/Toast";
 import Button from "@/components/brands/kit/ui/Button";
 
 const kebab = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
@@ -36,12 +37,16 @@ function stylesheet(brand: BrandConfig) {
 
 export default function CopyCssPill() {
   const brand = useBrand();
+  const toast = useToast();
   const ref = useRef<HTMLButtonElement>(null);
   return (
     <Button
       ref={ref}
       variant="pill"
-      onClick={() => copyText(stylesheet(brand), ref.current)}
+      onClick={async () => {
+        const ok = await copyText(stylesheet(brand), ref.current);
+        toast(ok ? "Copied the type stylesheet" : "Couldn’t copy — check clipboard permissions");
+      }}
       className="gap-2.5 !text-label"
     >
       Copy CSS

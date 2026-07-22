@@ -10,11 +10,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 import Button from "@/components/brands/kit/ui/Button";
+import { useToast } from "@/components/brands/kit/ui/Toast";
 import { DownloadIcon } from "@/components/brands/kit/ui/icons";
 import AssetGenerator from "@/components/brands/kit/AssetGenerator";
 
 export default function BrandAssets() {
   const { assetCategories: ASSET_CATEGORIES } = useBrand();
+  const toast = useToast();
   const [active, setActive] = useState(ASSET_CATEGORIES[0].id);
   const category = ASSET_CATEGORIES.find((c) => c.id === active) ?? ASSET_CATEGORIES[0];
 
@@ -90,6 +92,7 @@ export default function BrandAssets() {
                   size="sm"
                   href={`${category.dir}/${file}`}
                   download
+                  onClick={() => toast(`Downloading ${name}`)}
                   aria-label={`Download ${name} — PNG, ${dims}, ${size}`}
                 >
                   Download

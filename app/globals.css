@@ -622,6 +622,14 @@ html.lenis body {
      content keeps width on a narrow screen. */
   @media (max-width: 860px) { .statement { padding: 20px 16px; } }
 
+  /* Toasts rise a few px as they appear. Short and small — the message is the
+     point, not the motion. The global reduced-motion rule flattens it. */
+  .toast-in { animation: toastIn 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+
   /* Construction lines draw themselves on from the centre out, staggered, so a
      mark switch reads as the drawing being re-measured rather than as a set of
      lines blinking into place. */

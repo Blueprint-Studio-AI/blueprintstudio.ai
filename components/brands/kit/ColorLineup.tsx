@@ -10,6 +10,7 @@ import type { Step } from "@/components/brands/kit/types";
 import { relLum } from "@/components/brands/kit/lib/color";
 import { copyText } from "@/components/brands/kit/lib/clipboard";
 import Tag from "@/components/brands/kit/ui/Tag";
+import { useToast } from "@/components/brands/kit/ui/Toast";
 
 const COLS = 11; // ramp width — accents pad to this so every row shares a grid
 
@@ -37,22 +38,24 @@ function Chip({
       className="relative flex h-[149px] min-w-0 flex-1 cursor-pointer flex-col rounded-2xl px-3 py-3.5 text-left transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(.2,.8,.2,1)] hover:z-[3] hover:-translate-y-4 hover:shadow-[0_20px_34px_rgba(30,20,10,0.22)] max-[860px]:h-[110px] max-[860px]:min-w-[54px] max-[860px]:hover:translate-y-0 max-[860px]:hover:shadow-none"
     >
       <span className="font-mono text-label">{label}</span>
-      {/* copy confirmation — small, bottom, centred */}
+      {/* Copy confirmation. A bare checkmark left people guessing what had
+          happened — it now says what it did, and the toast carries the value. */}
       <span
         aria-hidden
-        className={`pointer-events-none absolute inset-x-0 bottom-2.5 flex justify-center transition-opacity duration-150 ${
+        className={`pointer-events-none absolute inset-x-0 bottom-2.5 flex items-center justify-center gap-1.5 text-label transition-opacity duration-150 ${
           copied ? "opacity-100" : "opacity-0"
         }`}
       >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" className="shrink-0">
           <path
             d="M2.4 6.3l2.4 2.3 4.8-5"
             stroke="currentColor"
-            strokeWidth="1.6"
+            strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </svg>
+        Copied
       </span>
     </button>
   );
@@ -97,13 +100,19 @@ function Group({ tag, children }: { tag: string; children: React.ReactNode }) {
 
 export default function ColorLineup() {
   const { lineup: LINEUP, accents: ACCENTS, slug } = useBrand();
+  const toast = useToast();
   const [copied, setCopied] = useState<string | null>(null);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => clearTimeout(copyTimer.current), []);
 
-  const onCopy = (id: string, hex: string) => {
-    copyText(hex.toUpperCase());
+  const onCopy = async (id: string, hex: string) => {
+    const value = hex.toUpperCase();
+    const ok = await copyText(value);
+    if (!ok) return toast("Couldn’t copy — check clipboard permissions");
+    // The chip says "Copied"; the toast says what. Between them there's no
+    // guessing what the click did.
+    toast(`Copied ${value}`);
     setCopied(id);
     clearTimeout(copyTimer.current);
     copyTimer.current = setTimeout(() => setCopied(null), 1200);

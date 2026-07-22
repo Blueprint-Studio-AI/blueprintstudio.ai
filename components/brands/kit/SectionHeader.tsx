@@ -1,6 +1,9 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Button from "@/components/brands/kit/ui/Button";
 import { DownloadIcon, LinkIcon } from "@/components/brands/kit/ui/icons";
+import { useToast } from "@/components/brands/kit/ui/Toast";
 
 /**
  * Section CTA pill (Figma 296:854). Every current use is a download, so it wears
@@ -16,8 +19,16 @@ export function PillLink({
   external?: boolean;
   children: ReactNode;
 }) {
+  const toast = useToast();
   return (
-    <Button variant="pill" href={href} external={external} download={!external} className="gap-2.5 !text-label">
+    <Button
+      variant="pill"
+      href={href}
+      external={external}
+      download={!external}
+      onClick={external ? undefined : () => toast(`Downloading ${href.split("/").pop()}`)}
+      className="gap-2.5 !text-label"
+    >
       {children}
       {external ? <LinkIcon /> : <DownloadIcon />}
     </Button>
