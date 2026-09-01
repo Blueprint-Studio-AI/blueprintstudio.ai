@@ -40,8 +40,8 @@ const footerLinks: Record<string, FooterSection> = {
   products: {
     title: 'Products',
     links: [
-      // Lives in the separate tools monorepo, served from the tools subdomain.
-      { name: 'Asset Generator', href: 'https://tools.blueprintstudio.ai/asset-generator', external: true },
+      // Lives in the separate tools monorepo, served from the tools subdomain. /landing to keep coldstart fast
+      { name: 'Asset Generator', href: 'https://tools.blueprintstudio.ai/asset-generator/landing', external: true },
     ]
   },
   // Terms/Privacy now sit inline with the copyright (see bottom bar), not a column.
