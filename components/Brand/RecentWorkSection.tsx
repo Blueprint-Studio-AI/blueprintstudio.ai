@@ -36,12 +36,13 @@ const projects: (CaseStudy & { id: number; color: string })[] = [
     name: "Jinba",
     logo: "/brands/jinba/dl/lockup-black.png",
     logoHeight: 30,
-    title: "Bitcoin Stablecoin",
+    title: "AI automation for finance",
     description:
-      "Complete brand identity for a Bitcoin stablecoin. Logo system, brand narrative, type & palette, and visual language.",
+      "Complete brand identity for an enterprise automation platform serving regulated industries. Logo system, brand narrative, a refreshed website, and a design system.",
     deliverables: [
       { num: "01", label: "Brand" },
       { num: "02", label: "Website" },
+      { num: "03", label: "Design System" },
     ],
     image: "/media/recent-work/jinba-desktop.webp",
     imageMobile: "/media/recent-work/jinba-mobile.webp",
