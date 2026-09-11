@@ -5,7 +5,15 @@ Reference: the arch.network codebase (`Blueprint-Studio-AI/arch-website`, public
 
 **Done so far.** Ported from Nick's standalone review app onto the shared brand-kit template. The palette now leads with Orange `#EC641D` and Black `#181818`, the site's two core tokens, and the tokens download includes `--arch-orange`. The links between Arch Network and Arch Prime point at `/brands/arch-prime` and `/brands/arch`.
 
-Work in order. Items 1 and 2 are config and asset changes; item 3 needs one small template change. Do this on its own branch or worktree off `feat/brand-pages`, so a half-finished split never blocks the other brand pages.
+## Priority: make the brand deck, then build the page from it
+
+The biggest gap is that Arch Network has no brand guidelines deck yet. Today the page is a first draft reverse-engineered from arch.network's code. Arch Prime works well because its page follows its deck.
+
+1. **Make the deck.** Logo, colour (core palette plus the /chain system), type, photography, motifs, voice. Items 1 and 2 below are inputs to it, not substitutes.
+2. **Attach it.** Put it on the shared Drive with "anyone with the link can view", then set `downloads.guidelines` in `lib/brands/arch.ts` to its link. It appears first in the Downloads section, and the generated design.md links to it. No code changes needed.
+3. **Update the page from it.** Overview copy, swatch names, palette and type, asset categories, and the tagline should all match the deck. Where the page and the deck disagree, the deck wins, as it does for Arch Prime.
+
+The numbered items below are the smaller fixes, in order. Items 1 and 2 are config and asset changes; item 3 needs one small template change. Do this on its own branch or worktree off `feat/brand-pages`, so a half-finished split never blocks the other brand pages.
 
 ---
 
@@ -80,11 +88,7 @@ Everything under `public/brands/arch/` can be downloaded by anyone with the URL.
 - **Moodboards, drafts, source files:** keep them out of the repo for now (Drive or Figma).
 - **A real private tier** means gated downloads behind a login. Out of scope until there's a concrete need.
 
-## 5. Brand deck (when it exists)
-
-Arch Network's guidelines deck is still being made. When it's done, put it on the shared Drive with "anyone with the link can view", and set `downloads.guidelines` in `lib/brands/arch.ts` to its link. It then appears first in the Downloads section, and the generated design.md links to it. No code changes needed.
-
-## 6. Small things
+## 5. Small things
 
 - **Orange as text:** `#EC641D` on white is 3.14:1, which fails WCAG AA for body text. The page's contrast readout already shows it. Add a usage line to the Overview or the design doc: orange for display type, marks and graphics, not body copy on white.
 - **Unused Lottie files:** the site has `bow.lottie` and `menu.lottie` (UI animations). The site code doesn't reference them; ignore them unless Arch says the bow is a brand element.
