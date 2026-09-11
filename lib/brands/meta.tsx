@@ -76,10 +76,11 @@ export const brandViewport = (b: BrandConfig): Viewport => ({ themeColor: b.hero
 /**
  * iOS 26 Safari ignores theme-color and paints the status-bar strip with the
  * <body> background (tested: not <html>'s, and transparent fixed headers don't
- * count). The site-wide body is a light grey, which sat as a pale band above
- * dark heroes. On brand routes, make the body the hero's field so the strip
- * runs straight into the hero. The body only shows there and in overscroll.
+ * count), and the space past either end of the page with the <html> one. The
+ * site-wide colour is a light grey, a pale band above dark heroes. On brand
+ * routes both start as the hero's field, so the strip runs into the hero; the
+ * kit Footer hands them to its own colour while it's on screen.
  */
 export function BrandChrome({ brand }: { brand: BrandConfig }) {
-  return <style>{`body{background:${brand.hero.background ?? brand.brandInk}}`}</style>;
+  return <style>{`html,body{background:${brand.hero.background ?? brand.brandInk}}`}</style>;
 }

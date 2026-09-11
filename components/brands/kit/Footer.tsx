@@ -1,6 +1,9 @@
+"use client";
+
 // The studio footer — recreated 1:1 from blueprintstudio.ai's shared <Footer>
 // (components/Footer) for the standalone review app. When this page becomes a
 // route in the main site, swap this file for a direct import of that component.
+import { useEffect, useRef } from "react";
 import Newsletter from "@/components/brands/kit/footer/Newsletter";
 import BlueprintWordmark from "@/components/brands/kit/ui/BlueprintWordmark";
 
@@ -100,8 +103,30 @@ const Socials = ({ className = "" }: { className?: string }) => (
 );
 
 export default function Footer() {
+  const ref = useRef<HTMLElement>(null);
+
+  // iOS Safari paints its status-bar strip with the <body> background, and the
+  // space past the end of the page with the page background. BrandChrome sets
+  // both to the hero's field, which is right at the top but left a hero-coloured
+  // band under and above the footer at the bottom. While the footer is on screen,
+  // hand both over to the footer's own colour. IntersectionObserver fires only
+  // when the footer crosses the viewport edge, never per scroll frame.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const bg = getComputedStyle(el).backgroundColor;
+    const roots = [document.documentElement, document.body];
+    const set = (v: string) => roots.forEach((r) => (r.style.backgroundColor = v));
+    const io = new IntersectionObserver(([e]) => set(e.isIntersecting ? bg : ""));
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      set("");
+    };
+  }, []);
+
   return (
-    <footer className="relative w-full bg-neutral-900 text-neutral-400">
+    <footer ref={ref} id="footer" className="relative w-full bg-neutral-900 text-neutral-400">
       {/* dashed side rails on the section edge (60px desktop / 10px mobile) */}
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:left-[60px]" />
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:right-[60px]" />
