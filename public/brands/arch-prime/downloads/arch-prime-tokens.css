@@ -1,0 +1,38 @@
+/* Arch Prime — design tokens (brand deck, September 2026) */
+:root {
+  /* brand */
+  --prime-orange: #FF5E00;
+  --prime-indigo: #545EB3;
+  --prime-ink: #181818;
+
+  /* app sections */
+  --prime-boost: #6B1E0D;
+  --prime-earn: #113671;
+  --prime-borrow: #1F5543;
+
+  /* earn categories */
+  --prime-earn-products: #F1CFB6;
+  --prime-earn-pools: #CCDAF0;
+  --prime-earn-lending: #CEDBD7;
+  --prime-earn-strategies: #F2E9CE;
+
+  /* type */
+  --arch-font-display: "Gascogne Serial", Georgia, serif;
+  --arch-font-text: "Plus Jakarta Sans", Arial, sans-serif;
+  --arch-font-numbers: "Inter", Arial, sans-serif;
+  --arch-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Display — Gascogne Serial (secondary, editorial headings) */
+.arch-headline   { font-family: var(--arch-font-display); font-size: 64px; line-height: 1.05; letter-spacing: -0.03em; }
+.arch-headline-1 { font-family: var(--arch-font-display); font-size: 48px; line-height: 1.1;  letter-spacing: -0.022em; }
+.arch-heading-2  { font-family: var(--arch-font-display); font-size: 36px; line-height: 1.15; letter-spacing: -0.018em; }
+.arch-heading-3  { font-family: var(--arch-font-display); font-size: 28px; line-height: 1.2;  letter-spacing: -0.014em; }
+.arch-heading-4  { font-family: var(--arch-font-display); font-size: 20px; line-height: 1.3;  letter-spacing: -0.01em; }
+
+/* Text — Plus Jakarta Sans (primary) */
+.arch-body-large { font-family: var(--arch-font-text); font-size: 18px; line-height: 1.55; letter-spacing: -0.012em; }
+.arch-body       { font-family: var(--arch-font-text); font-size: 16px; line-height: 1.55; }
+.arch-body-small { font-family: var(--arch-font-text); font-size: 14px; line-height: 1.5; }
+.arch-caption    { font-family: var(--arch-font-text); font-size: 12px; line-height: 1.4; letter-spacing: 0.06em; }
+.arch-label      { font-family: var(--arch-font-text); font-size: 11px; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; }

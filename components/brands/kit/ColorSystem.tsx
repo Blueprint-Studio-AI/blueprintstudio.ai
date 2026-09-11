@@ -8,6 +8,7 @@ import type { Swatch } from "@/components/brands/kit/types";
 import { rgbStr, hslStr, contrast, bestInk, grade } from "@/components/brands/kit/lib/color";
 import { copyText } from "@/components/brands/kit/lib/clipboard";
 import ColorLineup from "@/components/brands/kit/ColorLineup";
+import ColorFields from "@/components/brands/kit/ColorFields";
 import Tag from "@/components/brands/kit/ui/Tag";
 
 
@@ -75,7 +76,7 @@ export default function ColorSystem() {
         <div className="flex items-start gap-gutter max-[1200px]:gap-14 max-[1024px]:flex-col max-[1024px]:gap-11">
           {/* left */}
           <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[1200px]:w-[46%] max-[1024px]:w-full">
-            <Tag>{slug}-{selected.name.toLowerCase()}</Tag>
+            <Tag>{slug}-{selected.name.toLowerCase().replace(/\s+/g, "-")}</Tag>
 
             {/* One property, not two. `background` takes a hex and a
                 linear-gradient() alike, so branching to backgroundImage only
@@ -149,6 +150,7 @@ export default function ColorSystem() {
 
         {/* full token ramps — collapsible, inside the same construction lines */}
         <ColorLineup />
+        <ColorFields />
       </div>
     </section>
   );

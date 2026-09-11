@@ -6,6 +6,7 @@ import { LinkIcon } from "@/components/brands/kit/ui/icons";
 
 export default function Overview() {
   const { overview, links } = useBrand();
+  if (!overview) return null;
   return (
     <section id="overview" className="px-edge py-section">
       <div className="flex items-start gap-gutter max-[1360px]:gap-24 max-[860px]:flex-col max-[860px]:gap-10">

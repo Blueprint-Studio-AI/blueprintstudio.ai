@@ -1,6 +1,7 @@
 "use client";
 
-// "Copy for AI" — hands the brand's design system to a coding agent.
+// "Copy design.md" — hands the brand's design system to a coding agent. The
+// same file ships as design.md in every download zip.
 //
 // The page already tells a human how to adopt the system; this is the same
 // thing addressed to a machine. Paste it into Cursor/Claude/whatever and prompt
@@ -53,7 +54,7 @@ export default function AgentDoc() {
     // "Copied" and leave someone pasting stale content.
     const ok = await copyText(text, btn.current);
     setState(ok ? "copied" : "error");
-    toast(ok ? `Copied the ${name} design system` : "Couldn’t copy — use Download instead");
+    toast(ok ? `Copied ${name}’s design.md` : "Couldn’t copy — use Download design.md instead");
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setState("idle"), 2000);
   }, [text, name, toast]);
@@ -85,7 +86,7 @@ export default function AgentDoc() {
             </>
           ) : (
             <>
-              Copy for AI
+              Copy design.md
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
                 <rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" strokeWidth="1.3" />
                 <path d="M10.5 3.2A1.7 1.7 0 008.8 2H3.7A1.7 1.7 0 002 3.7v5.1c0 .77.51 1.42 1.2 1.63" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -97,10 +98,10 @@ export default function AgentDoc() {
         <a
           href={file}
           download
-          onClick={() => toast("Downloading the design system")}
+          onClick={() => toast("Downloading design.md")}
           className="inline-flex h-11 items-center gap-2.5 rounded-full border border-line bg-white px-6 text-meta font-medium text-muted-3 transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
-          Download .md
+          Download design.md
           <DownloadIcon />
         </a>
 
@@ -108,7 +109,7 @@ export default function AgentDoc() {
             but a disabled/failed state needs to reach a screen reader too. */}
         <span role="status" aria-live="polite" className="text-meta text-muted-3">
           {state === "error"
-            ? "Couldn’t copy — use Download instead."
+            ? "Couldn’t copy — use Download design.md instead."
             : kb !== null
               ? `${name} design system · ${kb} KB of Markdown`
               : "Loading…"}

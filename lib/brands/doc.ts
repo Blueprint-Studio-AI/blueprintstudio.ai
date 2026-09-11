@@ -25,11 +25,13 @@ export function brandDocMarkdown(brand: BrandConfig): string {
   L.push(`**What it covers:** colour tokens, the type scale, and the logo system.`);
   L.push(`**What it does not:** voice, motion, or component specs — those aren't captured on the brand page yet.`);
   L.push("");
-  L.push(`## The brand in a line`);
-  L.push("");
-  L.push(`**${overview.headline} ${overview.headlineFaint}**`);
-  L.push("");
-  for (const p of overview.body) L.push(p, "");
+  if (overview) {
+    L.push(`## The brand in a line`);
+    L.push("");
+    L.push(`**${overview.headline} ${overview.headlineFaint}**`);
+    L.push("");
+    for (const p of overview.body) L.push(p, "");
+  }
 
   /* ── Logo ─────────────────────────────────────────────────────────────── */
   L.push(`## Logo system`);
@@ -111,6 +113,13 @@ export function brandDocMarkdown(brand: BrandConfig): string {
     L.push(`- **${c.label}** — ${c.items.length} file${c.items.length === 1 ? "" : "s"}: ${c.items.map((i) => i[0]).join(", ")}`);
   }
   L.push("");
+  if (brand.downloads.guidelines) {
+    L.push(`## Brand guidelines`);
+    L.push("");
+    L.push(`The full guidelines — voice, photography, motifs and applications — are in the brand deck: ${brand.downloads.guidelines}`);
+    L.push(`Where the deck and this file disagree, the deck wins.`);
+    L.push("");
+  }
   if (brand.links?.length) {
     L.push(`## Live`);
     L.push("");

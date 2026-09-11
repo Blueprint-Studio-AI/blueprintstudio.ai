@@ -7,10 +7,10 @@
 // the text of; the idle auto-rewrite mutates it imperatively. Ported from app.js.
 import { useEffect, useRef, useState } from "react";
 import { useBrand } from "@/components/brands/kit/BrandContext";
-import type { TypeRow } from "@/components/brands/kit/types";
+import type { TypeGroupKey, TypeRow } from "@/components/brands/kit/types";
 import Tag from "@/components/brands/kit/ui/Tag";
 
-type GroupKey = "display" | "text";
+type GroupKey = TypeGroupKey;
 const IDLE_MS = 2200; // hands-off pause before the specimen restores itself
 // (re-armed on every keystroke, so it only counts once you've actually stopped)
 const ERASE_MS = 16; // per character, deleting
@@ -52,9 +52,11 @@ const METRIC_ICON: Record<string, React.ReactNode> = {
   ),
 };
 
-function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif: boolean }) {
+// `fontFamily` overrides the font-serif/font-sans classes for a group whose face
+// isn't one of the two route-scoped defaults (a numerals face, say).
+function TypeGroup({ group, tag, serif, fontFamily }: { group: GroupKey; tag: string; serif: boolean; fontFamily?: string }) {
   const { type: TYPE, typeDefaults: TYPE_DEFAULTS, brandInk } = useBrand();
-  const face = TYPE[group];
+  const face = TYPE[group]!; // TypeSystem only mounts the groups the brand defines
   const [applied, setApplied] = useState(face.base);
   const [activeRow, setActiveRow] = useState<number | null>(null);
   const specRef = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
 
   // Seed the specimen text once (uncontrolled thereafter).
   useEffect(() => {
-    if (specRef.current) specRef.current.textContent = TYPE_DEFAULTS[group];
+    if (specRef.current) specRef.current.textContent = TYPE_DEFAULTS[group] ?? "";
     return () => clearTimeout(idleTimer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -76,7 +78,7 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
   function autoRewrite() {
     const s = specRef.current;
     if (!s) return;
-    const target = TYPE_DEFAULTS[group];
+    const target = TYPE_DEFAULTS[group] ?? "";
     if (s.textContent === target) return;
     if (document.activeElement === s) s.blur();
     const tok = (animTok.current = {});
@@ -164,6 +166,7 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
                   serif ? "font-serif" : "font-sans font-normal"
                 }`}
                 style={{
+                  fontFamily,
                   fontSize: `${applied.size}px`,
                   lineHeight: applied.lh,
                   letterSpacing: applied.ls,
@@ -227,7 +230,7 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
                   >
                     <span
                       className={`leading-none text-ink ${serif ? "font-serif tracking-[-0.025em]" : "font-sans"}`}
-                      style={{ fontSize: `${Math.min(sizePx, 60)}px` }}
+                      style={{ fontFamily, fontSize: `${Math.min(sizePx, 60)}px` }}
                     >
                       {label}
                     </span>
@@ -250,11 +253,15 @@ function TypeGroup({ group, tag, serif }: { group: GroupKey; tag: string; serif:
 }
 
 export default function TypeSystem() {
-  const { slug } = useBrand();
+  const { slug, type } = useBrand();
   return (
     <section className="flex flex-col gap-32 px-edge pb-section pt-16">
       <TypeGroup group="display" tag={`${slug}-display`} serif />
       <TypeGroup group="text" tag={`${slug}-text`} serif={false} />
+      {/* Optional third face — the route layout supplies it as --font-numbers. */}
+      {type.numbers && (
+        <TypeGroup group="numbers" tag={`${slug}-numbers`} serif={false} fontFamily="var(--font-numbers), sans-serif" />
+      )}
     </section>
   );
 }

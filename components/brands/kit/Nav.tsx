@@ -42,10 +42,10 @@ export default function Nav() {
   const ink = navOnLight ? mixOnLight(LIGHT_INK, "#ffffff") : "#ffffff";
   const ruleIdle = navOnLight ? mixOnLight(LIGHT_RULE, "rgba(229,229,229,0.1)") : "rgba(229,229,229,0.1)";
 
-  // Preference order, best-available-wins. "Download All" only means anything
+  // Preference order, best-available-wins. "Download Brand Kit" only means anything
   // when there IS an all; the design doc is the next most useful single grab.
   const cta = downloads.kit
-    ? { href: downloads.kit, label: "Download All", what: "the full brand kit" }
+    ? { href: downloads.kit, label: "Download Brand Kit", what: "the full brand kit" }
     : agentDoc
       ? { href: agentDoc.file, label: "Design System", what: "the design system" }
       : null;
@@ -170,7 +170,7 @@ export default function Nav() {
                   aria-current={on ? "true" : undefined}
                   // Mobile drops to a 36px segment at a smaller size: the tabs
                   // wrap to their own row there, so every px is paid for twice.
-                  className={`flex h-10 w-[112px] shrink-0 items-center justify-center whitespace-nowrap border-b text-nav transition-[opacity,border-color] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white max-[860px]:h-9 max-[860px]:w-auto max-[860px]:px-3.5 max-[860px]:text-meta ${
+                  className={`flex h-10 w-[112px] shrink-0 items-center justify-center whitespace-nowrap border-b text-nav transition-[opacity,border-color] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white max-[1100px]:w-auto max-[1100px]:px-3.5 max-[860px]:h-9 max-[860px]:text-meta ${
                     on ? "opacity-100" : "opacity-[0.33] hover:opacity-75"
                   }`}
                   style={{ color: ink, borderColor: on ? ink : ruleIdle }}
@@ -203,7 +203,10 @@ export default function Nav() {
                   : undefined
               }
             >
-              <span className="max-[860px]:hidden">{cta.label}</span>
+              {/* Label only where it fits. Below ~1366px it pushed Arch's six tabs
+                  into a scrolling strip and hid "Files", so narrower screens get the
+                  icon alone; aria-label keeps the name for screen readers. */}
+              <span className="hidden min-[1366px]:inline">{cta.label}</span>
               <DownloadIcon />
             </Button>
           )}

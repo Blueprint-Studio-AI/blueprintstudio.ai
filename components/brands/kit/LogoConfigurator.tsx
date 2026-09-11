@@ -195,8 +195,8 @@ function baselineFor(src: string): Promise<number | null> {
 /** Below this the baseline is the ink bottom — no descenders, so no extra rule. */
 const BASELINE_MIN_LIFT = 0.04;
 
-const MARK_LABELS: Record<MarkKey, string> = { glyph: "Glyph", lockup: "Lockup", compact: "Compact" };
-const MARK_ORDER: MarkKey[] = ["glyph", "lockup", "compact"];
+const MARK_LABELS: Record<MarkKey, string> = { glyph: "Glyph", lockup: "Lockup", wordmark: "Wordmark", compact: "Compact" };
+const MARK_ORDER: MarkKey[] = ["glyph", "lockup", "wordmark", "compact"];
 const SIZES = [512, 1024, 2048];
 
 /** Control group label — 12px uppercase (Figma). */

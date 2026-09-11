@@ -14,6 +14,8 @@ import { useToast } from "@/components/brands/kit/ui/Toast";
 import { DownloadIcon } from "@/components/brands/kit/ui/icons";
 import AssetGenerator from "@/components/brands/kit/AssetGenerator";
 
+const SIZES = "(max-width: 860px) 100vw, 360px"; // frame caps at 1440 → a column never exceeds ~350px
+
 export default function BrandAssets() {
   const { assetCategories: ASSET_CATEGORIES } = useBrand();
   const toast = useToast();
@@ -62,45 +64,67 @@ export default function BrandAssets() {
 
       <div className="statement">
         <div className="grid grid-cols-3 gap-x-6 gap-y-14 max-[860px]:grid-cols-1">
-          {category.items.map(([name, file, dims, size]) => (
-            <figure key={file} className="m-0 flex flex-col gap-3">
-              {/* next/image, not <img>: these thumbnails ARE the source files —
-                  Field 2 is a 14MB PNG rendering in a ~400px card. The optimizer
-                  serves a resized AVIF/WebP while Download still hands over the
-                  original. */}
-              <Image
-                src={`${category.dir}/${file}`}
-                alt={name}
-                width={816}
-                height={510}
-                // 360px, not 33vw: the frame caps at 1440, so a grid column never
-                // exceeds ~350px CSS no matter how wide the monitor is
-                sizes="(max-width: 860px) 100vw, 360px"
-                className="aspect-[16/10] w-full rounded-lg bg-[#f4f1eb] object-cover"
-              />
-              <figcaption className="flex items-baseline justify-between gap-2.5">
-                <div>
-                  <div className="text-meta font-medium tracking-snug text-ink">{name}</div>
-                  <div className="font-mono text-micro text-muted-3">
-                    PNG · {dims} · {size}
+          {category.items.map(([name, file, dims, size, stage]) => {
+            const src = `${category.dir}/${file}`;
+            const ext = file.split(".").pop()?.toUpperCase();
+            return (
+              <figure key={file} className="m-0 flex flex-col gap-3">
+                {/* next/image, not <img>: these thumbnails ARE the source files —
+                    Field 2 is a 14MB PNG rendering in a ~400px card. The optimizer
+                    serves a resized AVIF/WebP while Download still hands over the
+                    original. */}
+                {category.tile === "cutout" ? (
+                  // Transparent cut-outs on a bare white tile. The image fills the
+                  // tile's height and sits on its bottom edge, so a building
+                  // anchored to the bottom of its PNG stands on the card rather
+                  // than floating in it.
+                  <div className="flex aspect-[16/10] w-full items-end justify-center overflow-hidden rounded-lg border border-line bg-white">
+                    <Image src={src} alt={name} width={816} height={510} sizes={SIZES} className="h-full w-auto object-contain object-bottom" />
                   </div>
-                </div>
-                {/* names the asset — otherwise a links list reads
-                    "Download, Download, Download…" with nothing to tell apart */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  href={`${category.dir}/${file}`}
-                  download
-                  onClick={() => toast(`Downloading ${name}`)}
-                  aria-label={`Download ${name} — PNG, ${dims}, ${size}`}
-                >
-                  Download
-                  <DownloadIcon size={14} />
-                </Button>
-              </figcaption>
-            </figure>
-          ))}
+                ) : category.tile === "logo" ? (
+                  // Logo files sit inside a fixed box on a white tile — every mark
+                  // reads at a comparable size, wide wordmark or square glyph, the
+                  // way a logo kit lays out its files.
+                  <div className="flex aspect-[16/10] w-full items-center justify-center rounded-lg border border-line bg-white">
+                    <Image src={src} alt={name} width={816} height={510} sizes={SIZES} className="h-auto max-h-[36%] w-auto max-w-[58%] object-contain" />
+                  </div>
+                ) : (
+                  <Image
+                    src={src}
+                    alt={name}
+                    width={816}
+                    height={510}
+                    sizes={SIZES}
+                    className={`aspect-[16/10] w-full rounded-lg ${
+                      category.fit === "contain" ? "object-contain p-8 max-[860px]:p-6" : "object-cover"
+                    }`}
+                    style={{ background: stage ?? category.stage ?? "#f4f1eb" }}
+                  />
+                )}
+                <figcaption className="flex items-baseline justify-between gap-2.5">
+                  <div>
+                    <div className="text-meta font-medium tracking-snug text-ink">{name}</div>
+                    <div className="font-mono text-micro text-muted-3">
+                      {ext} · {dims} · {size}
+                    </div>
+                  </div>
+                  {/* names the asset — otherwise a links list reads
+                      "Download, Download, Download…" with nothing to tell apart */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    href={src}
+                    download
+                    onClick={() => toast(`Downloading ${name}`)}
+                    aria-label={`Download ${name} — ${ext}, ${dims}, ${size}`}
+                  >
+                    Download
+                    <DownloadIcon size={14} />
+                  </Button>
+                </figcaption>
+              </figure>
+            );
+          })}
         </div>
       </div>
 

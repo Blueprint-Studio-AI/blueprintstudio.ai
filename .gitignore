@@ -40,3 +40,6 @@ debug-screenshots/
 # docs
 .aireadme
 aireadme.txt
+
+# brand-page download zips — generated from the loose files by scripts/build-zips.mjs
+public/**/*.zip

@@ -15,14 +15,16 @@ import ColorChips from "@/components/brands/kit/ColorChips";
 import TypeSystem from "@/components/brands/kit/TypeSystem";
 import CopyCssPill from "@/components/brands/kit/CopyCssPill";
 import CopyColorsPill from "@/components/brands/kit/CopyColorsPill";
+import Motion from "@/components/brands/kit/Motion";
 import BrandAssets from "@/components/brands/kit/BrandAssets";
 import Downloads from "@/components/brands/kit/Downloads";
+import RelatedBrand from "@/components/brands/kit/RelatedBrand";
 import Footer from "@/components/brands/kit/Footer";
 import { ToastProvider } from "@/components/brands/kit/ui/Toast";
 
 export default function BrandKitPage({ brand }: { brand: BrandConfig }) {
   const meta = metaFor(brand);
-  const { downloads, galleries } = brand;
+  const { downloads, galleries, motion } = brand;
 
   return (
     <BrandProvider brand={brand}>
@@ -36,7 +38,7 @@ export default function BrandKitPage({ brand }: { brand: BrandConfig }) {
           the "covering" read depends entirely on the sheet being solid. No
           shadow at the seam: the hard edge is the cleaner read. */}
         <div className="relative z-10 bg-white">
-          <Overview />
+          {brand.overview && <Overview />}
 
           <SectionHeader id="logo" title="Logo System" meta={meta.logo}>
             {downloads.logos && (
@@ -44,7 +46,7 @@ export default function BrandKitPage({ brand }: { brand: BrandConfig }) {
             )}
           </SectionHeader>
           <LogoConfigurator />
-          <Gallery items={galleries.logo} />
+          {!!galleries.logo?.length && <Gallery items={galleries.logo} />}
 
           <SectionHeader id="color" title="Color System" meta={meta.color}>
             <CopyColorsPill />
@@ -53,13 +55,22 @@ export default function BrandKitPage({ brand }: { brand: BrandConfig }) {
             )}
           </SectionHeader>
           {brand.colorLayout === "chips" ? <ColorChips /> : <ColorSystem />}
-          {galleries.color && <Gallery items={galleries.color} />}
+          {!!galleries.color?.length && <Gallery items={galleries.color} />}
 
           <SectionHeader id="type" title="Type System" meta={meta.type}>
             <CopyCssPill />
           </SectionHeader>
           <TypeSystem />
-          <Gallery items={galleries.type} />
+          {!!galleries.type?.length && <Gallery items={galleries.type} />}
+
+          {motion && (
+            <>
+              <SectionHeader id="motion" title="Motion" meta={meta.motion}>
+                {motion.zip && <PillLink href={motion.zip}>Download All Motion</PillLink>}
+              </SectionHeader>
+              <Motion />
+            </>
+          )}
 
           <SectionHeader id="assets" title="Brand Assets" meta={meta.assets}>
             {downloads.assets && (
@@ -69,6 +80,7 @@ export default function BrandKitPage({ brand }: { brand: BrandConfig }) {
           <BrandAssets />
 
           <Downloads />
+          <RelatedBrand />
           <Footer />
         </div>
       </ToastProvider>

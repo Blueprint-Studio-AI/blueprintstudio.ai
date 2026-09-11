@@ -176,6 +176,21 @@ export const jinba: BrandConfig = {
         ["Blog Index", "website-blog.png", "3840×2160", "6.4 MB"],
       ],
     },
+    {
+      // Restored from the original Jinba page's LinkedIn download row. The covers
+      // are 1128×191 banners, so they sit whole on a stage rather than cropping.
+      id: "social",
+      label: "Social",
+      dir: "/brands/jinba/linkedin",
+      fit: "contain",
+      items: [
+        ["LinkedIn Cover — Speed", "linkedin-business-cover-speed.png", "1128×191", "208 KB"],
+        ["LinkedIn Cover — Dots", "linkedin-business-cover-dots.png", "1128×191", "340 KB"],
+        ["LinkedIn Cover — Field", "linkedin-business-cover-field.png", "1128×191", "380 KB"],
+        ["Profile Picture — Dark", "pfp-dark.png", "400×400", "22 KB"],
+        ["Profile Picture — Light", "pfp-light.png", "400×400", "22 KB"],
+      ],
+    },
   ],
   galleries: {
     logo: [
@@ -192,9 +207,9 @@ export const jinba: BrandConfig = {
 
 
   // Generated from this config by lib/brands/doc.ts — see the route at
-  // app/brands/jinba/jinba-design.md. Derived, so it can't drift from the page.
+  // app/brands/jinba/design.md. Derived, so it can't drift from the page.
   agentDoc: {
-    file: "/brands/jinba/jinba-design.md",
+    file: "/brands/jinba/design.md",
     title: "Design system for coding agents",
     blurb:
       "The system as one Markdown file — colour tokens, the type scale and the logo rules, generated from this page. Paste it into your coding agent and prompt \u201cbuild X following this\u201d.",
@@ -209,10 +224,15 @@ export const jinba: BrandConfig = {
   },
   // Textures and full-kit zips aren't built yet — omitted so they don't 404.
   downloads: {
-    logos: "/downloads/jinba-logos.zip",
-    tokens: "/downloads/jinba-tokens.css",
+    // Jinba-Brand-Deck-04-16-26.pdf (167 MB) on the shared Drive — linked from the old page too
+    guidelines: "https://drive.google.com/file/d/1zZaz_NnLIcT-b2WeNSgJn1VO9Nry83dx/view",
+    logos: "/brands/jinba/downloads/jinba-logos.zip",
+    tokens: "/brands/jinba/downloads/jinba-tokens.css",
+    // Built at deploy time from the logos, every asset on the page, the business
+    // card print files (.ai) and the tokens — see scripts/build-zips.mjs.
+    kit: "/brands/jinba/downloads/jinba-brand-kit.zip",
   },
-  downloadLabels: { logos: "Logo system", tokens: "Design tokens (CSS)" },
+  downloadLabels: { guidelines: "Brand deck (PDF)", logos: "Logo system", tokens: "Design tokens (CSS)", kit: "Full brand kit" },
   sections: [
     { id: "logo", label: "Logo" },
     { id: "color", label: "Color" },
