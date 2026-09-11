@@ -55,7 +55,6 @@ export const archPrime: BrandConfig = {
     { key: "indigo", hex: "#545EB3", dark: false },
     { key: "white", hex: "#FFFFFF", dark: true },
   ],
-  kit: { logoFiles: 9, logoZip: "20 KB" }, // glyph + lockup + wordmark × ink / orange / white
 
   primary: [
     { role: "Primary", name: "Arch-Orange", bg: "#FF5E00", inspect: "#FF5E00" },
@@ -121,8 +120,8 @@ export const archPrime: BrandConfig = {
       label: "Photography",
       dir: `${B}/photo`,
       items: [
-        ["Key Visual", "prime-key-visual.png", "1920×1080", "2.2 MB"],
-        ["City at Dusk", "city-top.png", "1920×1080", "2.6 MB"],
+        ["Key Visual", "prime-key-visual.png", "1920×1080"],
+        ["City at Dusk", "city-top.png", "1920×1080"],
       ],
     },
     {
@@ -135,13 +134,13 @@ export const archPrime: BrandConfig = {
       dir: `${B}/buildings`,
       tile: "cutout",
       items: [
-        ["Boost", "boost.png", "1080×1080", "409 KB"],
-        ["Borrow", "borrow.png", "1080×1080", "581 KB"],
-        ["Earn", "earn.png", "1080×1080", "232 KB"],
-        ["Earn (alt)", "earn-alt.png", "1080×1080", "229 KB"],
-        ["Pool", "pool.png", "1080×1080", "510 KB"],
-        ["Product", "product.png", "1080×1080", "789 KB"],
-        ["Strategy", "strategy.png", "1080×1080", "597 KB"],
+        ["Boost", "boost.png", "1080×1080"],
+        ["Borrow", "borrow.png", "1080×1080"],
+        ["Earn", "earn.png", "1080×1080"],
+        ["Earn (alt)", "earn-alt.png", "1080×1080"],
+        ["Pool", "pool.png", "1080×1080"],
+        ["Product", "product.png", "1080×1080"],
+        ["Strategy", "strategy.png", "1080×1080"],
       ],
     },
   ],

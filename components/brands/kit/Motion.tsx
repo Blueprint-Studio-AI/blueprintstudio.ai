@@ -8,6 +8,7 @@
 // won't play video. The card previews the MP4 on a loop (muted, so browsers
 // allow autoplay); the buttons hand over the files.
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 import type { MotionClip } from "@/components/brands/kit/types";
 import Button from "@/components/brands/kit/ui/Button";
@@ -40,10 +41,15 @@ function Clip({ clip, dir }: { clip: MotionClip; dir: string }) {
         className="relative overflow-hidden rounded-2xl"
         style={{ background: clip.stage ?? "#ffffff", aspectRatio: clip.aspect }}
       >
-        {near ? (
+        {/* The still is always there, through next/image (the posters are
+            150–900 KB PNGs; this serves a WebP sized to the card). Once the card
+            is near, the video mounts on top of it with no `poster`, so the PNG
+            isn't fetched a second time; until its first frame paints, the still
+            shows through. */}
+        <Image src={`${base}-poster.png`} alt="" fill sizes="(max-width: 860px) 100vw, 560px" className={fit} />
+        {near && (
           <video
             src={`${base}.mp4`}
-            poster={`${base}-poster.png`}
             autoPlay
             loop
             muted
@@ -51,10 +57,6 @@ function Clip({ clip, dir }: { clip: MotionClip; dir: string }) {
             aria-label={clip.name}
             className={`absolute inset-0 h-full w-full ${fit}`}
           />
-        ) : (
-          // lazy: eight posters are ~4 MB of PNG, all well below the fold
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={`${base}-poster.png`} alt="" loading="lazy" decoding="async" className={`absolute inset-0 h-full w-full ${fit}`} />
         )}
       </div>
       <figcaption className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">

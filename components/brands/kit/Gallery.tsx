@@ -102,7 +102,7 @@ export default function Gallery({ items }: { items: Sample[] }) {
                   alt={s.alt}
                   width={1364}
                   height={766}
-                  sizes="(max-width: 860px) 82vw, 682px"
+                  sizes="(max-width: 520px) 430px, (max-width: 860px) 82vw, 682px"
                   className="h-[383px] w-[682px] max-w-[82vw] rounded-2xl bg-[#f4f1eb] object-cover max-[860px]:h-[240px] max-[860px]:w-[82vw]"
                 />
               </button>

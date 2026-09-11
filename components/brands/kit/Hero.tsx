@@ -10,11 +10,21 @@
 // The hero is pinned (sticky) while the rest of the page scrolls over it as an
 // opaque sheet — see BrandKitPage. Sticky is the strongest parallax there is:
 // the background moves 0 while the foreground moves 1, and it costs no JS.
-import { useEffect, useRef } from "react";
+// Above 860px only: on phones iOS 26 Safari tinted its toolbar with the pinned
+// hero's colour over every section, so there the hero scrolls normally.
+import { Fragment, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const DARK_SCRIM =
   "linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(23,23,23,0.63) 15.129%, rgba(102,102,102,0) 50%)";
+
+// The art is cover-scaled into a 730px-tall frame, so on most screens (every
+// phone) it's drawn far wider than the viewport: "100vw" under-asked and came
+// out soft. Every hero source is ≤ 2646px wide, so ask for the largest variant;
+// the optimizer caps it at the source width. Same sharpness as the original
+// file, as a WebP a fraction of the size.
+const HERO_SIZES = "3840px";
 
 /**
  * Band art fades out toward its top edge. Figma models this as a near-white veil
@@ -22,6 +32,12 @@ const DARK_SCRIM =
  * same result without hard-coding a veil colour that has to match the field.
  */
 const MASK = "linear-gradient(to top, #000 0%, #000 25%, transparent 97%)";
+
+/** "A · B · C · D" → ["A · B", "C · D"]: the tagline's phone lines. */
+const pairs = (tagline: string) => {
+  const items = tagline.split(" · ");
+  return Array.from({ length: Math.ceil(items.length / 2) }, (_, i) => items.slice(i * 2, i * 2 + 2).join(" · "));
+};
 
 export default function Hero() {
   const { hero, name, brandInk } = useBrand();
@@ -75,24 +91,27 @@ export default function Hero() {
       // Height is per-brand: a viewport-relative hero scales with the window,
       // a fixed one stays a slab. minHeight is the floor that stops a vh value
       // collapsing on a short laptop screen.
-      className="sticky top-0 z-0 w-full overflow-hidden motion-reduce:relative"
+      className="sticky top-0 z-0 w-full overflow-hidden motion-reduce:relative max-[860px]:relative"
       style={{
         backgroundColor: hero.background ?? brandInk,
         height: hero.height ?? "730px",
         minHeight: hero.minHeight,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* The art goes through next/image, not a raw <img>: the source files are
+          the downloadable originals (up to 2646px and 800 KB+), and the hero is
+          the page's largest paint. next/image serves a WebP sized to the screen
+          and `preload` starts it with the HTML, instead of after the page parses.
+          It never upscales, so it can't come out softer than the source. The
+          wrapper div carries the crop and effects; the image just fills it. */}
       {band ? (
         // Band: the art is a horizon along the bottom that dissolves upward into
         // the flat field, so the lockup sits on colour rather than on artwork.
         // multiply + 66% is what keeps the comb from reading as a photograph
         // pasted on — it tints the field instead of covering it.
-        <img
-          src={hero.image}
-          alt=""
+        <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 w-full max-w-none object-cover object-bottom"
+          className="absolute inset-x-0 bottom-0"
           style={{
             height: hero.artHeight ?? "46%",
             filter: "blur(2.3px)",
@@ -101,16 +120,24 @@ export default function Hero() {
             maskImage: MASK,
             WebkitMaskImage: MASK,
           }}
-        />
+        >
+          <Image src={hero.image} alt="" fill preload sizes={HERO_SIZES} quality={hero.quality} className="object-cover object-bottom" />
+        </div>
       ) : (
-        <img
-          src={hero.image}
-          alt=""
-          aria-hidden
-          className="absolute left-0 top-[-7.82%] h-[111.01%] w-full max-w-none object-cover"
-        />
+        <div aria-hidden className="absolute left-0 top-[-7.82%] h-[111.01%] w-full">
+          <Image src={hero.image} alt="" fill preload sizes={HERO_SIZES} quality={hero.quality} className="object-cover" />
+        </div>
       )}
       {overlay && <div aria-hidden className="absolute inset-0" style={{ background: overlay }} />}
+      {/* Phones: iOS Safari paints the status-bar strip with the body colour,
+          which BrandChrome sets to this same field. Fading the hero's top edge
+          up from it makes the strip run into the photo with no seam, whatever
+          the photo is. (No strip on desktop, so no fade there.) */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 hidden h-24 max-[860px]:block"
+        style={{ background: `linear-gradient(${hero.background ?? brandInk}, transparent)` }}
+      />
       <div ref={inner} className="relative flex h-full flex-col items-center justify-center gap-8 will-change-[transform,opacity]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -124,7 +151,16 @@ export default function Hero() {
             className="max-w-[575px] text-balance px-6 text-center text-title-sm font-light"
             style={{ color: hero.taglineColor ?? "#faf8f3" }}
           >
-            {hero.tagline}
+            {/* "A · B · C · D": one line on desktop. On phones it wrapped wherever
+                it ran out of room, so a line could start with a dangling "·".
+                There it's two lines of two items each, split at a separator
+                that's hidden, so no line starts or ends on a dot. */}
+            {pairs(hero.tagline).map((line, i) => (
+              <Fragment key={line}>
+                {i > 0 && <span className="max-[860px]:hidden"> · </span>}
+                <span className="max-[860px]:block">{line}</span>
+              </Fragment>
+            ))}
           </p>
         )}
       </div>

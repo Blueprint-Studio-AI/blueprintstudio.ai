@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { BrandConfig } from "@/components/brands/kit/types";
 
 // Route metadata shared by every /brands/* page. The title/description shape
@@ -64,4 +64,22 @@ export function BrandJsonLd({ brand, image = `/brands/${brand.slug}/opengraph-im
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
     />
   );
+}
+
+/**
+ * Browser chrome colour for the route: Android Chrome and iOS Safari up to 18
+ * tint their toolbars with it. The site-wide default is the marketing pages'
+ * light grey; use the hero's own field. (iOS 26 Safari ignores theme-color.)
+ */
+export const brandViewport = (b: BrandConfig): Viewport => ({ themeColor: b.hero.background ?? b.brandInk });
+
+/**
+ * iOS 26 Safari ignores theme-color and paints the status-bar strip with the
+ * <body> background (tested: not <html>'s, and transparent fixed headers don't
+ * count). The site-wide body is a light grey, which sat as a pale band above
+ * dark heroes. On brand routes, make the body the hero's field so the strip
+ * runs straight into the hero. The body only shows there and in overscroll.
+ */
+export function BrandChrome({ brand }: { brand: BrandConfig }) {
+  return <style>{`body{background:${brand.hero.background ?? brand.brandInk}}`}</style>;
 }
