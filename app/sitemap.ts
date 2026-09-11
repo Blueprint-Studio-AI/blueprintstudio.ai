@@ -25,6 +25,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/launch-videos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     // Case study
     { url: `${base}/brands/jinba`,  lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${base}/brands/honeyb`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${base}/brands/arch`,   lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${base}/brands/arch-prime`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     ...blogEntries,
     // /terms and /privacy-policy are intentionally excluded — they're noindex (see their layout.tsx)
   ]

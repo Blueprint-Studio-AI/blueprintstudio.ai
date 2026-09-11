@@ -1,0 +1,51 @@
+/* ── HoneyB — design tokens ───────────────────────────────────────────────
+   Generated from the HoneyB brand kit · blueprintstudio.ai/brands/honeyb
+   Shades of Gold + Shades of Grey, and the type scale, as CSS custom
+   properties. Plain CSS variables — no Tailwind or framework requirement. */
+
+:root {
+  /* ── Shades of Gold ─────────────────────────────────────────────────── */
+  --honeyb-liquid-gold: #F47000; /* the brand's single accent */
+  --honeyb-marigold:    #FFB445;
+  --honeyb-wax:         #FFCB7F;
+  --honeyb-light:       #FFF3E1;
+  --honeyb-muted:       #FDF8F1;
+  --honeyb-off-white:   #FFFEFD;
+
+  /* Same ramp, light → dark, for scale-based use */
+  --gold-100: #FFFEFD; --gold-200: #FDF8F1; --gold-300: #FFF3E1;
+  --gold-400: #FFCB7F; --gold-500: #FFB445; --gold-600: #F47000;
+
+  /* ── Shades of Grey ─────────────────────────────────────────────────── */
+  --neutral-100: #F8F8F8;
+  --neutral-200: #BAB9BB;
+  --neutral-300: #64656A;
+  --neutral-400: #2D2E36;
+  --neutral-500: #14161F; /* brand ink */
+
+  /* ── Roles ──────────────────────────────────────────────────────────── */
+  --honeyb-accent:     var(--honeyb-liquid-gold);
+  --honeyb-ink:        var(--neutral-500);
+  --honeyb-body:       var(--neutral-300);
+  --honeyb-surface:    var(--honeyb-off-white);
+  --honeyb-surface-alt: var(--neutral-100);
+
+  /* ── Typefaces ──────────────────────────────────────────────────────── */
+  /* Both are on Google Fonts. Load once at the app root. */
+  --font-display: "Poly", Georgia, serif;
+  --font-text: "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /* ── Type scale ─────────────────────────────────────────────────────── */
+  /* Display — Poly Regular. Line heights are part of the scale; don't
+     hand-tune them per surface. */
+  --h1-size: 68px; --h1-leading: 1.1;
+  --h2-size: 48px; --h2-leading: 1.1;
+  --h3-size: 30px; --h3-leading: 1.2;
+
+  /* Text — Inter */
+  --body-lg-size:     26px; --body-lg-leading:     1.2;
+  --body-size:        18px; --body-leading:        1.1;
+  --body-sm-size:     15px; --body-sm-leading:     1.1;
+  --button-size:      16px; --button-leading:      1.5; --button-weight: 500;
+  --link-size:        16px; --link-leading:        1.2;
+}

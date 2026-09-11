@@ -1,0 +1,30 @@
+/* Arch Network — design tokens (first draft, pulled from arch.network) */
+:root {
+  /* colours */
+  --arch-orange: #EC641D;
+  --arch-indigo: #3E3A8E;
+  --arch-violet: #736FB9;
+  --arch-gold: #E6C98A;
+  --arch-parchment: #F3EFD7;
+  --arch-peach: #F4814A;
+  --arch-ink: #181818;
+
+  /* type */
+  --arch-font-display: "Gascogne Serial", Georgia, serif;
+  --arch-font-text: "Geist", Arial, sans-serif;
+  --arch-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Display — Gascogne Serial */
+.arch-headline   { font-family: var(--arch-font-display); font-size: 64px; line-height: 1.05; letter-spacing: -0.03em; }
+.arch-headline-1 { font-family: var(--arch-font-display); font-size: 48px; line-height: 1.1;  letter-spacing: -0.022em; }
+.arch-heading-2  { font-family: var(--arch-font-display); font-size: 36px; line-height: 1.15; letter-spacing: -0.018em; }
+.arch-heading-3  { font-family: var(--arch-font-display); font-size: 28px; line-height: 1.2;  letter-spacing: -0.014em; }
+.arch-heading-4  { font-family: var(--arch-font-display); font-size: 20px; line-height: 1.3;  letter-spacing: -0.01em; }
+
+/* Text — Geist */
+.arch-body-large { font-family: var(--arch-font-text); font-size: 18px; line-height: 1.55; letter-spacing: -0.012em; }
+.arch-body       { font-family: var(--arch-font-text); font-size: 16px; line-height: 1.55; }
+.arch-body-small { font-family: var(--arch-font-text); font-size: 14px; line-height: 1.5; }
+.arch-caption    { font-family: var(--arch-font-text); font-size: 12px; line-height: 1.4; letter-spacing: 0.06em; }
+.arch-label      { font-family: var(--arch-font-text); font-size: 11px; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; }
