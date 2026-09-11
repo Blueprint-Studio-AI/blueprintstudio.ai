@@ -4,15 +4,15 @@ import type { BrandConfig, Texture } from "@/components/brands/kit/types";
 // Asset paths resolve from /public.
 
 const TEXTURES: Texture[] = [
-  ["Brush 1", "brush-1.png", "2752×1536", "6.4 MB"],
-  ["Brush 2", "brush-2.png", "1264×639", "1.4 MB"],
-  ["Brush 3", "brush-3.png", "1850×768", "2.3 MB"],
-  ["Brush 4", "brush-4.png", "3328×3082", "8.3 MB"],
-  ["Field 1", "field-1.png", "1264×705", "2.1 MB"],
-  ["Field 2", "field-2.png", "4096×2286", "14 MB"],
-  ["Field 3", "field-3.png", "1365×768", "1.7 MB"],
-  ["Field 4", "field-4.png", "2752×1536", "7.0 MB"],
-  ["Field 5", "field-5.png", "2752×1536", "6.9 MB"],
+  ["Brush 1", "brush-1.png", "2752×1536"],
+  ["Brush 2", "brush-2.png", "1264×639"],
+  ["Brush 3", "brush-3.png", "1850×768"],
+  ["Brush 4", "brush-4.png", "3328×3082"],
+  ["Field 1", "field-1.png", "1264×705"],
+  ["Field 2", "field-2.png", "4096×2286"],
+  ["Field 3", "field-3.png", "1365×768"],
+  ["Field 4", "field-4.png", "2752×1536"],
+  ["Field 5", "field-5.png", "2752×1536"],
 ];
 
 export const jinba: BrandConfig = {
@@ -77,7 +77,6 @@ export const jinba: BrandConfig = {
     { key: "light", hex: "#FAF8F3", dark: true },
     { key: "white", hex: "#FFFFFF", dark: true },
   ],
-  kit: { logoFiles: 30, logoZip: "228 KB" },
 
   primary: [
     { role: "Primary", name: "Urushi", bg: "#322014", inspect: "#322014" },
@@ -148,8 +147,8 @@ export const jinba: BrandConfig = {
       label: "Materials",
       dir: "/brands/jinba/textures",
       items: [
-        ["Golden Turrell Field", "texture-1.png", "1920×1080", "146 KB"],
-        ["Brushed Grain", "texture-3.png", "3840×2160", "4.1 MB"],
+        ["Golden Turrell Field", "texture-1.png", "1920×1080"],
+        ["Brushed Grain", "texture-3.png", "3840×2160"],
       ],
     },
     {
@@ -157,11 +156,11 @@ export const jinba: BrandConfig = {
       label: "Mockups",
       dir: "/brands/jinba/samples",
       items: [
-        ["Business Cards", "business-cards.png", "3840×2160", "8.5 MB"],
-        ["Stationery", "stationary.png", "3840×2160", "9.1 MB"],
-        ["Social Banners", "linkedin-banners.png", "3840×2160", "2.7 MB"],
-        ["Social Posts", "linkedin-posts.png", "3840×2160", "3.5 MB"],
-        ["Soft-focus Glyph", "logo-blur.png", "3840×2160", "91 KB"],
+        ["Business Cards", "business-cards.png", "3840×2160"],
+        ["Stationery", "stationary.png", "3840×2160"],
+        ["Social Banners", "linkedin-banners.png", "3840×2160"],
+        ["Social Posts", "linkedin-posts.png", "3840×2160"],
+        ["Soft-focus Glyph", "logo-blur.png", "3840×2160"],
       ],
     },
     {
@@ -169,11 +168,11 @@ export const jinba: BrandConfig = {
       label: "UI Design",
       dir: "/brands/jinba/samples",
       items: [
-        ["Bento Grid", "website-bento.png", "3840×2160", "630 KB"],
-        ["Product Grid", "website-products-short.png", "2314×2160", "359 KB"],
-        ["Site Menu", "website-menu-short.png", "2314×2160", "350 KB"],
-        ["Article Page", "website-article.png", "3840×2160", "4.1 MB"],
-        ["Blog Index", "website-blog.png", "3840×2160", "6.4 MB"],
+        ["Bento Grid", "website-bento.png", "3840×2160"],
+        ["Product Grid", "website-products-short.png", "2314×2160"],
+        ["Site Menu", "website-menu-short.png", "2314×2160"],
+        ["Article Page", "website-article.png", "3840×2160"],
+        ["Blog Index", "website-blog.png", "3840×2160"],
       ],
     },
     {
@@ -184,11 +183,11 @@ export const jinba: BrandConfig = {
       dir: "/brands/jinba/linkedin",
       fit: "contain",
       items: [
-        ["LinkedIn Cover — Speed", "linkedin-business-cover-speed.png", "1128×191", "208 KB"],
-        ["LinkedIn Cover — Dots", "linkedin-business-cover-dots.png", "1128×191", "340 KB"],
-        ["LinkedIn Cover — Field", "linkedin-business-cover-field.png", "1128×191", "380 KB"],
-        ["Profile Picture — Dark", "pfp-dark.png", "400×400", "22 KB"],
-        ["Profile Picture — Light", "pfp-light.png", "400×400", "22 KB"],
+        ["LinkedIn Cover — Speed", "linkedin-business-cover-speed.png", "1128×191"],
+        ["LinkedIn Cover — Dots", "linkedin-business-cover-dots.png", "1128×191"],
+        ["LinkedIn Cover — Field", "linkedin-business-cover-field.png", "1128×191"],
+        ["Profile Picture — Dark", "pfp-dark.png", "400×400"],
+        ["Profile Picture — Light", "pfp-light.png", "400×400"],
       ],
     },
   ],

@@ -27,7 +27,7 @@ const sizesFor = (dims: string, cover: boolean) => {
 };
 
 export default function BrandAssets() {
-  const { assetCategories: ASSET_CATEGORIES } = useBrand();
+  const { assetCategories: ASSET_CATEGORIES, fileSizes } = useBrand();
   const toast = useToast();
   const [active, setActive] = useState(ASSET_CATEGORIES[0].id);
   const category = ASSET_CATEGORIES.find((c) => c.id === active) ?? ASSET_CATEGORIES[0];
@@ -74,9 +74,10 @@ export default function BrandAssets() {
 
       <div className="statement">
         <div className="grid grid-cols-3 gap-x-6 gap-y-14 max-[860px]:grid-cols-1">
-          {category.items.map(([name, file, dims, size, stage]) => {
+          {category.items.map(([name, file, dims]) => {
             const src = `${category.dir}/${file}`;
             const ext = file.split(".").pop()?.toUpperCase();
+            const size = fileSizes?.[src] ?? "";
             return (
               <figure key={file} className="m-0 flex flex-col gap-3">
                 {/* next/image, not <img>: these thumbnails ARE the source files —
@@ -108,7 +109,7 @@ export default function BrandAssets() {
                     className={`aspect-[16/10] w-full rounded-lg ${
                       category.fit === "contain" ? "object-contain p-8 max-[860px]:p-6" : "object-cover"
                     }`}
-                    style={{ background: stage ?? category.stage ?? "#f4f1eb" }}
+                    style={{ background: category.stage ?? "#f4f1eb" }}
                   />
                 )}
                 <figcaption className="flex items-baseline justify-between gap-2.5">

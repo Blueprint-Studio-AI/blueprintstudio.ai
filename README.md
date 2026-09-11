@@ -54,7 +54,9 @@ Every zip is named after its brand (`arch-prime-brand-kit.zip`, never a shared `
 
 Jinba's and HoneyB's full kits are built from the page itself: every asset listed in the brand's data file, plus logos and tokens. If a listed file is missing, the build stops rather than shipping a kit that doesn't match the page.
 
-To change what's in a zip, edit the **source folders**, not the unzipped copy. The mapping is at the top of `scripts/build-zips.mjs`: a new zip, or a new folder in an existing zip, is one line there. The zip sizes shown on the page (for example `kit.logoZip`) are typed by hand in the data file; update them if they change noticeably.
+To change what's in a zip, edit the **source folders**, not the unzipped copy. The mapping is at the top of `scripts/build-zips.mjs`: a new zip, or a new folder in an existing zip, is one line there.
+
+Every size on the page, from each asset's file size to each download and the logo zip's file count, is measured from the real files by `lib/brands/measure.ts`. It runs while the static page is built, once per deploy, never per visit, so there's nothing to keep up to date by hand. Sizes are of the originals the buttons download, not the optimized previews the page displays.
 
 ### Brand decks
 
@@ -86,7 +88,7 @@ The files in `public/brands/<slug>/` are the originals: they're what the downloa
 - **Asset cards** size themselves from each item's dimensions in the data file, so wide images that get cropped to a 16:10 card still come out sharp. Keep those dimensions accurate.
 - **SVGs** go through a plain `<img>`; there's nothing to optimise. Anything far below the fold should be `loading="lazy"`.
 - **Rules of thumb:** hero at display size under ~200 KB, card thumbnails under ~100 KB, and first-view images under ~1 MB on a phone. LCP (the largest paint, here the hero) under 2.5 s is Google's "good" Core Web Vitals threshold.
-- **iOS:** the hero is pinned (sticky) only above 860px. On phones, iOS 26 Safari tinted its toolbar with the pinned hero's colour over every section. Check phone layouts in the iOS Simulator's Safari, not only a narrow desktop window.
+- **iOS:** the hero is pinned (sticky) only above 860px; on phones, iOS 26 Safari tinted its bottom toolbar with the pinned hero's colour over every section. iOS 26 also ignores `theme-color` and paints the status-bar strip with the `<body>` background, so brand routes set the body to the hero's field (`BrandChrome`), and on phones the hero's top edge fades up from that same colour, so the strip runs into the photo. Check phone layouts in the iOS Simulator's Safari, not only a narrow desktop window, and force a reload (Safari happily shows a cached page).
 
 ### Fonts
 
@@ -98,7 +100,7 @@ The goal is for each brand's data file to drive everything. These still don't:
 
 - **Tokens CSS files** (`public/brands/<slug>/downloads/<slug>-tokens.css`) are written by hand and can drift from the palette and type in the data file. Generate them the way `design.md` is generated.
 - **The zip list** in `scripts/build-zips.mjs` is kept by hand. Jinba's and HoneyB's kits already read their assets from the data file. The Arch Network and Arch Prime kits still list folders copied from Nick's original zips. They come out almost the same as the page, plus ready-made recoloured logos, motion poster frames and Arch Prime's hero photo, minus the motion GIFs, with folders named after the site's folders rather than the page's tabs. The comment above the Arch entries in the script has the details and the switch-over steps.
-- **Sizes shown on the page** (asset sizes, `kit.logoZip`) are typed by hand. Measure them at build time.
+- **Asset dimensions** (`"1920×1080"` in each item) are still typed by hand. Sizes are measured; dimensions could be too, with an image-size read in `measure.ts`.
 - **HoneyB's design.md** is a filtered copy of the brand-kit repo's DESIGN.md, refreshed by hand with `scripts/build-agent-doc.mjs`.
 
 ### What not to put in `public/`

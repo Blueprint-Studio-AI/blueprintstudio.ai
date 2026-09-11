@@ -1,7 +1,7 @@
 import { Geist_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { gascogne } from "../_fonts/gascogne";
 import { archPrime } from "@/lib/brands/arch-prime";
-import { brandMetadata, brandViewport, BrandJsonLd } from "@/lib/brands/meta";
+import { brandMetadata, brandViewport, BrandChrome, BrandJsonLd } from "@/lib/brands/meta";
 
 // Arch Prime's faces, scoped to this route (brand guidelines pp.19–21): Plus
 // Jakarta Sans as --font-text (primary: headings and body), Gascogne Serial as
@@ -19,6 +19,7 @@ export const viewport = brandViewport(archPrime);
 export default function ArchPrimeLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`brand-kit-root ${gascogne.variable} ${jakarta.variable} ${geistMono.variable} ${inter.variable}`}>
+      <BrandChrome brand={archPrime} />
       <BrandJsonLd brand={archPrime} />
       {children}
     </div>

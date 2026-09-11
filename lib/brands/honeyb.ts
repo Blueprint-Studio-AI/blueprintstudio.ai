@@ -73,7 +73,6 @@ export const honeyb: BrandConfig = {
     { key: "black", hex: "#141417", dark: false },
     { key: "white", hex: "#FFFFFF", dark: true },
   ],
-  kit: { logoFiles: 5, logoZip: "15 KB" }, // measured from the built zip
 
   // Paint chips only — the palette is two short ramps, which the inspector's
   // swatch/readout/contrast panel would dwarf rather than explain.
@@ -160,11 +159,11 @@ export const honeyb: BrandConfig = {
       label: "Mockups",
       dir: `${B}/mockups`,
       items: [
-        ["Homepage on Display", "honeyb-mockup-1.png", "5504×3072", "6.8 MB"],
-        ["Vault Dashboard on iMac", "honeyb-mockup-2.png", "5504×3072", "6.3 MB"],
-        ["Mobile Web Pair", "honeyb-mockup-3.png", "1920×1080", "317 KB"],
-        ["Homepage on Laptop", "honeyb-mockup-4.png", "2048×2048", "7.2 MB"],
-        ["Product Page in Hand", "honeyb-mockup-5.png", "4096×4096", "6.5 MB"],
+        ["Homepage on Display", "honeyb-mockup-1.png", "5504×3072"],
+        ["Vault Dashboard on iMac", "honeyb-mockup-2.png", "5504×3072"],
+        ["Mobile Web Pair", "honeyb-mockup-3.png", "1920×1080"],
+        ["Homepage on Laptop", "honeyb-mockup-4.png", "2048×2048"],
+        ["Product Page in Hand", "honeyb-mockup-5.png", "4096×4096"],
       ],
     },
     {
@@ -172,11 +171,11 @@ export const honeyb: BrandConfig = {
       label: "Assets",
       dir: `${B}/assets`,
       items: [
-        ["Wallet & Coin", "honeyb-asset-1.png", "1920×1080", "546 KB"],
-        ["Coin Stack", "honeyb-asset-2.png", "1920×1080", "486 KB"],
-        ["Coin Face", "honeyb-asset-3.png", "1920×1080", "474 KB"],
-        ["Yield Progress", "honeyb-asset-4.png", "1920×1080", "300 KB"],
-        ["Honeycomb Field", "honeyb-asset-5.png", "1920×1080", "947 KB"],
+        ["Wallet & Coin", "honeyb-asset-1.png", "1920×1080"],
+        ["Coin Stack", "honeyb-asset-2.png", "1920×1080"],
+        ["Coin Face", "honeyb-asset-3.png", "1920×1080"],
+        ["Yield Progress", "honeyb-asset-4.png", "1920×1080"],
+        ["Honeycomb Field", "honeyb-asset-5.png", "1920×1080"],
       ],
     },
     {
@@ -186,9 +185,9 @@ export const honeyb: BrandConfig = {
       // Source filenames kept verbatim so re-copying from the brand-kit folder
       // is a straight overwrite with no rename step to forget.
       items: [
-        ["Banner Artwork", "HoneyB-LinkedIn-banners.png", "3840×2160", "877 KB"],
-        ["LinkedIn Page", "HoneyB-LinkedIn-banner-mockup.png", "1920×1080", "471 KB"],
-        ["X Profile", "HoneyB-X-banner-mockup.png", "1920×1080", "592 KB"],
+        ["Banner Artwork", "HoneyB-LinkedIn-banners.png", "3840×2160"],
+        ["LinkedIn Page", "HoneyB-LinkedIn-banner-mockup.png", "1920×1080"],
+        ["X Profile", "HoneyB-X-banner-mockup.png", "1920×1080"],
       ],
     },
     {
@@ -196,12 +195,12 @@ export const honeyb: BrandConfig = {
       label: "UI Design",
       dir: `${B}/ui`,
       items: [
-        ["Feature Cards", "honeyb-ui-1.png", "1920×1080", "92 KB"],
-        ["Epoch Onboarding", "honeyb-ui-2.png", "1920×1080", "860 KB"],
-        ["Portfolio Overview", "honeyb-ui-3.png", "1920×1080", "65 KB"],
-        ["LTV Slider", "honeyb-ui-4.png", "1920×1080", "106 KB"],
-        ["Vault Detail", "honeyb-ui-5.png", "1920×1080", "129 KB"],
-        ["KYC Onboarding", "honeyb-ui-6.png", "1920×1080", "53 KB"],
+        ["Feature Cards", "honeyb-ui-1.png", "1920×1080"],
+        ["Epoch Onboarding", "honeyb-ui-2.png", "1920×1080"],
+        ["Portfolio Overview", "honeyb-ui-3.png", "1920×1080"],
+        ["LTV Slider", "honeyb-ui-4.png", "1920×1080"],
+        ["Vault Detail", "honeyb-ui-5.png", "1920×1080"],
+        ["KYC Onboarding", "honeyb-ui-6.png", "1920×1080"],
       ],
     },
   ],

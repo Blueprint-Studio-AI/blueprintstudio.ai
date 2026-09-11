@@ -28,7 +28,7 @@ const FALLBACK_LABELS: Record<(typeof ORDER)[number], string> = {
 export default function Downloads() {
   const brand = useBrand();
   const toast = useToast();
-  const { downloads, downloadLabels, kit, agentDoc } = brand;
+  const { downloads, downloadLabels, kit, agentDoc, fileSizes } = brand;
   const meta = metaFor(brand);
 
   const rows = ORDER.filter((k) => downloads[k]).map((k) => {
@@ -41,13 +41,12 @@ export default function Downloads() {
       href,
       external,
       label: downloadLabels?.[k] ?? FALLBACK_LABELS[k],
+      // sizes come from measure() at build time
       meta: external
         ? new URL(href).hostname.replace(/^www\./, "")
-        : k === "logos"
+        : k === "logos" && kit
           ? `${kit.logoFiles} files · ${kit.logoZip}`
-          : k === "assets"
-            ? meta.assets
-            : href.split("/").pop(),
+          : [k === "assets" ? meta.assets : href.split("/").pop(), fileSizes?.[href]].filter(Boolean).join(" · "),
     };
   });
 

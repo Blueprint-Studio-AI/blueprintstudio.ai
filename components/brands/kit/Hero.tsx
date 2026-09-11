@@ -10,18 +10,15 @@
 // The hero is pinned (sticky) while the rest of the page scrolls over it as an
 // opaque sheet — see BrandKitPage. Sticky is the strongest parallax there is:
 // the background moves 0 while the foreground moves 1, and it costs no JS.
-import { useEffect, useRef } from "react";
+// Above 860px only: on phones iOS 26 Safari tinted its toolbar with the pinned
+// hero's colour over every section, so there the hero scrolls normally.
+import { Fragment, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const DARK_SCRIM =
   "linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(23,23,23,0.63) 15.129%, rgba(102,102,102,0) 50%)";
 
-/**
- * Band art fades out toward its top edge. Figma models this as a near-white veil
- * over the art (transparent at the art's foot, opaque by 98% up); a mask is the
- * same result without hard-coding a veil colour that has to match the field.
- */
 // The art is cover-scaled into a 730px-tall frame, so on most screens (every
 // phone) it's drawn far wider than the viewport: "100vw" under-asked and came
 // out soft. Every hero source is ≤ 2646px wide, so ask for the largest variant;
@@ -29,7 +26,18 @@ const DARK_SCRIM =
 // file, as a WebP a fraction of the size.
 const HERO_SIZES = "3840px";
 
+/**
+ * Band art fades out toward its top edge. Figma models this as a near-white veil
+ * over the art (transparent at the art's foot, opaque by 98% up); a mask is the
+ * same result without hard-coding a veil colour that has to match the field.
+ */
 const MASK = "linear-gradient(to top, #000 0%, #000 25%, transparent 97%)";
+
+/** "A · B · C · D" → ["A · B", "C · D"]: the tagline's phone lines. */
+const pairs = (tagline: string) => {
+  const items = tagline.split(" · ");
+  return Array.from({ length: Math.ceil(items.length / 2) }, (_, i) => items.slice(i * 2, i * 2 + 2).join(" · "));
+};
 
 export default function Hero() {
   const { hero, name, brandInk } = useBrand();
@@ -121,6 +129,15 @@ export default function Hero() {
         </div>
       )}
       {overlay && <div aria-hidden className="absolute inset-0" style={{ background: overlay }} />}
+      {/* Phones: iOS Safari paints the status-bar strip with the body colour,
+          which BrandChrome sets to this same field. Fading the hero's top edge
+          up from it makes the strip run into the photo with no seam, whatever
+          the photo is. (No strip on desktop, so no fade there.) */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 hidden h-24 max-[860px]:block"
+        style={{ background: `linear-gradient(${hero.background ?? brandInk}, transparent)` }}
+      />
       <div ref={inner} className="relative flex h-full flex-col items-center justify-center gap-8 will-change-[transform,opacity]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -134,7 +151,16 @@ export default function Hero() {
             className="max-w-[575px] text-balance px-6 text-center text-title-sm font-light"
             style={{ color: hero.taglineColor ?? "#faf8f3" }}
           >
-            {hero.tagline}
+            {/* "A · B · C · D": one line on desktop. On phones it wrapped wherever
+                it ran out of room, so a line could start with a dangling "·".
+                There it's two lines of two items each, split at a separator
+                that's hidden, so no line starts or ends on a dot. */}
+            {pairs(hero.tagline).map((line, i) => (
+              <Fragment key={line}>
+                {i > 0 && <span className="max-[860px]:hidden"> · </span>}
+                <span className="max-[860px]:block">{line}</span>
+              </Fragment>
+            ))}
           </p>
         )}
       </div>

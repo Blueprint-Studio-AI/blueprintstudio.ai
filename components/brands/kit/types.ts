@@ -65,8 +65,8 @@ export interface TypeFace {
 export type TypeGroupKey = "display" | "text" | "numbers";
 
 /* ── Assets ──────────────────────────────────────────────────────────── */
-/** The optional 5th slot is a per-file stage colour, overriding the category's. */
-export type Texture = [name: string, file: string, dims: string, size: string, stage?: string];
+/** [name, file, dims]. File size isn't typed here: lib/brands/measure.ts reads it at build time. */
+export type Texture = [name: string, file: string, dims: string];
 export interface AssetCategory {
   id: string;
   label: string;
@@ -192,7 +192,13 @@ export interface BrandConfig {
   families: Record<string, Family>;
   /** monochrome treatments shared by every family */
   mono: StyleDot[];
-  kit: { logoFiles: number; logoZip: string };
+  /**
+   * Filled in by measure() (lib/brands/measure.ts) at build time, never typed
+   * by hand: file count and size of the logo zip, and every listed file's size
+   * keyed by its public path.
+   */
+  kit?: { logoFiles: number; logoZip: string };
+  fileSizes?: Record<string, string>;
 
   primary: Swatch[];
   secondary: Swatch[];
@@ -265,7 +271,7 @@ export const metaFor = (b: BrandConfig) => {
   const named = b.primary.length + b.secondary.length;
   const steps = b.lineup.reduce((n, g) => Math.max(n, ...g.rows.map((r) => r.length)), 0);
   return {
-    logo: `${b.kit.logoFiles} files · ${b.kit.logoZip}`,
+    logo: b.kit ? `${b.kit.logoFiles} files · ${b.kit.logoZip}` : "",
     // Chips mode has no named-swatch panel, so the count describes what's actually
     // on screen: every chip, across every ramp.
     color:

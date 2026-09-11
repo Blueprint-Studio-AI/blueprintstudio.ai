@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { jinba } from "@/lib/brands/jinba";
-import { brandMetadata, brandViewport, BrandJsonLd } from "@/lib/brands/meta";
+import { brandMetadata, brandViewport, BrandChrome, BrandJsonLd } from "@/lib/brands/meta";
 
 // Geist is loaded and scoped to this route only — the `.brand-kit-root` wrapper
 // (see globals.css) points font-sans at --font-text without touching the site's
@@ -19,6 +19,7 @@ export default function JinbaLayout({ children }: { children: React.ReactNode })
       // Tiempos is a local @font-face in globals, so it is named directly.
       style={{ "--font-display": '"Tiempos Text"' } as React.CSSProperties}
     >
+      <BrandChrome brand={jinba} />
       <BrandJsonLd brand={jinba} image={OG} />
       {children}
     </div>
