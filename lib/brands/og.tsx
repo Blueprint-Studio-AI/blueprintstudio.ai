@@ -16,7 +16,11 @@ export const OG_SIZE = { width: 1200, height: 630 };
 const DARK_SCRIM = "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.25) 100%)";
 const MIME: Record<string, string> = { svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" };
 
-/** Inline a /public file as a data URI — satori can't fetch relative URLs. */
+/**
+ * Inline a /public file as a data URI — satori can't fetch relative URLs.
+ * Runs at build time only: next.config.mjs excludes public/ from the /brands
+ * functions, so every opengraph-image route must stay `force-static`.
+ */
 async function dataUri(publicPath: string) {
   const bytes = await readFile(join(process.cwd(), "public", publicPath));
   const ext = publicPath.split(".").pop()?.toLowerCase() ?? "";

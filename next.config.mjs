@@ -70,6 +70,16 @@ const nextConfig = {
   // Keep only if self-hosting. If deploying to Vercel, remove this.
   // output: 'standalone',
 
+  // Brand pages: the share images (lib/brands/og.tsx) read their art from
+  // public/ by a path built at runtime, so file tracing can't tell which files
+  // and bundles ALL of public/ (hundreds of MB of brand assets and zips) into
+  // each /brands function, past Vercel's 250 MB limit. Nothing under /brands
+  // reads public/ at request time: the pages and share images are prerendered
+  // at build, when the files are on disk. Keep them force-static.
+  outputFileTracingExcludes: {
+    '/brands/**': ['./public/**/*'],
+  },
+
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
