@@ -22,6 +22,7 @@ export const arch: BrandConfig = {
     overlay: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(24,24,24,0.45) 18%, rgba(24,24,24,0.35) 100%)",
     taglineColor: "#F3EFD7",
     lockupWidth: "364px", // 104px tall at the lockup's 3.5:1
+    quality: 85, // film grain smooths out at the default 75 (147 KB → 213 KB)
   },
 
   // Copy is the home page's own framing: "Real Bitcoin." above the fold,
@@ -55,24 +56,37 @@ export const arch: BrandConfig = {
     { key: "white", hex: "#FFFFFF", dark: true },
   ],
 
-  // Orange and Black are arch.network's --color-orange / --color-black: the
-  // signal colour and the ink everything is set in, so they lead.
-  primary: [
-    { role: "Primary", name: "Orange", bg: "#EC641D", inspect: "#EC641D" },
-    { role: "Primary", name: "Black", bg: "#181818", inspect: "#181818" },
-  ],
+  // Orange is arch.network's --color-orange, the signal colour. (Black, the ink,
+  // is brandInk and stays in the tokens; it isn't shown as a swatch.)
+  primary: [{ role: "Primary", name: "Orange", bg: "#EC641D", inspect: "#EC641D" }],
   // Indigo, Violet and Parchment are --color-dark-purple, --color-purple and
-  // --color-light. Gold and Peach appear only inline on the /chain page (code
-  // highlighting, one button gradient) — kept until the chain-system call is
-  // made. Names are working titles.
+  // --color-light. Names are working titles.
   secondary: [
     { role: "Accent", name: "Indigo", bg: "#3E3A8E", inspect: "#3E3A8E" },
     { role: "Accent", name: "Violet", bg: "#736FB9", inspect: "#736FB9" },
-    { role: "Accent", name: "Gold", bg: "#E6C98A", inspect: "#E6C98A" },
     { role: "Accent", name: "Parchment", bg: "#F3EFD7", inspect: "#F3EFD7" },
-    { role: "Accent", name: "Peach", bg: "#F4814A", inspect: "#F4814A" },
   ],
-  lineup: [], // no documented ramps yet — the inspector alone carries the palette
+  // The /chain page runs its own technical system: these are its tokens from
+  // src/app/chain/chain.css (scoped to .chain-scope), used nowhere else on
+  // arch.network. Orange 2 ("Peach") is the light end of its button gradient
+  // and its code keywords; Code Gold colours type names in its code sample.
+  lineup: [
+    {
+      tag: "chain",
+      rows: [
+        [
+          ["Background", "#FBFAF7"],
+          ["Body", "#46443F"],
+          ["Muted", "#6C6A62"],
+          ["Faint", "#9A978C"],
+          ["Orange 2", "#F4814A"],
+          ["Orange Ink", "#C9520F"],
+          ["Code Gold", "#E6C98A"],
+        ],
+      ],
+    },
+  ],
+  lineupNoun: "chain colors",
   accents: [],
 
   // Tracking steps mirror the site's stylesheet (-.03 / -.022 / -.018 / -.014 /

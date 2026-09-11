@@ -26,6 +26,8 @@ Arch Prime already has its own page, so this stays **one page with two labelled 
 
 ### Colour (`lib/brands/arch.ts`, config only)
 
+**Done (2026-09-11):** swatches are Orange, Indigo, Violet, Parchment (Black removed from the swatches; it stays in the tokens as the ink). The /chain page's own colours are a separate `arch-chain` group: Background, Body, Muted, Faint, Orange 2 (was "Peach"), Orange Ink, Code Gold. Both Peach and Gold are used only on /chain. The tokens download has them as `--arch-chain-*`. Still open below: names, the two untokenised surfaces, and the illustration shading ramps.
+
 - **Core palette (inspector swatches).** The eight `@theme` tokens: Orange, Black, Dark Purple, Purple, Light, Grey, Light Grey `#E9E9E9`, White.
   - Decide names: the site's (`dark-purple`, `purple`, `light`) or Nick's working titles (Indigo, Violet, Parchment). Pick one set and use it in the tokens file too.
   - Decide whether Charcoal `#2E2D33` (home city section, chain app card) and Deep Indigo `#1F1C3E` (Jaidon's "why" band on /chain) are brand surfaces. They're used, but not tokenised on the site.
