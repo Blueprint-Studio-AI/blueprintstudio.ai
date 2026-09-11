@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -16,49 +17,25 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
-      ],
-      "@/components/*": [
-        "./components/*"
-      ],
-      "@/service-components/*": [
-        "./service-pages/components/*"
-      ],
-      "@/service-types/*": [
-        "types/*"
-      ],
-      "@/service-lib/*": [
-        "./service-pages/lib/*"
-      ],
-      "@/service-data/*": [
-        "./service-pages/data/*"
       ]
-    },
-    "target": "ES2017"
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "app/tools/roast-my-site/layout.tsx",
-    "app/tools/roast-my-site/page.tsx"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "arch-prime-portfolio"
+    "node_modules"
   ]
 }

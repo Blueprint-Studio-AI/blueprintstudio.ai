@@ -1,0 +1,144 @@
+"use client";
+
+// Brand Assets — every downloadable asset, one category at a time.
+//
+// A grid rather than a preview-and-select list: prospects scroll instead of
+// clicking, so the work has to land without interaction, and "Brush 3" tells you
+// nothing a thumbnail doesn't tell you better. Clients get a per-card Download
+// plus Download All in the header — the two cases that actually happen.
+import { useState } from "react";
+import Image from "next/image";
+import { ASSET_CATEGORIES } from "@/lib/data";
+import Button from "@/components/ui/Button";
+import { DownloadIcon } from "@/components/ui/icons";
+import AssetGenerator from "@/components/AssetGenerator";
+
+export default function BrandAssets() {
+  const [active, setActive] = useState(ASSET_CATEGORIES[0].id);
+  const category = ASSET_CATEGORIES.find((c) => c.id === active) ?? ASSET_CATEGORIES[0];
+  const v = category.version ? `?v=${category.version}` : "";
+
+  return (
+    <section className="flex flex-col gap-16 px-edge pb-section pt-16">
+      {/* Rule spans the tabs only, never the page. An unproduced category says so
+          on the control — you learn it before spending a click, not after. */}
+      {/* w-fit keeps the rule under the tabs only; max-w-full + scroll stops the
+          four labels from pushing the page wide on a phone. */}
+      <div
+        role="tablist"
+        aria-label="Asset categories"
+        className="no-scrollbar flex w-fit max-w-full items-center gap-8 overflow-x-auto border-b border-line max-[600px]:gap-5"
+      >
+        {ASSET_CATEGORIES.map((c) => {
+          const empty = c.items.length === 0;
+          const on = c.id === active;
+          return (
+            <button
+              key={c.id}
+              role="tab"
+              aria-selected={on}
+              aria-disabled={empty || undefined}
+              onClick={() => !empty && setActive(c.id)}
+              className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 pb-3 text-meta transition-colors ${
+                on
+                  ? "border-ink font-medium text-ink"
+                  : empty
+                    ? "cursor-default border-transparent text-muted-3"
+                    : "cursor-pointer border-transparent text-muted-1 hover:text-ink"
+              }`}
+            >
+              {c.label}
+              {empty && (
+                <span className="rounded bg-chip px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted-3">
+                  Soon
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="statement">
+        <div className="grid grid-cols-3 gap-x-6 gap-y-14 max-[860px]:grid-cols-1">
+          {category.items.map(([name, file, dims, size, stage]) => (
+            <figure key={file} className="m-0 flex flex-col gap-3">
+              {/* next/image, not <img>: these thumbnails ARE the source files —
+                  Field 2 is a 14MB PNG rendering in a ~400px card. The optimizer
+                  serves a resized AVIF/WebP while Download still hands over the
+                  original. */}
+              {category.tile === "cutout" ? (
+                // Transparent cut-outs on a bare white tile. The image fills the
+                // tile's height and sits on its bottom edge, so a building
+                // anchored to the bottom of its PNG stands on the card rather
+                // than floating in it.
+                <div className="flex aspect-[16/10] w-full items-end justify-center overflow-hidden rounded-lg border border-line bg-white">
+                  <Image
+                    src={`${category.dir}/${file}${v}`}
+                    unoptimized={!!category.version}
+                    alt={name}
+                    width={816}
+                    height={510}
+                    sizes="(max-width: 860px) 100vw, 360px"
+                    className="h-full w-auto object-contain object-bottom"
+                  />
+                </div>
+              ) : category.tile === "logo" ? (
+                // Logo files sit inside a fixed box on a white tile — every mark
+                // reads at a comparable size, wide wordmark or square glyph, the
+                // way a logo kit lays out its files.
+                <div className="flex aspect-[16/10] w-full items-center justify-center rounded-lg border border-line bg-white">
+                  <Image
+                    src={`${category.dir}/${file}${v}`}
+                    unoptimized={!!category.version}
+                    alt={name}
+                    width={816}
+                    height={510}
+                    sizes="(max-width: 860px) 100vw, 360px"
+                    className="h-auto max-h-[36%] w-auto max-w-[58%] object-contain"
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={`${category.dir}/${file}${v}`}
+                    unoptimized={!!category.version}
+                  alt={name}
+                  width={816}
+                  height={510}
+                  // 360px, not 33vw: the frame caps at 1440, so a grid column never
+                  // exceeds ~350px CSS no matter how wide the monitor is
+                  sizes="(max-width: 860px) 100vw, 360px"
+                  className={`aspect-[16/10] w-full rounded-lg ${
+                    category.fit === "contain" ? "object-contain p-8 max-[860px]:p-6" : "object-cover"
+                  }`}
+                  style={{ background: stage ?? category.stage ?? "#f3efd7" }}
+                />
+              )}
+              <figcaption className="flex items-baseline justify-between gap-2.5">
+                <div>
+                  <div className="text-meta font-medium tracking-snug text-ink">{name}</div>
+                  <div className="font-mono text-micro text-muted-3">
+                    {file.split(".").pop()?.toUpperCase()} · {dims} · {size}
+                  </div>
+                </div>
+                {/* names the asset — otherwise a links list reads
+                    "Download, Download, Download…" with nothing to tell apart */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  href={`${category.dir}/${file}`}
+                  download
+                  aria-label={`Download ${name} — ${file.split(".").pop()?.toUpperCase()}, ${dims}, ${size}`}
+                >
+                  Download
+                  <DownloadIcon size={14} />
+                </Button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+
+      <AssetGenerator category={category} />
+    </section>
+  );
+}
