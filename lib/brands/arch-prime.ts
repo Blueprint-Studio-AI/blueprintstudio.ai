@@ -32,6 +32,7 @@ export const archPrime: BrandConfig = {
     taglineColor: "#F3EFD7",
     background: "#0E2A4A",
     lockupWidth: "515px", // 72px tall at the lockup's 7.2:1
+    quality: 85, // edges and grain soften at the default 75 (58 KB → 88 KB)
   },
   // No overview — the review build opens straight on the logo system.
 

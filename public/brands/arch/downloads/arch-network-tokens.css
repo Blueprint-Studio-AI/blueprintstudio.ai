@@ -4,10 +4,17 @@
   --arch-orange: #EC641D;
   --arch-indigo: #3E3A8E;
   --arch-violet: #736FB9;
-  --arch-gold: #E6C98A;
   --arch-parchment: #F3EFD7;
-  --arch-peach: #F4814A;
   --arch-ink: #181818;
+
+  /* /chain page system (chain.css, .chain-scope) */
+  --arch-chain-bg: #FBFAF7;
+  --arch-chain-body: #46443F;
+  --arch-chain-muted: #6C6A62;
+  --arch-chain-faint: #9A978C;
+  --arch-chain-orange-2: #F4814A;
+  --arch-chain-orange-ink: #C9520F;
+  --arch-chain-code-gold: #E6C98A;
 
   /* type */
   --arch-font-display: "Gascogne Serial", Georgia, serif;

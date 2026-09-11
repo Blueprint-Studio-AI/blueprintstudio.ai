@@ -146,11 +146,12 @@ export interface BrandConfig {
     /** floor for a viewport-relative height, so it can't collapse */
     minHeight?: string;
     /**
-     * WebP quality for the art (next/image). 75 (default) is visually lossless for
-     * photographs under a scrim; flat graphics with soft gradients (HoneyB's comb)
-     * blotch at 75 and want 90. Must be listed in next.config images.qualities.
+     * WebP quality for the art (next/image). 75 (default) is fine for textured
+     * art (Jinba); photographs with fine grain read slightly soft at 75 and use 85
+     * (Arch, Arch Prime); flat graphics with soft gradients (HoneyB's comb) blotch
+     * below 90. Must be listed in next.config images.qualities.
      */
-    quality?: 75 | 90;
+    quality?: 75 | 85 | 90;
   };
   /**
    * Light-hero brands keep the nav's dark surface from the top, because white
@@ -203,6 +204,11 @@ export interface BrandConfig {
   primary: Swatch[];
   secondary: Swatch[];
   lineup: Lineup;
+  /**
+   * How the lineup is counted in the Color header, e.g. "chain colors" when
+   * it's a separate system rather than ramps. Default: "steps" (longest ramp).
+   */
+  lineupNoun?: string;
   accents: Step[];
   /**
    * Tinted fields keyed to a parent hue (Arch Prime's four Earn categories),
@@ -280,7 +286,9 @@ export const metaFor = (b: BrandConfig) => {
             b.lineup.length
           } ramps`
         : b.lineup.length
-          ? `${named} colors · ${steps} steps`
+          ? b.lineupNoun
+            ? `${named} colors · ${b.lineup.reduce((n, g) => n + g.rows.reduce((m, r) => m + r.length, 0), 0)} ${b.lineupNoun}`
+            : `${named} colors · ${steps} steps`
           : b.colorFields
             ? `${named} colors · ${b.colorFields.items.length} ${b.colorFields.label}`
             : `${named} colors`,

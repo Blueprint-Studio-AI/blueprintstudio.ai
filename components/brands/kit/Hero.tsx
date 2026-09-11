@@ -13,7 +13,7 @@
 // Above 860px only: on phones iOS 26 Safari tinted its toolbar with the pinned
 // hero's colour over every section, so there the hero scrolls normally.
 import { Fragment, useEffect, useRef } from "react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const DARK_SCRIM =
@@ -44,6 +44,7 @@ export default function Hero() {
   // `overlay` defaults to the dark scrim; pass null for a light hero.
   const overlay = hero.overlay === undefined ? DARK_SCRIM : hero.overlay;
   const band = hero.art === "band";
+  const preview = getImageProps({ src: hero.image, alt: "", width: 64, height: 36, quality: 75 }).props.src;
   const section = useRef<HTMLElement>(null);
   const inner = useRef<HTMLDivElement>(null);
 
@@ -125,6 +126,14 @@ export default function Hero() {
         </div>
       ) : (
         <div aria-hidden className="absolute left-0 top-[-7.82%] h-[111.01%] w-full">
+          {/* A 64px copy (~1 KB, same optimizer) blurred behind the photo, so a
+              slow connection shows the image's colours and shapes at once
+              instead of a flat field while the full one downloads. The photo
+              covers it completely once it lands. */}
+          <div
+            className="absolute inset-0 scale-110 blur-2xl"
+            style={{ backgroundImage: `url(${preview})`, backgroundSize: "cover", backgroundPosition: "center" }}
+          />
           <Image src={hero.image} alt="" fill preload sizes={HERO_SIZES} quality={hero.quality} className="object-cover" />
         </div>
       )}

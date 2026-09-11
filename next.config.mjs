@@ -29,8 +29,8 @@ const nextConfig = {
   turbopack: { root: __dirname },
 
   images: {
-    // 75 is next/image's default; 90 is for flat-graphic brand heroes (hero.quality)
-    qualities: [75, 90],
+    // 75 is next/image's default; 85/90 are brand-page hero qualities (hero.quality)
+    qualities: [75, 85, 90],
     remotePatterns: [
       { protocol: 'https', hostname: 'blueprintstudio.ai', pathname: '/**' },
       { protocol: 'http', hostname: 'localhost', port: '3000', pathname: '/**' },
