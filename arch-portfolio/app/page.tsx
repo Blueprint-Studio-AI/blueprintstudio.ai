@@ -9,6 +9,7 @@ import CopyCssPill from "@/components/CopyCssPill";
 import BrandAssets from "@/components/BrandAssets";
 import Motion from "@/components/Motion";
 import Implementation from "@/components/Implementation";
+import RelatedBrand from "@/components/RelatedBrand";
 import Footer from "@/components/Footer";
 import { META } from "@/lib/data";
 
@@ -51,6 +52,7 @@ export default function Home() {
         <BrandAssets />
 
         <Implementation />
+        <RelatedBrand />
       </main>
       <Footer />
     </>
