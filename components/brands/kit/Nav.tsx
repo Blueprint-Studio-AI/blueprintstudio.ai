@@ -11,6 +11,20 @@
 // together, so the bar tracks the scroll continuously instead of snapping. That
 // value is written straight to the DOM as a CSS variable via a ref, so scrolling
 // never re-renders React — only the active-section change does.
+//
+// TODO(brand pages): make the morph smooth in the edge cases, especially on
+// mobile. Known rough spots to check:
+//  - Jumps: tab clicks and deep links (/brands/arch#downloads) move past
+//    MORPH_RANGE in one frame, so the bar snaps from clear to solid instead of
+//    easing; a hash on load can also flash the clear state first.
+//  - Cost per frame: the float animates padding (a layout change every frame)
+//    and the backdrop blur radius, both expensive on iOS Safari. Consider a
+//    transform for the float and a fixed blur cross-faded with opacity.
+//  - iOS: the address bar collapsing/expanding resizes the viewport mid-scroll,
+//    rubber-band overscroll bounces at both ends, and since the hero no longer
+//    pins under 860px, MORPH_RANGE (tuned for the pinned hero) may feel off.
+//  - The site-wide smooth-scroll provider (components/SmoothScroll) also runs
+//    on these pages; check it isn't double-smoothing against this rAF read.
 import { useEffect, useRef, useState } from "react";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 import Button from "@/components/brands/kit/ui/Button";
