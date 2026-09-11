@@ -58,8 +58,9 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
                 generally enough for a prospect to see themselves in it. */}
             <div className="flex items-center gap-[14px]">
               {/* color wordmark SVG — the card sits on a light surface */}
+              {/* lazy: this SVG embeds a bitmap (~265 KB) and the card is far below the fold */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/blueprint-logo-color.svg" alt="Blueprint Studio" className="h-[18px] w-auto" />
+              <img src="/assets/blueprint-logo-color.svg" alt="Blueprint Studio" loading="lazy" decoding="async" className="h-[18px] w-auto" />
               <span aria-hidden className="h-[18px] w-[1.5px] shrink-0 bg-[rgba(230,230,230,0.8)]" />
               <span className="whitespace-nowrap text-label uppercase text-muted-1">Asset Generator</span>
             </div>

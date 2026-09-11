@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { BrandConfig } from "@/components/brands/kit/types";
 
 // Route metadata shared by every /brands/* page. The title/description shape
@@ -65,3 +65,10 @@ export function BrandJsonLd({ brand, image = `/brands/${brand.slug}/opengraph-im
     />
   );
 }
+
+/**
+ * Browser chrome colour for the route: Android Chrome and iOS Safari up to 18
+ * tint their toolbars with it. The site-wide default is the marketing pages'
+ * light grey; use the hero's own field. (iOS 26 Safari ignores theme-color.)
+ */
+export const brandViewport = (b: BrandConfig): Viewport => ({ themeColor: b.hero.background ?? b.brandInk });

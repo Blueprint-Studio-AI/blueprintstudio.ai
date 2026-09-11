@@ -11,6 +11,7 @@
 // opaque sheet — see BrandKitPage. Sticky is the strongest parallax there is:
 // the background moves 0 while the foreground moves 1, and it costs no JS.
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const DARK_SCRIM =
@@ -21,6 +22,13 @@ const DARK_SCRIM =
  * over the art (transparent at the art's foot, opaque by 98% up); a mask is the
  * same result without hard-coding a veil colour that has to match the field.
  */
+// The art is cover-scaled into a 730px-tall frame, so on most screens (every
+// phone) it's drawn far wider than the viewport: "100vw" under-asked and came
+// out soft. Every hero source is ≤ 2646px wide, so ask for the largest variant;
+// the optimizer caps it at the source width. Same sharpness as the original
+// file, as a WebP a fraction of the size.
+const HERO_SIZES = "3840px";
+
 const MASK = "linear-gradient(to top, #000 0%, #000 25%, transparent 97%)";
 
 export default function Hero() {
@@ -75,24 +83,27 @@ export default function Hero() {
       // Height is per-brand: a viewport-relative hero scales with the window,
       // a fixed one stays a slab. minHeight is the floor that stops a vh value
       // collapsing on a short laptop screen.
-      className="sticky top-0 z-0 w-full overflow-hidden motion-reduce:relative"
+      className="sticky top-0 z-0 w-full overflow-hidden motion-reduce:relative max-[860px]:relative"
       style={{
         backgroundColor: hero.background ?? brandInk,
         height: hero.height ?? "730px",
         minHeight: hero.minHeight,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* The art goes through next/image, not a raw <img>: the source files are
+          the downloadable originals (up to 2646px and 800 KB+), and the hero is
+          the page's largest paint. next/image serves a WebP sized to the screen
+          and `preload` starts it with the HTML, instead of after the page parses.
+          It never upscales, so it can't come out softer than the source. The
+          wrapper div carries the crop and effects; the image just fills it. */}
       {band ? (
         // Band: the art is a horizon along the bottom that dissolves upward into
         // the flat field, so the lockup sits on colour rather than on artwork.
         // multiply + 66% is what keeps the comb from reading as a photograph
         // pasted on — it tints the field instead of covering it.
-        <img
-          src={hero.image}
-          alt=""
+        <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 w-full max-w-none object-cover object-bottom"
+          className="absolute inset-x-0 bottom-0"
           style={{
             height: hero.artHeight ?? "46%",
             filter: "blur(2.3px)",
@@ -101,14 +112,13 @@ export default function Hero() {
             maskImage: MASK,
             WebkitMaskImage: MASK,
           }}
-        />
+        >
+          <Image src={hero.image} alt="" fill preload sizes={HERO_SIZES} quality={hero.quality} className="object-cover object-bottom" />
+        </div>
       ) : (
-        <img
-          src={hero.image}
-          alt=""
-          aria-hidden
-          className="absolute left-0 top-[-7.82%] h-[111.01%] w-full max-w-none object-cover"
-        />
+        <div aria-hidden className="absolute left-0 top-[-7.82%] h-[111.01%] w-full">
+          <Image src={hero.image} alt="" fill preload sizes={HERO_SIZES} quality={hero.quality} className="object-cover" />
+        </div>
       )}
       {overlay && <div aria-hidden className="absolute inset-0" style={{ background: overlay }} />}
       <div ref={inner} className="relative flex h-full flex-col items-center justify-center gap-8 will-change-[transform,opacity]">

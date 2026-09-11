@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { gascogne } from "../_fonts/gascogne";
 import { arch } from "@/lib/brands/arch";
-import { brandMetadata, BrandJsonLd } from "@/lib/brands/meta";
+import { brandMetadata, brandViewport, BrandJsonLd } from "@/lib/brands/meta";
 
 // Arch's faces, scoped to this route: Gascogne Serial as --font-display, Geist
 // as --font-text. The kit resolves font-serif/font-sans from those inside the
@@ -11,6 +11,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", disp
 
 // No static OG — ./opengraph-image.tsx composes one from the hero.
 export const metadata = brandMetadata(arch);
+export const viewport = brandViewport(arch);
 
 export default function ArchLayout({ children }: { children: React.ReactNode }) {
   return (

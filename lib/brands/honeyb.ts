@@ -34,6 +34,7 @@ export const honeyb: BrandConfig = {
     art: "band",
     artHeight: "46%", // 334 of the 730 frame
     lockupWidth: "402px", // brandmark + gap + wordmark, measured off 316:27
+    quality: 90, // the comb is a flat graphic: at the default 75 its soft edges blotch (still only ~10 KB)
   },
   // The cream field means the nav can start as dark ink on nothing and cross to
   // white as the bar materialises — the Jinba morph, rather than a black bar

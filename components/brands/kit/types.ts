@@ -145,6 +145,12 @@ export interface BrandConfig {
     height?: string;
     /** floor for a viewport-relative height, so it can't collapse */
     minHeight?: string;
+    /**
+     * WebP quality for the art (next/image). 75 (default) is visually lossless for
+     * photographs under a scrim; flat graphics with soft gradients (HoneyB's comb)
+     * blotch at 75 and want 90. Must be listed in next.config images.qualities.
+     */
+    quality?: 75 | 90;
   };
   /**
    * Light-hero brands keep the nav's dark surface from the top, because white

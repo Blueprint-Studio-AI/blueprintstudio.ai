@@ -14,7 +14,17 @@ import { useToast } from "@/components/brands/kit/ui/Toast";
 import { DownloadIcon } from "@/components/brands/kit/ui/icons";
 import AssetGenerator from "@/components/brands/kit/AssetGenerator";
 
-const SIZES = "(max-width: 860px) 100vw, 360px"; // frame caps at 1440 → a column never exceeds ~350px
+/**
+ * `sizes` for a card, from the asset's own dimensions ("2646×794"). Cards are
+ * 16:10 and ~360px wide (the frame caps at 1440); a photo wider than 16:10 is
+ * cover-cropped, so it's drawn wider than the card — a panorama at ~2x. Asking
+ * for the card width alone served those soft on retina screens.
+ */
+const sizesFor = (dims: string, cover: boolean) => {
+  const [w, h] = dims.split("×").map(Number);
+  const k = cover && w && h ? Math.max(1, (10 / 16) * (w / h)) : 1;
+  return `(max-width: 860px) ${Math.ceil(100 * k)}vw, ${Math.ceil(360 * k)}px`;
+};
 
 export default function BrandAssets() {
   const { assetCategories: ASSET_CATEGORIES } = useBrand();
@@ -79,14 +89,14 @@ export default function BrandAssets() {
                   // anchored to the bottom of its PNG stands on the card rather
                   // than floating in it.
                   <div className="flex aspect-[16/10] w-full items-end justify-center overflow-hidden rounded-lg border border-line bg-white">
-                    <Image src={src} alt={name} width={816} height={510} sizes={SIZES} className="h-full w-auto object-contain object-bottom" />
+                    <Image src={src} alt={name} width={816} height={510} sizes={sizesFor(dims, false)} className="h-full w-auto object-contain object-bottom" />
                   </div>
                 ) : category.tile === "logo" ? (
                   // Logo files sit inside a fixed box on a white tile — every mark
                   // reads at a comparable size, wide wordmark or square glyph, the
                   // way a logo kit lays out its files.
                   <div className="flex aspect-[16/10] w-full items-center justify-center rounded-lg border border-line bg-white">
-                    <Image src={src} alt={name} width={816} height={510} sizes={SIZES} className="h-auto max-h-[36%] w-auto max-w-[58%] object-contain" />
+                    <Image src={src} alt={name} width={816} height={510} sizes={sizesFor(dims, false)} className="h-auto max-h-[36%] w-auto max-w-[58%] object-contain" />
                   </div>
                 ) : (
                   <Image
@@ -94,7 +104,7 @@ export default function BrandAssets() {
                     alt={name}
                     width={816}
                     height={510}
-                    sizes={SIZES}
+                    sizes={sizesFor(dims, category.fit !== "contain")}
                     className={`aspect-[16/10] w-full rounded-lg ${
                       category.fit === "contain" ? "object-contain p-8 max-[860px]:p-6" : "object-cover"
                     }`}

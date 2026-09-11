@@ -78,6 +78,16 @@ Each brand page offers its design system as one Markdown file for coding agents 
 
 The share image (`opengraph-image.tsx`) is composed from the hero automatically.
 
+### Images
+
+The files in `public/brands/<slug>/` are the originals: they're what the download buttons hand over, so never compress or resize them in place. What the page *shows* goes through `next/image`, which serves a resized WebP from them on the fly (the hero, the asset grid, the gallery rails and the motion stills all do). It never upscales, so a displayed image can't be softer than its source.
+
+- **Hero art** loads with `preload` and always asks for the full source as WebP (`HERO_SIZES` in `Hero.tsx`), because it's cover-scaled into a tall frame and drawn wider than the screen. Quality is 75 by default; set `hero.quality: 90` for flat graphics with soft gradients, which blotch at 75 (HoneyB's honeycomb). Allowed values are listed in `next.config.mjs` → `images.qualities`.
+- **Asset cards** size themselves from each item's dimensions in the data file, so wide images that get cropped to a 16:10 card still come out sharp. Keep those dimensions accurate.
+- **SVGs** go through a plain `<img>`; there's nothing to optimise. Anything far below the fold should be `loading="lazy"`.
+- **Rules of thumb:** hero at display size under ~200 KB, card thumbnails under ~100 KB, and first-view images under ~1 MB on a phone. LCP (the largest paint, here the hero) under 2.5 s is Google's "good" Core Web Vitals threshold.
+- **iOS:** the hero is pinned (sticky) only above 860px. On phones, iOS 26 Safari tinted its toolbar with the pinned hero's colour over every section. Check phone layouts in the iOS Simulator's Safari, not only a narrow desktop window.
+
 ### Fonts
 
 Google Fonts load through `next/font/google` in the route's `layout.tsx`. Licensed fonts go in `app/brands/_fonts/` and load with `next/font/local` (see `gascogne.ts`). Confirm the licence covers web use before shipping one.

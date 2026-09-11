@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { jinba } from "@/lib/brands/jinba";
-import { brandMetadata, BrandJsonLd } from "@/lib/brands/meta";
+import { brandMetadata, brandViewport, BrandJsonLd } from "@/lib/brands/meta";
 
 // Geist is loaded and scoped to this route only — the `.brand-kit-root` wrapper
 // (see globals.css) points font-sans at --font-text without touching the site's
@@ -10,6 +10,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", disp
 
 const OG = "/brands/jinba/og-image.png";
 export const metadata = brandMetadata(jinba, OG);
+export const viewport = brandViewport(jinba);
 
 export default function JinbaLayout({ children }: { children: React.ReactNode }) {
   return (
