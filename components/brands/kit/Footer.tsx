@@ -126,7 +126,15 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer ref={ref} id="footer" className="relative w-full bg-neutral-900 text-neutral-400">
+    <footer
+      ref={ref}
+      id="footer"
+      className="relative w-full bg-neutral-900 text-neutral-400"
+      // Blueprint's footer, in Blueprint's face (Inter, from the root layout), not
+      // the brand's: inside .brand-kit-root everything else inherits the client's
+      // text face, which had the footer in Geist, Inter or Plus Jakarta by brand.
+      style={{ fontFamily: 'var(--font-inter), -apple-system, "Helvetica Neue", Arial, sans-serif' }}
+    >
       {/* dashed side rails on the section edge (60px desktop / 10px mobile) */}
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:left-[60px]" />
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:right-[60px]" />
