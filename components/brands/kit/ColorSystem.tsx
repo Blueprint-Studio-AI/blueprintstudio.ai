@@ -76,7 +76,9 @@ export default function ColorSystem() {
         <div className="flex items-start gap-gutter max-[1200px]:gap-14 max-[1024px]:flex-col max-[1024px]:gap-11">
           {/* left */}
           <div className="flex w-[596px] shrink-0 flex-col gap-8 max-[1200px]:w-[46%] max-[1024px]:w-full">
-            <Tag>{slug}-{selected.name.toLowerCase().replace(/\s+/g, "-")}</Tag>
+            {/* the group, like the lineup's tags (arch-chain, jinba-light); the
+                selected swatch is named on the swatch itself */}
+            <Tag>{slug}-main</Tag>
 
             {/* One property, not two. `background` takes a hex and a
                 linear-gradient() alike, so branching to backgroundImage only
