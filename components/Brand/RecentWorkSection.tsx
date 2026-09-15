@@ -27,7 +27,7 @@ const projects: (CaseStudy & { id: number; color: string })[] = [
     ],
     image: "/media/recent-work/honeyb-desktop.webp",
     imageMobile: "/media/recent-work/honeyb-mobile.webp",
-    href: "/work",
+    href: "/brands/honeyb",
   },
   {
     id: 2,
@@ -46,7 +46,7 @@ const projects: (CaseStudy & { id: number; color: string })[] = [
     ],
     image: "/media/recent-work/jinba-desktop.webp",
     imageMobile: "/media/recent-work/jinba-mobile.webp",
-    href: "/work",
+    href: "/brands/jinba",
   },
   {
     id: 3,
@@ -64,7 +64,6 @@ const projects: (CaseStudy & { id: number; color: string })[] = [
     ],
     image: "/media/projects/autara/recent-work-card.webp",
     imageMobile: "/media/recent-work/autara-mobile.webp",
-    href: "/work",
   },
 ];
 
