@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export interface CaseStudy {
   /** Brand logo lockup. */
   logo: string;
@@ -13,8 +15,8 @@ export interface CaseStudy {
   description: string;
   /** Numbered deliverable chips. */
   deliverables: { num: string; label: string }[];
-  /** Destination for "View Full Project". */
-  href: string;
+  /** Case-study page the whole card links to. Omit and the card isn't a link. */
+  href?: string;
   /**
    * Solid colour for the project visual panel. Used as the panel background —
    * it shows on its own as a placeholder, or sits behind `image` if one is set.
@@ -43,9 +45,11 @@ export default function CaseStudyCard({
   accent,
   image,
   imageMobile,
+  href,
 }: CaseStudy) {
-  return (
-    <div className="group block w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white sm:rounded-3xl">
+  const frame = "group block w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white sm:rounded-3xl";
+  const body = (
+    <>
       <div className="flex flex-col lg:flex-row">
         {/* Visual panel — a tall mockup on top when stacked (mobile/tablet), the
             right-hand column when side-by-side (lg+). `accent` is the background;
@@ -113,6 +117,20 @@ export default function CaseStudyCard({
           </div>
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  // A case study with a page links the whole card there (the image already
+  // zooms on hover); one without stays a plain card.
+  return href ? (
+    <Link
+      href={href}
+      aria-label={`${name}: ${title}`}
+      className={`${frame} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900`}
+    >
+      {body}
+    </Link>
+  ) : (
+    <div className={frame}>{body}</div>
   );
 }
