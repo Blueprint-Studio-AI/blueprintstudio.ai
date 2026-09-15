@@ -34,6 +34,15 @@ Two engagement models:
 - [Privacy Policy](https://blueprintstudio.ai/privacy-policy): Privacy policy
 - [Terms of Service](https://blueprintstudio.ai/terms): Terms of service
 
+## Brand Work
+
+Brand identity case studies, each with its logo system, colour and type systems, downloadable brand kit, and a `design.md` design system for coding agents.
+
+- [Jinba](https://blueprintstudio.ai/brands/jinba): AI automation for finance ([design.md](https://blueprintstudio.ai/brands/jinba/design.md))
+- [HoneyB](https://blueprintstudio.ai/brands/honeyb): Bitcoin yield platform ([design.md](https://blueprintstudio.ai/brands/honeyb/design.md))
+- [Arch Network](https://blueprintstudio.ai/brands/arch): Bitcoin-native financial market infrastructure ([design.md](https://blueprintstudio.ai/brands/arch/design.md))
+- [Arch Prime](https://blueprintstudio.ai/brands/arch-prime): Premier app on Arch Network, with its own sub-brand ([design.md](https://blueprintstudio.ai/brands/arch-prime/design.md))
+
 ## Social
 
 - X (Twitter): https://x.com/bpstu
