@@ -175,8 +175,8 @@ export const archPrime: BrandConfig = {
       "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Arch%20Prime%20asset%20generator%20account.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AWork%20email%3A%0A",
   },
   downloads: {
-    // Arch-Prime-Brand-Guidelines-v1.1.pdf (23 MB) on the shared Drive — "anyone with the link"
-    guidelines: "https://drive.google.com/file/d/13gdTJNiqeVUJsTcbDZQ3m5hjSZptdJAa/view",
+    // Arch-Prime-Brand-Guidelines-v1.1.pdf (22 MB) on the shared Drive — "anyone with the link"
+    guidelines: "https://drive.google.com/file/d/1s_wfr60pxOOmhpuCqw4rhcLCfy_9pZlC/view",
     logos: `${B}/downloads/arch-prime-logos.zip`,
     tokens: `${B}/downloads/arch-prime-tokens.css`,
     assets: `${B}/downloads/arch-prime-assets.zip`,
