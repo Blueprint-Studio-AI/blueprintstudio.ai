@@ -1,4 +1,4 @@
-/* Arch Prime — design tokens (brand deck, September 2026) */
+/* Arch Prime — design tokens (brand guidelines v1.1, September 2026) */
 :root {
   /* brand */
   --prime-orange: #FF5E00;
@@ -7,7 +7,7 @@
 
   /* app sections */
   --prime-boost: #6B1E0D;
-  --prime-earn: #113671;
+  --prime-earn: #123164;
   --prime-borrow: #1F5543;
 
   /* earn categories */
