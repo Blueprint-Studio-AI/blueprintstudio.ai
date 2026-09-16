@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import LocomotiveScroll from "locomotive-scroll";
 
 interface SmoothScrollContextType {
@@ -60,6 +61,43 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
       }
     };
   }, []);
+
+  // Land at the top of a new page.
+  //
+  // These are client-side navigations, so the browser doesn't reset the scroll —
+  // Next does. But Locomotive/Lenis owns the scroll position, and the two race:
+  // click a link far down a long page (the case-study cards sit ~7,700px down
+  // /brand) and the old offset can survive into the new page, which opens near
+  // its bottom. Resetting here makes it deterministic.
+  //
+  // Back/forward and in-page hashes are left alone: the browser restores the
+  // previous position, and a #section link should land on its section.
+  const pathname = usePathname();
+  const firstRender = useRef(true);
+  const backForward = useRef(false);
+
+  useEffect(() => {
+    const onPopState = () => {
+      backForward.current = true;
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false; // initial load: the browser already handled it
+      return;
+    }
+    if (backForward.current) {
+      backForward.current = false; // let scroll restoration do its job
+      return;
+    }
+    if (window.location.hash) return; // an anchor owns where we land
+
+    scrollRef.current?.scrollTo(0, { immediate: true });
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   // Handle route changes - refresh scroll
   useEffect(() => {
