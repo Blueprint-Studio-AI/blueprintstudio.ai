@@ -2,8 +2,8 @@ import type { BrandConfig, ColorField } from "@/components/brands/kit/types";
 
 // Arch Prime — ported from Nick's standalone review build (arch-prime-portfolio-review).
 // The product brand that descends from Arch Network: same mark and serif, its
-// own palette of section hues and a place system for the app (brand deck,
-// September 2026). Assets live under /public/brands/arch-prime.
+// own palette of section hues and a place system for the app (brand
+// guidelines v1.1, September 2026). Assets live under /public/brands/arch-prime.
 
 const B = "/brands/arch-prime";
 
@@ -64,7 +64,7 @@ export const archPrime: BrandConfig = {
   // One hue per app section — colour is spent once, at nav level.
   secondary: [
     { role: "App Section", name: "Boost", bg: "#6B1E0D", inspect: "#6B1E0D" },
-    { role: "App Section", name: "Earn", bg: "#113671", inspect: "#113671" },
+    { role: "App Section", name: "Earn", bg: "#123164", inspect: "#123164" },
     { role: "App Section", name: "Borrow", bg: "#1F5543", inspect: "#1F5543" },
   ],
   lineup: [],
@@ -175,8 +175,8 @@ export const archPrime: BrandConfig = {
       "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Arch%20Prime%20asset%20generator%20account.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AWork%20email%3A%0A",
   },
   downloads: {
-    // Arch-Prime-Brand-Guidelines-v1.0.pdf (24 MB) on the shared Drive — "anyone with the link"
-    guidelines: "https://drive.google.com/file/d/13gdTJNiqeVUJsTcbDZQ3m5hjSZptdJAa/view",
+    // Arch-Prime-Brand-Guidelines-v1.1.pdf (22 MB) on the shared Drive — "anyone with the link"
+    guidelines: "https://drive.google.com/file/d/1s_wfr60pxOOmhpuCqw4rhcLCfy_9pZlC/view",
     logos: `${B}/downloads/arch-prime-logos.zip`,
     tokens: `${B}/downloads/arch-prime-tokens.css`,
     assets: `${B}/downloads/arch-prime-assets.zip`,
