@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" class="light" style="color-scheme:light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arch · Chain — the financial network for native Bitcoin</title>
+<meta name="description" content="Arch is the financial network for native Bitcoin — real BTC, made programmable, settling on Bitcoin itself.">
+<style>
+  @font-face{font-family:"Gascogne";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de2f5fc55d8552a1a01d77_GascogneSerial.woff2) format("woff2");font-weight:400;font-display:swap}
+  @font-face{font-family:"Geist";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68dfd946fca94176b058660c_GeistVF.woff2) format("woff2");font-weight:100 900;font-display:swap}
+  @font-face{font-family:"AzeretMono";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de3df12192bb34d3f552bc_AzeretMono%5Bwght%5D.ttf) format("truetype");font-weight:100 900;font-display:swap}
+
+  :root{
+    --sans:"Geist",system-ui,-apple-system,sans-serif;
+    --serif:"Gascogne",Georgia,"Times New Roman",serif;
+    --mono:"AzeretMono",ui-monospace,SFMono-Regular,monospace;
+    --bg:oklch(0.992 0 0); --card:oklch(1 0 0); --hair:oklch(0.929 0 0); --hair-2:oklch(0.95 0 0);
+    --ink:oklch(0.235 0 0); --body:oklch(0.40 0 0); --muted:oklch(0.52 0 0); --faint:oklch(0.66 0 0);
+    --orange:#ec641d; --orange-2:#f4814a; --orange-ink:#c9520f;
+    --green:oklch(0.70 0.16 158); --gold:#34343a; --gold-ink:#34343a; --gold-tint:#ededed;
+    --blue:oklch(0.62 0.16 250);
+    --cream:#f3efd7; --purple:#3e3a8e; --purple-2:#736fb9;   /* Arch brand */
+    /* flat: no drop shadows — cards are defined by a single hairline only (utila-style) */
+    --shadow:none;
+    --shadow-h:none;
+    --r:.5rem; --r-sm:.375rem; --r-lg:8px; --soft:oklch(0.966 0 0); --ease:cubic-bezier(.4,0,.2,1); --ease-out:cubic-bezier(0,0,.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  ::selection{background:color-mix(in oklab,var(--orange) 18%,transparent)}
+  svg{display:block}
+
+  /* ---- nav ---- */
+  .nav{position:sticky;top:0;z-index:50;background:color-mix(in oklab,#fff 74%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+  .nav__in{max-width:48rem;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:13px 22px}
+  .brand{display:inline-flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none}
+  .brand svg{height:18px;width:auto}
+  .chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:6px}
+  .chip .led{width:6px;height:6px;border-radius:999px;background:var(--green);box-shadow:0 0 0 3px color-mix(in oklab,var(--green) 18%,transparent)}
+  .nav__links{display:flex;align-items:center;gap:22px;font-size:13px;color:var(--muted)}
+  .nav__links a{color:inherit;text-decoration:none;transition:color .15s}
+  .nav__links a:hover{color:var(--ink)}
+  .nav__links .on{color:var(--ink);font-weight:500}
+  @media(max-width:680px){.nav__links a{display:none}.nav .chip{display:none}}
+
+  /* ---- layout ---- */
+  .page{max-width:48rem;margin-inline:auto;padding:0 22px}
+  .col{max-width:42rem;margin-inline:auto}
+  section{scroll-margin-top:62px}
+  .sec{padding-block:5rem;border-top:1px solid var(--hair)}
+  @media(max-width:680px){.sec{padding-block:3.5rem}}
+
+  /* ---- type ---- */
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:9px}
+  .eyebrow .n{color:var(--orange);font-weight:500}
+  .eyebrow .ic{width:12px;height:12px;flex:none;color:var(--orange)}
+  h1{font-size:3.5rem;line-height:1.02;font-weight:500;letter-spacing:-.032em;text-wrap:balance;margin-top:20px;color:var(--ink)}
+  @media(max-width:680px){h1{font-size:2.35rem}}
+  h2{font-size:1.42rem;line-height:1.26;font-weight:450;letter-spacing:-.015em;text-wrap:balance;margin-top:14px;color:var(--ink)}
+  @media(max-width:680px){h2{font-size:1.28rem}}
+  h3{font-size:.98rem;font-weight:550;letter-spacing:-.01em;color:var(--ink)}
+  em{font-family:var(--serif);font-style:normal;font-weight:400;letter-spacing:0}
+  .lede{font-size:1.05rem;line-height:1.5;color:var(--body);max-width:42ch;margin-top:18px;text-wrap:pretty}
+  @media(max-width:680px){.lede{font-size:1rem}}
+  p.body{font-size:.95rem;line-height:1.62;color:var(--body);max-width:58ch;margin-top:14px;text-wrap:pretty}
+  p.body b,p.body strong{color:var(--ink);font-weight:500}
+  p.body em{font-family:var(--serif)}
+  .small{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+
+  /* ---- buttons ---- */
+  .btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:26px}
+  .btn{font-family:var(--sans);font-size:.94rem;font-weight:500;display:inline-flex;align-items:center;gap:7px;border-radius:11px;padding:11px 18px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:scale .14s var(--ease-out),box-shadow .2s,filter .2s}
+  .btn:active{scale:.975}
+  .btn--p{background:linear-gradient(180deg,var(--orange-2),var(--orange));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1.5px 2px rgba(0,0,0,.13),0 0 0 1px var(--orange-ink)}
+  .btn--p:hover{filter:brightness(1.04)}
+  .btn--g{background:var(--card);color:var(--ink);border-color:var(--hair);box-shadow:var(--shadow)}
+  .btn--g:hover{box-shadow:var(--shadow-h)}
+  .btn .ar{transition:translate .2s var(--ease-out)}
+  .btn:hover .ar{translate:2px 0}
+
+  /* ---- figure / diagram frame ---- */
+  figure{margin-top:30px;border:1px solid var(--hair);border-radius:var(--r);background:var(--card);overflow:hidden}
+  figure svg{width:100%;height:auto}
+  .fcap{font-family:var(--mono);font-size:.7rem;line-height:1.7;color:var(--muted);border-top:1px solid var(--hair);padding:11px 16px;text-wrap:pretty}
+  .fcap b{color:var(--ink)}
+
+  /* ---- metrics divider ---- */
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--hair);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);overflow:hidden;margin-top:22px}
+  @media(max-width:560px){.metrics{grid-template-columns:1fr}}
+  .metric{padding:18px 20px;border-right:1px solid var(--hair)}
+  .metric:last-child{border-right:0}
+  @media(max-width:560px){.metric{border-right:0;border-bottom:1px solid var(--hair)}.metric:last-child{border-bottom:0}}
+  .metric .v{font-size:1.7rem;font-weight:500;letter-spacing:-.02em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+  .metric .v small{font-family:var(--mono);font-size:.42em;font-weight:400;color:var(--faint);margin-left:2px}
+  .metric .k{font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-top:9px}
+  .metrics-foot{font-family:var(--mono);font-size:.66rem;color:var(--faint);margin-top:10px;text-align:center}
+
+  /* ---- part header (full-bleed-ish kicker) ---- */
+  .parthead{display:flex;align-items:center;gap:14px;margin-bottom:-2.5rem;padding-top:1rem}
+  .parthead .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);white-space:nowrap}
+  .parthead .ln{height:1px;background:var(--hair);flex:1}
+
+  /* ---- axiom cards ---- */
+  .axioms{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px}
+  @media(max-width:560px){.axioms{grid-template-columns:1fr}}
+  .axiom{border:1px solid var(--hair);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);padding:22px}
+  .axiom .ic{width:30px;height:30px;color:var(--orange)}
+  .axiom h3{margin:14px 0 6px}
+  .axiom p{font-size:.92rem;line-height:1.5;color:var(--body)}
+  .axiom p em{font-family:var(--serif)}
+  .bridge{font-size:1rem;line-height:1.55;color:var(--ink);max-width:48ch;margin-top:30px;text-wrap:pretty}
+  .bridge em{font-family:var(--serif)}
+
+  /* ---- consumer app cards ---- */
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  @media(max-width:640px){.apps{grid-template-columns:1fr}}
+  .appc{border:1px solid var(--hair);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+  .appc .viz{background:var(--bg);border-bottom:1px solid var(--hair);padding:0}
+  .appc .viz svg{width:100%;height:auto}
+  .appc .bd{padding:16px 18px}
+  .appc .l{font-family:var(--mono);font-size:.64rem;color:var(--orange);text-transform:uppercase;letter-spacing:.06em}
+  .appc h3{margin:7px 0 5px;font-size:1.05rem}
+  .appc p{font-size:.86rem;line-height:1.45;color:var(--body)}
+
+  /* ---- cta card ---- */
+  .cta{margin-top:34px;border:1px solid var(--hair);border-radius:var(--r);background:var(--card);padding:30px 26px;text-align:center}
+  .cta .l{font-family:var(--mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .cta h3{font-size:1.18rem;font-weight:500;letter-spacing:-.014em;margin:9px auto 0;max-width:26ch;line-height:1.28}
+  .cta h3 em{font-family:var(--serif)}
+  .cta .btns{justify-content:center;margin-top:20px}
+  .install{display:inline-flex;align-items:center;gap:0;margin-top:18px;border:1px solid var(--hair);border-radius:10px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+  .install code{font-family:var(--mono);font-size:.84rem;color:var(--ink);padding:10px 14px}
+  .install code .pr{color:var(--orange)}
+  .install .cp{border-left:1px solid var(--hair);padding:10px 13px;font-family:var(--mono);font-size:.7rem;color:var(--muted);background:var(--bg)}
+
+  /* ---- footer ---- */
+  footer{border-top:1px solid rgba(243,239,215,.12);background:#191a23}   /* graphite */
+  footer .foot__st{color:#f3efd7}
+  footer .foot__row,footer .foot__row a{color:rgba(243,239,215,.6)}
+  footer .foot__row a:hover{color:#f3efd7}
+  .foot{max-width:48rem;margin-inline:auto;padding:5rem 22px 3.5rem}
+  .foot__st{font-size:1.7rem;font-weight:500;letter-spacing:-.018em;line-height:1.22;max-width:22ch;color:var(--ink)}
+  .foot__st em{font-family:var(--serif)}
+  .foot__row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:44px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .foot__row a{color:var(--muted);text-decoration:none}
+  .foot__row a:hover{color:var(--ink)}
+
+  .wf{font-family:var(--mono);font-size:.66rem;line-height:1.7;color:var(--muted);border:1px dashed var(--faint);border-radius:8px;padding:11px 14px;margin-top:26px}
+  .wf b{color:var(--ink)}
+
+  /* shared svg label classes */
+  .l-mono{font-family:var(--mono);letter-spacing:.06em}
+/* === hero additions === */
+  /* ---- hero namespaced refinements ---- */
+  .hero .lede{max-width:34ch}
+  .hero .metric .k{text-wrap:balance}
+  .hero .metrics-foot{max-width:46ch;margin-inline:auto;text-wrap:balance;line-height:1.6}
+  .hero figure svg text{font-variant-numeric:tabular-nums}
+/* === foundation additions === */
+/* ===== PART 1 — namespaced additions (no global-token changes) ===== */
+.p1-fig svg{width:100%;height:auto}
+/* === axioms additions === */
+  /* ===== UX AXIOMS interstitial (namespaced: .ax-) ===== */
+  .ax-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
+  @media(max-width:560px){.ax-grid{grid-template-columns:1fr}}
+  .ax-card{
+    position:relative;display:flex;flex-direction:column;
+    border:1px solid var(--hair);border-radius:var(--r);background:var(--card);
+    box-shadow:var(--shadow);padding:22px 22px 24px;
+    transition:box-shadow .15s var(--ease),border-color .15s var(--ease),translate .15s var(--ease);
+  }
+  .ax-card:hover{box-shadow:var(--shadow-h);border-color:color-mix(in oklab,var(--orange) 22%,var(--hair));translate:0 -1px}
+  /* icon tile — optically centered, consistent footprint */
+  .ax-ic{
+    width:38px;height:38px;flex:none;display:grid;place-items:center;
+    border-radius:10px;color:var(--orange);
+    background:color-mix(in oklab,var(--orange) 7%,var(--card));
+    box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--orange) 16%,transparent);
+  }
+  .ax-ic svg{width:20px;height:20px;display:block}
+  .ax-n{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;color:var(--faint);font-variant-numeric:tabular-nums}
+  .ax-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .ax-card h3{margin:15px 0 7px;font-size:1.04rem;letter-spacing:-.012em}
+  .ax-card p{font-size:.92rem;line-height:1.5;color:var(--body);text-wrap:balance;max-width:30ch}
+  .ax-card p b,.ax-card p strong{color:var(--ink);font-weight:500}
+  /* bridge / payoff line */
+  .ax-bridge{
+    display:flex;align-items:flex-start;gap:14px;
+    margin-top:2.75rem;
+  }
+  .ax-bridge .mk{flex:none;margin-top:.46em;width:7px;height:7px;border-radius:999px;background:var(--orange);box-shadow:0 0 0 4px color-mix(in oklab,var(--orange) 14%,transparent)}
+  .ax-bridge p{font-size:1rem;line-height:1.55;color:var(--ink);max-width:48ch;text-wrap:balance;margin:0}
+  @media(max-width:680px){.ax-bridge p{font-size:.96rem}}
+  .ax-bridge em{font-family:var(--serif);color:var(--ink)}
+/* === consumer additions === */
+  /* ===== PART 3 namespaced additions ===== */
+  .appc{transition:box-shadow .18s var(--ease),translate .18s var(--ease)}
+  .appc:hover{box-shadow:var(--shadow-h);translate:0 -2px}
+  .appc h3{text-wrap:balance}
+  .appc p{text-wrap:pretty}
+  .appc .small{display:inline-block;margin-top:6px;color:var(--faint)}
+  .appc .applink{display:inline-flex;align-items:center;gap:5px;margin-top:11px;font-family:var(--mono);font-size:.66rem;letter-spacing:.02em;color:var(--orange);text-decoration:none;transition:gap .15s var(--ease-out)}
+  .appc .applink:hover{gap:8px}
+  .appc .applink .ar{transition:translate .15s var(--ease-out)}
+
+  /* ===== real Arch site nav (restored from the main site) ===== */
+  .archnav{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding:17px 44px;font-family:var(--sans);font-size:13px;color:#181818;background:color-mix(in oklab,#fff 78%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+  .archnav__logo{justify-self:start;display:inline-flex;align-items:center;color:inherit}
+  .archnav__logo svg{height:22px;width:auto;display:block}
+  .archnav__center{justify-self:center;display:flex;align-items:center;gap:28px}
+  .archnav__center > a{font:inherit;font-size:13px;text-decoration:none;color:inherit;opacity:.78;transition:opacity .15s ease}
+  .archnav__center > a:hover{opacity:1}
+  .archnav__center > a[aria-current="page"]{opacity:1;font-weight:600}
+  .archnav__x{justify-self:end;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:inherit;opacity:.78;transition:opacity .15s ease,background .15s ease}
+  .archnav__x:hover{opacity:1;background:rgba(0,0,0,.05)}
+  .archnav__x svg{width:15px;height:15px;display:block}
+  @media(max-width:760px){.archnav{padding:14px 20px;gap:14px}.archnav__center{gap:16px}.archnav__center > a{font-size:12.5px}}
+
+  /* ===== v6: colour-block movements (arch.network-style background bands) ===== */
+  /* overflow-x:clip (not hidden) prevents the 100vw breakouts from causing a sidescroll
+     WITHOUT turning <body> into a scroll container — which would break position:sticky pinning */
+  body{overflow-x:clip}
+  .band{width:100vw;margin-left:calc(50% - 50vw)}
+  /* only SOME movements get a brand-colour band — alternating breaks, not every section */
+  .band--how{background:transparent}                                    /* white paper */
+  /* the four rules run on a dramatic dark band — a deliberate section-change beat */
+  .band--why{background:#1f1c3e}                                        /* deep indigo */
+  .band--why .feat{padding-block:7.5rem}
+  .band--why .feat__head h2{color:var(--cream)}
+  .band--why .feat__intro{color:color-mix(in oklab,var(--cream) 72%,transparent)}
+  /* cards sit on the dark band: each a self-contained translucent tile, bare icon */
+  .band--why .rule{background:color-mix(in oklab,var(--cream) 5%,transparent)}
+  .band--why .rule__ic{color:color-mix(in oklab,var(--cream) 78%,transparent)}
+  .band--why .rule h3{color:var(--cream)}
+  .band--why .rule p{color:color-mix(in oklab,var(--cream) 50%,transparent)}
+  .band--unlock{background:transparent}                                 /* white paper */
+  .band--do{background:transparent}                                     /* white paper */
+  /* builder CTA — its own full-bleed soft-gray section, centered, no card chrome */
+  .band--builders{background:var(--soft)}
+  .band--builders .feat{padding-block:5.5rem}
+  .band--builders .cta{border:0;background:transparent;box-shadow:none;margin:0 auto;padding:0;max-width:42rem}
+  .band--builders .cta h3{font-size:1.6rem;letter-spacing:-.02em;max-width:24ch;margin-inline:auto}
+  @media(max-width:680px){.band--builders .cta h3{font-size:1.35rem}}
+  /* the colour shift does the separation, so the first section in a band drops its top hairline */
+  .band > .page > .sec:first-child,.band > .page > .kicker + .sec{border-top:0}
+
+  /* ===== v6: movement kicker (replaces the "Part N" labels) ===== */
+  .kicker{display:flex;align-items:center;gap:14px;padding-top:4.75rem}
+  @media(max-width:680px){.kicker{padding-top:3.25rem}}
+  .kicker .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);white-space:nowrap}
+  .kicker .ln{height:1px;background:var(--hair);flex:1}
+
+  /* ===== v6: layer-cake animation slot (close climax) ===== */
+  .animwrap{margin-top:30px;border:1px solid var(--hair);border-radius:var(--r);overflow:hidden;
+    background:radial-gradient(120% 90% at 50% -10%,color-mix(in oklab,var(--orange) 4%,transparent),transparent 55%),var(--card);
+    box-shadow:var(--shadow)}
+  .animwrap iframe{width:100%;height:560px;border:0;display:block;background:var(--bg)}
+  @media(max-width:680px){.animwrap iframe{height:460px}}
+  .animwrap .cap{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-family:var(--mono);font-size:.7rem;color:var(--muted);border-top:1px solid var(--hair);padding:11px 16px;text-wrap:pretty}
+  .animwrap .cap a{color:var(--orange);text-decoration:none}
+  .animwrap .cap a:hover{text-decoration:underline}
+  .animwrap .badge{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--orange);
+    border:1px solid color-mix(in oklab,var(--orange) 40%,transparent);border-radius:999px;padding:2px 8px;white-space:nowrap}
+
+  /* 3D hologram section visuals — a contained holographic projection card (sized for the portrait stack) */
+  .holowrap{position:relative;max-width:660px;margin:30px auto;padding:24px 0 30px;border-radius:var(--r);
+    background:radial-gradient(130% 100% at 50% 0%,#1f1c36 0%,#151324 55%,#0e0d18 100%);
+    border:1px solid var(--hair);overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .holowrap .holostage{position:relative;perspective:1200px}
+  .holowrap iframe{width:min(460px,84vw);height:470px;border:0;display:block;background:transparent;pointer-events:none;
+    transform-style:preserve-3d;animation:holofloat 9s ease-in-out infinite;filter:drop-shadow(0 8px 30px rgba(115,111,185,.45))}
+  @keyframes holofloat{0%,100%{transform:rotateY(-5deg) translateY(0)}50%{transform:rotateY(5deg) translateY(-7px)}}
+  .holowrap .holostage::before{content:'';position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:min(360px,72%);height:38px;background:radial-gradient(ellipse at center,rgba(115,111,185,.5),transparent 70%);filter:blur(10px);pointer-events:none}
+  .holowrap::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(115,111,185,.07) 0,rgba(115,111,185,.07) 1px,transparent 2px,transparent 5px);mix-blend-mode:screen;opacity:.6}
+  .holowrap .holocap{position:relative;z-index:2;font-family:var(--mono,monospace);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#a9a4d6}
+  @media(max-width:680px){.holowrap iframe{height:380px}}
+
+  /* ===== v6: paired consumer surfaces (Arch Prime + HoneyB) ===== */
+  .surfaces{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px}
+  @media(max-width:640px){.surfaces{grid-template-columns:1fr}}
+  .surface{display:flex;flex-direction:column;border:1px solid var(--hair);border-radius:var(--r);background:var(--card);
+    box-shadow:var(--shadow);overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow .18s var(--ease),translate .18s var(--ease)}
+  .surface:hover{box-shadow:var(--shadow-h);translate:0 -2px}
+  .surface__viz{background:var(--bg);border-bottom:1px solid var(--hair)}
+  .surface__viz svg{width:100%;height:auto;display:block}
+  .surface__bd{padding:18px 20px}
+  .surface__bd .l{font-family:var(--mono);font-size:.64rem;color:var(--orange);text-transform:uppercase;letter-spacing:.06em}
+  .surface__bd h3{margin:7px 0 6px;font-size:1.02rem;font-weight:600;letter-spacing:-.012em}
+  .surface__bd p{font-size:.9rem;line-height:1.5;color:var(--body);text-wrap:pretty}
+  .surface__bd .go{display:inline-flex;align-items:center;gap:5px;margin-top:12px;font-family:var(--mono);font-size:.66rem;color:var(--orange);transition:gap .15s var(--ease-out)}
+  .surface:hover .go{gap:8px}
+
+  /* ===== applications-now-possible ecosystem grid ===== */
+  .eco-lead{font-size:.95rem;line-height:1.6;color:var(--body);max-width:58ch;margin-top:8px;text-wrap:pretty}
+  .eco-lead em{font-family:var(--serif)}
+  .eco{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:24px}
+  @media(max-width:760px){.eco{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.eco{grid-template-columns:1fr}}
+  .eco-card{display:flex;flex-direction:column;border:1px solid var(--hair);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);padding:15px 17px;transition:box-shadow .16s var(--ease),translate .16s var(--ease)}
+  .eco-card:hover{box-shadow:var(--shadow-h);translate:0 -2px}
+  .eco-tag{align-self:flex-start;font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 8px;color:var(--orange);border:1px solid color-mix(in oklab,var(--orange) 38%,transparent)}
+  .eco-tag.partner{color:var(--purple-2);border-color:color-mix(in oklab,var(--purple-2) 48%,transparent)}
+  .eco-tag.consumer{color:var(--muted);border-color:var(--hair)}
+  .eco-card h4{margin:11px 0 5px;font-size:1.02rem;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+  .eco-card p{font-size:.86rem;line-height:1.45;color:var(--body);text-wrap:pretty}
+  .eco-card .built{margin-top:auto;padding-top:11px;font-family:var(--mono);font-size:.6rem;color:var(--faint);line-height:1.5}
+  .eco-card .built b{color:var(--muted);font-weight:500}
+  .eco-more{margin-top:14px;font-family:var(--mono);font-size:.68rem;color:var(--faint);text-wrap:pretty}
+
+  /* ===== breakout animated hero — the layer animation (items + hovers), rail on the left ===== */
+  /* pinned scroll-scrub hero: a tall track holds a sticky frame that locks centered in the
+     viewport while you scroll through the 4 layers, then releases back into normal flow.
+     --track-h sets the total scroll length of the pin (bigger = slower scrub). */
+  .herotrack{position:relative;width:100vw;margin-left:calc(50% - 50vw);height:var(--track-h,560vh);margin-bottom:5rem}
+  /* padding-top = nav height so the frame centers in the viewport area BELOW the sticky nav,
+     not the full viewport (keeps top:0 + height:100vh, so the pin math is unchanged) */
+  .herosticky{position:sticky;top:0;height:100vh;box-sizing:border-box;padding-top:var(--nav-h,69px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  .heroframe{display:flex;justify-content:center;width:100%}
+  .heroframe iframe{width:min(1240px,96vw);height:min(620px,82vh);border:0;border-radius:var(--r);background:var(--cream);display:block}
+  .heroprog{display:flex;gap:9px;align-items:center}
+  .heroprog i{width:7px;height:7px;border-radius:50%;background:rgba(62,58,142,.22);transition:background .35s var(--ease,ease),transform .35s var(--ease,ease)}
+  .heroprog i.on{background:var(--orange);transform:scale(1.3)}
+  @media(max-width:680px){.herotrack{height:var(--track-h,420vh)}.heroframe iframe{height:min(560px,76vh)}}
+
+  /* ===== Lenis smooth scroll (vendored 1.3.18) — official CSS, minus the iframe{pointer-events:none}
+     rule so the hero iframe keeps its hover interactions; wheel over it is forwarded to Lenis instead ===== */
+  html.lenis,html.lenis body{height:auto}
+  .lenis.lenis-smooth{scroll-behavior:auto!important}
+  .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+  .lenis.lenis-stopped{overflow:clip}
+
+  /* ===== utila-style feature section (.feat) — flat, left text + right illustration ===== */
+  .feat{max-width:64rem;margin-inline:auto;padding-block:5rem}
+  @media(max-width:680px){.feat{padding-block:3.5rem}}
+  .feat__head{max-width:42rem;margin-bottom:1rem}
+  .feat__head h2{font-size:1.85rem;line-height:1.16;letter-spacing:-.022em;font-weight:450}
+  @media(max-width:680px){.feat__head h2{font-size:1.5rem}}
+  .feat__intro{font-size:1rem;line-height:1.5;color:var(--body);max-width:48ch;margin-top:14px;text-wrap:pretty}
+  .feat__intro em{font-family:var(--serif)}
+  /* each feature = one row: text on the left, illustration card on the right.
+     no dividers — generous vertical rhythm separates the rows (reference-style) */
+  .feat__row{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:3rem;align-items:center;
+    padding-block:6.75rem}
+  @media(max-width:760px){.feat__row{grid-template-columns:1fr;gap:1.6rem;padding-block:4rem}}
+  .feat__rtitle{font-size:1.22rem;font-weight:450;letter-spacing:-.012em;line-height:1.3;color:var(--ink);text-wrap:balance}
+  .feat__rtitle em{font-family:var(--serif)}
+  .feat__desc{font-size:.95rem;line-height:1.55;color:var(--body);margin-top:.65rem;max-width:44ch;text-wrap:pretty}
+  .feat__desc b,.feat__desc strong{color:var(--ink);font-weight:500}
+  .feat__desc em{font-family:var(--serif)}
+  .feat__values{list-style:none;margin:1.15rem 0 0;display:flex;flex-direction:column;gap:.7rem}
+  .feat__values li{border-left:1px solid var(--hair);padding-left:.75rem;font-size:.84rem;line-height:1.45;color:var(--muted);text-wrap:pretty}
+  .feat__values li b{color:var(--body);font-weight:500}
+  /* big soft-gray panel, no stroke — illustration sits small, centered, with lots of air */
+  .feat__art{border:0;border-radius:var(--r-lg);background:var(--soft);overflow:hidden;margin:0;
+    display:flex;align-items:center;justify-content:center;padding:3.5rem 3rem;min-height:380px}
+  .feat__art svg{width:100%;max-width:420px;height:auto;display:block}
+  .feat__art .l-mono{font-variant-numeric:tabular-nums}
+  @media(max-width:760px){.feat__art{min-height:300px;padding:2.5rem 2rem}}
+
+  /* ===== "four rules" — separate cards: bare icon pinned top, text block below, tall card ===== */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:2.75rem}
+  @media(max-width:520px){.rules{grid-template-columns:1fr}}
+  .rule{background:var(--soft);border-radius:6px;padding:30px;min-height:258px;
+    display:flex;flex-direction:column;justify-content:flex-start}
+  .rule__ic{width:26px;height:26px;color:var(--ink)}
+  .rule__ic svg{width:100%;height:100%;display:block}
+  .rule h3{font-size:1.3rem;font-weight:450;letter-spacing:-.014em;line-height:1.3;margin:2.4rem 0 .55rem;color:var(--ink)}
+  .rule p{font-size:.95rem;line-height:1.42;color:var(--muted);margin:0;text-wrap:pretty}
+  .rule p b{font-weight:inherit;color:inherit}
+</style>
+</head>
+<body>
+
+<main id="top">
+
+  <div class="page">
+
+  <!-- ============================== MOVEMENT 2 — WHY IT MATTERS ============================== -->
+  <section class="band band--why"><div class="feat" id="why">
+    <div class="feat__head">
+      <h2>Four rules we couldn't break.</h2>
+      <p class="feat__intro">Real finance on Bitcoin needs all four at once. Every prior attempt broke at least one — so the markets never came, and Bitcoin's liquidity went everywhere except Bitcoin. Arch is the first to hold all four.</p>
+    </div>
+
+    <div class="rules">
+      <div class="rule">
+        <span class="rule__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8.5 5.5v13M11 3.5v2.5M14 3.5v2.5M11 18.5v2.5M14 18.5v2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8.5 5.5h6a3.25 3.25 0 0 1 0 6.5h-6m0 0h6.6a3.25 3.25 0 0 1 0 6.5h-6.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>Native</h3>
+        <p>If it isn't your <b>real Bitcoin</b>, you've already lost. So it always is.</p>
+      </div>
+      <div class="rule">
+        <span class="rule__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2.5 5 13.2h5.4L11 21.5 19 10.8h-5.4L13 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+        <h3>Fast</h3>
+        <p>Markets can't form on slow, uncertain recovery. So <b>execution is sub-second</b>.</p>
+      </div>
+      <div class="rule">
+        <span class="rule__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="2.6" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="18" r="2.6" stroke="currentColor" stroke-width="1.5"/><circle cx="19" cy="18" r="2.6" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 7.2 6.4 15.8M13.4 7.2l4.2 8.6M7.6 18h8.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <h3>Decentralized</h3>
+        <p>One custodian is one point of failure. So <b>no single party</b> can move your coin — the validators sign together.</p>
+      </div>
+      <div class="rule">
+        <span class="rule__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8.5 7.5 4 12l4.5 4.5M15.5 7.5 20 12l-4.5 4.5M13.5 5l-3 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>Programmable</h3>
+        <p>Payments alone don't make a market. So Arch runs <b>real programs</b> on native Bitcoin.</p>
+      </div>
+    </div>
+  </div></section><!-- /why -->
+
+  <!-- ============================== MOVEMENT 1 — HOW IT WORKS ============================== -->
+  <section class="band band--how"><div class="feat" id="native">
+    <div class="feat__head">
+      <h2>Native Bitcoin, made programmable — end to end.</h2>
+      <p class="feat__intro">Each layer inherits the one beneath it: a real coin, a chain that speaks Bitcoin, keys split across the validators, and settlement on Bitcoin itself.</p>
+    </div>
+
+    <!-- §1.1 native -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">It never stops being Bitcoin.</h3>
+        <p class="feat__desc">Most "Bitcoin" products hand you a receipt for coins held somewhere else. Arch never does — what you hold is the coin itself, recorded on Bitcoin's own ledger.</p>
+        <ul class="feat__values">
+          <li>A real <b>UTXO</b> — not an IOU or a wrapped token</li>
+          <li>Moves settle in a Bitcoin block, like any payment</li>
+          <li>The same coin before, during, and after</li>
+        </ul>
+      </div>
+      <figure class="feat__art p1-fig">
+      <svg viewBox="0 0 440 188" role="img" aria-label="Your Bitcoin is one real UTXO living inside Bitcoin's own ledger — not a receipt for one.">
+        <text x="220" y="30" text-anchor="middle" class="l-mono" font-size="10" fill="#8a8a92">BITCOIN · THE LEDGER</text>
+        <!-- chain links -->
+        <g stroke="#d3d3da" stroke-width="1.3"><line x1="117" y1="105" x2="131" y2="105"/><line x1="165" y1="105" x2="179" y2="105"/><line x1="213" y1="105" x2="227" y2="105"/><line x1="261" y1="105" x2="275" y2="105"/><line x1="309" y1="105" x2="323" y2="105"/></g>
+        <!-- ledger blocks -->
+        <g fill="#fff" stroke="#c4c4cc"><rect x="83" y="88" width="34" height="34" rx="7"/><rect x="131" y="88" width="34" height="34" rx="7"/><rect x="227" y="88" width="34" height="34" rx="7"/><rect x="275" y="88" width="34" height="34" rx="7"/><rect x="323" y="88" width="34" height="34" rx="7"/></g>
+        <!-- your UTXO — one real block in the chain -->
+        <rect x="179" y="88" width="34" height="34" rx="7" fill="#fff" stroke="#ec641d" stroke-width="1.6"/>
+        <rect x="189" y="98" width="14" height="14" rx="3" fill="#34343a"/>
+        <!-- callout -->
+        <line x1="196" y1="88" x2="196" y2="68" stroke="#ec641d" stroke-width="1.2" stroke-dasharray="2 2"/>
+        <rect x="144" y="48" width="104" height="20" rx="10" fill="#fff" stroke="#ec641d"/>
+        <text x="196" y="61.5" text-anchor="middle" class="l-mono" font-size="8.5" fill="#ec641d">your BTC · UTXO</text>
+        <text x="220" y="158" text-anchor="middle" class="l-mono" font-size="10" fill="#8a8a92">a real coin in the chain — not a receipt for one</text>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §1.2 VM -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">A chain that speaks Bitcoin natively.</h3>
+        <p class="feat__desc">Apps fire transactions; Arch sequences them into blocks every <b>180&nbsp;ms</b> and executes them against real Bitcoin UTXOs. It even has machinery for Bitcoin reorgs — so its record stays consistent with Bitcoin itself.</p>
+        <ul class="feat__values">
+          <li>Blocks every <b>180&nbsp;ms</b>, run on real UTXOs</li>
+          <li>A UTXO-aware virtual machine</li>
+          <li>Reorg-safe — rolls back and reapplies with Bitcoin</li>
+        </ul>
+      </div>
+      <figure class="feat__art p1-fig">
+      <svg viewBox="0 0 680 204" role="img" aria-label="Floating app transactions enter ArchVM, which sequences them into a fast chain of Arch blocks; reorg-safe.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#c4c4cc"/></marker></defs>
+        <text x="40" y="32" class="l-mono" font-size="9.5" fill="#8a8a92">FLOATING TXNS</text>
+        <!-- a column of pending txns, all flowing into ArchVM -->
+        <g fill="#fff" stroke="#b6b6be"><rect x="44" y="46" width="13" height="13" rx="2.5"/><rect x="44" y="74" width="13" height="13" rx="2.5"/><rect x="44" y="102" width="13" height="13" rx="2.5"/><rect x="44" y="130" width="13" height="13" rx="2.5"/></g>
+        <g stroke="#dcdce2" fill="none"><path d="M59 52 C108 60 120 92 148 98" marker-end="url(#a2)"/><path d="M59 80 C100 86 122 95 148 99" marker-end="url(#a2)"/><path d="M59 108 C100 104 122 101 148 101" marker-end="url(#a2)"/><path d="M59 136 C108 128 120 110 148 102" marker-end="url(#a2)"/></g>
+        <rect x="150" y="74" width="96" height="52" rx="9" fill="#fff" stroke="#ec641d" stroke-width="1.4"/>
+        <text x="198" y="98" text-anchor="middle" class="l-mono" font-size="12" letter-spacing="1.5px" fill="#ec641d">ArchVM</text>
+        <text x="198" y="113" text-anchor="middle" class="l-mono" font-size="8" fill="#b6b6be">UTXO-aware</text>
+        <path d="M246 100 L286 100" stroke="#c4c4cc" marker-end="url(#a2)"/>
+        <text x="468" y="56" text-anchor="middle" class="l-mono" font-size="9.5" fill="#8a8a92">ARCH CHAIN · one block / 180ms</text>
+        <line x1="290" y1="100" x2="650" y2="100" stroke="#d3d3da"/>
+        <g fill="#fff" stroke="#c4c4cc"><rect x="296" y="93" width="14" height="14" rx="3"/><rect x="330" y="93" width="14" height="14" rx="3" fill="#f2f2f4"/><rect x="364" y="93" width="14" height="14" rx="3"/><rect x="398" y="93" width="14" height="14" rx="3" fill="#f2f2f4"/><rect x="432" y="93" width="14" height="14" rx="3"/><rect x="466" y="93" width="14" height="14" rx="3" fill="#f2f2f4"/><rect x="500" y="93" width="14" height="14" rx="3"/><rect x="534" y="93" width="14" height="14" rx="3" fill="#f2f2f4"/><rect x="568" y="93" width="14" height="14" rx="3"/><rect x="602" y="93" width="14" height="14" rx="3" fill="#f2f2f4"/><rect x="636" y="93" width="14" height="14" rx="3"/></g>
+        <g><rect x="296" y="142" width="240" height="26" rx="13" fill="#fff" stroke="#d3d3da"/><circle cx="313" cy="155" r="4.5" fill="none" stroke="#7a7a82" stroke-width="1.1"/><path d="M313 152 v3 l2 2" fill="none" stroke="#7a7a82" stroke-width="1.1" stroke-linecap="round"/><text x="329" y="159" class="l-mono" font-size="8.5" fill="#7a7a82">reorg-safe · rollback &amp; reapply</text></g>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §1.3 threshold signing -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">There's no single key to hold.</h3>
+        <p class="feat__desc">If Arch can move your Bitcoin, who holds the key? <b>Nobody.</b> The authority to move a coin lives only as shares split across Arch's validators. No single party, Arch included, can move anything alone. On-chain it looks like an ordinary Bitcoin spend, because that's what it is.</p>
+        <ul class="feat__values">
+          <li>Authority split across validators (<b>FROST · ROAST</b>)</li>
+          <li>No single party — not even Arch — moves a coin alone</li>
+          <li>On-chain it's an ordinary Taproot spend</li>
+        </ul>
+      </div>
+      <figure class="feat__art p1-fig">
+      <svg viewBox="0 0 680 232" role="img" aria-label="Validator key-shares combine via threshold signing into one ordinary Bitcoin signature; no single key exists.">
+        <defs><marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#c4c4cc"/></marker></defs>
+        <text x="40" y="34" class="l-mono" font-size="9.5" fill="#8a8a92">VALIDATOR SET · key-shares</text>
+        <!-- 5 validator share nodes -->
+        <g>
+          <g transform="translate(60,62)"><circle r="20" fill="#fff" stroke="#d3d3da"/><path d="M-4 -2 a4 4 0 1 1 6 4 l3 3 -2 2 -2 -2 1.5 -1.5 -1.5 -1.5" fill="none" stroke="#8a8a92" stroke-width="1.3"/></g>
+          <g transform="translate(60,118)"><circle r="20" fill="#fff" stroke="#d3d3da"/><path d="M-4 -2 a4 4 0 1 1 6 4 l3 3 -2 2 -2 -2 1.5 -1.5 -1.5 -1.5" fill="none" stroke="#8a8a92" stroke-width="1.3"/></g>
+          <g transform="translate(60,174)"><circle r="20" fill="#fff" stroke="#d3d3da"/><path d="M-4 -2 a4 4 0 1 1 6 4 l3 3 -2 2 -2 -2 1.5 -1.5 -1.5 -1.5" fill="none" stroke="#8a8a92" stroke-width="1.3"/></g>
+          <g transform="translate(118,90)"><circle r="20" fill="#fff" stroke="#d3d3da"/><path d="M-4 -2 a4 4 0 1 1 6 4 l3 3 -2 2 -2 -2 1.5 -1.5 -1.5 -1.5" fill="none" stroke="#8a8a92" stroke-width="1.3"/></g>
+          <g transform="translate(118,146)"><circle r="20" fill="#fff" stroke="#d3d3da"/><path d="M-4 -2 a4 4 0 1 1 6 4 l3 3 -2 2 -2 -2 1.5 -1.5 -1.5 -1.5" fill="none" stroke="#8a8a92" stroke-width="1.3"/></g>
+        </g>
+        <!-- converge -->
+        <g stroke="#dcdce2" fill="none">
+          <path d="M84 66 C200 72 230 102 300 114" marker-end="url(#a3)"/>
+          <path d="M84 118 C210 118 240 117 300 118" marker-end="url(#a3)"/>
+          <path d="M84 170 C200 164 230 134 300 123" marker-end="url(#a3)"/>
+          <path d="M142 93 C220 100 250 110 300 116" marker-end="url(#a3)"/>
+          <path d="M142 149 C220 142 250 128 300 121" marker-end="url(#a3)"/>
+        </g>
+        <text x="200" y="212" text-anchor="middle" class="l-mono" font-size="9" fill="#9a9aa2">enough sign together (FROST · ROAST)</text>
+        <!-- combined signature -->
+        <rect x="312" y="92" width="150" height="52" rx="10" fill="#fff" stroke="#ec641d" stroke-width="1.4"/>
+        <text x="387" y="116" text-anchor="middle" class="l-mono" font-size="11" fill="#ec641d">1 signature</text>
+        <text x="387" y="131" text-anchor="middle" class="l-mono" font-size="8.5" fill="#b6b6be">no single key exists</text>
+        <path d="M462 118 L502 118" stroke="#c4c4cc" marker-end="url(#a3)"/>
+        <!-- bitcoin spend -->
+        <rect x="506" y="86" width="148" height="64" rx="10" fill="#ededed" stroke="#34343a"/>
+        <text x="580" y="112" text-anchor="middle" class="l-mono" font-size="10" fill="#8a8a92">Bitcoin spend</text>
+        <text x="580" y="128" text-anchor="middle" class="l-mono" font-size="8" fill="#b6b6be">an ordinary Taproot tx</text>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §1.4 settlement -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">Fast where it needs to be. Final where it counts.</h3>
+        <p class="feat__desc">Developers can choose when to stay fast on Arch or make things final on Bitcoin. Native Bitcoin, moving faster than Bitcoin alone ever could, then settling with Bitcoin's own finality.</p>
+        <ul class="feat__values">
+          <li>Stay fast on Arch, or finalize on Bitcoin</li>
+          <li>Native BTC, faster than Bitcoin alone</li>
+          <li>Settled with Bitcoin's own finality</li>
+        </ul>
+      </div>
+      <figure class="feat__art p1-fig">
+      <svg viewBox="0 0 680 220" role="img" aria-label="Many fast Arch blocks above versus one slow ten-minute Bitcoin block below; single-movement settlements drop down.">
+        <defs><marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#34343a"/></marker></defs>
+        <!-- ARCH row -->
+        <text x="40" y="36" class="l-mono" font-size="9.5" fill="#ec641d">ARCH · executes · 180ms</text>
+        <line x1="40" y1="58" x2="640" y2="58" stroke="#d3d3da"/>
+        <g fill="#fff" stroke="#c4c4cc"><rect x="44" y="52" width="11" height="11" rx="2"/><rect x="70" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="96" y="52" width="11" height="11" rx="2"/><rect x="122" y="52" width="11" height="11" rx="2"/><rect x="148" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="174" y="52" width="11" height="11" rx="2"/><rect x="200" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="226" y="52" width="11" height="11" rx="2"/><rect x="252" y="52" width="11" height="11" rx="2"/><rect x="278" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="304" y="52" width="11" height="11" rx="2"/><rect x="330" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="356" y="52" width="11" height="11" rx="2"/><rect x="382" y="52" width="11" height="11" rx="2"/><rect x="408" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="434" y="52" width="11" height="11" rx="2"/><rect x="460" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="486" y="52" width="11" height="11" rx="2"/><rect x="512" y="52" width="11" height="11" rx="2"/><rect x="538" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="564" y="52" width="11" height="11" rx="2"/><rect x="590" y="52" width="11" height="11" rx="2" fill="#f2f2f4"/><rect x="616" y="52" width="11" height="11" rx="2"/></g>
+        <!-- single-movement settlements dropping into the one Bitcoin block -->
+        <g stroke="#d3d3da" stroke-dasharray="3 3" fill="none"><path d="M310 66 L330 150" marker-end="url(#a4)"/><path d="M360 66 L344 150" marker-end="url(#a4)"/><path d="M412 66 L362 150" marker-end="url(#a4)"/></g>
+        <!-- BITCOIN row -->
+        <text x="40" y="130" class="l-mono" font-size="9.5" fill="#8a8a92">BITCOIN · settles · ~10 min</text>
+        <line x1="40" y1="172" x2="640" y2="172" stroke="#d3d3da"/>
+        <g fill="#fff" stroke="#c4c4cc"><rect x="120" y="152" width="40" height="40" rx="6"/><rect x="520" y="152" width="40" height="40" rx="6"/></g>
+        <rect x="298" y="152" width="84" height="40" rx="6" fill="#ededed" stroke="#34343a"/>
+        <text x="340" y="176" text-anchor="middle" class="l-mono" font-size="8.5" fill="#8a8a92">1 block</text>
+        <text x="640" y="130" text-anchor="end" class="l-mono" font-size="8.5" fill="#b6b6be">not batched · one user → one user</text>
+      </svg>
+    </figure>
+    </div>
+  </div></section><!-- /how -->
+
+  <!-- ============================== MOVEMENT 3 — FINANCIAL PRIMITIVES ============================== -->
+  <section class="band band--unlock"><div class="feat" id="unlock">
+    <div class="feat__head">
+      <h2>The financial primitives Arch unlocks.</h2>
+      <p class="feat__intro">Pools, enforceable collateral, and real liquidations — the building blocks of markets, finally possible on native Bitcoin.</p>
+    </div>
+
+    <!-- §2.1 pools -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">Bitcoin could send value. It couldn't pool it.</h3>
+        <p class="feat__desc">A pool is shared capital many people draw on at once — the basis of almost every market. Bitcoin can't form one alone; Arch can, while every coin stays native.</p>
+        <ul class="feat__values">
+          <li>Shared liquidity from native UTXOs</li>
+          <li>The basis for AMMs and efficient markets</li>
+          <li>A market anyone can trade against</li>
+        </ul>
+      </div>
+      <figure class="feat__art">
+      <svg viewBox="0 0 680 228" role="img" aria-label="Peer-to-peer is one coin to one coin; a pool is many coins sharing one reserve — only possible on Arch.">
+        <defs><marker id="a5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#b6b6be"/></marker></defs>
+        <!-- P2P -->
+        <text x="40" y="34" class="l-mono" font-size="9.5" fill="#8a8a92">BITCOIN · peer-to-peer</text>
+        <rect x="40" y="50" width="280" height="130" rx="12" fill="#fff" stroke="#ededf0"/>
+        <rect x="78" y="100" width="26" height="26" rx="6" fill="#34343a" stroke="#34343a"/>
+        <path d="M118 113 L236 113" stroke="#c4c4cc" marker-end="url(#a5)"/>
+        <rect x="252" y="100" width="26" height="26" rx="6" fill="#34343a" stroke="#34343a"/>
+        <text x="180" y="206" text-anchor="middle" class="l-mono" font-size="9" fill="#9a9aa2">one coin → one coin</text>
+        <!-- pool -->
+        <text x="360" y="34" class="l-mono" font-size="9.5" fill="#ec641d">ARCH · a pool</text>
+        <rect x="360" y="50" width="280" height="130" rx="12" fill="#fff" stroke="#ec641d" stroke-opacity=".35"/>
+        <g fill="#34343a" stroke="#34343a"><rect x="384" y="70" width="18" height="18" rx="4"/><rect x="384" y="96" width="18" height="18" rx="4"/><rect x="384" y="122" width="18" height="18" rx="4"/><rect x="384" y="148" width="18" height="18" rx="4" opacity=".7"/></g>
+        <g stroke="#dcdce2" fill="none"><path d="M404 79 L470 110" marker-end="url(#a5)"/><path d="M404 105 L470 113" marker-end="url(#a5)"/><path d="M404 131 L470 116" marker-end="url(#a5)"/><path d="M404 157 L470 120" marker-end="url(#a5)"/></g>
+        <rect x="472" y="84" width="148" height="62" rx="12" fill="#ededed" stroke="#d3d3da"/>
+        <text x="546" y="111" text-anchor="middle" class="l-mono" font-size="10" fill="#8a8a92">shared reserve</text>
+        <text x="546" y="126" text-anchor="middle" class="l-mono" font-size="8.5" fill="#b6b6be">pooled · native UTXOs</text>
+        <text x="500" y="206" text-anchor="middle" class="l-mono" font-size="9" fill="#9a9aa2">a market anyone can trade against</text>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §2.2 collateral -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">Collateral you can actually enforce.</h3>
+        <p class="feat__desc">A loan market only works if the lender can seize collateral without the borrower's consent. Arch enforces it mechanically and settles to Bitcoin — the borrower can't yank it back.</p>
+        <ul class="feat__values">
+          <li>Seized by rule, not by permission</li>
+          <li>Moving the coin needs the validators' signature</li>
+          <li>Settles on Bitcoin — no wrapping, no bridge</li>
+        </ul>
+      </div>
+      <figure class="feat__art">
+      <svg viewBox="0 0 680 216" role="img" aria-label="A price line crosses the liquidation threshold; the VM assembles a Bitcoin transaction that moves the collateral.">
+        <defs><marker id="a6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ec641d"/></marker></defs>
+        <!-- price chart -->
+        <text x="40" y="26" class="l-mono" font-size="9.5" fill="#8a8a92">COLLATERAL PRICE</text>
+        <line x1="44" y1="40" x2="44" y2="150" stroke="#e4e4e8"/>
+        <line x1="44" y1="150" x2="344" y2="150" stroke="#e4e4e8"/>
+        <line x1="44" y1="106" x2="344" y2="106" stroke="#ec641d" stroke-dasharray="4 3" stroke-opacity=".5"/>
+        <text x="344" y="100" text-anchor="end" class="l-mono" font-size="8" fill="#ec641d">liquidation threshold</text>
+        <!-- price falls and crosses the threshold exactly at the breach -->
+        <path d="M52 60 C108 56 156 80 196 92 C214 98 224 102 232 106 C268 118 296 128 320 138" fill="none" stroke="#34343a" stroke-width="1.6"/>
+        <line x1="232" y1="110" x2="232" y2="150" stroke="#ec641d" stroke-opacity=".3" stroke-dasharray="2 3"/>
+        <circle cx="232" cy="106" r="4.5" fill="#ec641d"/>
+        <text x="232" y="167" text-anchor="middle" class="l-mono" font-size="8.5" fill="#ec641d">breach</text>
+        <!-- the breach fires the VM -->
+        <path d="M344 124 C386 124 380 112 414 112" fill="none" stroke="#ec641d" stroke-width="1.4" marker-end="url(#a6)"/>
+        <rect x="416" y="88" width="92" height="48" rx="9" fill="#fff" stroke="#8a8a92" stroke-width="1.3"/>
+        <text x="462" y="110" text-anchor="middle" class="l-mono" font-size="11" fill="#ec641d">ArchVM</text>
+        <text x="462" y="124" text-anchor="middle" class="l-mono" font-size="8" fill="#b6b6be">assembles tx</text>
+        <path d="M508 112 L544 112" stroke="#c4c4cc" marker-end="url(#a6)"/>
+        <!-- collateral moved and settled -->
+        <rect x="548" y="84" width="116" height="56" rx="9" fill="#ededed" stroke="#34343a"/>
+        <rect x="598" y="92" width="16" height="16" rx="4" fill="#34343a" stroke="#34343a"/>
+        <text x="606" y="122" text-anchor="middle" class="l-mono" font-size="8.5" fill="#8a8a92">collateral</text>
+        <text x="606" y="133" text-anchor="middle" class="l-mono" font-size="8.5" fill="#8a8a92">moved · settled</text>
+        <text x="352" y="194" text-anchor="middle" class="l-mono" font-size="9" fill="#9a9aa2">the moment a rule fires — settled to Bitcoin, the borrower can't intercept</text>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §2.3 liquidations -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">A liquidation that's on time and final.</h3>
+        <p class="feat__desc">A late liquidation isn't slow — it's a loss. Arch detects a breach, locks the price at signing, and broadcasts the closeout in under three seconds, then settles on Bitcoin.</p>
+        <ul class="feat__values">
+          <li>Price locked at the moment of signing</li>
+          <li>Closeout broadcast in under three seconds</li>
+          <li>Final with Bitcoin's own settlement</li>
+        </ul>
+      </div>
+      <figure class="feat__art">
+      <svg viewBox="0 0 680 184" role="img" aria-label="Under three seconds from breach to broadcast on Arch, then about ten minutes for Bitcoin settlement — two timescales.">
+        <!-- arch bracket -->
+        <rect x="40" y="56" width="320" height="62" rx="10" fill="#fff" stroke="#ec641d" stroke-opacity=".4"/>
+        <text x="52" y="46" class="l-mono" font-size="9" fill="#ec641d">ON ARCH · &lt; 3 SECONDS</text>
+        <g class="l-mono" font-size="8.5" fill="#7a7a82">
+          <circle cx="78" cy="87" r="4" fill="#ec641d"/><text x="78" y="107" text-anchor="middle">breach</text>
+          <circle cx="158" cy="87" r="4" fill="#ec641d" opacity=".7"/><text x="158" y="107" text-anchor="middle">detect</text>
+          <circle cx="238" cy="87" r="4" fill="#ec641d" opacity=".7"/><text x="238" y="107" text-anchor="middle">price locked</text>
+          <circle cx="322" cy="87" r="4" fill="#ec641d"/><text x="322" y="107" text-anchor="middle">broadcast</text>
+        </g>
+        <line x1="82" y1="87" x2="318" y2="87" stroke="#f0c9b0"/>
+        <!-- gap arrow -->
+        <path d="M364 87 L408 87" stroke="#c4c4cc" stroke-dasharray="3 3"/>
+        <!-- bitcoin -->
+        <rect x="412" y="56" width="228" height="62" rx="10" fill="#ededed" stroke="#d3d3da"/>
+        <text x="424" y="46" class="l-mono" font-size="9" fill="#8a8a92">ON BITCOIN · ~10 MIN</text>
+        <rect x="430" y="70" width="34" height="34" rx="6" fill="#fff" stroke="#34343a"/>
+        <text x="478" y="84" class="l-mono" font-size="8.5" fill="#8a8a92">settled with</text>
+        <text x="478" y="96" class="l-mono" font-size="8.5" fill="#8a8a92">Bitcoin finality</text>
+        <text x="340" y="152" text-anchor="middle" class="l-mono" font-size="9" fill="#9a9aa2">fast enough to stay solvent · final enough to trust</text>
+      </svg>
+    </figure>
+    </div>
+
+    <!-- §2.4 the unlock -->
+    <div class="feat__row">
+      <div class="feat__text">
+        <h3 class="feat__rtitle">Lending on Bitcoin — natively, for the first time.</h3>
+        <p class="feat__desc">Native settlement made the collateral enforceable; speed made the liquidations real. Together they make pooled lending possible on Bitcoin itself — no wrapping, no bridge, no custodian.</p>
+        <ul class="feat__values">
+          <li>Pools + enforceable collateral + fast liquidation</li>
+          <li>Pooled lending on native Bitcoin</li>
+          <li>Wasn't possible before — it is now</li>
+        </ul>
+      </div>
+      <figure class="feat__art">
+      <svg viewBox="0 0 680 220" role="img" aria-label="A ladder: pools plus enforceable collateral plus fast liquidation combine into pool-based lending on native Bitcoin.">
+        <g font-family="AzeretMono,monospace">
+          <rect x="60" y="150" width="560" height="42" rx="8" fill="#fff" stroke="#d3d3da"/><text x="80" y="176" font-size="11" fill="#34343a">Pools — shared, native liquidity</text><text x="600" y="176" text-anchor="end" font-size="9" fill="#b6b6be">§2.1</text>
+          <rect x="80" y="100" width="520" height="42" rx="8" fill="#fff" stroke="#d3d3da"/><text x="100" y="126" font-size="11" fill="#34343a">+ Enforceable collateral</text><text x="580" y="126" text-anchor="end" font-size="9" fill="#b6b6be">§2.2</text>
+          <rect x="100" y="50" width="480" height="42" rx="8" fill="#fff" stroke="#d3d3da"/><text x="120" y="76" font-size="11" fill="#34343a">+ Fast, final liquidation</text><text x="560" y="76" text-anchor="end" font-size="9" fill="#b6b6be">§2.3</text>
+          <rect x="120" y="8" width="440" height="34" rx="8" fill="#ec641d"/><text x="340" y="30" text-anchor="middle" font-size="11.5" letter-spacing="1px" fill="#fff">= POOL-BASED LENDING ON NATIVE BITCOIN</text>
+        </g>
+      </svg>
+    </figure>
+    </div>
+  </div></section><!-- /unlock -->
+
+  <!-- ============================== BUILDER CTA — its own section ============================== -->
+  <section class="band band--builders"><div class="feat">
+    <div class="cta">
+      <div class="l">For builders</div>
+      <h3>These primitives are <em>yours</em> to build on.</h3>
+      <div class="install"><code><span class="pr">$</span> npx create-arch-app</code><span class="cp">copy</span></div>
+      <div class="btns">
+        <a class="btn btn--p" href="#">Add to Claude Code <span class="ar">↗</span></a>
+        <a class="btn btn--g" href="#">Read the docs</a>
+      </div>
+    </div>
+  </div></section><!-- /builders -->
+
+  <!-- ============================== MOVEMENT 4 — WHAT YOU CAN DO ============================== -->
+  <section class="band band--do"><div class="page">
+  <div class="col kicker" id="unlocks"><span class="tag">What you can do</span><span class="ln"></span></div>
+
+  <section class="sec col">
+    <div class="eyebrow"><span class="n">3.1</span> For holders</div>
+    <h2>Your Bitcoin, finally doing more — and still yours.</h2>
+    <p class="body">Each layer inherits the one beneath it. Native, fast, settled foundations → real primitives → things you simply couldn't do with Bitcoin before.</p>
+    <div class="apps">
+      <div class="appc">
+        <div class="viz"><svg viewBox="0 0 200 112" role="img" aria-label="Your native BTC stays in place while you draw a loan against it.">
+          <defs><marker id="bA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ec641d"/></marker></defs>
+          <rect x="30" y="40" width="32" height="32" rx="8" fill="#34343a" stroke="#34343a"/>
+          <text x="46" y="90" text-anchor="middle" class="l-mono" font-size="8.5" fill="#8a8a92">your BTC</text>
+          <path d="M70 56 L116 56" stroke="#ec641d" stroke-width="1.4" stroke-dasharray="3 3" marker-end="url(#bA)"/>
+          <rect x="122" y="42" width="52" height="28" rx="7" fill="#fff" stroke="#d3d3da"/>
+          <text x="148" y="60" text-anchor="middle" class="l-mono" font-size="8.5" fill="#34343a">loan out</text>
+        </svg></div>
+        <div class="bd"><div class="l">Borrow</div><h3>Borrow against it. Keep it.</h3><p>Draw a loan against native BTC — no wrapping, no custodian. Still your Bitcoin the whole time.</p><a class="applink" href="#">Borrow in Arch Prime <span class="ar">↗</span></a></div>
+      </div>
+      <div class="appc">
+        <div class="viz"><svg viewBox="0 0 200 112" role="img" aria-label="Native BTC earns yield that rises while you keep 100 percent of your Bitcoin.">
+          <defs><marker id="eA" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#16a34a"/></marker></defs>
+          <rect x="30" y="56" width="32" height="32" rx="8" fill="#34343a" stroke="#34343a"/>
+          <text x="46" y="46" text-anchor="middle" class="l-mono" font-size="8.5" fill="#8a8a92">BTC</text>
+          <path d="M66 80 C104 78 128 60 162 40" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#eA)"/>
+          <text x="100" y="104" text-anchor="middle" class="l-mono" font-size="8.5" fill="#9a9aa2">yield · 100% BTC kept</text>
+        </svg></div>
+        <div class="bd"><div class="l">Earn</div><h3>Put idle Bitcoin to work.</h3><p>Earn on BTC while keeping full Bitcoin exposure — yield that accrues to real Bitcoin, not a receipt.</p><a class="applink" href="#">Earn with HoneyB <span class="ar">↗</span></a></div>
+      </div>
+      <div class="appc">
+        <div class="viz"><svg viewBox="0 0 200 112" role="img" aria-label="Swap native Bitcoin in and out against a shared liquidity pool.">
+          <defs><marker id="sA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#9a9aa2"/></marker></defs>
+          <rect x="30" y="34" width="28" height="28" rx="7" fill="#34343a" stroke="#34343a"/>
+          <rect x="30" y="68" width="28" height="28" rx="7" fill="#fff" stroke="#7c7ce0"/>
+          <path d="M64 48 L118 48" stroke="#9a9aa2" stroke-width="1.3" marker-end="url(#sA)"/>
+          <path d="M118 82 L64 82" stroke="#9a9aa2" stroke-width="1.3" marker-end="url(#sA)"/>
+          <rect x="124" y="42" width="46" height="46" rx="9" fill="#f6f6f8" stroke="#d3d3da"/>
+          <text x="147" y="68" text-anchor="middle" class="l-mono" font-size="8.5" fill="#7a7a82">pool</text>
+        </svg></div>
+        <div class="bd"><div class="l">Swap</div><h3>Swap against real liquidity.</h3><p>Pooled, always-on liquidity for native Bitcoin — move in and out at a tight, predictable spread.</p><a class="applink" href="#">Swap in Arch Prime <span class="ar">↗</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §3.4 Prime -->
+  <section class="sec col">
+    <div class="eyebrow"><span class="n">3.2</span> The ecosystem</div>
+    <h2>The whole stack, settling as one.</h2>
+    <p class="body">The only way to make native-Bitcoin finance actually work was to build the chain, the settlement, and the primitives so they settle as one. Meet the surfaces built on top of it.</p>
+    <p class="eco-lead">The same stack, built on once — by <em>Arch</em>, by partners, and by the surfaces that reach real users.</p>
+    <div class="eco">
+      <div class="eco-card"><h4>Arch Prime</h4><p>Self-custodial prime-brokerage terminal: swap, borrow, earn, invest.</p><div class="built">Built on <b>the full stack</b></div></div>
+      <div class="eco-card"><h4>HoneyB</h4><p>Institutional Bitcoin yield — idle BTC to real yield, 100% exposure kept.</p><div class="built">Built on <b>Arch Lend · APIs</b></div></div>
+    </div>
+    <p class="eco-more">+ a mobile neobank, virtual debit card, on/off-ramp, get-paid-in-Bitcoin, and a Bitcoin-backed mortgage — all on the same rails.</p>
+  </section>
+  </div></section><!-- /do -->
+
+</main>
+
+
+</body>
+</html>

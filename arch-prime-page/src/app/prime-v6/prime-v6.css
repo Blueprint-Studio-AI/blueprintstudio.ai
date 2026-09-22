@@ -1,0 +1,31 @@
+/* /prime-v6 — what the scroll moments can't express inline. */
+
+/* Review notes (components/prime-v6/note.tsx): hidden unless the switcher turns them on. */
+.v6-note {
+  display: none;
+}
+html[data-v6-notes="on"] .v6-note {
+  display: block;
+}
+
+/* The two scroll moments pin in CSS, not JS, so the server and the client lay the page out the
+   same (no jump at hydration; deep links land). Same query as PIN_QUERY in window-stage.tsx.
+   Unlayered, so it beats the utilities' `relative` / `min-h-svh` on the frame. */
+@media (min-width: 768px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  .v6-stage {
+    height: var(--track);
+  }
+  .v6-stage > .v6-frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+}
+
+/* §4: the headline column stays in view while the steps scroll past it (sticky, not pinned). */
+@media (min-width: 1024px) {
+  .v6-sticky {
+    position: sticky;
+    top: 128px;
+  }
+}

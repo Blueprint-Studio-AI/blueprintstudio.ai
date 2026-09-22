@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chain — layer cake · trial C (block treemap)</title>
+<style>
+  @font-face{font-family:Gascogneserial;src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de2f60432255865eede0bc_GascogneSerial-light.woff2)format("woff2");font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:Geist;src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68dfd946fca94176b058660c_GeistVF.woff2)format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+  :root{
+    --cream:#f3efd7; --ink:#181818; --soft:#2c2a26; --grey:#808080;
+    --orange:#ec641d; --line:rgba(24,24,24,.22);
+    --sans:"Geist",-apple-system,system-ui,sans-serif;
+    --serif:"Gascogneserial",Georgia,serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:18px;max-width:1260px;margin:0 auto;padding:0 36px}
+  .stagecol{position:relative}
+  .stage{position:sticky;top:calc(50vh - 395px);width:680px;height:790px;transform-origin:0 0}
+  .stage svg{display:block;width:680px;height:790px;overflow:visible}
+
+  .step{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    opacity:.25;transition:opacity .5s ease;padding:48px 0}
+  .step.on{opacity:1}
+  .step h2{font-family:var(--serif);font-weight:300;font-size:clamp(28px,3vw,38px);line-height:1.08;margin-bottom:18px;text-wrap:balance}
+  .step .big{font-size:19px;font-weight:500;color:var(--ink);line-height:1.45;text-wrap:pretty}
+  .step .big .lite{color:var(--grey);font-weight:400}
+  .step .small{font-size:14px;color:var(--grey);margin-top:10px;text-wrap:pretty}
+  .step p{font-size:15.5px;color:var(--soft);text-wrap:pretty}
+  .step p + p{margin-top:10px}
+  .step ul{list-style:none;margin-top:16px;display:flex;flex-direction:column}
+  .step li{font-size:13.5px;color:var(--soft);padding:7px 10px;border-left:2px solid rgba(128,128,128,.3);
+    cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .step li b{font-weight:600;color:var(--ink)}
+  .step li .lite{display:block;color:var(--grey);font-weight:400;font-size:12.5px;line-height:1.45}
+  .step li:hover{background:rgba(236,100,29,.06)}
+  .step li.on{border-left-color:var(--orange);background:rgba(236,100,29,.08)}
+  .step li.on b{color:var(--orange)}
+
+  /* iso faces */
+  polygon,ellipse,path.cylbody{stroke:var(--line);stroke-width:.8;stroke-linejoin:round}
+  .lift{transition:transform 1s cubic-bezier(.22,.9,.3,1.06),opacity .75s ease}
+  #world{transition:transform 1s cubic-bezier(.22,.9,.3,1.06)}
+  .layer.hid .lift{transform:translateY(-360px);opacity:0}
+  .layer.fadein.hid .lift{transform:none;opacity:0}
+  .layer.dim .lift{opacity:.5}
+  .comp.sel polygon.ft,.comp.sel ellipse.ft{fill:#ec641d}
+  .comp.sel polygon.fe,.comp.sel path.fe{fill:#cf5418}
+  .comp.sel polygon.fs{fill:#b84a14}
+
+  /* ---- layer-2 native-tech schematic ---- */
+  .wire{fill:none;stroke:#c4bfa7;stroke-width:var(--vw,1.4);stroke-linecap:round;stroke-linejoin:round;
+    transition:stroke .2s ease,stroke-width .2s ease}
+  .l2addr{font-family:var(--sans);font-size:8px;letter-spacing:.04em;fill:#9a9684}
+  .l2el,.pipe .tube{transition:opacity .28s ease}
+  #L2.focus .l2el{opacity:.16}
+  #L2.focus .l2el.hot{opacity:1}
+  #L2.focus .l2el.keep{opacity:1}   /* lit (full opacity) but NOT recoloured orange */
+  /* flow mode (settle/syscall): fade everything but the moving cubes and the Arch VM */
+  #L2.flow .l2el{opacity:.16}
+  #L2.flow .pipe{opacity:1}             /* keep the pipe groups lit so their cubes read at full */
+  #L2.flow .pipe .tube{opacity:.16}     /* but fade the cable tubes themselves */
+  #L2.flow #g-vm{opacity:1}             /* Arch VM stays lit */
+  .pipe.hot .wpkt{opacity:0}        /* highlighting a cable hides its moving data cubes (snaps, no fade) */
+  .wire.hot,.l2el.hot .wire{stroke:#ec641d;stroke-width:2.8}
+  .l2el.hot polygon.ft,.l2el.hot ellipse.ft{fill:#ec641d}
+  .l2el.hot polygon.fe,.l2el.hot path.fe{fill:#cf5418}
+  .l2el.hot polygon.fs{fill:#b84a14}
+  .l2el.hot .l2addr{fill:#ec641d;font-weight:600}
+  .vmshell,.utxocore{transition:opacity .35s ease}
+  .utxocore{opacity:0}
+  #g-vm.xray .vmshell{opacity:.08}
+  #g-vm.xray .utxocore{opacity:1}
+  #L2.focus #g-vm.xray{opacity:1}   /* x-ray IS the focus — don't dim the VM group itself */
+
+  .dot{cursor:pointer;transition:opacity .22s ease}
+  .dots.dimothers .dot{opacity:.16}        /* hovering one indicator fades the rest */
+  .dots.dimothers .dot.act{opacity:1}
+  .dot circle.c{fill:var(--orange);stroke:#fff;stroke-width:2;transition:r .15s}
+  .dot:hover circle.c{r:7.5}
+  .dot circle.hit{fill:transparent;stroke:none}
+  .dots{opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .45s ease,visibility 0s linear .45s}
+  .dots.show{opacity:1;visibility:visible;pointer-events:auto;
+    transition:opacity .45s ease 1.05s,visibility 0s linear 1.05s}
+  .ping{animation:ping 2.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes ping{0%{transform:scale(.5);opacity:.9}70%{transform:scale(2.4);opacity:0}100%{transform:scale(2.4);opacity:0}}
+
+  .isolabel{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;fill:var(--grey)}
+  .subname{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;fill:#6b675a}
+
+
+  @media (max-width:1080px){
+    .wrap{grid-template-columns:1fr;gap:0}
+    .stage{top:0}
+    .step{min-height:70vh}
+  }
+  /* finance-city: callout card (c5 dropped it; re-added for the L3 buildings) */
+  #card{position:absolute;width:220px;background:#fff;border:1px solid rgba(128,128,128,.4);border-radius:10px;
+    padding:10px 13px;pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:6;font-family:var(--sans)}
+  #card .t{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35}
+  #card .b{font-size:12px;color:var(--grey);line-height:1.45;margin-top:3px}
+  #card::before{content:"";position:absolute;left:-5px;top:14px;width:8px;height:8px;background:#fff;
+    border-left:1px solid rgba(128,128,128,.4);border-bottom:1px solid rgba(128,128,128,.4);transform:rotate(45deg)}
+  #card.flip::before{left:auto;right:-5px;transform:rotate(225deg)}
+</style>
+<style id="hero-override">html,body{background:transparent!important;overflow:hidden}.wrap{display:block;max-width:none;margin:0;padding:0}.steps{display:none!important}.stagecol{position:fixed;inset:0;display:grid;place-items:center}.stage{position:static!important;top:auto!important;transform:none!important}</style>
+</head>
+<body data-s="1">
+
+<div class="wrap">
+  <div class="stagecol">
+    <div class="stage" id="stage">
+      <svg id="iso" viewBox="-320 -360 680 790" aria-label="Isometric layer stack: Bitcoin and Arch chains, native tech board, finance district, app layer"></svg>
+      <div id="card"><div class="t"></div><div class="b"></div></div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <section class="step" data-s="1">
+      <h2>What is Arch?</h2>
+      <p class="big">Arch is a Bitcoin-native VM, chain, and validator network.</p>
+      <p class="small">Together they execute on Bitcoin UTXOs, and settle assets back to Bitcoin&rsquo;s ledger.</p>
+    </section>
+
+    <section class="step" data-s="2">
+      <h2>Native tech</h2>
+      <p class="big">What&rsquo;s built on Arch lives on Bitcoin:<br>same coins, same wallets, same ledger.</p>
+      <p class="small">Making that true took new technology at almost every layer:</p>
+      <ul>
+        <li data-c="settle"><b>Direct Bitcoin settlement</b><span class="lite">assets are never wrapped</span></li>
+        <li data-c="utxo"><b>UTXO-native execution</b><span class="lite">programs run on real UTXOs, not IOUs</span></li>
+        <li data-c="addr"><b>Per-account Bitcoin addresses</b><span class="lite">every balance verifiable on any explorer</span></li>
+        <li data-c="perutxo"><b>Per-account UTXOs</b><span class="lite">funds are never pooled into one wallet</span></li>
+        <li data-c="taproot"><b>Taproot account model</b><span class="lite">compatible with existing Bitcoin wallets</span></li>
+        <li data-c="schnorr"><b>Threshold Schnorr signing (FROST + ROAST)</b><span class="lite">no single key ever exists, signing never stalls</span></li>
+        <li data-c="syscall"><b>Native Bitcoin syscalls</b><span class="lite">programs read and write Bitcoin directly, no oracle in between</span></li>
+        <li data-c="vm"><b>Bitcoin-native VM</b><span class="lite">Solana&rsquo;s proven eBPF engine, forked and rebuilt around UTXOs</span></li>
+        <li data-c="dpos"><b>Fast dPoS consensus</b><span class="lite">180ms blocks, 1,500 TPS</span></li>
+      </ul>
+    </section>
+
+    <section class="step" data-s="3">
+      <h2>Financial primitives</h2>
+      <p class="big">Speed, reliability, and general programmability become financial infrastructure on Bitcoin.</p>
+      <p class="small">This is where the native tech pays off. Pooling on real UTXOs enables AMMs. Oracle price feeds enable collateral enforcement. Enforceable collateral makes lending safe, and safe lending carries credit, perps, and structured products.</p>
+      <ul>
+        <li data-c="pools"><b>Pooled liquidity</b></li>
+        <li data-c="oracle"><b>Oracle price feeds</b></li>
+        <li data-c="collateral"><b>Collateral enforcement</b></li>
+        <li data-c="liquidation"><b>Liquidation engine</b></li>
+        <li data-c="issuance"><b>Token issuance</b></li>
+        <li data-c="risk"><b>Risk &amp; margin</b></li>
+      </ul>
+    </section>
+
+    <section class="step" data-s="4">
+      <h2>Finance unlocks</h2>
+      <p class="big">Those primitives compose into real markets &mdash; trading, lending, prime brokerage, and more.</p>
+      <p class="small">Swap, Lend, and Prime aren&rsquo;t three products bolted together; they&rsquo;re co-located on one chain so they reinforce each other.</p>
+      <ul>
+        <li data-c="dexs"><b>DEXs</b></li>
+        <li data-c="lend"><b>Lending &amp; credit</b></li>
+        <li data-c="prime"><b>Prime brokerage</b></li>
+        <li data-c="vaults"><b>Vaults</b></li>
+        <li data-c="stables"><b>Stablecoins</b></li>
+        <li data-c="rwas"><b>RWAs</b></li>
+        <li data-c="looping"><b>Looping</b></li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<!-- finance-city integration (on Jaidon's c5 block-treemap base): shared kit + builders + assembly -->
+<script src="city-lab/kit.js"></script>
+<script src="city-lab/buildings.js"></script>
+<script src="city-lab/city.js"></script>
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var K=13, KZ=12, CX=Math.cos(Math.PI/6)*K, CY=Math.sin(Math.PI/6)*K;
+  var R2=Math.SQRT2;
+  function P(x,y,z){ return [(x-y)*CX, (x+y)*CY - z*KZ]; }
+  function el(t,attrs,parent){ var e=document.createElementNS(NS,t);
+    for(var k in attrs) e.setAttribute(k,attrs[k]); if(parent)parent.appendChild(e); return e; }
+  function pts(arr){ return arr.map(function(p){return p[0].toFixed(2)+','+p[1].toFixed(2);}).join(' '); }
+
+  var COL = { t:'#ffffff', e:'#eae7d6', s:'#dcd8c4' };
+  var COLB = { t:'#f4f1de', e:'#e2decb', s:'#d3cfba' };   // substrates
+  var COLO = { t:'#ec641d', e:'#cf5418', s:'#b84a14' };   // orange
+  // the Arch mark (681×496 viewBox), reused on every ArchVM top face
+  var ARCHLOGO='<g fill="#ffffff"><path d="M486.886 496.312H464.224C461.851 496.312 459.624 495.102 458.365 493.068L348.93 317.09C346.363 312.974 342.344 312.537 340.746 312.537C339.148 312.537 335.081 312.974 332.563 317.09L223.128 493.068C221.869 495.102 219.642 496.312 217.269 496.312H194.607C189.183 496.312 185.891 490.356 188.748 485.756L304.526 299.657C312.37 287.017 325.929 279.511 340.795 279.511C355.66 279.511 369.219 287.017 377.063 299.657L492.841 485.756C495.699 490.356 492.406 496.312 486.982 496.312H486.886Z"/><path d="M548.962 496.322H526.299C523.924 496.322 521.7 495.112 520.439 493.078L355.367 227.658C352.074 222.379 346.699 219.377 340.501 219.377C334.303 219.377 328.879 222.379 325.635 227.658L160.563 493.078C159.304 495.112 157.076 496.322 154.703 496.322H132.042C126.619 496.322 123.326 490.366 126.183 485.765L297.55 210.224C306.847 195.261 322.875 186.35 340.501 186.35C349.314 186.35 357.691 188.578 365.1 192.694C372.46 196.811 378.803 202.767 383.452 210.224L554.817 485.765C557.678 490.366 554.381 496.322 548.962 496.322Z"/><path d="M610.939 496.315H588.275C585.905 496.315 583.677 495.105 582.416 493.071L361.755 138.209C357.01 130.606 349.165 126.247 340.207 126.247C331.249 126.247 323.405 130.606 318.66 138.209L97.9977 493.071C96.7387 495.105 94.5114 496.315 92.1387 496.315H69.4768C64.0533 496.315 60.7604 490.359 63.6178 485.758L290.622 120.727C301.13 103.827 319.143 93.5604 338.997 93.173C359.915 92.737 379.381 103.875 390.47 121.647L616.894 485.71C619.751 490.31 616.459 496.267 611.035 496.267L610.939 496.315Z"/><path d="M673.011 496.313H650.352C647.977 496.313 645.749 495.102 644.493 493.068L368.192 48.7644C361.995 38.7888 351.728 33.0746 339.962 33.0746C328.195 33.0746 317.93 38.7888 311.732 48.7644L35.4328 493.068C34.1738 495.102 31.9462 496.313 29.5735 496.313H6.91182C1.48849 496.313 -1.80435 490.357 1.05258 485.756L283.695 31.2829C295.897 11.719 316.913 0 340.01 0C363.108 0 384.124 11.6706 396.326 31.2829L678.966 485.756C681.828 490.357 678.531 496.313 673.112 496.313H673.011Z"/></g>';
+
+  function box(parent,o){
+    var c = o.c || COL, z = o.z||0, g = el('g', o.cls?{'class':o.cls}:{}, parent);
+    var x=o.x,y=o.y,w=o.w,d=o.d,h=o.h;
+    el('polygon',{points:pts([P(x+w,y,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x+w,y,z)]),fill:c.e,'class':'fe'},g);
+    el('polygon',{points:pts([P(x,y+d,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x,y+d,z)]),fill:c.s,'class':'fs'},g);
+    el('polygon',{points:pts([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)]),fill:c.t,'class':'ft'},g);
+    return g;
+  }
+  /* iso cylinder — circle in plan projects to an axis-aligned ellipse */
+  function cyl(parent,o){
+    var c=o.c||COL, z=o.z||0, g=el('g',o.cls?{'class':o.cls}:{},parent);
+    var rx=o.r*R2*CX, ry=o.r*R2*CY;
+    var top=P(o.cx,o.cy,z+o.h), bot=P(o.cx,o.cy,z);
+    el('path',{d:'M'+(bot[0]-rx).toFixed(2)+' '+top[1].toFixed(2)+
+      ' L'+(bot[0]-rx).toFixed(2)+' '+bot[1].toFixed(2)+
+      ' A'+rx.toFixed(2)+' '+ry.toFixed(2)+' 0 0 0 '+(bot[0]+rx).toFixed(2)+' '+bot[1].toFixed(2)+
+      ' L'+(bot[0]+rx).toFixed(2)+' '+top[1].toFixed(2)+' Z',
+      fill:c.e,'class':'fe cylbody'},g);
+    el('ellipse',{cx:top[0],cy:top[1],rx:rx,ry:ry,fill:c.t,'class':'ft'},g);
+    return g;
+  }
+  function comp(parent,id,defs){
+    var g=el('g',{'class':'comp',id:'comp-'+id},parent);
+    defs.sort(function(a,b){
+      var ka=(a.cx!==undefined? a.cx+a.cy : a.x+a.y), kb=(b.cx!==undefined? b.cx+b.cy : b.x+b.y);
+      return ka-kb;
+    }).forEach(function(d){ d.cx!==undefined? cyl(g,d) : box(g,d); });
+    return g;
+  }
+  function label(parent,x,y,z,txt,anchor){
+    var p=P(x,y,z);
+    var t=el('text',{x:p[0],y:p[1],'class':'isolabel','text-anchor':anchor||'middle'},parent);
+    t.textContent=txt; return t;
+  }
+  /* project arbitrary SVG markup (drawn in a flat viewW×viewW px space) onto a
+     top face at grid (x,y,z), spanning wUnits grid units — drop any flat icon
+     in here and it lands in perfect isometric */
+  function onTop(parent,x,y,z,wUnits,viewW,markup){
+    var t=wUnits/viewW, o=P(x,y,z);
+    var g=el('g',{transform:'matrix('+(t*CX).toFixed(3)+','+(t*CY).toFixed(3)+','+(-t*CX).toFixed(3)+','+(t*CY).toFixed(3)+','+o[0].toFixed(2)+','+o[1].toFixed(2)+')'},parent);
+    g.innerHTML=markup;
+    return g;
+  }
+
+  /* layer name written onto the front face of the substrate */
+  function subLabel(parent,sl,z,txt){
+    var p=P(sl.x+0.3,sl.y+sl.d,z+sl.h*0.32);
+    var t=el('text',{'class':'subname',
+      transform:'matrix(0.866,0.5,0,1,'+p[0].toFixed(2)+','+p[1].toFixed(2)+')'},parent);
+    t.textContent=txt; return t;
+  }
+
+  var svg=document.getElementById('iso');
+  var stage=document.getElementById('stage');
+  var VBX=-320, VBY=-360;
+  var world=el('g',{id:'world'},svg);
+
+  /* uniform substrate for every layer */
+  var SL={x:3,y:2,w:28,d:20,h:1.6};
+  function substrate(parent,z,name){
+    box(parent,{x:SL.x,y:SL.y,w:SL.w,d:SL.d,h:SL.h,z:z,c:COLB});
+    subLabel(parent,SL,z,name);
+  }
+
+  /* ============ LAYER 1 — chains (fades in) ============ */
+  var G1=0, g1=G1+SL.h;             // substrate base z, content z
+  var L1=el('g',{'class':'layer fadein',id:'L1'},world);
+  var L1f=el('g',{'class':'lift'},L1);
+  substrate(L1f,G1,'Bitcoin');
+  // everything on top of the substrate goes into a shifted group so it sits further toward the
+  // upper-left, with uniform padding to the substrate edges. Tune SHX/SHY (grid units; -x = up-left).
+  var SHX=-0.5, SHY=0;
+  L1f=el('g',{transform:'translate('+((SHX-SHY)*CX).toFixed(2)+','+((SHX+SHY)*CY).toFixed(2)+')'},L1f);
+
+  // shared west-edge fade: a luminance mask each chain *wears* (white=visible east, black=hidden west).
+  // It's applied to a static wrapper — the chain crawls inside it — so the fade stays put, never
+  // travels with the animation, and (being a mask, not a painted shape) never touches the substrate.
+  var mdefs=el('defs',{},svg);
+  function fadeMask(id, y0, xWhite, xBlack){
+    var gid=id+'-g', pW=P(xWhite,y0,g1), pB=P(xBlack,y0,g1);
+    var lg=el('linearGradient',{id:gid,gradientUnits:'userSpaceOnUse',
+      x1:pB[0].toFixed(1),y1:pB[1].toFixed(1),x2:pW[0].toFixed(1),y2:pW[1].toFixed(1)},mdefs);
+    el('stop',{offset:'0','stop-color':'#000'},lg);     // west end → hidden
+    el('stop',{offset:'1','stop-color':'#fff'},lg);     // east end → visible
+    var m=el('mask',{id:id,maskUnits:'userSpaceOnUse',x:-700,y:-700,width:1400,height:1400},mdefs);   // just covers the scene; small buffer = cheap on mobile
+    el('rect',{x:-700,y:-700,width:1400,height:1400,fill:'url(#'+gid+')'},m);
+    return 'url(#'+id+')';
+  }
+
+  // --- Arch's chain: a fast stream of lots of tiny blocks pouring west out of the ArchVM ---
+  // (drawn before the VM so blocks emerge from behind it; far more, far smaller than Bitcoin = speed)
+  var gArchWrap=el('g',{mask:fadeMask('archmask',4.8,9,4)},L1f);
+  var gArch=el('g',{},gArchWrap), archSegs=[];
+  var AN=20, ASPC=1.1, AW=.8, AY=4.4, AE=22;   // fewer, square blocks (AW = width along the chain ≈ depth)
+  function aBlock(ax){ var g=el('g',{},gArch); box(g,{x:ax,y:AY,w:AW,d:.8,h:.5,z:g1,c:COL}); archSegs.push({g:g,x0:ax}); }
+  function aLink(ax){ var g=el('g',{},gArch); box(g,{x:ax+AW,y:AY+.27,w:ASPC-AW,d:.26,h:.16,z:g1+.1,c:COL}); archSegs.push({g:g,x0:ax+AW}); }
+  for(var ai=AN-1;ai>=1;ai--){ var ax=AE-ai*ASPC; aBlock(ax); aLink(ax); }   // west→east: block then its east link
+  aBlock(AE);
+
+  // ArchVM — orange cube, centered north of the treemap, logo on top
+  var gVM=comp(L1f,'l1vm',[{x:22,y:3,w:5,d:3.5,h:1.4,z:g1,c:COLO}]);
+  onTop(gVM,23,3.55,g1+1.4,3,681,ARCHLOGO);
+  var vmName=el('text',{'class':'subname',style:'fill:#ffffff;font-size:9px',
+    transform:'matrix(0.866,0.5,0,1,'+P(22.5,6.5,g1+.35)[0].toFixed(2)+','+P(22.5,6.5,g1+.35)[1].toFixed(2)+')'},L1f);
+  vmName.textContent='ArchVM';
+  // thinking lights — four pulsing squares on the VM's east wall
+  var vmLights=[];
+  // four 0.5×0.5 squares stacked up the east face (x=27, y 3→6.5, z g1→g1+1.4),
+  // centered: y starts 3.45 (span 3.45→6.05, 0.45 padding each side), z g1+.45→g1+.95 (centered on g1+.7)
+  for(var i=0;i<4;i++){
+    var ly=3.45+i*0.7;
+    vmLights.push(el('polygon',{points:pts([P(27,ly,g1+.45),P(27,ly+.5,g1+.45),P(27,ly+.5,g1+.95),P(27,ly,g1+.95)]),
+      fill:'#ffffff',stroke:'none',opacity:.15},L1f));
+  }
+
+  // (the VM→block dots are built below, once the quadtree tiles exist)
+
+  // bitcoin chain — flows west OUT of the treemap plate, centered on the plate's N-S middle
+  var gBtcWrap=el('g',{mask:fadeMask('btcmask',15.25,10,4.5)},L1f);
+  var gBtc=el('g',{},gBtcWrap), btcSegs=[];
+  // append west→east, each block BEFORE the link on its east side, so the link sits in front of
+  // the older (west) block and tucks behind the newer (east) one — no smushing at the joins
+  // 6 blocks (the 6th starts hidden behind the treemap) crawl exactly one slot per treemap cycle.
+  // Each carries an orange overlay that's bright as it emerges from NEXT BLOCK and settles to white.
+  var BSP=5.2;
+  for(var i=0;i<6;i++){
+    var bx=-1.8+i*BSP;
+    var bg=el('g',{},gBtc);
+    box(bg,{x:bx,y:14.1,w:2.3,d:2.3,h:1,z:g1});               // white block
+    var og=el('g',{opacity:0},bg);                            // orange overlay — BEFORE the link, so the link draws over it just like the white block
+    box(og,{x:bx,y:14.1,w:2.3,d:2.3,h:1,z:g1,c:COLO});
+    box(bg,{x:bx+2.3,y:14.95,w:2.9,d:.6,h:.3,z:g1+.22});      // link to the east block
+    btcSegs.push({g:bg,x0:bx,o:og});
+  }
+
+  // dots live here — placed before the block in DOM so the block occludes them (they drop in behind it)
+  var dotsLayer=el('g',{},L1f);
+
+  // treemap — the currently-filling Bitcoin block: plate with its name on the thickness
+  box(L1f,{x:19,y:9.5,w:11,d:11,h:1,z:g1,c:{t:'#e9e5d2',e:'#d8d4c0',s:'#cbc7b2'}});   // square plate
+  var tmName=el('text',{'class':'subname',style:'font-size:9px',
+    transform:'matrix(0.866,0.5,0,1,'+P(19.1,20.5,g1+.1)[0].toFixed(2)+','+P(19.1,20.5,g1+.1)[1].toFixed(2)+')'},L1f);
+  tmName.textContent='Next block';
+  var TM_CYCLE=5.9, TM_FILL=4.8, TM_CONSO=5.5;   // fill / hold / seal timing (seconds)
+  // deterministic quadtree pack — recursively split a square region into quadrants, so every
+  // tile is a square snapped to the grid and they tile the block with zero gaps. Mixed sizes.
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(11);
+  var TMX=19.5, TMY=10, TMS=10, GG=16, CELL=TMS/GG;   // square pack centered on the square plate → equal 0.5 padding on all sides
+  var SPLIT={16:1, 8:1, 4:.52, 2:.34};                // split probability by node size; min tile = 1 cell
+  var leaves=[];
+  (function quad(x,y,s){
+    if(s>1 && rng()<(SPLIT[s]||0)){ var h=s/2; quad(x,y,h);quad(x+h,y,h);quad(x,y+h,h);quad(x+h,y+h,h); }
+    else leaves.push({gx:x,gy:y,s:s});
+  })(0,0,GG);
+  // orderly fill: a clean diagonal sweep back(NW)→front(SE), tiebreak by gx
+  var TMN=leaves.length;
+  var sweep=leaves.map(function(_,i){return i;})
+    .sort(function(a,b){ var A=leaves[a],B=leaves[b]; return (A.gx+A.gy)-(B.gx+B.gy) || (A.gx-B.gx); });
+  sweep.forEach(function(li,k){ leaves[li].appear=(k/TMN)*TM_FILL; leaves[li].orange=false; });
+  // VM→block dots: a steady metronome that never pauses. DI evenly divides the cycle so it loops seamlessly.
+  var DLX=24.5, DLY=7, DTGY=10.5, DTRAVEL=0.4;
+  var DOT_N=Math.round(TM_CYCLE/0.5), DI=TM_CYCLE/DOT_N;
+  // every dot arrival that lands within the fill window lights up an orange tile (snapped to that tick) → in sync
+  for(var tick=DI; tick<=TM_FILL; tick+=DI){
+    var rk=Math.min(TMN-1, Math.round(tick/TM_FILL*TMN));
+    leaves[sweep[rk]].orange=true; leaves[sweep[rk]].appear=tick;
+  }
+  // paint back-to-front by depth (centre x+y); fill order is independent of paint order
+  var tmSquares=leaves.slice().sort(function(a,b){return (a.gx+a.gy+a.s)-(b.gx+b.gy+b.s);}).map(function(L){
+    var g=el('g',{opacity:0},L1f);
+    box(g,{x:TMX+L.gx*CELL, y:TMY+L.gy*CELL, w:L.s*CELL, d:L.s*CELL, h:.2, z:g1+1, c:L.orange?COLO:COL});
+    return {g:g, appear:L.appear};
+  });
+  var dots=[];
+  for(var dj=0; dj<DOT_N; dj++){
+    var dg=el('g',{opacity:0},dotsLayer);
+    box(dg,{x:DLX-.4,y:DLY-.4,w:.8,d:.8,h:.5,z:g1,c:COLO});   // low drop from the VM south face, like the original pulse
+    dots.push({g:dg, arrival:dj*DI});
+  }
+
+  // (the "new block" is now an orange tint on the actual chain blocks — see the crawl/tint in frame())
+
+  /* ============ LAYER 2 — native-tech schematic (z 8) ============ */
+  /* the hand sketch, re-projected to iso: validator mesh (left) → ArchVM (centre) → wallets (right);
+     six Bitcoin pipes drop out of the VM underside toward layer 1. Every highlightable piece is a
+     top-level group tagged .l2el so the focus-dim (in L2STATES/applyL2) can isolate it. */
+  var Z2=8, bz=Z2+SL.h;
+  var L2=el('g',{'class':'layer hid',id:'L2'},world);
+  var L2f=el('g',{'class':'lift'},L2);
+  substrate(L2f,Z2,'Native tech');
+
+  // thin stroked connector between two grid points (z defaults to board top bz)
+  function wire(parent,a,b,cls){
+    var pa=P(a[0],a[1],a[2]==null?bz:a[2]), pb=P(b[0],b[1],b[2]==null?bz:b[2]);
+    return el('path',{d:'M'+pa[0].toFixed(1)+' '+pa[1].toFixed(1)+' L'+pb[0].toFixed(1)+' '+pb[1].toFixed(1),
+      'class':'wire'+(cls?' '+cls:'')},parent);   // the group carries .l2el; paths must not, or they double-dim
+  }
+
+  /* ===========  CHIP — LEVERS  ===========
+     grid units · +x=down-right  +y=down-left  -y=up-right  +z=up */
+  var CHIP_X = 14.4, CHIP_Y = 8.7;                                   // position
+  var CHIP_W = 6,   CHIP_D = 6,   CHIP_H = 1.2;                      // footprint + thickness
+  var LOGO_DX = 0, LOGO_DY = -0.1, LOGO_SCALE = 3.8;                 // logo offset on top + size
+  var CABLE_DX = -0.05, CABLE_DY = 0;                                // cable bundle slide / in-out
+  var CABLE_N = 6, CABLE_W = 0.62, CABLE_GAP = 0.05, CABLE_H = 0.4;  // cable count / width / spacing / height
+  var LABEL_TEXT = 'ARCH VM';                                        // chip label text
+  var LABEL_DY = 0, LABEL_DZ = -0.11, LABEL_SIZE = 8.5;                  // label slide / raise / size
+  /* ======================================= */
+
+  // derived chip coords (used by the buses, wallets and cables below)
+  var VMX=CHIP_X, VMY=CHIP_Y, VMW=CHIP_W, VMD=CHIP_D, VMH=CHIP_H;
+  var VMR=VMX+VMW, VMB=VMY+VMD, VMcx=VMX+VMW/2, VMcy=VMY+VMD/2;
+
+  /* =================  VALIDATOR ARRAY — LEVERS  ================= */
+  var VAL_X = 4.1, VAL_Y = 3.3;          // overall position of the whole array (move it anywhere)
+  var VAL_SX = 2.9, VAL_SY = 3.2;        // spacing between nodes (X / Y)
+  var VAL_SIZE = 1.5, VAL_H = 0.65;      // node footprint size + height
+  var VAL_LINE = 1.4;                    // connector line weight
+  var VAL_COLS = 3, VAL_ROWS = 6;        // grid dimensions (cols × rows)
+  var VAL_BREAKOUT = 0.35;                // chip-bus turn line: 0 = at the array, 1 = at the chip
+  /* ============================================================= */
+  var vNodes=[];
+  for(var ci=0;ci<VAL_COLS;ci++)for(var ri=0;ri<VAL_ROWS;ri++){
+    var vx=VAL_X+ci*VAL_SX, vy=VAL_Y+ri*VAL_SY;
+    vNodes.push({x:vx,y:vy,ci:ci,ri:ri,cx:vx+VAL_SIZE/2,cy:vy+VAL_SIZE/2});
+  }
+  // inter-node mesh — every node linked to its neighbours (right · down · both diagonals).
+  // Drawn flat on the surface (z=bz), the same plane as the chip bus, so the two line systems meet
+  // exactly at each node — no offset when the node boxes are dimmed away.
+  function nodeAt(ci,ri){ for(var i=0;i<vNodes.length;i++){var n=vNodes[i]; if(n.ci===ci&&n.ri===ri)return n;} return null; }
+  var gMesh=el('g',{'class':'l2el',id:'g-schnorr',style:'--vw:'+VAL_LINE},L2f);
+  vNodes.forEach(function(n){
+    [nodeAt(n.ci+1,n.ri),nodeAt(n.ci,n.ri+1),nodeAt(n.ci+1,n.ri+1),nodeAt(n.ci-1,n.ri+1)].forEach(function(m){
+      if(m) wire(gMesh,[n.cx,n.cy,bz],[m.cx,m.cy,bz]); });
+  });
+  // chip bus — only the right column wires to the chip: +x to the breakout line, along it to the
+  // chip's centre-y, then one trunk +x into the chip (flat on the surface).
+  var gBus=el('g',{'class':'l2el',id:'g-valbus',style:'--vw:'+VAL_LINE},L2f);
+  var tz=bz, arrayEdge=VAL_X+(VAL_COLS-1)*VAL_SX+VAL_SIZE, midX=arrayEdge+VAL_BREAKOUT*(VMX-arrayEdge);
+  function trace(){ var d='', a=[].slice.call(arguments);
+    a.forEach(function(p,i){ var q=P(p[0],p[1],tz); d+=(i?' L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1); });
+    el('path',{d:d,'class':'wire'},gBus); }
+  vNodes.filter(function(n){return n.ci===VAL_COLS-1;}).forEach(function(n){ trace([n.cx,n.cy],[midX,n.cy],[midX,VMcy]); });
+  trace([midX,VMcy],[VMX+0.6,VMcy]);
+  var gVal=el('g',{'class':'l2el',id:'g-dpos'},L2f);               // validator nodes (Fast dPoS)
+  vNodes.forEach(function(n){ box(gVal,{x:n.x,y:n.y,w:VAL_SIZE,d:VAL_SIZE,h:VAL_H,z:bz}); });
+
+  // --- ArchVM (centre) : big orange cube + interior UTXO cubes revealed on x-ray ---
+  var gVMwrap=el('g',{'class':'l2el',id:'g-vm'},L2f);
+  // interior UTXO cubes (revealed on x-ray) — same orange as the cubes riding the cables, so the data
+  // reads as one thing: it comes in on the cables, gets operated on here, then heads back out to Bitcoin.
+  var CORE_N=4, CORE_SIZE=0.6, CORE_GAP=1.32, CORE_H=0.6, CORE_Z=bz+0.35;   // grid · cube size (matches the cable cubes) · spacing · height · lift
+  var coreSpan=(CORE_N-1)*CORE_GAP+CORE_SIZE, coreOff=(VMW-coreSpan)/2;      // centre the grid in the chip — same footprint as before
+  var gUtxoCore=el('g',{'class':'utxocore'},gVMwrap), coreCubes=[];   // drawn first → occluded by the shell
+  for(var cxi=0;cxi<CORE_N;cxi++)for(var cyi=0;cyi<CORE_N;cyi++){
+    var ccx=VMX+coreOff+cxi*CORE_GAP, ccy=VMY+coreOff+cyi*CORE_GAP, cc=el('g',{},gUtxoCore);
+    box(cc,{x:ccx,y:ccy,w:CORE_SIZE,d:CORE_SIZE,h:CORE_H,z:CORE_Z,c:COLO});
+    coreCubes.push({g:cc}); }
+  var gVMshell=el('g',{'class':'vmshell'},gVMwrap);
+  box(gVMshell,{x:VMX,y:VMY,w:VMW,d:VMD,h:VMH,z:bz,c:COLO});
+  // Arch logo (same mark as layer 1), centred on the top face
+  var LOGOW=LOGO_SCALE, LOGOH=LOGOW*496/681;
+  onTop(gVMshell, VMcx-LOGOW/2+LOGO_DX, VMcy-LOGOH/2+LOGO_DY, bz+VMH, LOGOW, 681, ARCHLOGO);
+  // chip label on the bottom-right (east) face, reading up-to-the-right (LEVER 4)
+  var LBLP=P(VMR, VMB-0.5+LABEL_DY, bz+0.42+LABEL_DZ);
+  var vmLabel=el('text',{'class':'subname',style:'fill:#fff;letter-spacing:.1em;font-size:'+LABEL_SIZE+'px',
+    transform:'matrix(0.866,-0.5,0,1,'+LBLP[0].toFixed(2)+','+LBLP[1].toFixed(2)+')'},gVMshell);
+  vmLabel.textContent=LABEL_TEXT;
+
+  // --- Bitcoin pipes: a 3D bundled cable running flat across the surface, out the VM's front and
+  //     down-left to the substrate's front edge (y=22). Six chunky tubes in left/centre/right pairs. ---
+  var pipes=[], waveCubes=[];
+  var PIPE_Y1=SL.y+SL.d;                                 // substrate front-left edge (y = 22)
+  var PBW=CABLE_N*CABLE_W+(CABLE_N-1)*CABLE_GAP;         // total bundle width
+  var PX0=VMcx-PBW/2+CABLE_DX;                           // centred on the chip's bottom edge, then shifted by CABLE_DX (LEVER 3)
+  var PIPE_Y0=VMB+CABLE_DY;                              // emerge exactly at the front-bottom edge (CABLE_DY<0 tucks under the chip)
+  var WAVE_SPEED=0.3, WAVE_PER=1, WAVE_CUBE=0.6;                 // data cubes: speed · count per cable · cube size
+  var WAVE_PHASE=0.3, WAVE_EASE=0;                            // phase offset between cables · turnaround easing (0 = sharp bounce, 1 = fully smooth)
+  var waveTravel=(PIPE_Y1-PIPE_Y0)-WAVE_CUBE;
+  for(var pi=0;pi<CABLE_N;pi++){
+    var ppx=PX0+pi*(CABLE_W+CABLE_GAP);
+    var g=el('g',{'class':'l2el pipe'},L2f);
+    box(g,{x:ppx, y:PIPE_Y0, w:CABLE_W, d:PIPE_Y1-PIPE_Y0, h:CABLE_H, z:bz, c:COL, cls:'tube'});
+    for(var wk=0;wk<WAVE_PER;wk++){
+      var wc=el('g',{'class':'wpkt'},g);                  // a data cube riding the cable
+      box(wc,{x:ppx+(CABLE_W-WAVE_CUBE)/2, y:PIPE_Y0, w:WAVE_CUBE, d:WAVE_CUBE, h:WAVE_CUBE, z:bz, c:COLO});
+      waveCubes.push({g:wc, pi:pi, off: pi*WAVE_PHASE + wk/WAVE_PER});   // staggered phase across the cables
+    }
+    pipes.push(g);
+  }
+
+  /* =================  WALLETS — LEVERS  ================= */
+  var WAL_X = 22.8, WAL_Y = 3;            // position of the column (top wallet, left edge)
+  var WAL_N = 4;                          // number of wallets (single column)
+  var WAL_SY = 4.8;                       // spacing down the column
+  var WAL_UTXO_N = 4;                     // UTXOs per wallet
+  var WAL_UTXO = 1.15, WAL_UTXO_H = 0.4;  // UTXO footprint size + height
+  var WAL_GAP = 0.4;                      // gap between UTXOs
+  var WAL_PAD = 0.7;                      // padding around the contents
+  var WAL_ADDR = 1;                     // space under the UTXOs for the address
+  var WAL_ADDR_SIZE = 9;                  // address font size (px)
+  var WAL_ADDR_DX = 0, WAL_ADDR_DY = 0.5;   // nudge the address text (+x = →, +y = down-left)
+  var WAL_CARD_H = 0.25;                  // wallet card thickness
+  var WAL_LINE = 1.4;                     // connector line weight
+  var WAL_BREAKOUT = 0.5;                 // chip-bus turn line: 0 = at the chip, 1 = at the wallets
+  var WAL_ADDRS = ['1A1zP1…DivfNa','17SkEw…XaxFyQ','1Bitco…f59kuE','34xp4v…4Twseo','1FeexV…9sb6uF'];  // Satoshi · pizza · burn · Binance · Mt.Gox (cycled)
+  /* ===================================================== */
+  var wRow=WAL_UTXO_N*WAL_UTXO+(WAL_UTXO_N-1)*WAL_GAP;     // UTXO row width
+  var wCardW=wRow+2*WAL_PAD, wCardD=2*WAL_PAD+WAL_UTXO+WAL_ADDR, wTop=bz+WAL_CARD_H;
+  var gWalletConn=el('g',{'class':'l2el',id:'g-walletconn',style:'--vw:'+WAL_LINE},L2f);  // first → bus tucks under the cards
+  var gCards=el('g',{'class':'l2el',id:'g-cards'},L2f);
+  var gUTXOacc=el('g',{'class':'l2el',id:'g-perutxo'},L2f);        // per-account UTXOs
+  var gAddrs=el('g',{'class':'l2el',id:'g-addr'},L2f);             // per-account addresses
+  for(var wi=0;wi<WAL_N;wi++){
+    var wx=WAL_X, wy=WAL_Y+wi*WAL_SY;
+    box(gCards,{x:wx,y:wy,w:wCardW,d:wCardD,h:WAL_CARD_H,z:bz,c:{t:'#f4f1de',e:'#e2decb',s:'#d3cfba'}});
+    for(var uj=0;uj<WAL_UTXO_N;uj++)
+      box(gUTXOacc,{x:wx+WAL_PAD+uj*(WAL_UTXO+WAL_GAP),y:wy+WAL_PAD,w:WAL_UTXO,d:WAL_UTXO,h:WAL_UTXO_H,z:wTop,c:COL});
+    // address lying flat on the card, below the UTXOs, reading −x → +x
+    var ap=P(wx+WAL_PAD+WAL_ADDR_DX, wy+WAL_PAD+WAL_UTXO+WAL_ADDR*0.62+WAL_ADDR_DY, wTop+0.02);
+    var at=el('text',{'class':'l2addr',style:'font-size:'+WAL_ADDR_SIZE+'px',
+      transform:'matrix(0.866,0.5,-0.866,0.5,'+ap[0].toFixed(2)+','+ap[1].toFixed(2)+')'},gAddrs);
+    at.textContent=WAL_ADDRS[wi%WAL_ADDRS.length];
+  }
+  // circuit bus chip → wallets : trunk +x to the breakout line, along it to each wallet, then +x in
+  var wbusX=VMR+WAL_BREAKOUT*(WAL_X-VMR);
+  function wtrace(){ var d='', a=[].slice.call(arguments);
+    a.forEach(function(p,i){ var q=P(p[0],p[1],bz); d+=(i?' L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1); });
+    el('path',{d:d,'class':'wire'},gWalletConn); }
+  wtrace([VMR,VMcy],[wbusX,VMcy]);
+  for(var wj=0;wj<WAL_N;wj++){ var wcy=WAL_Y+wj*WAL_SY+wCardD/2; wtrace([wbusX,VMcy],[wbusX,wcy],[WAL_X+0.4,wcy]); }
+
+  /* ---- the NEW Financial Primitives layer: 6 plumbing modules. Built from the old
+         product-tile vocabulary (low module-block + a glyph on top), each a hover-selectable
+         .comp so it gets the orange highlight + focus-dim for free. ---- */
+  function buildPrimitives(parent, bz){
+    var CARD={t:'#e7e2cb',e:'#d8d3bc',s:'#cac5ad'};   // module base card
+    var BLK ={t:'#dad5be',e:'#cbc6af',s:'#bdb8a1'};    // raised component block
+    var PRIMS=[
+      {id:'pools',      x:6.4,  y:5.8,  g:'<path d="M3 19 C3 9 9 3 19 3" fill="none" stroke="#1c1c1c" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="10" r="2.1" fill="#ec641d"/>'},
+      {id:'oracle',     x:14.4, y:5.8,  g:'<circle cx="12" cy="6" r="2.6" fill="#ec641d"/><path d="M6 9 Q12 14 18 9 M12 8.5 L12 20" fill="none" stroke="#1c1c1c" stroke-width="2" stroke-linecap="round"/>'},
+      {id:'collateral', x:22.4, y:5.8,  g:'<rect x="5.5" y="11" width="13" height="9.5" rx="1.6" fill="none" stroke="#1c1c1c" stroke-width="2"/><path d="M8 11 V8 a4 4 0 0 1 8 0 V11" fill="none" stroke="#1c1c1c" stroke-width="2"/><circle cx="12" cy="15.4" r="1.8" fill="#ec641d"/>'},
+      {id:'liquidation',x:6.4,  y:13.8, g:'<path d="M13 3 L6 13 H11 L9 21 L18 10 H12 Z" fill="#ec641d" stroke="#1c1c1c" stroke-width="1.4" stroke-linejoin="round"/>'},
+      {id:'issuance',   x:14.4, y:13.8, g:'<circle cx="12" cy="12" r="8" fill="none" stroke="#1c1c1c" stroke-width="2"/><path d="M12 5.5 V18.5 M9.6 9 H14 M9.6 15 H14" fill="none" stroke="#ec641d" stroke-width="2" stroke-linecap="round"/>'},
+      {id:'risk',       x:22.4, y:13.8, g:'<path d="M3.5 17 A8.5 8.5 0 0 1 20.5 17" fill="none" stroke="#1c1c1c" stroke-width="2"/><path d="M12 17 L16.5 10.5" stroke="#ec641d" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17" r="1.6" fill="#1c1c1c"/>'}
+    ];
+    PRIMS.sort(function(a,b){ return (a.x+a.y)-(b.x+b.y); });   // append back-to-front (iso occlusion)
+    PRIMS.forEach(function(p){
+      var g=el('g',{'class':'comp',id:'comp-'+p.id,'data-cb':'comp-'+p.id},parent);
+      box(g,{x:p.x,     y:p.y,     w:5.2, d:4.4, h:.5,  z:bz,    c:CARD});   // base card
+      box(g,{x:p.x+1.2, y:p.y+1.0, w:2.8, d:2.4, h:1.2, z:bz+.5, c:BLK});    // raised component
+      onTop(g, p.x+1.45, p.y+1.2, bz+1.7, 2.2, 24, p.g);                     // glyph on top
+    });
+  }
+
+  /* ============ LAYER 3 — financial primitives (plumbing, z 16) ============ */
+  var Z3=16, cz=Z3+SL.h;
+  var L3=el('g',{'class':'layer hid',id:'L3'},world);
+  var L3f=el('g',{'class':'lift'},L3);
+  substrate(L3f,Z3,'Financial primitives');
+  buildPrimitives(L3f, cz);
+
+  /* ============ LAYER 4 — finance city (apps / markets, z 24, now on TOP) ============ */
+  var Z4=24, cz4=Z4+SL.h;
+  var L4=el('g',{'class':'layer hid',id:'L4'},world);
+  var L4f=el('g',{'class':'lift'},L4);
+  substrate(L4f,Z4,'Finance unlocks');
+  /* the city is now the top layer: the apps / markets built on the primitives below.
+     buildings + names unchanged — only the base z moved up one slab (cz -> cz4). */
+  buildFinanceCity(L4f, cz4);
+  var tiles=[];   // kept (empty) so the frame() bob loop stays safe after the tiles were retired
+
+  /* ============ callout dots (layers 3 & 4; layer 2 uses the L2STATES highlight system) ============ */
+  var CALLOUTS={
+    // L3 — financial primitives (the plumbing). Anchors sit over each module's glyph.
+    pools:       {l:3,a:[9.0,8.0,cz+2.0],    t:'Pooled liquidity', b:'Pooling on real UTXOs enables AMMs — deep markets in the actual coin.'},
+    oracle:      {l:3,a:[17.0,8.0,cz+2.0],   t:'Oracle price feeds', b:'Live prices on-chain, read on every state change — not on a schedule.'},
+    collateral:  {l:3,a:[25.0,8.0,cz+2.0],   t:'Collateral enforcement', b:'Native BTC locked under threshold scripts. No wrapped IOU, no custodian.'},
+    liquidation: {l:3,a:[9.0,16.0,cz+2.0],   t:'Liquidation engine', b:'Breach to settled in one atomic bundle, price locked at signing.'},
+    issuance:    {l:3,a:[17.0,16.0,cz+2.0],  t:'Token issuance', b:'Mint native assets — stablecoins, RWAs, vault shares.'},
+    risk:        {l:3,a:[25.0,16.0,cz+2.0],  t:'Risk & margin', b:'Every position monitored and cleared mechanically inside the stack.'},
+    // L4 — finance city (apps / markets built on the primitives). Same buildings, elevated to cz4.
+    dexs:    {l:4,a:[5.96,13.45,cz4+3.21], t:'DEXs', b:'Deep markets in the actual coin, built on UTXO-native pools.'},
+    looping: {l:4,a:[15.14,17.1,cz4+1.44], t:'Looping', b:'Leverage from lend + swap in one atomic transaction.'},
+    lend:    {l:4,a:[7.56,5.66,cz4+4.42], t:'Lending & credit', b:'Pooled deposits, enforced collateral, liquidations in seconds.'},
+    prime:   {l:4,a:[13.06,7.06,cz4+5.86], t:'Prime brokerage', b:'One account margining everything.'},
+    vaults:  {l:4,a:[12.0,12.72,cz4+2.62], t:'Vaults', b:'Deposited capital auto-deployed across strategies.'},
+    stables: {l:4,a:[22.37,5.78,cz4+2.7], t:'Stablecoins', b:'Minted against BTC collateral, or issued 1:1.'},
+    rwas:    {l:4,a:[21.54,12.95,cz4+2.13], t:'RWAs', b:'Treasuries and funds as tokens with transfer rules.'}
+  };
+
+  var dotLayers={2:el('g',{'class':'dots',id:'dots2'},world),
+                 3:el('g',{'class':'dots',id:'dots3'},world),
+                 4:el('g',{'class':'dots',id:'dots4'},world)};
+  function WS(n){return -150+(n-1)*96;}   // world shift: keeps the active layer vertically centered
+  var selected=null;try{parent.postMessage({arch:"clear"},"*");}catch(e){}
+  var card=document.getElementById('card');
+
+  // ---- layer-2 highlight states: each native-tech item lights up part of the schematic ----
+  var L2STATES={
+    settle:  {dir:'out', anchor:'g-vm', t:'Direct Bitcoin settlement', b:'Assets are never wrapped. Results settle straight back to Bitcoin.'},
+    utxo:    {xray:true, flow:true, anchor:'g-vm', t:'UTXO-native execution', b:'Programs run on real UTXOs, not IOUs — operated live inside the VM.'},
+    addr:    {hot:['g-addr'], anchor:'g-addr', t:'Per-account Bitcoin addresses', b:'Every balance is verifiable on any Bitcoin explorer.'},
+    perutxo: {hot:['g-perutxo'], anchor:'g-perutxo', t:'Per-account UTXOs', b:'Funds are never pooled into one wallet.'},
+    taproot: {hot:['pipeR','g-walletconn','g-cards','g-addr'], keep:['g-perutxo'], anchor:'g-cards', t:'Taproot account model', b:'Compatible with existing Bitcoin wallets.'},
+    hybrid:  {hot:['g-cards','g-perutxo','g-addr'], anchor:'g-cards', t:'Hybrid Account Model', b:'Accounts and programs hold both Arch-native balances and Bitcoin UTXOs.'},
+    schnorr: {hot:['g-schnorr','g-valbus'], anchor:'g-schnorr', t:'Threshold Schnorr signing', b:'FROST + ROAST: no single key ever exists, signing never stalls.'},
+    syscall: {dir:'in', anchor:'g-vm', t:'Native Bitcoin syscalls', b:'Programs read and write Bitcoin directly, no oracle in between.'},
+    vm:      {flow:true, anchor:'g-vm', t:'Bitcoin-native VM', b:'Solana’s proven eBPF engine, forked and rebuilt around UTXOs.'},
+    dpos:    {hot:['g-dpos'], anchor:'g-dpos', t:'Fast dPoS consensus', b:'180ms blocks, 1,500 TPS.'}
+  };
+  var PIPEGRP={pipeL:[0,1], pipeC:[2,3], pipeR:[4,5]};
+  // directional reveal across ALL cables: settle shows packets only on the way OUT (away from VM,
+  // into Bitcoin), syscall only on the way IN (toward the VM). Wires untouched; driven in the wave loop.
+  var ALLPIPES=pipes.map(function(_,i){return i;});
+  var WAVE_DIR={settle:{pipes:ALLPIPES, away:true}, syscall:{pipes:ALLPIPES, away:false}};
+  function hotEls(key){
+    if(PIPEGRP[key]) return PIPEGRP[key].map(function(i){return pipes[i];});
+    var e=document.getElementById(key); return e?[e]:[];
+  }
+  function clearL2(){
+    L2.classList.remove('focus','flow');
+    document.getElementById('g-vm').classList.remove('xray');
+    [].forEach.call(L2.querySelectorAll('.hot,.keep'),function(e){e.classList.remove('hot');e.classList.remove('keep');});
+  }
+  function applyL2(id){
+    var s=L2STATES[id]; if(!s) return;
+    // flow: fade everything except the moving cubes and the Arch VM (settle/syscall add a direction
+    // via the wave loop; vm/utxo keep every cube). focus: the generic spotlight that lifts hot/keep.
+    if(s.flow||s.dir) L2.classList.add('flow');
+    else if(s.hot||s.keep||s.xray) L2.classList.add('focus');
+    if(s.xray) document.getElementById('g-vm').classList.add('xray');
+    (s.hot||[]).forEach(function(k){ hotEls(k).forEach(function(e){e.classList.add('hot');}); });
+    (s.keep||[]).forEach(function(k){ hotEls(k).forEach(function(e){e.classList.add('keep');}); });
+  }
+
+  function clearDots(){
+    [].forEach.call(document.querySelectorAll('.dots.dimothers'),function(d){d.classList.remove('dimothers');});
+    [].forEach.call(document.querySelectorAll('.dot.act'),function(d){d.classList.remove('act');});
+  }
+  function clearSel(){
+    if(selected){ var pc=document.getElementById('comp-'+selected); if(pc)pc.classList.remove('sel'); }
+    selected=null; clearL2(); clearDots();
+    document.querySelectorAll('.step li.on').forEach(function(li){li.classList.remove('on');});
+    document.querySelectorAll('#L3 [data-cb], #L4 [data-cb]').forEach(function(w){ w.style.opacity=''; });
+    if(card) card.style.opacity=0;
+  }
+
+  function select(id){
+    if(selected){ var pc=document.getElementById('comp-'+selected); if(pc)pc.classList.remove('sel'); }
+    clearL2(); clearDots();
+    document.querySelectorAll('.step li.on').forEach(function(li){li.classList.remove('on');});
+    selected=id;try{parent.postMessage({arch:"sel",id:id},"*");}catch(e){}
+    var li=document.querySelector('.step li[data-c="'+id+'"]'); if(li)li.classList.add('on');
+    // fade the other hover indicators, keep the active one lit
+    var ad=document.querySelector('.dot[data-id="'+id+'"]');
+    if(ad){ ad.classList.add('act'); ad.parentNode.classList.add('dimothers'); }
+    if(L2STATES[id]){ applyL2(id); return; }
+    var c=CALLOUTS[id]; if(!c) return;
+    var g=document.getElementById('comp-'+id); if(g)g.classList.add('sel');
+    // L3 city: dim the rest of the district to focus the hovered building
+    if(c.l===3||c.l===4) document.querySelectorAll('#L'+c.l+' [data-cb]').forEach(function(w){ w.style.opacity=(w.getAttribute('data-cb')==='comp-'+id)?'':'0.4'; });
+    // callout card (re-added; positioned at the projected anchor)
+    if(card){ var p=P.apply(null,c.a), sx=p[0]-VBX, sy=p[1]-VBY+WS(state);
+      card.querySelector('.t').textContent=c.t; card.querySelector('.b').textContent=c.b;
+      if(sx>430){ card.style.left=(sx-238)+'px'; card.classList.add('flip'); } else { card.style.left=(sx+16)+'px'; card.classList.remove('flip'); }
+      card.style.top=(sy-22)+'px'; card.style.opacity=1; }
+  }
+
+  Object.keys(CALLOUTS).forEach(function(id){
+    var c=CALLOUTS[id], p=P.apply(null,c.a);
+    var g=el('g',{'class':'dot','data-id':id},dotLayers[c.l]);
+    el('circle',{cx:p[0],cy:p[1],r:12,'class':'hit'},g);
+    el('circle',{cx:p[0],cy:p[1],r:5.5,'class':'c'},g);
+    g.addEventListener('mouseenter',function(){select(id);});
+    g.addEventListener('mouseleave',clearSel);
+    g.addEventListener('click',function(){select(id);});
+  });
+  document.querySelectorAll('.step li[data-c]').forEach(function(li){
+    li.addEventListener('mouseenter',function(){select(li.getAttribute('data-c'));});
+    li.addEventListener('mouseleave',clearSel);
+    li.addEventListener('click',function(){select(li.getAttribute('data-c'));});
+  });
+  // make each city building (L4) AND each primitive module (L3) hover-selectable (not just its dot)
+  ['dexs','looping','lend','prime','vaults','stables','rwas',
+   'pools','oracle','collateral','liquidation','issuance','risk'].forEach(function(id){
+    var c=document.getElementById('comp-'+id); if(!c)return;
+    c.style.cursor='pointer';
+    c.addEventListener('mouseenter',function(){select(id);});
+    c.addEventListener('mouseleave',clearSel);
+    c.addEventListener('click',function(){select(id);});
+  });
+
+  /* ========  CALLOUT DOTS — LEVERS  (hover circles on the art; [x, y, z] grid units) ======== */
+  var L2DOTS = {
+    dpos:    [5.4, 7.8,    bz+1.2],   // a validator node
+    schnorr: [9.7,   12.5,   bz+0.8],   // the node-to-node mesh
+    vm:      [17.8,  8.4,   bz+2.0],   // the chip
+    utxo:    [16,  12.5, bz+2.0],   // inside the chip
+    syscall: [20.9,  18.5,   bz+0.6],   // left Bitcoin cables
+    settle:  [14.3,  18.5,   bz+0.6],   // centre Bitcoin cables
+    taproot: [26.7,  15.7,   bz+0.8],   // the wallets
+    perutxo: [24.2,  4.4,    bz+0.8],   // a UTXO
+    addr:    [28,  11,   bz+0.8]    // a wallet address
+  };
+  /* ========================================================================================= */
+  Object.keys(L2DOTS).forEach(function(id){
+    var a=L2DOTS[id], p=P(a[0],a[1],a[2]);
+    var g=el('g',{'class':'dot','data-id':id},dotLayers[2]);
+    el('circle',{cx:p[0],cy:p[1],r:12,'class':'hit'},g);
+    el('circle',{cx:p[0],cy:p[1],r:5.5,'class':'c'},g);
+    g.addEventListener('mouseenter',function(){select(id);});
+    g.addEventListener('mouseleave',clearSel);
+    g.addEventListener('click',function(){select(id);});
+  });
+
+  /* ============ scroll states ============ */
+  var layers={1:L1,2:L2,3:L3,4:L4};
+  var state=0;
+  function setState(n){
+    if(n===state)return; state=n;
+    document.body.setAttribute('data-s',n);
+    world.style.transform='translateY('+WS(n)+'px)';
+    for(var i=1;i<=4;i++){
+      layers[i].classList.toggle('hid', i>n);
+      layers[i].classList.toggle('dim', i<n);
+    }
+    for(var d in dotLayers) dotLayers[d].classList.toggle('show', +d===n);
+    document.querySelectorAll('.step').forEach(function(s){
+      s.classList.toggle('on', +s.getAttribute('data-s')===n);
+    });
+    clearSel();
+  }
+  window.__archSetState=setState;window.__archSelect=select;window.__archClearSel=clearSel;
+  /* scale the whole stage (art + cards together) to the column width */
+  function fit(){
+    var col=document.querySelector('.stagecol').clientWidth;
+    var s=Math.min(1,col/680);
+    stage.style.transform='scale('+s+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  // state from scroll position (nearest step to viewport centre). A plain scroll handler instead of
+  // IntersectionObserver: IO is suppressed when the document is backgrounded/hidden (which happens
+  // inside the lab iframe and on mobile), so scrolling silently stopped advancing the layers. A
+  // scroll handler always fires and works identically standalone, in the iframe, and on the phone.
+  var steps=[].slice.call(document.querySelectorAll('.step'));
+  function nearestStep(){
+    var mid=window.innerHeight/2, best=1, bd=Infinity;
+    steps.forEach(function(s){
+      var r=s.getBoundingClientRect(), c=(r.top+r.bottom)/2, dd=Math.abs(c-mid);
+      if(dd<bd){ bd=dd; best=+s.getAttribute('data-s'); }
+    });
+    return best;
+  }
+  var forced=+(new URLSearchParams(location.search).get('s')||0);
+  if(forced){ setState(forced); }
+  else{
+    function onScroll(){ setState(nearestStep()); }   // setState early-returns when unchanged; 4 getBoundingClientRect calls are cheap
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.addEventListener('resize',onScroll);
+    setState(nearestStep());
+  }
+
+  /* ============ motion ============ */
+  function tr(g,ux,uy){ g.setAttribute('transform','translate('+((ux-uy)*CX).toFixed(2)+','+((ux+uy)*CY).toFixed(2)+')'); }
+  var t0=performance.now();
+  function frame(now){
+    var t=(now-t0)/1000;
+    var ob=((t%TM_CYCLE)/TM_CYCLE)*BSP;   // one block-slot per treemap cycle — synced to the seal
+    tr(gBtc, -ob, 0);                      // bitcoin crawl, leftward away
+    // each block emerges orange from NEXT BLOCK and settles to white as it ages west
+    btcSegs.forEach(function(s){ s.o.setAttribute('opacity', Math.max(0,Math.min(1,(s.x0-ob-13)/4)).toFixed(2)); });
+    // Arch's chain — fast westward crawl, looping by one (tiny) block-space
+    var oa=(t*1.9)%ASPC;
+    tr(gArch, -oa, 0);
+    // VM thinking lights — pulse in sequence
+    vmLights.forEach(function(l,i){
+      var v=Math.max(0, Math.sin(t*3 - i*0.9));
+      l.setAttribute('opacity',(0.15+0.85*v).toFixed(2));
+    });
+    // next block: gentle orderly fill -> brief hold -> seal (all at once) -> refill immediately
+    var ct=t%TM_CYCLE;
+    tmSquares.forEach(function(sq){
+      var o;
+      if(ct<sq.appear) o=0;
+      else if(ct<TM_CONSO){ var x=Math.min(1,(ct-sq.appear)/0.32); o=x*x*(3-2*x); }   // gentle ease-in, hold full
+      else o=Math.max(0,1-(ct-TM_CONSO)/0.4);   // seal: fade out together
+      sq.g.setAttribute('opacity', o.toFixed(2));
+    });
+    // VM→block dots: a steady metronome dropping south from the VM, never pausing through seal/refill
+    dots.forEach(function(d){
+      var ph=((ct-(d.arrival-DTRAVEL))%TM_CYCLE+TM_CYCLE)%TM_CYCLE;
+      if(ph<=DTRAVEL){ var p=ph/DTRAVEL;
+        tr(d.g,0,(DTGY-DLY)*p);
+        d.g.setAttribute('opacity',(p<.2?p/.2:p>.85?(1-p)/.15:1).toFixed(2));
+      } else d.g.setAttribute('opacity',0);
+    });
+    // ArchVM interior — UTXOs merge/split/blink while the shell is x-rayed (UTXO-native execution)
+    if(gVMwrap.classList.contains('xray')){
+      coreCubes.forEach(function(c,i){
+        var ph=t*0.9+i*0.7;
+        tr(c.g, Math.sin(ph)*0.14, Math.cos(ph*0.8+i)*0.14);
+        c.g.setAttribute('opacity', (Math.sin(t*1.6+i*1.7)>-0.3?1:0.12).toFixed(2));
+      });
+    }
+    // Bitcoin cables — data cubes bounce end-to-end with an eased turnaround (no hard reset), phased per cable
+    waveCubes.forEach(function(w){
+      var ph=t*WAVE_SPEED + w.off; ph-=Math.floor(ph);            // [0,1)
+      var L=1-Math.abs(1-2*ph), S=0.5-0.5*Math.cos(2*Math.PI*ph); // linear bounce vs eased bounce
+      tr(w.g, 0, ((1-WAVE_EASE)*L + WAVE_EASE*S)*waveTravel);
+      var dir=WAVE_DIR[selected];                                 // directional reveal for settle / syscall
+      if(dir && dir.pipes.indexOf(w.pi)>=0){
+        w.g.style.opacity = ((ph<0.5)===dir.away) ? 1 : 0;        // visible only on the matching half of the trip
+      } else { w.g.style.opacity=''; }                            // otherwise hand opacity back to CSS
+    });
+    tiles.forEach(function(tg,i){ tg.setAttribute('transform','translate(0,'+(Math.sin(t*1.4+i*1.3)*3).toFixed(2)+')'); });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
