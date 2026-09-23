@@ -1,0 +1,120 @@
+/* /prime-v9 — the journey. One circle carries the page from the hero to the deposit, and the
+   scroll writes --p1..--p5 on .v9-journey (hero-coin.tsx); every transform lives here.
+     --p1  the circle closes from full-bleed to a coin; the hero's words step back
+     --p2  the photograph blurs out and Bitcoin's mark arrives
+     --p3  beat 1 → 2
+     --p4  beat 2 → 3
+     --p5  the deposit: the bank rises, the coin drops behind it
+
+   The circle is one element the whole way down. At --p1: 0 it is simply a circle wide enough
+   to cover the viewport, which is why the page appears to open on a full-bleed photograph. */
+
+.v9-journey {
+  --p1: 0;
+  --p2: 0;
+  --p3: 0;
+  --p4: 0;
+  --p5: 0;
+
+  /* the diameter at each end of the close */
+  --d-open: calc(max(100vw, 100svh) * 1.5);
+  --d-coin: 340px;
+  /* where the coin ends up: centred until it has closed, then right of the copy */
+  --coin-x: 0px;
+}
+
+@media (min-width: 1024px) {
+  .v9-journey {
+    --d-coin: 380px;
+    --coin-x: 23vw;
+  }
+}
+
+.v9-journey .v9-circle-box {
+  transform: translate(calc(-50% + var(--p1) * var(--coin-x)), calc(-50% + var(--p5) * 34svh));
+}
+.v9-journey .v9-circle {
+  width: calc((1 - var(--p1)) * var(--d-open) + var(--p1) * var(--d-coin));
+  height: calc((1 - var(--p1)) * var(--d-open) + var(--p1) * var(--d-coin));
+  transform: scale(calc(1 - 0.55 * var(--p5)));
+}
+.v9-journey .v9-circle-photo {
+  /* the circle is an aperture over a viewport-sized photograph, not a square crop of it; the
+     counter-translate keeps the photograph still while the aperture slides right */
+  position: absolute;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 100vw;
+  height: 100svh;
+  max-width: none;
+  transform: translate(calc(-50% - var(--p1) * var(--coin-x)), -50%);
+  object-fit: cover;
+  object-position: 50% 58%;
+  filter: blur(calc(var(--p2) * 22px)) saturate(calc(1 + var(--p2) * 1.6));
+  opacity: calc(1 - var(--p2));
+}
+.v9-journey .v9-circle-mark {
+  opacity: var(--p2);
+}
+
+/* the hero's words sit over the photograph and clear as the circle closes */
+.v9-journey .v9-hero {
+  opacity: max(0, calc(1 - var(--p1) * 1.45));
+  transform: translateY(calc(var(--p1) * -40px));
+}
+
+/* The beats hand off rather than crossfade: two headlines stacked at half opacity read as a
+   bug, and the blank between them is about 30px of scroll — a blink at reading speed. */
+.v9-journey .v9-beats {
+  opacity: max(0, calc((var(--p1) - 0.72) * 3.6));
+}
+@media (min-width: 1024px) {
+  .v9-journey .v9-beat {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+  }
+  .v9-journey .v9-beat-1 {
+    opacity: max(0, calc(1 - var(--p3) * 2.2));
+    transform: translateY(calc(-50% + var(--p3) * -44px));
+  }
+  .v9-journey .v9-beat-2 {
+    opacity: calc(max(0, calc((var(--p3) - 0.55) * 2.2)) * max(0, calc(1 - var(--p4) * 2.2)));
+    transform: translateY(calc(-50% + (1 - var(--p3)) * 44px + var(--p4) * -44px));
+  }
+  .v9-journey .v9-beat-3 {
+    opacity: calc(max(0, calc((var(--p4) - 0.55) * 2.2)) * max(0, calc(1 - var(--p5) * 1.6)));
+    transform: translateY(calc(-50% + (1 - var(--p4)) * 44px));
+  }
+}
+@media (max-width: 1023px) {
+  .v9-journey .v9-beat + .v9-beat {
+    margin-top: 2.5rem;
+  }
+}
+
+/* the bank waits below the fold and rises to meet the coin */
+.v9-journey .v9-bank {
+  transform: translateY(calc((1 - var(--p5)) * 40svh));
+  opacity: min(1, calc(var(--p5) * 2));
+}
+.v9-journey .v9-deposit {
+  opacity: calc(max(0, calc(var(--p5) - 0.55)) * 2.2);
+}
+
+/* stacked (under md, or reduced motion): no pin, so the circle is simply a coin */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .v9-journey .v9-circle {
+    width: 220px;
+    height: 220px;
+    transform: none;
+  }
+  .v9-journey .v9-circle-box {
+    transform: none;
+  }
+  .v9-journey .v9-bank,
+  .v9-journey .v9-deposit {
+    display: none;
+  }
+}

@@ -1,0 +1,1502 @@
+/* /prime-v10 — §1 the hero. Every transform, colour and transition of the hero lives here, keyed
+   off the contract hero.tsx writes (see its header comment). No scroll range lives here — those are
+   all timeline.ts's — and no field number: the data arrives as vars on the section.
+
+   WHERE EACH VAR IS WRITTEN (so a change restyles only what uses it):
+     .v10-hero      data-phase data-beat data-beat-from data-idle data-lit data-live;
+                    geometry (on measure): --W --H --cx --cy --cy0 --r0 --rc --coin --pitch --S
+                    --half --nav-h; data (server-rendered inline): --dolly-k --focus --focus-x
+                    --dot --merge --lod0 --lod1 --clip0 --clip1 --btc
+     .v10-band      --words --scroll         the hero's words lift away, masked at the nav's line
+     .v10-aperture  --close --turn           the lens closes (and dollies), the coin turns
+     .v10-field     --zoom --ring --grow     the camera, the neighbours coming into view, and
+                    the form's first sub-phase (the dots merge over the disc filling in)
+     their readers  --disc (.v10-dots .v10-disc), --draw (.v10-glyph .v10-draw): the form's other
+                    two, written only on the nodes that read them
+     host + beats   --rel                    px the stage has scrolled up at the release
+     nav items      [data-v10-ink]           an item the closing circle has uncovered while the
+                    rest of the nav is still over the photograph (hero.tsx, THE NAV)
+
+   STATIC IS THE DEFAULT: the photo band, then two stacked frames (the idle field, the token).
+   Everything pinned is in the ONE @media block below, the same query as hero.tsx's PIN_QUERY.
+   Only transform, opacity, clip-path, mask and colour ever change; nothing animates a box's size
+   or position. */
+
+/* Registered, so they compute to numbers: a child restyles only when the value it reads really
+   changes (an unregistered var's computed value is its unevaluated text, so every scrub frame
+   would restyle the whole field). --zoom and --fs are read only where they're written, and --disc
+   and --draw are written on their few readers, so none of those inherit; --ring, --grow and
+   --glyph are read by every coin, so they do. */
+@property --zoom {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --fs {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+@property --ring {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --grow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --disc {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --draw {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --glyph {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.v10-hero,
+.v10-frame {
+  /* geometry, at rest (before the first measure: a circle that covers any screen) */
+  --cx: 0;
+  --cy: 0;
+  --cy0: 0;
+  --r0: 100000;
+  --rc: 100;
+  --coin: 200;
+  --pitch: 27;
+  --S: 10;
+  --W: 1440;
+  --H: 900;
+  --half: 450;
+  --nav-h: 80;
+
+  --btc: #f7931a; /* Bitcoin (hero.tsx writes marks.tsx's BTC_COLOR over this) */
+  --idle: #d4d4d4; /* the still dots */
+  --ground: #f7f6f6;
+  --night: #0d2249; /* the photo's sky: what shows until the photograph has loaded */
+}
+
+.v10-hero {
+  position: relative;
+  background: var(--ground);
+  /* Chrome's scroll anchoring keyed a reload's restored position off the transformed hero
+     nodes (off by up to 540px); the hero's layout never shifts, so it needs none */
+  overflow-anchor: none;
+}
+
+/* ── The hero band: the photograph and its words ──────────────────────────── */
+.v10-band {
+  --words: 0;
+  --scroll: 0;
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding-block: 112px 72px;
+  text-align: center;
+}
+.v10-band-photo {
+  position: absolute;
+  inset: 0;
+  background: var(--night);
+}
+.v10-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+/* legibility for the white words and the light nav over a bright facade */
+.v10-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgb(8 20 45 / 0.5), rgb(8 20 45 / 0) 22%),
+    rgb(13 34 73 / 0.3);
+}
+.v10-words {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* the display size; each sentence is its own line (beats.tsx), sized with the width so the
+   longer one always fits on one line — up to 64px (a fixed 64px from 480 broke "Earn on your /
+   Bitcoin." until ≈620px) */
+.v10-h1 {
+  font-size: min(48px, 10.6vw);
+  line-height: 1.17;
+  letter-spacing: -0.04em;
+}
+@media (min-width: 480px) {
+  .v10-h1 {
+    font-size: min(64px, 10vw);
+    line-height: 1.19;
+  }
+}
+
+/* ── The stage's headlines ─────────────────────────────────────────────────── */
+.v10-beat-h {
+  font-size: 36px;
+  line-height: 44px;
+  letter-spacing: -0.04em;
+}
+.v10-figure {
+  font-size: 44px;
+  line-height: 48px;
+  letter-spacing: -0.04em;
+}
+.v10-beat-sub {
+  font-size: 17px;
+  line-height: 26px;
+}
+@media (min-width: 480px) {
+  .v10-beat-h {
+    font-size: 48px;
+    line-height: 56px;
+  }
+  .v10-beat-sub {
+    font-size: 20px;
+    line-height: 30px;
+  }
+}
+@media (min-width: 768px) {
+  /* /chain's pinned headline size */
+  .v10-beat-h {
+    font-size: 60px;
+    line-height: 68px;
+  }
+  .v10-figure {
+    font-size: 64px;
+    line-height: 68px;
+  }
+}
+
+/* ── The field (both the stage's and the frames') ─────────────────────────── */
+.v10-field-svg {
+  display: block;
+  overflow: visible;
+}
+.v10-field {
+  --zoom: 1;
+  --ring: 1;
+  --grow: 0;
+  /* px per pitch on screen: the camera (pitch at rest, pitch × S when the centre coin is coin-sized) */
+  --fs: calc(var(--pitch) * pow(var(--S), 1 - var(--zoom)));
+  /* the ₿ on a coin: legible at --lod1 px across, gone at --lod0 */
+  --glyph: clamp(0, (var(--fs) * var(--dot) - var(--lod0)) / (var(--lod1) - var(--lod0)), 1);
+}
+.v10-dot {
+  color: var(--btc);
+}
+[data-idle] .v10-ring .v10-dot {
+  color: var(--idle);
+}
+[data-lit] .v10-ring .v10-dot {
+  color: var(--btc);
+}
+.v10-coin {
+  /* about the coin's own centre: the <use> sits at -r,-r in a group translated to the dot */
+  transform: scale(calc(1 + (var(--merge) - 1) * var(--grow)));
+}
+/* form: the dots are clipped to a circle closing from the resting dots' reach (--clip0) to the disc
+   (--clip1: the idle field's own outline) as they grow, while a solid disc of that radius fills in
+   under them in Bitcoin's orange — so the bites between the rim dots are orange and the outline
+   is that one circle from the start: only the texture closes. Then the primeBTC disc fades in over
+   them (the same circle, primeBTC's orange), and the dots go. */
+.v10-under {
+  color: var(--btc);
+  opacity: clamp(0, var(--grow) * 1.25 - 0.1, 1);
+}
+/* the clip starts just clear of the resting dots and is on the disc's circle by a quarter of the
+   grow, before any grown rim dot could poke out past it */
+.v10-clip {
+  transform: scale(calc(var(--clip1) + (var(--clip0) - var(--clip1)) * (1 - clamp(0, var(--grow) * 4, 1))));
+}
+.v10-dots {
+  opacity: clamp(0, (1 - var(--disc)) * 1000, 1);
+}
+.v10-disc {
+  opacity: var(--disc);
+}
+/* the glyph, written in along its spine: a mask stroke, so the solid white shape appears behind
+   a clean front — never an outline with a fill */
+.v10-glyph {
+  opacity: clamp(0, var(--draw) * 1000, 1);
+}
+.v10-draw {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: calc(1 - var(--draw));
+}
+.v10-centre-label {
+  fill: var(--p-ink, #292a2e);
+  font-size: 0.55px;
+  font-weight: 500;
+  /* a ground-coloured halo, so the label reads over the dot row under the centre */
+  paint-order: stroke;
+  stroke: var(--ground);
+  stroke-width: 0.22px;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+[data-idle]:not([data-lit]) .v10-centre-label {
+  opacity: 1;
+}
+
+/* ── Static: the key frames, stacked ──────────────────────────────────────── */
+.v10-stage,
+.v10-navprobe {
+  display: none;
+}
+.v10-svh {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
+.v10-frames {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 96px;
+  padding: 96px 16px;
+}
+.v10-frame {
+  display: flex;
+  width: 100%;
+  max-width: 760px;
+  margin: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  text-align: center;
+}
+.v10-frame .v10-field {
+  --glyph: 0; /* at frame size the coins are dots */
+}
+.v10-frame[data-lit] .v10-field {
+  --grow: 1;
+}
+.v10-frame[data-lit] :is(.v10-dots, .v10-disc) {
+  --disc: 1;
+}
+.v10-frame[data-lit] :is(.v10-glyph, .v10-draw) {
+  --draw: 1;
+}
+.v10-frame-art {
+  width: min(420px, 100%);
+  aspect-ratio: 1;
+}
+.v10-field-svg--framed {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Pinned ───────────────────────────────────────────────────────────────────
+   The section is 500svh (420svh on a phone); the stage is one LARGE viewport (lvh), sticky, so a
+   phone's collapsing toolbar never uncovers a strip under the full-bleed photo. The pinned travel
+   (section − stage, measured) is the p of timeline.ts. */
+@media (prefers-reduced-motion: no-preference) and (min-height: 500px) {
+  .v10-hero {
+    height: 500svh;
+  }
+  @media (max-width: 767px) {
+    .v10-hero {
+      height: 420svh;
+    }
+  }
+  .v10-frames {
+    display: none;
+  }
+
+  /* the words ride over the stage's first viewport, then scroll — and lift — away. They never
+     pass under the bare nav: the band is masked at the nav's line, in viewport terms (--scroll is
+     how far the section has scrolled, so scroll + lift is the band's own offset). The mask only
+     ever covers the photograph — nothing is left as a ghost over the light ground. */
+  .v10-band {
+    --lift: calc(var(--words) * 60lvh);
+    --line: calc(var(--scroll) * 1px + var(--lift) + var(--nav-h) * 1px);
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 3;
+    /* the small viewport: the words centre in what's visible on load, toolbar expanded */
+    height: 100svh;
+    min-height: 0;
+    overflow: visible;
+    transform: translateY(calc(-1 * var(--lift)));
+    /* a short feather (a long one showed each line as a sliced ghost for a few px of scroll) */
+    -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 4px), #000 calc(var(--line) + 8px));
+    mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 4px), #000 calc(var(--line) + 8px));
+  }
+  .v10-band-photo {
+    display: none;
+  }
+  /* the nav's probe (hero.tsx sizes it): light nav text until the circle has uncovered the last
+     nav item, dark after; the items it uncovers before that are inked one by one (below) */
+  .v10-navprobe {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 20svh; /* until measured */
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* hero.tsx, THE NAV: an item the circle has already uncovered, while the rest of the nav is
+     still light over the photograph. This file only loads on /prime-v10. */
+  nav [data-v10-ink]:not(:hover) {
+    color: var(--color-black, #181818) !important;
+    border-color: var(--color-black, #181818) !important;
+  }
+  nav button[data-v10-ink] > span {
+    background-color: var(--color-black, #181818) !important;
+  }
+
+  .v10-stage {
+    display: block;
+    position: sticky;
+    top: 0;
+    height: 100lvh;
+    overflow: hidden;
+    overflow: clip;
+    background: var(--ground);
+  }
+
+  /* ── the aperture: the lens closes (full stage, clip-path + a dolly), then the coin turns ── */
+  .v10-aperture {
+    --close: 0;
+    --turn: 0;
+    /* the aperture's radius */
+    --r: calc(var(--r0) + (var(--rc) - var(--r0)) * var(--close));
+    /* the dolly: once the circle fits in the frame the photograph shrinks with it — --dolly-k
+       times what covers the circle — and pans (--shift) into that slack toward --focus */
+    --ps: min(1, var(--r) * var(--dolly-k) / var(--half));
+    --shift: calc(max(0, var(--ps) * (var(--H) - var(--cy0)) - var(--r)) * var(--focus));
+    --shift-x: calc(max(0, var(--ps) * var(--W) / 2 - var(--r)) * var(--focus-x));
+    --lift: calc(1 + 0.08 * sin(var(--turn) * 180deg)); /* a flipped coin rises a little */
+  }
+  .v10-hero[data-phase="field"] .v10-aperture {
+    display: none;
+  }
+  .v10-aperture,
+  .v10-lens,
+  .v10-dolly,
+  .v10-field-host {
+    position: absolute;
+    inset: 0;
+  }
+  .v10-lens {
+    background: var(--night);
+    clip-path: circle(calc(var(--r) * 1px) at calc(var(--cx) * 1px) calc(var(--cy0) * 1px));
+    /* hands over to the coin the instant the turn starts */
+    opacity: clamp(0, 1 - var(--turn) * 100000, 1);
+  }
+  .v10-dolly {
+    transform-origin: calc(var(--cx) * 1px) calc(var(--cy0) * 1px);
+    transform: translate(calc(var(--shift-x) * -1px), calc(var(--shift) * -1px)) scale(var(--ps));
+  }
+  .v10-lens .v10-scrim {
+    opacity: calc(1 - var(--close));
+  }
+  .v10-coin3d {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--coin) * 1px);
+    height: calc(var(--coin) * 1px);
+    transform: translate(calc((var(--cx) - var(--coin) / 2) * 1px), calc((var(--cy0) - var(--coin) / 2) * 1px));
+    /* ONE perspective for both faces: a face carrying its own perspective() is skewed in WebKit
+       and its sliver pops at the swap. 700px on a 200px coin reads as a coin, not a card. */
+    perspective: 700px;
+  }
+  .v10-face {
+    position: absolute;
+    inset: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .v10-face--photo {
+    /* Chromium: a rounded overflow clip. Its clip-path on a 3D-turned face rasterised the photo
+       soft (and the edge stair-stepped mid-turn) — a visible pop from the crisp lens at the
+       handoff. WebKit (matched by its -apple-system font keyword) keeps clip-path: it flattens a
+       rounded overflow clip's edge in 3D. */
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--night);
+    transform: rotateY(calc(var(--turn) * 180deg)) scale(var(--lift));
+    /* only while turning, and — belt and braces for backface-visibility — gone at 90deg */
+    opacity: calc(clamp(0, var(--turn) * 100000, 1) * clamp(0, (0.5 - var(--turn)) * 100000, 1));
+  }
+  /* the same full-stage photograph as the lens, at the same dolly, offset so the coin shows the
+     same pixels: (cx, cy0) of the stage lands on the coin's centre */
+  .v10-face-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--W) * 1px);
+    height: calc(var(--H) * 1px);
+    transform-origin: calc(var(--cx) * 1px) calc(var(--cy0) * 1px);
+    transform: translate(calc((var(--coin) / 2 - var(--cx) - var(--shift-x)) * 1px), calc((var(--coin) / 2 - var(--cy0) - var(--shift)) * 1px)) scale(var(--ps));
+  }
+  @supports (font: -apple-system-body) {
+    .v10-face--photo {
+      border-radius: 0;
+      overflow: visible;
+      clip-path: circle(50%);
+    }
+  }
+  .v10-face--btc {
+    transform: rotateY(calc(var(--turn) * 180deg - 180deg)) scale(var(--lift));
+    /* from 90deg on; data-phase="field" (display:none on the aperture) is what hides it — never
+       --turn reaching 1, so there's no frame where both the face and the field are gone */
+    opacity: clamp(0, (var(--turn) - 0.5) * 100000 + 1, 1);
+  }
+  /* each face darkens a little as it turns away from the light */
+  .v10-shade {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #081427;
+    opacity: calc(0.28 * (1 - cos(var(--turn) * 180deg)));
+    pointer-events: none;
+  }
+  .v10-face--btc .v10-shade {
+    opacity: calc(0.28 * (1 + cos(var(--turn) * 180deg)));
+  }
+  /* the coin's edge: a thin band seen only near edge-on, so the coin never vanishes at 90deg.
+     Painted under the faces (DOM order), navy on the photo half, Bitcoin's darker orange after. */
+  .v10-rim {
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    transform: scaleX(calc(0.03 * sin(var(--turn) * 180deg))) scaleY(var(--lift));
+    opacity: clamp(0, (sin(var(--turn) * 180deg) - 0.6) * 5, 1);
+  }
+  .v10-aperture {
+    --rim-b: clamp(0, (var(--turn) - 0.5) * 100000, 1); /* 0 on the photo half, 1 on the ₿ half */
+  }
+  .v10-rim {
+    background: color-mix(in srgb, #b8650b calc(var(--rim-b) * 100%), #0a1c3d);
+  }
+  .v10-btc-mark {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* TURN = "flood": no rotation; orange rises through the circle from the bottom. The lens is
+     pulled in a pixel under the rising face, so its edge never fringes the ₿ disc. */
+  .v10-hero[data-turn="flood"] .v10-lens {
+    --r: calc(var(--r0) + (var(--rc) - var(--r0)) * var(--close) - clamp(0, var(--turn) * 100000, 1));
+  }
+  .v10-hero[data-turn="flood"] .v10-lens,
+  .v10-hero[data-turn="flood"] .v10-face--btc {
+    opacity: clamp(0, (1 - var(--turn)) * 100000, 1);
+  }
+  .v10-hero[data-turn="flood"] .v10-face--photo,
+  .v10-hero[data-turn="flood"] .v10-rim {
+    opacity: 0;
+  }
+  .v10-hero[data-turn="flood"] .v10-face--btc {
+    transform: none;
+    clip-path: inset(calc((1 - var(--turn)) * 100%) 0 0 0);
+  }
+
+  /* ── the camera: the field takes over from the ₿ face at the end of the turn, then pulls back ── */
+  .v10-field-host {
+    --rel: 0;
+    --line: calc((var(--nav-h) + var(--rel)) * 1px);
+    display: none;
+    /* the art stays clear of the nav's bar: coins passing under it fade out above its line — in
+       viewport terms, so at the release (--rel: the stage scrolling away) the token doesn't slide
+       under the nav's glass as a blurred orange slab */
+    -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 16px), #000 calc(var(--line) + 40px));
+    mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 16px), #000 calc(var(--line) + 40px));
+  }
+  .v10-hero[data-phase="field"] .v10-field-host {
+    display: block;
+  }
+  .v10-field-host .v10-field-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .v10-stage .v10-field {
+    --zoom: 0;
+    --ring: 0;
+    /* the pan: the coin turned at the screen's centre (cy0); the field rests under the headline
+       slot (cy), so the camera drifts down as it pulls back */
+    transform: translate(calc(var(--cx) * 1px), calc((var(--cy) + (1 - var(--zoom)) * (var(--cy0) - var(--cy))) * 1px)) scale(var(--fs));
+  }
+
+  /* the neighbours come into view as the camera starts to pull back: each coin arrives whole,
+     at full size, in order of its distance from the centre — never smaller than the centre coin
+     (growing them in read as coins inflating) */
+  .v10-stage .v10-ring .v10-dot {
+    opacity: clamp(0, (var(--ring) * 1.25 - var(--dd)) * 5, 1);
+  }
+
+  /* idle and lit: time-based, rippling by each dot's distance (--dd), reversing on the way back.
+     Only once the reader is live, so a page restored mid-hero doesn't play them on load.
+     Idle is a quick per-dot change on a long spread, so it reads as a wave, not a wash. */
+  .v10-hero[data-live] .v10-ring .v10-dot {
+    transition: color 300ms ease;
+  }
+  .v10-hero[data-live][data-idle] .v10-ring .v10-dot {
+    transition: color 160ms ease calc(var(--dd) * 440ms);
+  }
+  .v10-hero[data-live][data-lit] .v10-ring .v10-dot {
+    transition: color 180ms ease-out calc(var(--dd) * 320ms);
+  }
+  .v10-hero[data-live][data-lit][data-light="all"] .v10-ring .v10-dot {
+    transition-delay: 0ms;
+  }
+  /* the form has begun: every dot is lit now, whatever the ripple's progress (a fast flick
+     through lit into the form merged grey dots, then popped an orange disc over them). No
+     transition: that cancels the ripple's delayed ones (a new duration wouldn't — they're already
+     running toward the same orange), so the rest land at once. */
+  .v10-hero[data-live][data-form] .v10-ring .v10-dot {
+    color: var(--btc);
+    transition: none;
+  }
+
+  /* the headlines: one slot at the top of the stage, handed off — the old one leaves upward
+     (250ms: it holds, then drops, while it visibly lifts), then the new one rises (400ms). The
+     new one waits 250ms only when an old one is leaving (data-beat-from): never two at once,
+     and no dead air when the first headline arrives. */
+  .v10-beats {
+    --rel: 0;
+    --gap: clamp(16px, 4svh, 48px);
+    /* the nav's line in the slot's own terms: above the slot while pinned, down through it as the
+       stage scrolls away at the release — the headline then leaves under a fade, not the glass */
+    --line: calc(var(--rel) * 1px - var(--gap));
+    -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 8px), #000 calc(var(--line) + 24px));
+    mask-image: linear-gradient(to bottom, transparent calc(var(--line) - 8px), #000 calc(var(--line) + 24px));
+    position: absolute;
+    top: calc(var(--nav-h) * 1px + var(--gap));
+    inset-inline: 16px;
+    z-index: 2;
+    display: grid;
+    max-width: 880px;
+    margin-inline: auto;
+    text-align: center;
+    pointer-events: none;
+  }
+  .v10-stage .v10-beat {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .v10-hero[data-beat="prime"] .v10-stage .v10-beat--idle {
+    transform: translateY(-14px);
+  }
+  .v10-hero[data-beat="idle"] .v10-stage .v10-beat--idle,
+  .v10-hero[data-beat="prime"] .v10-stage .v10-beat--prime {
+    opacity: 1;
+    transform: none;
+  }
+  .v10-hero[data-live] .v10-stage .v10-beat {
+    transition:
+      opacity 250ms cubic-bezier(0.5, 0, 0.9, 0.5),
+      transform 250ms cubic-bezier(0.2, 0, 0.4, 1);
+  }
+  .v10-hero[data-live][data-beat="idle"] .v10-stage .v10-beat--idle,
+  .v10-hero[data-live][data-beat="prime"] .v10-stage .v10-beat--prime {
+    transition:
+      opacity 400ms cubic-bezier(0.2, 0.7, 0.2, 1) 250ms,
+      transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1) 250ms;
+  }
+  /* nothing is leaving: no wait (a jump from the hero straight to prime, too) */
+  .v10-hero[data-live][data-beat="idle"][data-beat-from="hero"] .v10-stage .v10-beat--idle,
+  .v10-hero[data-live][data-beat="prime"][data-beat-from="hero"] .v10-stage .v10-beat--prime {
+    transition-delay: 0ms;
+  }
+}
+
+/* The native scrollbar reads as an unbalanced edge on this page (Nick, 2026-09-22), so it is
+   hidden — on THIS route only: `:has(.v10-page)` keeps every other page's scrollbar alone.
+   Scrolling itself is untouched (wheel, trackpad, keys, Lenis); only the indicator goes.
+   `scrollbar-width` covers Firefox, `::-webkit-scrollbar` covers Safari and Chrome. */
+html:has(.v10-page) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html:has(.v10-page)::-webkit-scrollbar,
+html:has(.v10-page) body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* THE PAGE'S RULER. The nav and the footer are site chrome, outside .v10-page, so they kept the
+   site's own container (92% wide, capped at 1300) — which puts the logo at 70px on a 1440 screen
+   and 214px on a 1728 one, while every section here sits at 128. That mismatch is what reads as
+   "the margins aren't consistent with the rest of the page". `:has` scopes the fix to this route:
+   nav, sections and footer all take the same gutter, and no other page changes. */
+/* The nav and the footer are site chrome: they use `w-[94%] / w-[92%] max-w-(--container-site)`
+   of their own, which puts the logo at 70px on a 1440 screen and 214px on a 1728 one while every
+   section here sits at 128. `:has` scopes the correction to this route — nav, sections and footer
+   take one gutter, and no other page is touched. The selectors match the utility classes Tailwind
+   emits for those two components (nav.tsx:138, prime-v6/prime-footer.tsx:18). */
+body:has(.v10-page) header > div.mx-auto,
+body:has(.v10-page) nav > div.mx-auto,
+body:has(.v10-page) footer > div.mx-auto,
+body:has(.v10-page) footer div.mx-auto {
+  width: 100%;
+  max-width: 2200px;
+  padding-inline: 24px;
+}
+@media (min-width: 768px) {
+  body:has(.v10-page) header > div.mx-auto,
+  body:has(.v10-page) nav > div.mx-auto,
+  body:has(.v10-page) footer > div.mx-auto,
+  body:has(.v10-page) footer div.mx-auto {
+    padding-inline: 48px;
+  }
+}
+@media (min-width: 992px) {
+  body:has(.v10-page) header > div.mx-auto,
+  body:has(.v10-page) nav > div.mx-auto,
+  body:has(.v10-page) footer > div.mx-auto,
+  body:has(.v10-page) footer div.mx-auto {
+    padding-inline: 128px;
+  }
+}
+
+/* The page's own margins (Nick: 128px): the site's .site-container is 92% wide with a 1300px
+   cap, which ran tight against the Figma. Here it is a full-width container with a fluid
+   128px gutter (24px on a phone, 48px at md) and a cap that keeps the gutter honest on very
+   wide screens. Scoped to .v10-page so no other route moves. */
+.v10-page .site-container {
+  width: 100%;
+  max-width: 2200px; /* a stop for very wide screens only: the 128px gutter is what sets the margin */
+  padding-inline: 24px;
+}
+@media (min-width: 768px) {
+  .v10-page .site-container {
+    padding-inline: 48px;
+  }
+}
+@media (min-width: 992px) {
+  .v10-page .site-container {
+    padding-inline: 128px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   §2 `#offers` — the still point. White ground, four cards side by side, one
+   Reveal on entry (offers.tsx) and nothing else that moves. No scroll reader,
+   no state: everything below is static style.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.v10-offers {
+  background: #fff;
+  padding-block: clamp(88px, 8.5vw, 168px);
+}
+.v10-offers-eyebrow {
+  color: #6e6e6e;
+  font-weight: 500;
+}
+.v10-offers-h2 {
+  margin-top: 14px;
+  max-width: 540px;
+  font-family: var(--font-jakarta), var(--font-sans);
+  font-size: clamp(30px, 2.9vw, 44px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.035em;
+}
+
+/* ONE grid, never a second layout: 1 column, 2 from md, and `--cols` (the card count, written
+   by offers.tsx) from lg — so the optional fifth Boost card widens the row without new markup. */
+.v10-offers-grid {
+  display: grid;
+  margin: clamp(40px, 6vw, 89px) 0 0; /* 86px of visible air under the headline (Nick's Figma) */
+  padding: 0;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+}
+.v10-offers-grid > li {
+  display: flex; /* the row's height, handed down to the card (items stretch) */
+}
+.v10-offer-cell {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .v10-offers-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 992px) {
+  .v10-offers-grid {
+    grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  }
+}
+
+.v10-offer {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-height: clamp(268px, 16.6vw, 324px);
+  border-radius: 20px;
+  background: #f8f6f7;
+  padding: 32px; /* Nick's preview measures ~32 all round */
+}
+
+/* the tile: Nick's rendered icon, 192×192 with its own rounded corners baked in — drawn at 96,
+   so it stays crisp on a 2× screen. One colour per offering; no filter, no crop. */
+.v10-offer-thumb {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+.v10-offer-head {
+  display: flex;
+  /* ONE BASELINE ACROSS THE ROW. This block used to be bottom-anchored (`margin-top: auto`), so
+     a card whose copy ran to two lines where its neighbours ran to three lifted its title — and
+     its "In testing" chip — a full 22px above theirs, which the Figma
+     (scratchpad/v10/figma-cards.png) does not do. The line count is not stable: measured across
+     390→1920 the four bodies run anywhere from 1 to 6 lines and which card is longest changes
+     with the width, so no min-height floor fixes it at every size. Anchoring the head to its
+     72px floor under the icon does: the icon is 96 and the padding above is fixed, so all four
+     titles sit exactly 200px down from the card's top at every width, and the ragged edge falls
+     at the card's FOOT where it belongs. */
+  padding-top: 72px; /* the floor: the copy never comes closer than this to the icon */
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.v10-offer-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+.v10-offer-chip {
+  flex: none;
+  border-radius: 6px;
+  background: #ececec;
+  padding: 4px 8px;
+  color: #6b6b6b;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.v10-offer-body {
+  margin-top: 10px;
+  color: #55565a;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+/* the slot: OFF until there is something to say (Nick, 2026-09-22 — no rule with nothing under
+   it). Give any card a `note` in the data file and its rule and line come back, pinned to the
+   card's foot so the rules line up across the row. */
+.v10-offer-slot {
+  margin-top: auto;
+  border-top: 1px solid #e2e2e2;
+  padding-top: 14px;
+}
+.v10-offer-note {
+  color: #6b6b6b;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   §3 `#how` — the elevator. ONE LAYOUT, and it is the Figma's (node 518:115).
+   `data-layout`, the review toggle and the stacked / split passes are DELETED:
+   what is below is the single composition, on the PAGE'S OWN 128px gutters —
+   `.v10-how-row` IS `.site-container`, so §3 lines up with §2's cards above it
+   and nothing here carries a gutter of its own. The pinned stage is the ONE
+   nested @media block at the end, the same query as how.tsx's PIN_QUERY.
+
+   WHAT CSS READS   .v10-how  data-step  0–3   which step is showing
+                    .v10-how  --i        0–3   the same, as a number (the marker, the ghost)
+                    .v10-how  --sp       0→1   progress inside the current step (pinned)
+                    .v10-how  --rail-dim 0.2   the inactive rail label's opacity (data)
+   Only transform, opacity and colour ever change.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.v10-how {
+  /* THE FIGMA'S OWN VALUES, in one place. Every number below that has a name has it here. */
+  --hot: #ff5e00;
+  --frame: #141216; /* the 460 frame's fill */
+  --rail-line: #242424; /* the inactive 2px shaft */
+  --rail-ink: #8c8c8c; /* every rail label — the inactive ones only dim, they never recolour */
+  --title-ink: #e3e5e5;
+  --body-ink: #929292;
+  --num-line: #38383e;
+  --num-ink-on: #f2f2f3;
+  --num-ink-off: #787878;
+  /* one step's scroll, pinned */
+  --band: 90svh;
+  /* THE FRAME. 460 at 1440 — the Figma, exactly — and it may never be wider than the row can
+     carry or taller than the screen. `50vw - 260px` is the line through the Figma's own point
+     (720 - 260 = 460 at 1440) and it falls FASTER than the viewport does, which is the point:
+     the two side columns are what is left over, so a frame that shrank only as fast as the page
+     would have left a 165px words column at 992. It gives back 1.5px of column for every 1px of
+     width lost. 56svh caps it on a short screen, 260 is its floor, 460 its ceiling. */
+  --frame-size: min(460px, 56svh, max(260px, calc(50vw - 260px)));
+  /* the Figma's 64px, easing back so the two side columns stay usable at 992 */
+  --col-gap: clamp(28px, 4.45vw, 64px);
+  /* the room the headline gets over the stage's photograph, and the distance the host is
+     pulled up by — one number, so they can never disagree */
+  --head-h: clamp(320px, 36.7vw, 528px);
+  position: relative; /* the dotted floor's frame */
+  background: #100e12; /* the Figma's own ground (rgb 16,14,18) */
+  color: #fff;
+}
+
+/* ── the header band: the lit facade, fading into the section's own ground ──
+   NOT PINNED (Nick: "the subject text shouldn't be locked"). It sits outside the sticky host,
+   so the eyebrow and the H2 scroll away normally as the stage takes over. */
+.v10-how-band {
+  /* THE HEADER: the photograph with the words on it. A normal block in the flow — it scrolls
+     away at page speed and the stage takes over. Nothing here is pinned or offset. */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: var(--head-h);
+  align-items: flex-end;
+  overflow: hidden;
+}
+.v10-how-band-pic,
+.v10-how-band-pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+.v10-how-band-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(16, 14, 18, 0.66) 0%, rgba(24, 23, 26, 0.595) 22%, rgba(102, 102, 102, 0) 45%),
+    linear-gradient(to top, #100e12 0%, rgba(20, 18, 22, 0.957) 17%, rgba(24, 23, 26, 0.902) 41%, rgba(102, 102, 102, 0) 88%);
+}
+.v10-how-band-copy {
+  position: relative;
+  padding-bottom: clamp(28px, 4vw, 48px);
+}
+.v10-how-eyebrow {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+/* SANS, as §2's headline is (Nick): the serif is spent on the STEP titles below, where it
+   anchors the eye and marks this page out from the rest of Arch. */
+.v10-how-h2 {
+  margin-top: 10px;
+  max-width: 720px;
+  font-family: var(--font-jakarta), var(--font-sans);
+  font-size: clamp(30px, 2.9vw, 44px); /* §2's ramp exactly: the two sections are adjacent */
+  line-height: 1.14;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* ── the stage. Default: a block in the flow, about a screen and a bit tall ── */
+.v10-how-stage {
+  position: relative; /* the windows and the dotted floor are painted inside it */
+}
+.v10-how-host {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(48px, 7vw, 88px);
+}
+
+/* ── THE ROW (Figma 518:115) ─────────────────────────────────────────────────
+   Flex row, `gap: 64`, `align-items: center`, on `.site-container`'s 128px gutters:
+       left   flex 1 0 0, the floor rail, justified to the frame
+       centre 460 × 460, fixed, #141216, radius 20.5, no stroke
+       right  flex 1 0 0, padding-top 24, the LED / the words / the numbers 42px apart
+   The side columns are EQUAL and neither is padded, so the frame's centre is the viewport's
+   centre at every width. Below lg this collapses to one column (see the block at the foot). */
+.v10-how-row {
+  position: relative;
+  z-index: 1; /* over the ghost and the dotted floor */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* ── the frame ── */
+.v10-how-frame {
+  position: relative;
+  width: 100%;
+  max-width: var(--frame-size);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  border-radius: 20.5px;
+  background: var(--frame);
+  overflow: hidden; /* THE CLIP: the window the four boards slide through */
+}
+.v10-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* ── THE WINDOW (how.tsx's frame, /chain's beat window) ──────────────────────
+   Each slide carries `translateY((i - step) * 100%)` inline, so advancing the step slides them
+   together — the one you were reading leaves upward, the next rises into its place, and the clip
+   means a neighbour is never visible on the way. ONLY `transform` animates.
+   600ms and this curve are /chain's, deliberately: the rail's marker takes 400ms, so the
+   indicator settles first and the frame follows, which reads as the marker leading the car. */
+.v10-art-stack {
+  position: absolute;
+  inset: 0;
+}
+.v10-art-slide {
+  position: absolute;
+  inset: 0;
+  transition: transform 600ms cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+/* the marks rise in; the accented shafts draw themselves */
+@keyframes v10-art-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes v10-art-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.v10-art-node {
+  animation: v10-art-rise 300ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both;
+}
+.v10-art-draw > path {
+  fill: none;
+  stroke: var(--hot);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: v10-art-draw 500ms cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0ms) forwards;
+}
+
+/* ── THE FLOOR RAIL ──────────────────────────────────────────────────────────
+   Four rows, 01 at the BOTTOM, because you rise. The DOM holds them 01→04 so the tab order is
+   the reading order; `column-reverse` turns them over on screen.
+
+   THE 2px RIGHT BORDER IS THE SHAFT. Every row carries it at #242424; the current one is
+   #ff5e00 — and it is ONE absolutely-placed element (`.v10-how-rail-car`) moved by `transform`
+   off `--i`, not four borders toggling, so the marker CLIMBS between rows in 400ms. That motion
+   is the section's only explanation of why the words advance while the marker rises.
+
+   A11Y, DELIBERATE AND FLAGGED (spec §1, `V10.how.railDim`): the inactive labels ship at the
+   Figma's 0.2 opacity, which puts them near 1.3:1 on #100e12 — and they are real buttons, so
+   this fails WCAG 1.4.3. It is ONE token (`--rail-dim`, from the data file) and hover AND
+   focus-visible both raise the row to full opacity. Nick decides before the page ships; 0.55 is
+   the value that clears AA at 18px SemiBold.
+
+   BELOW LG THE RAIL IS DROPPED, not laid down: the 01–04 numbers are already the whole control
+   in the one-column stack, and four 18px labels cannot sit across a 390px screen. `display:
+   none` takes it out of the tab order with it, so there is exactly one control on a phone. */
+.v10-how-rail {
+  display: none;
+}
+.v10-how-rail-rows {
+  /* THE PITCH, IN ONE PLACE. The marker travels one row plus one gap, so the car's height and
+     its travel are both driven off `--row-h` — 13 + 22 line-height + 13 = 48, the row's REAL
+     height. It was hardcoded at 47 against a 48px row, which put the marker 1px out per step and
+     left a 4px stub of grey shaft above the orange by step 04. Change the row's padding or
+     line-height and you change this token with it, never the numbers below. */
+  --row-h: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse; /* 01 at the BOTTOM — you rise */
+  gap: 16px;
+}
+.v10-how-rail-row {
+  display: block;
+  width: 100%;
+  border-right: 2px solid var(--rail-line);
+  padding: 13px 24px 13px 0;
+  background: transparent;
+  color: var(--rail-ink);
+  font-family: var(--font-jakarta), var(--font-sans);
+  /* the page's supporting scale, not a heading: 16/500 sits with the step body (16/1.4) instead
+     of competing with the serif title. Tabular figures keep the four numbers on one rhythm. */
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  /* THE PITCH IS THE MECHANISM: the marker travels `row + gap` per step, so a label that wrapped
+     would break the whole rail. One line, always — the label is shortened instead. */
+  white-space: nowrap;
+  opacity: var(--rail-dim, 0.2);
+  cursor: pointer;
+  transition: opacity 200ms linear;
+}
+.v10-how-rail-row[aria-current="step"] {
+  opacity: 1;
+}
+/* the deviation's mitigation: an inactive row comes all the way up on hover AND on keyboard
+   focus, so it is never a 1.3:1 target that the reader is actually pointing at */
+.v10-how-rail-row:hover,
+.v10-how-rail-row:focus-visible {
+  opacity: 1;
+}
+.v10-how-rail-row:focus-visible {
+  outline: 2px solid var(--hot);
+  outline-offset: 3px;
+}
+/* THE MARKER. One element, 2px wide, exactly over the row's own border, moved by transform.
+   The pitch is the row (`--row-h`) plus the 16px gap — both off the same token, so the marker
+   covers its row exactly at every step and every width. */
+.v10-how-rail-car {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 2px;
+  height: var(--row-h, 48px);
+  background: var(--hot);
+  transform: translateY(calc((var(--row-h, 48px) + 16px) * var(--i, 0) * -1));
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── the words ── */
+.v10-how-words {
+  display: flex;
+  width: 100%;
+  max-width: 420px;
+  flex-direction: column;
+  align-items: center;
+  gap: 42px; /* the Figma: LED → copy → numbers */
+  text-align: center;
+}
+.v10-led {
+  display: block;
+}
+.v10-led circle {
+  transition: fill 80ms linear;
+}
+/* the copy block. Re-keyed on every step change (how.tsx), so this entrance plays again. */
+@keyframes v10-how-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.v10-how-copy {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 24px; /* the Figma: title → body */
+  animation: v10-how-in 420ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+}
+/* the decorative anchor: the ONE serif on this section (Nick — the HoneyB move) */
+.v10-how-title {
+  color: var(--title-ink);
+  font-family: var(--font-serif);
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -1.12px;
+}
+.v10-how-body {
+  color: var(--body-ink);
+  font-family: var(--font-jakarta), var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+/* THE NUMBERS — the section's other control, and the whole control below lg. 48 × 48, radius 24,
+   14px apart: current = transparent behind a 1.5px #38383e ring, the others = a #141216 disc
+   with no ring at all. */
+.v10-how-nums {
+  display: flex;
+  gap: 14px;
+}
+.v10-how-num {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 1.5px solid transparent;
+  border-radius: 24px;
+  background: var(--frame);
+  color: var(--num-ink-off);
+  font-family: var(--font-jakarta), var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.32px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    color 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.v10-how-num:hover {
+  color: var(--num-ink-on);
+}
+.v10-how-num[aria-current="step"] {
+  border-color: var(--num-line);
+  background: transparent;
+  color: var(--num-ink-on);
+}
+.v10-how-num:focus-visible {
+  outline: 2px solid var(--hot);
+  outline-offset: 3px;
+}
+
+/* ── lg and up: THE FIGMA'S ROW ───────────────────────────────────────────── */
+@media (min-width: 992px) {
+  .v10-how-row {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--col-gap);
+    text-align: left;
+  }
+  /* `flex: 1 0 0` on BOTH sides — equal columns, so the frame's centre is the page's centre.
+     Never make either one fixed, and never pad one of them. */
+  .v10-how-rail,
+  .v10-how-words {
+    flex: 1 0 0;
+    min-width: 0;
+    max-width: none;
+  }
+  /* the Figma's left column: centred in its own height, with the inner stack held off the top
+     by 24px — which is also what sets the rail 12px below the frame's centre line. */
+  .v10-how-rail {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* THE FIGMA'S 24/12/0, AND IT STAYS ON THE ROWS. Putting it on the rail — the flex item —
+     added 24px to that column's outer width and walked the frame 12px off the page's centre
+     line, which is the one thing this composition may not do. On the rows it is inside the
+     column, the 24px top still drops the rail 12px below the frame's centre (the box is
+     centred, the content is not), and the marker is offset to match. */
+  .v10-how-rail-rows {
+    padding: 24px 12px 0;
+    /* THE LABELS START ON THE PAGE'S GUTTER. Riding the column's right edge (margin-left: auto,
+       capped at the Figma's 298) held the label-to-marker distance, but above 1440 it walked the
+       labels inward — at 1728 they began at 264 while the nav, the headline and every other
+       section began at 128. Nick: "make sure the margins are consistent with the rest of the
+       page." The stack now fills its column and sits on the gutter; the shaft rides the column's
+       right edge, which is where the Figma puts it too. */
+    width: 100%;
+    margin-left: 0;
+  }
+  /* the rows' own 12px right padding: the border the marker replaces sits on the CONTENT edge,
+     so the marker has to sit there too or the current step shows two vertical lines. */
+  .v10-how-rail-car {
+    right: 12px;
+  }
+  .v10-how-words {
+    align-items: flex-start;
+    padding-top: 24px;
+    text-align: left;
+  }
+  .v10-how-title,
+  .v10-how-body {
+    text-wrap: pretty;
+  }
+  /* the same cap on the right, and for the same reason: at 1920 a 538px measure dropped the body
+     to two lines, so the widest screen read with a different rhythm from 1440's three. The COPY
+     is capped; the column is not, so the frame stays on the page's centre line. */
+  .v10-how-copy {
+    max-width: 420px;
+  }
+  /* 992–1199: the side columns are at their narrowest, so the label gives a point and its own
+     right padding rather than wrap, and the marker's pitch follows it (12 + 19 + 12 = 43, plus
+     the 16px gap). */
+  @media (max-width: 1199px) {
+    .v10-how-rail-row {
+      padding-right: 12px;
+      font-size: 15px;
+      line-height: 19px;
+    }
+    /* the row is 13 + 19 + 13 = 45 here; the car and its travel follow the token, not a constant */
+    .v10-how-rail-rows {
+      --row-h: 45px;
+    }
+    /* THE NUMBERS HAVE TO FIT THE COLUMN. At 992 the words column is ~194px (1184 − 260 frame −
+       2 × 44 gap, halved) and four 48px discs 14px apart want 234 — the "04" crossed the page's
+       128px right margin that the LED plate and the title both respect. 4 × 40 + 3 × 10 = 190. */
+    .v10-how-nums {
+      gap: 10px;
+    }
+    .v10-how-num {
+      width: 40px;
+      height: 40px;
+      font-size: 15px;
+    }
+  }
+}
+
+/* ── the dotted floor (Figma 511:65) ─────────────────────────────────────────
+   A fine grid across the section's foot: the cue that there is more below. CSS, not an asset;
+   under everything, no pointer events, and it does not move on scroll. */
+.v10-how-floor {
+  position: absolute;
+  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* Inside the STAGE, not the section: under the pin the section is four screens tall, and a
+     band at its foot would only appear after the reader had finished scrolling — the opposite of
+     the cue. Here it sits at the foot of every screen the stage holds. */
+  height: clamp(150px, 22vh, 300px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1.2px);
+  background-size: 16px 16px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  pointer-events: none;
+}
+
+/* ── below lg: ONE COLUMN, in the spec's order — LED, frame, title, body, buttons ──────────
+   `.v10-how-words` becomes `display: contents`, so its three blocks are row children in their
+   own right and `order` can put the plate ABOVE the frame without the markup moving. That is
+   the whole mechanism: no second DOM, no JS.
+
+   THE RAIL IS DROPPED HERE, not laid down. The numbers are already the whole control in this
+   stack, so a horizontal rail under them would be a second control saying the same thing — in
+   labels ("03 – Put it to work" at 18px SemiBold is ~160px) that cannot sit four across a 390px
+   screen without becoming ticks, which is a THIRD thing to learn. `display: none` takes it out
+   of the tab order with it, so a phone has exactly one control. */
+@media (max-width: 991px) {
+  .v10-how-row {
+    gap: 32px;
+  }
+  .v10-how-words {
+    display: contents;
+  }
+  .v10-led {
+    order: 1;
+  }
+  .v10-how-frame {
+    order: 2;
+    /* the frame is the focal point on a phone too: 78vw, capped so it never dominates a tablet */
+    max-width: min(360px, 78vw);
+  }
+  .v10-how-copy {
+    order: 3;
+    max-width: 480px;
+    text-align: center;
+  }
+  /* the page's sticky pill sits at the foot of the viewport: the numbers are the last block in
+     the column, so they keep clear of it */
+  .v10-how-nums {
+    order: 4;
+    margin-bottom: 96px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the marker still marks the step, it just stops travelling to it */
+  .v10-how-rail-car,
+  /* no slide: the step simply changes. The three inactive boards are still translated a whole
+     window away inside the clip, so only the current one is on the glass. */
+  .v10-art-slide {
+    transition: none;
+    will-change: auto;
+  }
+  .v10-how-copy,
+  .v10-art-node {
+    animation: none;
+  }
+  .v10-art-draw > path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  }
+
+/* ── Pinned ───────────────────────────────────────────────────────────────────
+   lg and up, tall enough, motion allowed (how.tsx's PIN_QUERY). The host is the
+   travel — one stage plus four bands — and the stage is sticky inside it, so it
+   locks as step 01 arrives and lets go after 04. Nothing else changes: same
+   row, same component, same state. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 992px) {
+  @media (min-height: 700px) {
+    .v10-how-host {
+      height: calc(100svh + var(--n, 4) * var(--band));
+      padding-block: 0;
+    }
+    .v10-how-stage {
+      position: sticky;
+      top: 0;
+      display: flex;
+      height: 100svh;
+      align-items: center;
+    }
+    /* THE SITE NAV FLOATS OVER THIS SECTION. The row is the frame's height, so on a 700–820 tall
+       screen the 56svh cap has already pulled the frame in; this keeps the nav's band and a
+       hand's width at the foot clear, and the row centres in what is left. */
+    .v10-how-row {
+      padding-block: 72px 40px;
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THE NO-SCRIPT NET — the page reads complete with JavaScript off.
+   `Reveal` (chain-reveal.tsx) and the site's `Faq` (faq.tsx) both SSR their
+   rows at opacity:0 and only an effect clears it, so with scripting off every
+   word inside them stays invisible: §2's four offerings and §4's five risk
+   answers. globals.css nets this for prefers-reduced-motion
+   only — `scripting: none` was never covered, and neither component may be
+   edited from here, so the net is written once, on this route, and the copy
+   that carries the page's legal load paints without JS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (scripting: none) {
+  .v10-page [data-reveal],
+  .v10-page .v10-q-list > div > div {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* AND THE ANSWERS OPEN. Revealing the five questions without their answers would leave the
+     accordion showing five headings and no way to open one: the risk copy — liquidation,
+     withdrawal queues, pauses — is exactly what a reader without JS still has to be able to
+     read. With no script there is nothing to toggle, so every row stands open and its plus
+     stands as the cross it would be if it had been opened. */
+  .v10-page .v10-q-list [style*="grid-template-rows"] {
+    grid-template-rows: 1fr !important;
+  }
+  .v10-page .v10-q-list button img {
+    transform: rotate(45deg) !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   §4 `#questions` — the objections, immediately before the ask. v8's split:
+   the head sticky in lg columns 1–4, the site's own Faq in 6–12. One column
+   below lg and nothing sticks. No button lives in this section.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.v10-questions {
+  background: #f7f6f6; /* the page's one flip back to light, so §6's photograph lands */
+  color: #17181b;
+}
+.v10-q-grid {
+  display: grid;
+  gap: 40px 32px;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: clamp(72px, 7.5vw, 128px);
+}
+.v10-q-eyebrow {
+  color: #6e6e6e;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.v10-q-h2 {
+  margin-top: 14px;
+  font-family: var(--font-jakarta), var(--font-sans); /* SANS, with §2, §3 and §4 */
+  font-size: clamp(30px, 2.9vw, 44px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.035em;
+  /* with §4's and §6's headlines: at 992 the head column is narrow enough to wrap, and without
+     this the break lands INSIDE "sign up" — a two-word phrase split across lines on the section
+     that fronts the five risk answers. Balanced it breaks "Before you / sign up." */
+  text-wrap: balance;
+}
+.v10-q-sub {
+  margin-top: 16px;
+  max-width: 34ch;
+  color: #6e6e6e;
+  font-size: 16px;
+  line-height: 24px;
+  text-wrap: pretty; /* it was ending on the orphan "in." in the lg head column */
+}
+@media (min-width: 992px) {
+  .v10-q-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .v10-q-head {
+    position: sticky;
+    top: 112px; /* clear of the nav */
+    /* FIVE columns, not four: at exactly 992 four of twelve is ~222px, and the headline has
+       already clamped to its 30px floor with nowhere left to go. The fifth column buys the
+       ~60px that lets "Before you sign up." break on a phrase rather than inside one. */
+    grid-column: 1 / span 5;
+    align-self: start;
+  }
+  .v10-q-list {
+    grid-column: 7 / span 6;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   §5 `#view` — the bookend and the one ask. The photograph is v8's
+   `StandaloneView`, imported unchanged; only the words beneath it are styled
+   here. Nothing is set on the photograph.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.v10-view-copy {
+  max-width: 620px;
+  /* THE CLOSE GETS THE PAGE'S OWN AIR. `StandaloneView`'s container contributes a FIXED 56px
+     (py-14) that never grows, so with the old clamp the last beat sat ~20% tighter than §4 and
+     §5 above it and the gap widened as the viewport did. 56 + this lands ≈105/116 against
+     §4's 94/116 and §5's 108/128 — the same rhythm, and v8's component stays untouched. */
+  padding-block: clamp(16px, 3.4vw, 60px);
+}
+.v10-view-h2 {
+  /* THE SERIF, spent here: the hero's face, and the only other serif headline on the page */
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.6vw, 52px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.v10-view-body {
+  margin-top: 18px;
+  max-width: 46ch;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 17px;
+  line-height: 27px;
+  /* the last sentence on the page was ending on the orphan "bring." directly above the button */
+  text-wrap: pretty;
+}
+.v10-view-cta {
+  margin-top: 32px;
+}
+.v10-view-note {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 20px;
+}

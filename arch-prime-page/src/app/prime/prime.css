@@ -1,0 +1,73 @@
+/* /prime — the app's motion and colour tokens (arch-prime packages/ui/src/tokens/theme.css),
+   scoped so they can't leak into the rest of the site. Type sizes are written inline with the
+   app's scale (label 14/20, body 16/24, lead 20/32, sub 24/32, metric 28/36, value 32/40,
+   h1 48/56, display-s 56/64, display 64/76, display-l 96/100). */
+.prime-scope {
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --p-orange: #ff5e00;
+  --p-ink: #292a2e;
+  --p-navy: #123164;
+  --p-green: #1f5543;
+  --p-green-deep: #1a4436;
+  --p-green-strong: #2e714b;
+  --p-maroon: #6b1e0d;
+  --p-indigo: #545eb3;
+  --p-subtle: #f7f6f6;
+  --p-muted: #787878;
+  --p-faint: #b6b6b6;
+  --p-hairline: #dadada;
+
+  font-family: var(--font-jakarta), var(--font-sans);
+  color: var(--p-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* THE PEAK — scroll progress arrives as --p1..--p4 (0..1) on .prime-peak; see prime-peak.tsx. */
+.prime-peak {
+  --p1: 0;
+  --p2: 0;
+  --p3: 0;
+  --p4: 0;
+}
+.prime-peak .peak-photo {
+  opacity: var(--p4);
+}
+.prime-peak .peak-center {
+  transform: translate(-50%, -50%) translateY(calc(var(--p4) * -60vh)) scale(calc(1.5 - 0.6 * var(--p1)));
+  opacity: calc(1 - var(--p4));
+}
+.prime-peak .peak-token {
+  opacity: calc(var(--p2) * (1 - var(--p4)));
+  transform: translate(-50%, -50%)
+    translate(calc(var(--tx) * (2.6 - 1.6 * var(--p2))), calc(var(--ty) * (2.6 - 1.6 * var(--p2)) - var(--p4) * 60vh));
+}
+.prime-peak .peak-prime {
+  opacity: min(1, calc(var(--p3) * 1.6));
+}
+.prime-peak .peak-label-was {
+  opacity: max(0, calc(1 - var(--p3) * 2.2));
+}
+.prime-peak .peak-label-now {
+  opacity: max(0, calc((var(--p3) - 0.45) * 1.8));
+}
+.prime-peak .peak-h1 {
+  opacity: max(0, calc(1 - var(--p2) * 2.5));
+  transform: translateY(calc(var(--p2) * -12px));
+}
+.prime-peak .peak-h2 {
+  opacity: calc(max(0, calc((var(--p2) - 0.5) * 2)) * (1 - var(--p4)));
+  transform: translateY(calc((1 - var(--p2)) * 12px));
+}
+.prime-peak .peak-h3 {
+  opacity: var(--p4);
+  transform: translateY(calc((1 - var(--p4)) * 24px));
+  pointer-events: none;
+}
+.prime-peak[data-landed="1"] .peak-h3 {
+  pointer-events: auto;
+}

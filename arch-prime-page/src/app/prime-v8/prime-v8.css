@@ -1,0 +1,178 @@
+/* /prime-v8 — the climb. Two layouts chosen by CSS, never by JS, so the server and the client
+   agree and nothing jumps at hydration. PINNED is the same query as PIN_QUERY
+   (components/prime-v6/window-stage.tsx); everything else is STACKED. */
+
+.prime-scope {
+  --g0: #0a1226;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ——— the hero: rises once on load ——— */
+@keyframes v8-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.v8-rise {
+  animation: v8-rise 500ms var(--ease-out) both;
+}
+
+/* ——— STACKED (default): plain articles, the stage hidden ——— */
+.v8-climb {
+  background: linear-gradient(to bottom, #0a1226, #172b56);
+}
+.v8-stage,
+.v8-lead,
+.v8-topspace,
+.v8-hint-side {
+  display: none;
+}
+.v8-floor {
+  padding-block: 56px;
+}
+.v8-inline-panel {
+  order: 2;
+  margin-top: 24px;
+}
+.v8-step {
+  order: 1;
+}
+@media (min-width: 768px) {
+  .v8-inline-panel {
+    order: 1;
+    margin-top: 0;
+  }
+  .v8-step {
+    order: 2;
+    align-self: center;
+  }
+  .v8-hint-side {
+    display: inline;
+  }
+  .v8-hint-down {
+    display: none;
+  }
+}
+@keyframes v8-roll {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.v8-roll {
+  animation: v8-roll 250ms var(--ease-out) both;
+}
+
+/* ——— PINNED ——— */
+@media (min-width: 768px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  .v8-climb {
+    background: var(--g0);
+  }
+  .v8-stage {
+    display: block;
+  }
+  .v8-lead,
+  .v8-topspace {
+    display: block;
+  }
+  .v8-steps {
+    margin-top: -100svh;
+    pointer-events: none;
+    /* the floors fade as the view opens */
+    opacity: calc(1 - min(1, var(--p) / 0.15));
+  }
+  .v8-readout,
+  .v8-inline-panel {
+    display: none;
+  }
+  .v8-floor {
+    height: 80svh;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+  .v8-floor > * {
+    width: 100%;
+  }
+  .v8-step {
+    pointer-events: auto;
+    opacity: var(--on);
+    transition: opacity 300ms ease;
+  }
+  .v8-hint-side {
+    display: inline;
+  }
+  .v8-hint-down {
+    display: none;
+  }
+  /* the panel column and the rail leave as the view opens */
+  .v8-panelcol {
+    opacity: calc(1 - min(1, var(--p) / 0.15));
+  }
+  .v8-rail {
+    opacity: calc(1 - clamp(0, (var(--p) - 0.55) / 0.15, 1));
+  }
+
+  /* the panels hand over: the old one leaves upward, the new one rises from below */
+  .v8-panel {
+    transition:
+      opacity 250ms ease,
+      transform 400ms var(--ease-out);
+  }
+  .v8-panel[data-pos="active"] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 100ms;
+  }
+  .v8-panel[data-pos="below"] {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .v8-panel[data-pos="above"] {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  /* the closing words arrive on the view */
+  [data-arrived] .v8-vc {
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 500ms var(--ease-out);
+  }
+  [data-arrived="0"] .v8-vc {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  [data-arrived="1"] .v8-vc:nth-child(2) {
+    transition-delay: 80ms;
+  }
+  [data-arrived="1"] .v8-vc:nth-child(3) {
+    transition-delay: 160ms;
+  }
+  [data-arrived="1"] .v8-vc:nth-child(4) {
+    transition-delay: 240ms;
+  }
+}
+
+/* the standalone view only when stacked */
+@media (min-width: 768px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  #view {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v8-rise,
+  .v8-roll {
+    animation: none;
+  }
+}

@@ -1,0 +1,23 @@
+# Arch Network
+
+> Arch is Bitcoin-native financial market infrastructure enabling credit, derivatives, and capital markets. It lets institutions and users put their Bitcoin to work natively—borrowing, earning, and trading—without bridging, wrapping, or leaving the Bitcoin network.
+
+## Pages
+
+- [Home](https://www.arch.network/): Bitcoin Capital Markets Infrastructure. Native Bitcoin settlement, credit, yield, and trading.
+- [Chain](https://www.arch.network/chain): The financial chain for native Bitcoin. Borrow, earn, and swap real BTC—and it stays yours the whole way.
+- [Ecosystem](https://www.arch.network/ecosystem): Partners and applications building on Arch—wallets, fintech, consumer, and DeFi.
+
+## Resources
+
+- [Documentation](https://docs.arch.network/): Developer and product documentation.
+- [The Arch Book](https://book.arch.network/docs): Technical reference for building on Arch.
+- [Blog](https://www.blog.arch.network/): Latest news and updates.
+- [Manifesto](https://manifesto.arch.network): The Arch manifesto.
+
+## Social
+
+- [X](https://x.com/Arch)
+- [Discord](https://discord.com/invite/arch)
+- [YouTube](https://www.youtube.com/@ArchNtwrk)
+- [LinkedIn](https://www.linkedin.com/company/archntwrk/)

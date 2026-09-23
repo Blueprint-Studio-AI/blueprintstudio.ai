@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+
+  --color-black: #181818;
+  --color-white: #ffffff;
+  --color-light: #f3efd7;
+  --color-dark-purple: #3e3a8e;
+  --color-light-grey: #e9e9e9;
+  --color-grey: #808080;
+  --color-orange: #ec641d;
+  --color-purple: #736fb9;
+
+  --font-sans: var(--font-geist), Arial, sans-serif;
+  --font-serif: var(--font-gascogne), Georgia, serif;
+
+  --container-site: 1300px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: auto;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+@utility site-container {
+  width: 92%;
+  max-width: var(--container-site);
+  margin-inline: auto;
+}
+
+@keyframes arch-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The nav entrance fade-up reads as a glitchy jump on mobile — skip it below the md breakpoint. */
+@media (max-width: 767px) {
+  .nav-anim {
+    animation: none !important;
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    border-color: var(--color-white);
+  }
+  51%,
+  100% {
+    border-color: transparent;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 20px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .marquee-track,
+  .arch-draw {
+    animation: none !important;
+  }
+  .arch-draw {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* Chain "How it works" pinned scroll-story: stat boxes re-roll on each beat change. */
+@keyframes chain-reroll {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chain-reroll {
+  animation: chain-reroll 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Pixelated/digital glitch for the beat title when switching beats. Opacity stays 1 (the
+   crossfading card layer owns the fade); this only jitters clip + transform in hard steps
+   so it reads as a digital glitch rather than a smooth slide. (recompile bump) */
+@keyframes chain-glitch {
+  0% {
+    transform: translate3d(-7px, 0, 0);
+    clip-path: inset(45% 0 45% 0);
+  }
+  14% {
+    transform: translate3d(6px, 0, 0);
+    clip-path: inset(0 0 80% 0);
+  }
+  28% {
+    transform: translate3d(-6px, 0, 0);
+    clip-path: inset(75% 0 5% 0);
+  }
+  42% {
+    transform: translate3d(5px, 0, 0);
+    clip-path: inset(28% 0 46% 0);
+  }
+  56% {
+    transform: translate3d(-3px, 0, 0);
+    clip-path: inset(58% 0 18% 0);
+  }
+  70% {
+    transform: translate3d(2px, 0, 0);
+    clip-path: inset(10% 0 72% 0);
+  }
+  84% {
+    transform: translate3d(-1px, 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+}
+.chain-glitch {
+  animation: chain-glitch 0.46s steps(1, end) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chain-reroll,
+  .chain-glitch {
+    animation: none;
+  }
+}
+
+/* per-character number "decode" glitch — each char resolves through black/white/orange
+   blocks (hard steps = pixelated), staggered per character. Used by GlitchText. (bump) */
+@keyframes chain-char {
+  0% {
+    transform: translateY(0.14em);
+  }
+  55% {
+    transform: translateY(-0.05em);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes chain-char-block {
+  0% {
+    opacity: 1;
+    background: #181818;
+  }
+  20% {
+    opacity: 1;
+    background: #ffffff;
+  }
+  40% {
+    opacity: 1;
+    background: #181818;
+  }
+  58% {
+    opacity: 1;
+    background: var(--color-orange);
+  }
+  76% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.chain-char {
+  display: inline-block;
+  position: relative;
+  animation: chain-char 0.4s steps(1, end) both;
+}
+.chain-char::before {
+  content: "";
+  position: absolute;
+  inset: 0.1em -0.04em 0.04em -0.04em;
+  background: #181818;
+  animation-name: chain-char-block;
+  animation-duration: 0.4s;
+  animation-timing-function: steps(1, end);
+  animation-fill-mode: both;
+  animation-delay: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chain-char {
+    animation: none;
+  }
+  .chain-char::before {
+    display: none;
+  }
+}

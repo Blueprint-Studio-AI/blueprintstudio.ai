@@ -1,0 +1,286 @@
+/* ============================================================
+   CHAIN PAGE — scoped styles
+   Every rule is namespaced under .chain-scope so the chain page's
+   global-ish resets and element selectors can't leak into the rest
+   of the Tailwind site. Only @font-face stays global (font defs).
+   ============================================================ */
+
+/* ---- fonts (Arch brand · hosted woff2) ---- */
+@font-face{font-family:"Gascogne";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de2f60432255865eede0bc_GascogneSerial-light.woff2) format("woff2");font-weight:300;font-display:swap}
+@font-face{font-family:"Gascogne";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de2f5fc55d8552a1a01d77_GascogneSerial.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Gascogne";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de2f5f4ac3d78c88345eba_GascogneSerial-medium.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Geist";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68dfd946fca94176b058660c_GeistVF.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"AzeretMono";src:url(https://cdn.prod.website-files.com/68de2cda01fe05adb2852af1/68de3df12192bb34d3f552bc_AzeretMono%5Bwght%5D.ttf) format("truetype");font-weight:100 900;font-display:swap}
+
+.chain-scope{
+  --bg:#fbfaf7; --ink:#181818; --body:#46443f; --muted:#6c6a62; --faint:#9a978c;
+  --orange:#ec641d; --orange-2:#f4814a; --orange-ink:#c9520f;
+  --cream:#f3efd7; --purple:#3e3a8e;
+  --hair:rgba(24,24,24,.12); --card:#ffffff;
+  --sans:"Geist",-apple-system,system-ui,sans-serif;
+  --serif:"Gascogne",Georgia,"Times New Roman",serif;
+  --mono:"AzeretMono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.22,.9,.3,1.06);
+
+  font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;min-height:100vh;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+}
+
+.chain-scope, .chain-scope *{margin:0;padding:0;box-sizing:border-box}
+
+/* fade in once layout/fonts/illustration have settled — hides the load-in drift */
+.chain-scope .root{opacity:0;transition:opacity .45s ease}
+.chain-scope .root.ready{opacity:1}
+/* once the scroll is fully past the hero, the below-fold occludes it — hard-hide the fixed
+   overlays so the same-origin iframe can't composite/flicker behind the scrolling content. */
+.chain-scope .root.hero-done .illo-stage,
+.chain-scope .root.hero-done .glow,
+.chain-scope .root.hero-done .copyover{visibility:hidden;pointer-events:none}
+
+/* ============================================================
+   ILLUSTRATION — fixed, sits low; per-step y/scale driven by JS
+   ============================================================ */
+/* translateZ(0)+backface-hidden pin the fixed hero overlay onto its own stable GPU layer so the
+   opaque below-fold ("Four rules") can composite OVER it without the browser repainting the fixed
+   illustration iframe each frame — that repaint was the open/close flicker at the WhyBand seam. */
+.chain-scope .illo-stage{position:fixed;inset:0;z-index:1;pointer-events:none;
+  will-change:transform;transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.chain-scope .glow{position:fixed;z-index:0;left:50%;bottom:-220px;width:1240px;height:900px;
+  transform:translateX(-50%) translateZ(0);pointer-events:none;
+  /* The look is a big soft orange glow. It was a soft radial gradient with filter:blur(150px) on
+     top — but a 150px blur is one of the most expensive ops on Safari, so we drop the filter and
+     use a soft radial gradient instead. The box is intentionally TALL (900px) with the bloom
+     anchored to its bottom via a PIXEL ending-shape + `calc(100% - …)` centre — so the bloom stays
+     a fixed size/place while the box has plenty of headroom above for the gradient to fade fully to
+     transparent. (A short box clipped the still-visible top of the bloom into a hard line.) */
+  background:radial-gradient(ellipse 893px 296px at 50% calc(100% - 168px), rgba(236,100,29,.5) 0%, rgba(236,100,29,.24) 40%, rgba(236,100,29,0) 76%);
+  opacity:.42}
+.chain-scope .illo{position:absolute;left:50%;top:0;width:680px;height:1180px;margin-left:-340px;
+  transform-origin:center top;transform:translateY(45vh) scale(.9);
+  /* Per-frame JS sets `transform: translate3d(...) scale(s)` here. Safari was re-rasterizing the
+     whole inline vector SVG at every scale value (the lag de-iframing introduced — an iframe is
+     implicitly its own raster boundary). Make .illo a self-contained isolated compositing layer at
+     its fixed size so Safari snapshots its paint into a cached bitmap once and scales THAT texture.
+     Layer/raster hints only — no geometry/visible change, so Chromium is unaffected. */
+  will-change:transform;contain:layout paint;isolation:isolate;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.chain-scope .illo #iso{display:block;width:680px;height:790px;overflow:visible;
+  transform:translateZ(0);-webkit-transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+/* The illustration is now an INLINE svg (not an iframe), so it no longer traps the wheel — wheel
+   scroll reaches Lenis directly. pointer-events:auto lets the on-art nodes hover-highlight on mouse;
+   on touch devices we drop pointer-events so a swipe scrolls the page instead of grabbing the art. */
+.chain-scope .illo{pointer-events:auto}
+@media (pointer: coarse){.chain-scope .illo{pointer-events:none}}
+
+/* ============================================================
+   ILLUSTRATION — SVG-visual rules ported from public/illustration index.html <style>,
+   scoped under .chain-scope .illo so nothing leaks. (Was inside the iframe.)
+   ============================================================ */
+.chain-scope .illo :is(polygon,ellipse,path.cylbody){stroke:rgba(24,24,24,.22);stroke-width:.8;stroke-linejoin:round}
+.chain-scope .illo .lift{transition:transform 1s cubic-bezier(.22,.9,.3,1.06),opacity .75s ease}
+.chain-scope .illo #world{transition:transform 1s cubic-bezier(.22,.9,.3,1.06)}
+.chain-scope .illo .layer.hid .lift{transform:translateY(-360px);opacity:0}
+.chain-scope .illo .layer.fadein.hid .lift{transform:none;opacity:0}
+.chain-scope .illo .layer.dim .lift{opacity:.5}
+.chain-scope .illo .comp.sel polygon.ft,.chain-scope .illo .comp.sel ellipse.ft{fill:#ec641d}
+.chain-scope .illo .comp.sel polygon.fe,.chain-scope .illo .comp.sel path.fe{fill:#cf5418}
+.chain-scope .illo .comp.sel polygon.fs{fill:#b84a14}
+
+.chain-scope .illo .wire{fill:none;stroke:#c4bfa7;stroke-width:var(--vw,1.4);stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s ease,stroke-width .2s ease}
+.chain-scope .illo .l2addr{font-family:var(--sans);font-size:8px;letter-spacing:.04em;fill:#9a9684}
+.chain-scope .illo .l2el,.chain-scope .illo .pipe .tube{transition:opacity .28s ease}
+.chain-scope .illo #L2.focus .l2el{opacity:.16}
+.chain-scope .illo #L2.focus .l2el.hot{opacity:1}
+.chain-scope .illo #L2.focus .l2el.keep{opacity:1}
+.chain-scope .illo #L2.flow .l2el{opacity:.16}
+.chain-scope .illo #L2.flow .pipe{opacity:1}
+.chain-scope .illo #L2.flow .pipe .tube{opacity:.16}
+.chain-scope .illo #L2.flow #g-vm{opacity:1}
+/* validator packets show only in the default state (or when the validators/mesh — 9/dpos, 7/schnorr —
+   are hovered, which mark this group .hot); any other highlight hides them so nothing overlaps. */
+.chain-scope .illo #g-valpkts{transition:opacity .28s ease}
+.chain-scope .illo #L2.focus #g-valpkts,.chain-scope .illo #L2.flow #g-valpkts{opacity:0}
+.chain-scope .illo #L2 #g-valpkts.hot{opacity:1}
+.chain-scope .illo .pipe.hot .wpkt{opacity:0}
+.chain-scope .illo .wire.hot,.chain-scope .illo .l2el.hot .wire{stroke:#ec641d;stroke-width:2.8}
+.chain-scope .illo .l2el.hot polygon.ft,.chain-scope .illo .l2el.hot ellipse.ft{fill:#ec641d}
+.chain-scope .illo .l2el.hot polygon.fe,.chain-scope .illo .l2el.hot path.fe{fill:#cf5418}
+.chain-scope .illo .l2el.hot polygon.fs{fill:#b84a14}
+.chain-scope .illo .l2el.hot .l2addr{fill:#ec641d;font-weight:600}
+.chain-scope .illo .vmshell,.chain-scope .illo .utxocore{transition:opacity .35s ease}
+.chain-scope .illo .utxocore{opacity:0}
+.chain-scope .illo #g-vm.xray .vmshell{opacity:.08}
+.chain-scope .illo #g-vm.xray .utxocore{opacity:1}
+.chain-scope .illo #L2.focus #g-vm.xray{opacity:1}
+
+.chain-scope .illo .dot{cursor:pointer;transition:opacity .22s ease}
+.chain-scope .illo .dots.dimothers .dot{opacity:.16}
+.chain-scope .illo .dots.dimothers .dot.act{opacity:1}
+.chain-scope .illo .dot circle.c{fill:var(--orange);stroke:#fff;stroke-width:2;transition:r .15s}
+.chain-scope .illo .dot:hover circle.c{r:9}
+/* index number tying each dot to its numbered label in the left rail */
+.chain-scope .illo .dot text.dnum{fill:#fff;font-family:var(--sans);font-weight:600;font-size:9px;
+  text-anchor:middle;dominant-baseline:central;pointer-events:none;-webkit-user-select:none;user-select:none}
+.chain-scope .illo .dot circle.hit{fill:transparent;stroke:none}
+.chain-scope .illo .dots{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .45s ease,visibility 0s linear .45s}
+.chain-scope .illo .dots.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .45s ease 1.05s,visibility 0s linear 1.05s}
+.chain-scope .illo .ping{animation:chain-illo-ping 2.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes chain-illo-ping{0%{transform:scale(.5);opacity:.9}70%{transform:scale(2.4);opacity:0}100%{transform:scale(2.4);opacity:0}}
+
+.chain-scope .illo .isolabel{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;fill:#808080}
+.chain-scope .illo .subname{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;fill:#6b675a}
+
+.chain-scope .illo #card{position:absolute;width:220px;background:#fff;border:1px solid rgba(128,128,128,.4);border-radius:10px;padding:10px 13px;pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:6;font-family:var(--sans)}
+.chain-scope .illo #card .t{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35}
+.chain-scope .illo #card .b{font-size:12px;color:#808080;line-height:1.45;margin-top:3px}
+.chain-scope .illo #card::before{content:"";position:absolute;left:-5px;top:14px;width:8px;height:8px;background:#fff;border-left:1px solid rgba(128,128,128,.4);border-bottom:1px solid rgba(128,128,128,.4);transform:rotate(45deg)}
+.chain-scope .illo #card.flip::before{left:auto;right:-5px;transform:rotate(225deg)}
+
+/* ============================================================
+   COPY — fixed crossfade overlay (JS sets opacity/transform per panel)
+   ============================================================ */
+.chain-scope .copyover{position:fixed;inset:0;z-index:2;pointer-events:none}
+.chain-scope .panel{position:absolute;left:50%;top:9vh;transform:translateX(-50%);
+  width:min(760px,92vw);text-align:center;opacity:0;will-change:opacity,transform}
+/* Nav clearance: the fixed nav is 80px tall. The landing beat (11vh) clears it, but the section
+   beats sit at 9–10vh and their headings tuck under the nav (see "Native tech" clipping). Push ONLY
+   the section beats down by a fixed nav offset. Animation-safe: the illustration is placed relative
+   to each panel's LIVE offsetTop, so it follows the shifted text and every gap is preserved. */
+.chain-scope .panel--sec{margin-top:42px}
+
+.chain-scope .chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;
+  display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.6)}
+.chain-scope .chip .dot{width:6px;height:6px;border-radius:50%;background:#2bb673;box-shadow:0 0 0 3px rgba(43,182,115,.18)}
+
+.chain-scope h1{margin-top:24px;line-height:1.04;letter-spacing:-.01em}
+.chain-scope .h1-pre{display:block;font-size:clamp(20px,2.3vw,30px);font-weight:400;color:var(--muted)}
+.chain-scope .h1-serif{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(44px,6.6vw,88px);
+  color:var(--ink);letter-spacing:-.012em;margin-top:16px}
+.chain-scope .sub{margin-top:10px;font-size:clamp(15px,1.5vw,18px);color:var(--muted);line-height:1.5}
+.chain-scope .btns{display:flex;flex-wrap:nowrap;gap:12px;align-items:stretch;justify-content:center;margin-top:28px}
+
+/* sections — one heading + one flat body */
+.chain-scope .panel--sec h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,60px);
+  letter-spacing:-.014em;line-height:1.04;color:var(--ink)}
+.chain-scope .panel--sec .body{margin:16px auto 0;max-width:56ch;font-size:clamp(15px,1.5vw,18px);
+  color:var(--body);line-height:1.6}
+/* "How is that possible?" body runs one word long at 56ch — give just this beat a touch more room. */
+.chain-scope .panel--sec[data-i="1"] .body{max-width:64ch}
+
+.chain-scope .flist{list-style:none;margin:22px auto 0;max-width:660px;display:grid;gap:6px;text-align:left;
+  grid-template-columns:repeat(3,1fr);counter-reset:flist}
+.chain-scope .flist li{font-size:12px;line-height:1.35;color:var(--body);padding:7px 11px 7px 40px;cursor:default;
+  position:relative;counter-increment:flist;overflow:hidden;
+  background:rgba(24,24,24,.03);border-radius:6px;
+  transition:background .12s}
+/* index number seated in a band down the left edge (clipped to the card radius) — sans, grayscale
+   until active, then the band goes bright orange over a faded-orange card. */
+.chain-scope .flist li::before{content:counter(flist);position:absolute;left:0;top:0;bottom:0;width:28px;
+  display:flex;align-items:center;justify-content:center;background:rgba(24,24,24,.06);
+  font-family:var(--sans);font-weight:600;font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums;transition:background .12s,color .12s}
+.chain-scope .flist li b{display:block;font-weight:600;color:var(--ink);font-size:12.5px}
+.chain-scope .flist li .lite{display:block;color:var(--muted);font-size:11px;margin-top:1px}
+.chain-scope .flist li.on{background:rgba(236,100,29,.1)}
+.chain-scope .flist li.on::before{background:var(--orange);color:#fff}
+
+/* ============================================================
+   FEATURE INDEX RAIL — the flist pulled out to a fixed left column so the
+   illustration can sit higher and stay fully visible. Fades with the active section.
+   ============================================================ */
+/* Left edge aligns with the nav container (w-[94%], max 1300px) so the rail lines up with the logo. */
+.chain-scope .flist-rail{position:fixed;left:max(3%,calc(50% - 650px));top:50%;transform:translateY(-50%);
+  width:232px;z-index:3;pointer-events:none;opacity:0;transition:opacity .4s var(--ease)}
+.chain-scope .flist-rail.on{opacity:1}
+.chain-scope .flist-rail.on .flist{pointer-events:auto}
+.chain-scope .flist-rail .flist{display:flex;flex-direction:column;gap:6px;margin:0;max-width:none;
+  width:100%;grid-template-columns:none;text-align:left;animation:chain-railin .45s var(--ease)}
+@keyframes chain-railin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-width:900px){
+  /* narrow desktop/tablet: tuck the rail in tighter so it doesn't crowd the illustration */
+  .chain-scope .flist-rail{width:200px;left:14px}
+}
+@media(max-width:680px){
+  /* mobile: no room for the side rail or on-art callout dots — hide the whole interaction layer */
+  .chain-scope .flist-rail{display:none}
+  .chain-scope .illo .dots{display:none}
+}
+
+/* ============================================================
+   SNAP TRACK  (transparent spacers drive scroll/snap) + below-fold story
+   ============================================================ */
+.chain-scope .snaps{position:relative;z-index:0}
+.chain-scope .snap-pt{height:100vh;scroll-snap-align:start}
+.chain-scope .below{position:relative;z-index:3;background:var(--bg)}
+.chain-scope .below__frame{display:block;width:100%;height:100vh;border:0;background:var(--bg)}
+
+/* ============================================================
+   BUTTONS — flat (round 1 final)
+   ============================================================ */
+.chain-scope .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer;
+  font-family:var(--sans);font-weight:500;border:1px solid transparent;-webkit-user-select:none;user-select:none;
+  white-space:nowrap;line-height:1.2;font-size:15px;border-radius:8px;padding:14px 22px;
+  transition:background-color .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease)}
+.chain-scope .btn .ar{display:inline-block;transition:transform .2s var(--ease)}
+.chain-scope .btn:hover .ar{transform:translateY(2px)}
+.chain-scope .btn--primary{background:var(--orange);color:#fff}
+.chain-scope .btn--primary:hover{background:var(--purple)}
+.chain-scope .btn--ghost{background:#fff;color:var(--ink);border-color:var(--hair)}
+.chain-scope .btn--ghost:hover{border-color:var(--purple);color:var(--purple)}
+
+/* ============================================================
+   LEVERS — live tuning panel for the illustration keyframes
+   ============================================================ */
+.chain-scope .levers{position:fixed;right:14px;bottom:14px;z-index:60;width:230px;padding:11px 12px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--hair);border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.12);
+  font-family:var(--sans);font-size:12px;color:var(--ink)}
+.chain-scope .levers .lev-head{display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chain-scope .levers .lev-head button{border:0;background:transparent;font-size:15px;line-height:1;color:var(--muted);cursor:pointer}
+.chain-scope .levers label{display:block;margin-top:10px}
+.chain-scope .levers label span{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+.chain-scope .levers input[type=range]{width:100%;accent-color:var(--orange)}
+.chain-scope .levers pre{margin-top:10px;font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--faint);
+  white-space:pre-wrap;border-top:1px solid var(--hair);padding-top:8px}
+.chain-scope .levers-open{position:fixed;right:14px;bottom:14px;z-index:60;font-family:var(--mono);font-size:.62rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.9);
+  border:1px solid var(--hair);border-radius:8px;padding:7px 11px;cursor:pointer}
+
+@media(max-width:760px){
+  .chain-scope .illo{transform-origin:center top}
+  .chain-scope .flist{grid-template-columns:repeat(2,1fr);margin-top:10px;gap:5px}
+  .chain-scope .flist li{font-size:10px;padding:5px 8px 5px 34px}
+  .chain-scope .flist li::before{width:24px;font-size:12px}
+  .chain-scope .flist li b{font-size:10.5px}
+  .chain-scope .flist li .lite{font-size:9px}
+  .chain-scope .btns{gap:8px;margin-top:20px}
+  .chain-scope .btn{font-size:12.5px;padding:10px 14px}
+}
+@media(max-width:420px){
+  .chain-scope .btns{gap:6px}
+  .chain-scope .btn{font-size:11.5px;padding:9px 12px}
+}
+@media(max-width:480px){
+  .chain-scope .panel--sec .body{font-size:13px;margin-top:12px}
+  .chain-scope .chip{font-size:.56rem;padding:4px 10px;gap:6px}
+  .chain-scope .chip .dot{width:5px;height:5px}
+  .chain-scope h1{margin-top:16px}
+  .chain-scope .h1-serif{margin-top:10px}
+  .chain-scope .sub{font-size:13px;margin-top:7px}
+  .chain-scope .btns{margin-top:18px}
+}
+
+/* ============================================================
+   CTA CITY — a second, static illustration instance (top/city
+   layer only), cropped at the bottom of the builders CTA.
+   Reuses .chain-scope .illo styles via a local display:contents
+   .chain-scope wrapper (see chain-city.tsx).
+   ============================================================ */
+.chain-scope .cta-city{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+/* x / y / scale are set inline from the CITY levers in chain-city.tsx */
+/* height:790 restores the intrinsic art box: the hero's taller clip box (see .illo) is a
+   bottom-overflow allowance that only makes sense there — here the city is anchored by its BOTTOM,
+   so the extra height would shove the skyline up out of the CTA crop. */
+.chain-scope .cta-city .illo{left:auto;top:auto;height:790px;margin-left:0;pointer-events:none;contain:none;transform-origin:bottom right}
