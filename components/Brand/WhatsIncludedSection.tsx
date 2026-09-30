@@ -7,6 +7,7 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { usePackage, type AddonId } from "./PackageContext";
+import { assetGeneratorUrl } from "@/lib/asset-generator";
 
 // Each deliverable shows a real preview image on the right and a caption
 // naming the brand the example is pulled from.
@@ -273,8 +274,10 @@ export default function WhatsIncludedSection() {
 
                 {/* Try it now — Figma 72:3535: 1.5px #33A6F7 border, 12px radius,
                     faint 5% blue gradient fill, 262px wide, dark 16px label + 10px arrow */}
-                <button
-                  type="button"
+                <a
+                  href={assetGeneratorUrl("/asset-generator/landing", "brand_page")}
+                  target="_blank"
+                  rel="noopener"
                   className="mt-12 flex w-[262px] cursor-pointer items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-[#33A6F7] py-[20px] transition-colors hover:border-[#1472F6]"
                   style={{
                     background:
@@ -285,7 +288,7 @@ export default function WhatsIncludedSection() {
                     Try it now
                   </span>
                   <ArrowUpRight className="h-2.5 w-2.5 text-[#111]" strokeWidth={2.5} />
-                </button>
+                </a>
               </div>
 
               {/* Right: layered desktop mockup. The PNG (transparent around the
