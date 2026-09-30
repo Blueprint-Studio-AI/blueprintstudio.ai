@@ -1,9 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSmoothScroll } from './SmoothScroll';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import { assetGeneratorUrl } from '@/lib/asset-generator';
 
 const NavLink = ({
   href,
@@ -65,6 +67,25 @@ const NavLink = ({
     </a>
   );
 };
+
+// Blueprint Studio Asset Generator, the studio's own product on the tools
+// subdomain. Rendered twice: right after the logo on phones, where the pill
+// scrolls sideways and anything past Pricing starts off-screen, and after FAQ
+// from md up, where the whole pill fits.
+const AssetGeneratorNavLink = ({ className }: { className: string }) => (
+  <a
+    href={assetGeneratorUrl('/asset-generator/landing', 'nav')}
+    target="_blank"
+    rel="noopener"
+    className={`items-center gap-1 flex-shrink-0 px-3 py-1.5 rounded-2xl whitespace-nowrap text-sm font-medium text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5 ${className}`}
+    style={{
+      transition: 'all 200ms cubic-bezier(.25, .46, .45, .94)'
+    }}
+  >
+    Asset Generator
+    <ArrowUpRight aria-hidden="true" className="h-3 w-3 opacity-60" strokeWidth={2.25} />
+  </a>
+);
 
 // Routes where the floating nav should be hidden
 const HIDDEN_NAV_ROUTES = ['/launch-videos', '/launch', '/brand', '/insights', '/brands'];
@@ -208,7 +229,7 @@ export const FloatingNavNew = () => {
 
   return (
     <nav
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[650px] md:w-auto"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[800px] md:w-auto"
     >
       <div className={`
         relative
@@ -242,53 +263,60 @@ export const FloatingNavNew = () => {
             `}</style>
             <div className="flex items-center flex-nowrap gap-1">
               {navSections.map((section, index) => (
-                <a
-                  key={section.id}
-                  ref={el => { navItemsRef.current[index] = el; }}
-                  href={`#${section.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // If we're not on home, navigate there first
-                    if (pathname !== '/') {
-                      window.location.href = `/#${section.id}`;
-                      return;
-                    }
-                    // Smooth scroll to section using Locomotive Scroll
-                    scrollToElement(section.id);
-                  }}
-                  className={`
-                    flex items-center justify-center flex-shrink-0
-                    ${section.icon
-                      ? 'w-[34px] h-[32px] rounded-2xl'
-                      : 'px-3 py-1.5 rounded-2xl whitespace-nowrap'
-                    }
-                    text-sm font-medium
-                    ${pathname === '/' && activeSection === section.id
-                      ? 'bg-black/10 text-[rgba(29,29,31,1)]'
-                      : 'text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5'
-                    }
-                  `}
-                  style={{
-                    transition: 'all 200ms cubic-bezier(.25, .46, .45, .94)'
-                  }}
-                >
-                  {section.icon ? (
-                    <Image
-                      src="/blueprint-logo.svg"
-                      alt="Logo"
-                      width={22}
-                      height={22}
-                      className="w-[22px] h-[22px]"
-                      style={{
-                        imageRendering: '-webkit-optimize-contrast',
-                        shapeRendering: 'crispEdges'
-                      }}
-                    />
-                  ) : (
-                    section.label
-                  )}
-                </a>
+                <Fragment key={section.id}>
+                  <a
+                    ref={el => { navItemsRef.current[index] = el; }}
+                    href={`#${section.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // If we're not on home, navigate there first
+                      if (pathname !== '/') {
+                        window.location.href = `/#${section.id}`;
+                        return;
+                      }
+                      // Smooth scroll to section using Locomotive Scroll
+                      scrollToElement(section.id);
+                    }}
+                    className={`
+                      flex items-center justify-center flex-shrink-0
+                      ${section.icon
+                        ? 'w-[34px] h-[32px] rounded-2xl'
+                        : 'px-3 py-1.5 rounded-2xl whitespace-nowrap'
+                      }
+                      text-sm font-medium
+                      ${pathname === '/' && activeSection === section.id
+                        ? 'bg-black/10 text-[rgba(29,29,31,1)]'
+                        : 'text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5'
+                      }
+                    `}
+                    style={{
+                      transition: 'all 200ms cubic-bezier(.25, .46, .45, .94)'
+                    }}
+                  >
+                    {section.icon ? (
+                      <Image
+                        src="/blueprint-logo.svg"
+                        alt="Logo"
+                        width={22}
+                        height={22}
+                        className="w-[22px] h-[22px]"
+                        style={{
+                          imageRendering: '-webkit-optimize-contrast',
+                          shapeRendering: 'crispEdges'
+                        }}
+                      />
+                    ) : (
+                      section.label
+                    )}
+                  </a>
+                  {/* Phones: right after the logo, so it's in view without scrolling the pill */}
+                  {section.icon && <AssetGeneratorNavLink className="flex md:hidden" />}
+                </Fragment>
               ))}
+
+              {/* md and up: after the section links, set apart by a divider */}
+              <div aria-hidden="true" className="hidden md:block w-px h-4 bg-neutral-300/60 mx-1 flex-shrink-0" />
+              <AssetGeneratorNavLink className="hidden md:flex" />
             </div>
           </div>
 
