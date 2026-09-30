@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSmoothScroll } from './SmoothScroll';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import { assetGeneratorUrl } from '@/lib/asset-generator';
 
 const NavLink = ({
   href,
@@ -208,7 +210,7 @@ export const FloatingNavNew = () => {
 
   return (
     <nav
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[650px] md:w-auto"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[800px] md:w-auto"
     >
       <div className={`
         relative
@@ -289,6 +291,21 @@ export const FloatingNavNew = () => {
                   )}
                 </a>
               ))}
+
+              {/* The studio's product, on its own subdomain: set apart from the section links */}
+              <div aria-hidden="true" className="w-px h-4 bg-neutral-300/60 mx-1 flex-shrink-0" />
+              <a
+                href={assetGeneratorUrl('/asset-generator/landing', 'nav')}
+                target="_blank"
+                rel="noopener"
+                className="flex items-center gap-1 flex-shrink-0 px-3 py-1.5 rounded-2xl whitespace-nowrap text-sm font-medium text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5"
+                style={{
+                  transition: 'all 200ms cubic-bezier(.25, .46, .45, .94)'
+                }}
+              >
+                Asset Generator
+                <ArrowUpRight aria-hidden="true" className="h-3 w-3 opacity-60" strokeWidth={2.25} />
+              </a>
             </div>
           </div>
 

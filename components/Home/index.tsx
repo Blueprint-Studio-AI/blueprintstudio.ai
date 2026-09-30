@@ -8,6 +8,7 @@ import TestimonialSection from "./TestimonialSection";
 import FAQSection from "./FAQSection";
 import ScheduleCallSection from "./ScheduleCallSection";
 import ClientLogoTicker from "./ClientLogoTicker";
+import AssetGeneratorBand from "./AssetGeneratorBand";
 
 export default function Home() {
     return (
@@ -22,6 +23,7 @@ export default function Home() {
             <div className="h-screen" />
             <div className="relative z-30">
                 <ClientLogoTicker />
+                <AssetGeneratorBand />
                 <div id="work">
                     <PortfolioBento/>
                 </div>
