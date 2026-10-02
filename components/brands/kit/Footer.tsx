@@ -42,7 +42,7 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   },
   {
     title: "Products",
-    links: [{ name: "Asset Generator", href: "https://tools.blueprintstudio.ai/asset-generator", external: true }],
+    links: [{ name: "Asset Generator", href: "https://tools.blueprintstudio.ai/asset-generator/landing", external: true }],
   },
 ];
 

@@ -251,10 +251,10 @@ export const arch: BrandConfig = {
   // read on. The section appends the brand + category the visitor already chose.
   generator: {
     video: `${B}/video/assetgen.mp4`,
-    learnMore: "https://tools.blueprintstudio.ai/asset-generator",
+    learnMore: "https://tools.blueprintstudio.ai/asset-generator/landing",
     request:
       "mailto:blueprint.dao@gmail.com?subject=Asset%20Generator%20access%20%E2%80%94%20Arch%20Network" +
-      "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Arch%20Network%20asset%20generator%20account.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AWork%20email%3A%0A",
+      "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20to%20be%20invited%20to%20the%20Arch%20Network%20brand%20in%20Asset%20Generator.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AEmail%20you%27ll%20sign%20in%20with%3A%0A",
   },
   downloads: {
     logos: `${B}/downloads/arch-network-logos.zip`,
