@@ -71,8 +71,8 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
                 high quality assets.
               </h3>
               <p className="text-body-lg text-body">
-                These styles come from a model trained on your palette, type, and textures. Built for the whole team,
-                request access to your company account and start generating.
+                Made with your brand's Styles, colors and logos. Ask us to invite you to your company's brand,
+                then sign in and start making images. Each person uses their own credits.
               </p>
             </div>
           </div>

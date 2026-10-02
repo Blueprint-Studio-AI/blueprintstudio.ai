@@ -28,7 +28,7 @@ export default function AssetGeneratorBand() {
               >
                 Blueprint Studio Asset Generator: your brand’s Styles and logos in your AI&nbsp;app.
               </p>
-              <p className="text-base text-[#5A5E64]">Works with Claude, ChatGPT and Cursor.</p>
+              <p className="text-base text-[#5A5E64]">Works with Claude, ChatGPT, Codex, Cursor and VS Code.</p>
             </div>
 
             <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center md:flex-col md:items-stretch lg:flex-row lg:items-center">

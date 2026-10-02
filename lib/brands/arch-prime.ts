@@ -169,10 +169,10 @@ export const archPrime: BrandConfig = {
 
   generator: {
     video: "/brands/arch/video/assetgen.mp4", // same recording as Arch Network
-    learnMore: "https://tools.blueprintstudio.ai/asset-generator",
+    learnMore: "https://tools.blueprintstudio.ai/asset-generator/landing",
     request:
       "mailto:blueprint.dao@gmail.com?subject=Asset%20Generator%20access%20%E2%80%94%20Arch%20Prime" +
-      "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20access%20to%20the%20Arch%20Prime%20asset%20generator%20account.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AWork%20email%3A%0A",
+      "&body=Hi%20Blueprint%2C%0A%0AI%27d%20like%20to%20be%20invited%20to%20the%20Arch%20Prime%20brand%20in%20Asset%20Generator.%0A%0AName%3A%0ATeam%20(Arch%20%2F%20Arch%20Prime)%3A%0AEmail%20you%27ll%20sign%20in%20with%3A%0A",
   },
   downloads: {
     // Arch-Prime-Brand-Guidelines-v1.1.pdf (22 MB) on the shared Drive — "anyone with the link"
