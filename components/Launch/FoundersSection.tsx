@@ -44,7 +44,7 @@ export default function FoundersSection() {
                 letterSpacing: "-1px",
               }}
             >
-              Built by Founders, for Founders
+              Built by a Founder, for Founders
             </h2>
           </div>
 
