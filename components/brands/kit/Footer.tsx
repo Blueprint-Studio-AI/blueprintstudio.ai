@@ -28,7 +28,6 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     title: "Company",
     links: [
       { name: "Tyler Stupart", href: "https://www.linkedin.com/in/tylerstupart/", external: true },
-      { name: "Jaidon Lalor", href: "https://www.linkedin.com/in/jaidonlalor/", external: true },
       { name: "Insights", href: "https://blueprintstudio.ai/insights" },
       { name: "Contact", href: "mailto:blueprint.dao@gmail.com" },
     ],

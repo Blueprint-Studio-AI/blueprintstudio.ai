@@ -8,11 +8,6 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 const founders = [
   {
-    name: "Jaidon Lalor",
-    bio: "Ran an award-winning film company for 5 years. Lead 100+ documentary and commercial projects across Europe, Central America, and the US. Now works in design.",
-    image: "/images/jaidon-circle.png",
-  },
-  {
     name: "Tyler Stupart",
     bio: "A service and brand designer who's helped companies grow. From startups crafting their first pitch, to corporations redesigning customer experience at scale.",
     image: "/images/tyler-circle.png",
@@ -45,8 +40,8 @@ export default function FoundersSection() {
             </h2>
           </div>
 
-          {/* 2 Column Layout for Founders */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6 max-w-3xl mx-auto mb-12">
+          {/* Founder */}
+          <div className="grid grid-cols-1 gap-8 max-w-sm mx-auto mb-12">
             {founders.map((founder, index) => (
               <div key={index} className="text-left">
                 <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
