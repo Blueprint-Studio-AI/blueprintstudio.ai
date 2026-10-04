@@ -1,0 +1,45 @@
+/* ── Jinba — color tokens ─────────────────────────────────────────────────
+   Generated from the Jinba brand kit · blueprintstudio.ai/brands/jinba
+   Palette + full light/dark scales as CSS custom properties. */
+
+:root {
+  /* Primaries */
+  --jinba-urushi: #322014;
+  --jinba-kuri:   #5A3921;
+  /* Haku (gradient stops, top → bottom) */
+  --jinba-haku-1: #B78D62;
+  --jinba-haku-2: #C5A681;
+  --jinba-haku-3: #7E4E2D;
+  --jinba-haku-4: #52321B;
+
+  /* Secondaries */
+  --jinba-tsuchi: #C5A681;
+  --jinba-suna:   #EFEEE8;
+  --jinba-kami:   #F5F4F2;
+
+  /* Sand scale — light */
+  --sand-50:  #FAF8F3; --sand-100: #F4F1EB; --sand-200: #EAE3D7;
+  --sand-300: #DCCBB3; --sand-400: #CAB296; --sand-500: #B59575;
+  --sand-600: #9E7754; --sand-700: #835836; --sand-800: #5A3921;
+  --sand-900: #342115; --sand-950: #2B1C13;
+
+  /* Neutral scale — light */
+  --neutral-50:  #F8F8F8; --neutral-100: #EFEFEE; --neutral-200: #E2E2E1;
+  --neutral-300: #CECDCC; --neutral-400: #B8B6B3; --neutral-500: #9E9B98;
+  --neutral-600: #837F7C; --neutral-700: #66625F; --neutral-800: #44413F;
+  --neutral-900: #272625; --neutral-950: #21201F;
+}
+
+.dark, [data-theme="dark"] {
+  /* Sand scale — dark */
+  --sand-50:  #1A120E; --sand-100: #2E2019; --sand-200: #413026;
+  --sand-300: #694F3E; --sand-400: #93715A; --sand-500: #AC8B70;
+  --sand-600: #BEA083; --sand-700: #CEB69A; --sand-800: #DCCFBC;
+  --sand-900: #EAE7E2; --sand-950: #F3F3F3;
+
+  /* Neutral scale — dark */
+  --neutral-50:  #141414; --neutral-100: #242423; --neutral-200: #353434;
+  --neutral-300: #575553; --neutral-400: #7D7875; --neutral-500: #97918C;
+  --neutral-600: #ABA59E; --neutral-700: #BFB9B3; --neutral-800: #D4D0CB;
+  --neutral-900: #E9E8E4; --neutral-950: #F4F3F2;
+}

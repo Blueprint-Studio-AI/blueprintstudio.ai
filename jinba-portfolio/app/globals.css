@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Display face — local Tiempos Text (Geist + Geist Mono come from next/font). */
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("/assets/fonts/tiempos-text-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@layer base {
+  /* Centered 1440 frame: content sits inside --edge padding, while full-bleed
+     elements (nav, hero, galleries) escape to the viewport edge. 100% (not
+     100vw) is deliberate — it excludes the scrollbar and avoids overflow. */
+  :root {
+    --frame: 1440px;
+    --pad: 128px;
+    --pad-nav: 64px;
+    --edge: max(var(--pad), calc((100% - var(--frame)) / 2 + var(--pad)));
+    --edge-nav: max(var(--pad-nav), calc((100% - var(--frame)) / 2 + var(--pad-nav)));
+    --rail-gap: 64px;
+  }
+  @media (max-width: 1200px) {
+    :root { --pad: 64px; }
+  }
+  @media (max-width: 860px) {
+    :root { --pad: 24px; --pad-nav: 24px; --rail-gap: 24px; }
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Smooth anchor jumps are a long travel on a page this tall — only for people
+     who haven't asked the OS to stop moving things. */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  body {
+    @apply bg-white text-ink font-sans;
+  }
+  /* anchor offset so the sticky tabbar never covers a section heading */
+  section[id] { scroll-margin-top: 100px; }
+
+  /* One focus ring for every interactive element — including the custom-shaped
+     ones (paint chips, ramp rows, swatches, style dots) that don't route
+     through the Button primitive. Keyboard users get a consistent target.
+     The type specimens are the exception: a ring around a 64px headline reads
+     as a border, so they highlight like selected text instead (TypeSystem). */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid theme(colors.ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Construction lines — dashed vertical rules with gradient-faded ends and a
+     42px content inset. Wraps every interactive block ("pull assets here").
+     Stroke is 1:1 with Figma 296:865: 0.971px inside, dashed, painted with a
+     linear gradient (transparent → #9E9E9E at 20% → #9E9E9E at 80% →
+     transparent) at 33% opacity. The dash comes from the background, the fade
+     from the mask, and `opacity` stands in for Figma's stroke opacity. */
+  .statement {
+    @apply relative flex flex-col;
+    padding: 24px 42px;
+    gap: 40px;
+  }
+  .statement::before,
+  .statement::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0.971px;
+    pointer-events: none;
+    opacity: 0.33;
+    background: repeating-linear-gradient(to bottom, #9e9e9e 0 4px, transparent 4px 9px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  }
+  .statement::before { left: 0; }
+  .statement::after { right: 0; }
+  /* Mobile keeps the construction lines but tightens the inset to 16px (vs 42
+     on desktop) so the interactive content keeps its width on a narrow screen. */
+  @media (max-width: 860px) {
+    .statement { padding: 20px 16px; }
+  }
+
+  /* Blinking fake caret on the editable type specimens (hidden while focused). */
+  .caret::after {
+    content: "";
+    display: inline-block;
+    vertical-align: baseline;
+    width: 2px;
+    height: 0.78em;
+    margin-left: 0.04em;
+    background: currentColor;
+    transform: translateY(0.06em);
+    opacity: 0.85;
+    animation: caretBlink 1.1s steps(1) infinite;
+  }
+  .caret:focus::after { display: none; }
+  @keyframes caretBlink {
+    0%, 55% { opacity: 0.85; }
+    56%, 100% { opacity: 0; }
+  }
+}
+
+@layer utilities {
+  /* centered-frame horizontal padding */
+  .px-edge { padding-left: var(--edge); padding-right: var(--edge); }
+  .px-edge-nav { padding-left: var(--edge-nav); padding-right: var(--edge-nav); }
+  .pl-edge { padding-left: var(--edge); }
+  .ml-edge { margin-left: var(--edge); }
+  .mx-edge { margin-left: var(--edge); margin-right: var(--edge); }
+
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* copy-confirm flash */
+  .copied { outline: 1px solid currentColor; outline-offset: 2px; }
+}
