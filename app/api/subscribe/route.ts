@@ -11,21 +11,30 @@ const RATE_LIMIT_WINDOW = 3600000; // 1 hour
 const MAX_REQUESTS = 5;
 const ipRequests = new Map<string, { count: number; timestamp: number }>();
 
-function checkRateLimit(ip: string): boolean {
+/** Allowed, or when this network can sign up again (epoch ms). */
+function checkRateLimit(ip: string): { allowed: true } | { allowed: false; resetAt: number } {
   const now = Date.now();
   const userRequests = ipRequests.get(ip);
 
   if (!userRequests || (now - userRequests.timestamp) > RATE_LIMIT_WINDOW) {
     ipRequests.set(ip, { count: 1, timestamp: now });
-    return true;
+    return { allowed: true };
   }
 
   if (userRequests.count >= MAX_REQUESTS) {
-    return false;
+    return { allowed: false, resetAt: userRequests.timestamp + RATE_LIMIT_WINDOW };
   }
 
   userRequests.count += 1;
-  return true;
+  return { allowed: true };
+}
+
+/** A 429 that says nothing is broken and how long to wait, with a matching Retry-After. */
+function waitResponse(message: string, retryAfterSeconds: number) {
+  return NextResponse.json(
+    { error: message, code: 'RATE_LIMITED', retryAfterSeconds },
+    { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+  );
 }
 
 export async function POST(request: Request) {
@@ -34,10 +43,13 @@ export async function POST(request: Request) {
       const headersList = await headers();
       const ip = headersList.get('x-forwarded-for') || 'unknown';
       
-      if (!checkRateLimit(ip)) {
-        return NextResponse.json(
-          { error: 'Too many subscription attempts. Please try again later.' },
-          { status: 429 }
+      const limit = checkRateLimit(ip);
+      if (!limit.allowed) {
+        const retryAfterSeconds = Math.max(5, Math.ceil((limit.resetAt - Date.now()) / 1000));
+        const minutes = Math.ceil(retryAfterSeconds / 60);
+        return waitResponse(
+          `Lots of newsletter sign-ups from this network in the last hour, so we've paused new ones. Nothing is broken. Try again in about ${minutes === 1 ? 'a minute' : `${minutes} minutes`}.`,
+          retryAfterSeconds
         );
       }
   
@@ -143,9 +155,9 @@ export async function POST(request: Request) {
           );
         }
         if (error.message.includes('rate limit')) {
-          return NextResponse.json(
-            { error: 'Too many requests. Please try again later.' },
-            { status: 429 }
+          return waitResponse(
+            "Lots of sign-ups right now, so we've paused new ones. Nothing is broken. Try again in about a minute.",
+            60
           );
         }
       }
