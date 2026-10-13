@@ -8,13 +8,15 @@
     "build": "node --experimental-strip-types scripts/build-zips.mjs && next build",
     "zips": "node --experimental-strip-types scripts/build-zips.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "galley": "galley"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
+    "@blueprint-studio/galley": "file:vendor/blueprint-studio-galley-0.4.0.tgz",
     "@calcom/atoms": "^1.10.0",
     "@calcom/embed-react": "^1.5.3",
-    "@hookform/resolvers": "^4.1.1",
+    "@hookform/resolvers": "^5.9.1",
     "@iconify/react": "^6.0.0",
     "@linear/sdk": "^38.0.0",
     "@netlify/functions": "^3.0.0",
@@ -56,7 +58,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.179.1",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.9.4",
@@ -69,7 +71,9 @@
     "eslint-config-next": "^16.0.1",
     "fflate": "^0.8.2",
     "ignore-loader": "^0.1.2",
+    "playwright-core": "^1.64.0",
     "postcss": "^8.4.49",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.15",
     "typescript": "^5"
   }

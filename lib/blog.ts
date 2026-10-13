@@ -1,60 +1,63 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
+import { splitFrontmatter, validatePost } from "@blueprint-studio/galley";
+import galley from "@/galley.config";
+import type { PostFrontmatter } from "./blog-frontmatter";
 
+// Insights posts: one MDX file per post in content/insights/, named by slug, managed with
+// Galley (galley.config.ts). Every post is validated when the site builds, so a broken
+// post fails the build with the file, line and reason instead of reaching readers.
+
+// A literal path, so the build traces only the posts folder.
 const BLOG_DIR = path.join(process.cwd(), "content/insights");
+if (galley.postsDir !== "content/insights") {
+  throw new Error("Galley: update BLOG_DIR to match galley.config.ts");
+}
 
 export type BlogPost = {
   slug: string;
   title: string;
   description: string;
   date: string;
-  image: string;
+  image?: string;
   ogImage: string;
   author: string;
+  /** The post's MDX, without its front matter. */
   content: string;
 };
 
+function load(file: string): BlogPost {
+  const slug = file.replace(/\.mdx$/, "");
+  const source = fs.readFileSync(path.join(BLOG_DIR, file), "utf-8");
+  const result = validatePost(source, galley);
+  if (!result.ok) {
+    const lines = result.errors.map((e) => `  content/insights/${file}:${e.line}:${e.column} ${e.message}`);
+    throw new Error(`Galley: ${file} isn't a valid post. Run \`pnpm galley check\` for details.\n${lines.join("\n")}`);
+  }
+  const f = result.frontmatter as PostFrontmatter;
+  return {
+    slug,
+    title: f.title,
+    description: f.description,
+    date: f.date,
+    image: f.image,
+    ogImage: f.ogImage ?? f.image ?? "/og-image.jpg",
+    author: f.author,
+    content: splitFrontmatter(source).body,
+  };
+}
+
 export function getAllPosts(): BlogPost[] {
-  const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-
-  const posts = files.map((file) => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(BLOG_DIR, file), "utf-8");
-    const { data, content } = matter(raw);
-
-    return {
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      image: data.image,
-      ogImage: data.ogImage,
-      author: data.author,
-      content,
-    } as BlogPost;
-  });
-
-  return posts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  return fs
+    .readdirSync(BLOG_DIR)
+    .filter((f) => f.endsWith(".mdx"))
+    .map(load)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  const filePath = path.join(BLOG_DIR, `${slug}.md`);
-  if (!fs.existsSync(filePath)) return undefined;
-
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
-
-  return {
-    slug,
-    title: data.title,
-    description: data.description,
-    date: data.date,
-    image: data.image,
-    ogImage: data.ogImage,
-    author: data.author,
-    content,
-  } as BlogPost;
+  if (!/^[a-z0-9-]+$/.test(slug)) return undefined;
+  const file = `${slug}.mdx`;
+  if (!fs.existsSync(path.join(BLOG_DIR, file))) return undefined;
+  return load(file);
 }

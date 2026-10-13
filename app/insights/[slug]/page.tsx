@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { outline, renderPost } from "@blueprint-studio/galley/render";
 import { getAllPosts, getPostBySlug } from "@/lib/blog";
 import BlogPost from "@/components/Blog/BlogPost";
+import { elements } from "@/components/galley/elements";
+import galley from "@/galley.config";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -52,6 +55,7 @@ export default async function InsightsPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();
+  const { content, ...meta } = post;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -84,7 +88,13 @@ export default async function InsightsPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BlogPost post={post} />
+      <BlogPost
+        post={meta}
+        body={renderPost(content, galley, { elements })}
+        toc={outline(content)
+          .filter((h) => h.depth === 2)
+          .map(({ text, id }) => ({ text, id }))}
+      />
     </>
   );
 }
