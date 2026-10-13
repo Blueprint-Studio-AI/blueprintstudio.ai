@@ -38,7 +38,7 @@ export const stat = defineComponent({
       <figcaption className="mt-4 max-w-xl text-base leading-[1.5] text-neutral-600 sm:text-[17px]">
         {label}
         {source ? (
-          <span className="mt-2 block text-xs uppercase tracking-wide text-neutral-400">
+          <span className="mt-2 block text-xs uppercase tracking-wide text-neutral-500">
             {href ? (
               <a
                 href={href}

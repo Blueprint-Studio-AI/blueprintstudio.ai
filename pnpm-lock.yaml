@@ -12,8 +12,8 @@ importers:
         specifier: ^0.36.3
         version: 0.36.3
       '@blueprint-studio/galley':
-        specifier: file:vendor/blueprint-studio-galley-0.4.0.tgz
-        version: file:vendor/blueprint-studio-galley-0.4.0.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)
+        specifier: file:vendor/blueprint-studio-galley-0.4.1.tgz
+        version: file:vendor/blueprint-studio-galley-0.4.1.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)
       '@calcom/atoms':
         specifier: ^1.10.0
         version: 1.12.1(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
@@ -280,9 +280,9 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.4.0.tgz':
-    resolution: {integrity: sha512-6NKiH040n48VOHZmf82+Q0xm58fALV6gvgtZR7umFPmeBkvoBOWNCfg14JIGpFbnewEQKhI3RKD5VsmMcCy7rA==, tarball: file:vendor/blueprint-studio-galley-0.4.0.tgz}
-    version: 0.4.0
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.4.1.tgz':
+    resolution: {integrity: sha512-bdIfb/nquj4YroYMwfqzqQHy9x3qkexDbJcLA6wuwG1jMK9CHPD/shyXLyE2kx2mVEPGL/0oyNY05MwUE9qpUg==, tarball: file:vendor/blueprint-studio-galley-0.4.1.tgz}
+    version: 0.4.1
     engines: {node: '>=22.18'}
     hasBin: true
     peerDependencies:
@@ -5653,7 +5653,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.4.0.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)':
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.4.1.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.32.1(zod@4.6.7)
       hast-util-to-jsx-runtime: 2.3.6
