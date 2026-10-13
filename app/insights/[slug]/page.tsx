@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return {};
 
   return {
-    title: `${post.title} | Blueprint Studio`,
+    title: post.title,
     description: post.description,
     alternates: {
       canonical: `/insights/${post.slug}`,
