@@ -107,16 +107,16 @@ export function BlockView({ node, updateAttributes, deleteNode, selected, getPos
         </span>
         <span className="gx-block-tools">
           {isPicker ? (
-            <>
-              <button type="button" onClick={() => setChoosing((c) => !c)}>
-                {choosing ? "Close" : "Change image"}
-              </button>
-              {src ? (
+            src ? (
+              <>
+                <button type="button" onClick={() => setChoosing((c) => !c)}>
+                  {choosing ? "Close" : "Change image"}
+                </button>
                 <button type="button" onClick={() => setEditing((e) => !e)}>
                   Caption & alt
                 </button>
-              ) : null}
-            </>
+              </>
+            ) : null
           ) : (
             <button type="button" onClick={() => setEditing((e) => !e)}>
               {editing ? "Close" : "Edit"}

@@ -11,6 +11,25 @@ import type { ManifestComponent } from "./types";
 
 type Item = { key: string; label: string; hint: string; group: string; run(editor: TiptapEditor, at: InsertAt): void };
 
+/** How Galley's starter components read to a person adding one (their descriptions are written for agents). */
+const FRIENDLY: Record<string, { label?: string; hint: string }> = {
+  Image: { hint: "From the library, generated, or uploaded" },
+  YouTube: { label: "YouTube", hint: "A YouTube video" },
+  Video: { hint: "A video file that plays in the page" },
+  Tweet: { label: "Post from X", hint: "Quote a post from X" },
+  LinkCard: { label: "Link card", hint: "A preview card for a link" },
+  File: { hint: "A file to download" },
+  Callout: { hint: "A highlighted note, tip or warning" },
+};
+
+const labelOf = (name: string) => FRIENDLY[name]?.label ?? name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/ (\w)/g, (_, c: string) => ` ${c.toLowerCase()}`);
+const hintOf = (c: ManifestComponent) =>
+  FRIENDLY[c.name]?.hint ??
+  c.description
+    .split(/(?<=\.)\s/)[0]
+    .replace(/,?\s*(?:with\s+)?(?:its|an?|the)?\s*(?:optional\s+)?[\w\s]*between the tags/i, "")
+    .replace(/\.$/, "");
+
 const textItems: Item[] = [
   { key: "h2", label: "Heading", hint: "A section title", group: "Text", run: (e, at) => block(e, at, { type: "heading", attrs: { level: 2 } }) },
   { key: "h3", label: "Subheading", hint: "A smaller title", group: "Text", run: (e, at) => block(e, at, { type: "heading", attrs: { level: 3 } }) },
@@ -48,8 +67,8 @@ export function InsertMenu({
       .filter((c) => !c.motion && c.kind === "flow")
       .map((c) => ({
         key: c.name,
-        label: c.name.replace(/([a-z])([A-Z])/g, "$1 $2"),
-        hint: c.description.split(/(?<=\.)\s/)[0],
+        label: labelOf(c.name),
+        hint: hintOf(c),
         group: c.category ?? "Components",
         run: (e: TiptapEditor, where: InsertAt) => {
           const example = c.examples?.[0];
