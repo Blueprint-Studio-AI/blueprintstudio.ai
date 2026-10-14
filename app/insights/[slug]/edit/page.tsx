@@ -21,6 +21,7 @@ import {
   saveCommentsAction,
   savePostAction,
   stylesAction,
+  uploadAction,
 } from "../../edit/actions";
 import { editorEnabled } from "../../edit/enabled";
 
@@ -43,7 +44,7 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const cwd = process.cwd();
   const post = getPostBySlug(slug);
-  const editing = await openPost(new FsPostStore(path.join(cwd, galley.postsDir)), slug);
+  const editing = await openPost(new FsPostStore(path.join(cwd, galley.postsDir)), slug, galley);
   if (!post || !editing) notFound();
   const { content, ...meta } = post;
   return (
@@ -63,6 +64,7 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
         generate: generateAction,
         job: jobAction,
         importAsset: importAssetAction,
+        upload: uploadAction,
       }}
     >
       <BlogPost

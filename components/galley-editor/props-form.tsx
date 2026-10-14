@@ -17,7 +17,7 @@ export function PropsForm({
   error,
   onApply,
   onCancel,
-  onPickImage,
+  hide = [],
 }: {
   component: ManifestComponent;
   props: Record<string, unknown>;
@@ -25,7 +25,8 @@ export function PropsForm({
   error?: string;
   onApply(props: Record<string, unknown>, body: string | null): void;
   onCancel(): void;
-  onPickImage?: () => void;
+  /** Props the block sets another way, e.g. an image's src from the chooser. */
+  hide?: string[];
 }) {
   const [values, setValues] = useState<Record<string, unknown>>(props);
   const [text, setText] = useState(body ?? "");
@@ -45,7 +46,9 @@ export function PropsForm({
       onKeyDown={(e) => e.stopPropagation()}
     >
       <p className="gx-form-help">{component.description}</p>
-      {Object.entries(properties).map(([name, raw]) => {
+      {Object.entries(properties)
+        .filter(([name]) => !hide.includes(name))
+        .map(([name, raw]) => {
         const schema = plain(raw);
         const value = values[name];
         const id = `gx-${component.name}-${name}`;
@@ -98,11 +101,6 @@ export function PropsForm({
             <label htmlFor={id}>
               {label(name)}
               {required.has(name) ? "" : <span className="gx-optional"> optional</span>}
-              {name === "src" && onPickImage ? (
-                <button type="button" className="gx-link-button" onClick={onPickImage}>
-                  Choose from library
-                </button>
-              ) : null}
             </label>
             {field}
             {hint ? <span className="gx-hint">{hint}</span> : null}

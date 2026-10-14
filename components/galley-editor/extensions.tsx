@@ -17,6 +17,19 @@ const GalleyAttributes = Extension.create({
     return [
       { types: ["paragraph", "heading"], attributes: { source: hidden() } },
       { types: ["bulletList", "orderedList", "listItem"], attributes: { spread: hidden(false) } },
+      // An animation on a top-level block ({ name, props, group }), written back as the
+      // site's motion component around it. Shown as data-motion so edit mode can mark it.
+      {
+        types: ["paragraph", "heading", "blockquote", "bulletList", "orderedList", "codeBlock", "horizontalRule", "galleyBlock", "rawBlock"],
+        attributes: {
+          motion: {
+            default: null,
+            keepOnSplit: true,
+            parseHTML: () => null,
+            renderHTML: (attrs: { motion?: { name?: string } | null }) => (attrs.motion?.name ? { "data-motion": attrs.motion.name } : {}),
+          },
+        },
+      },
     ];
   },
 });

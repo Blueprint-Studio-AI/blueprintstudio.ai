@@ -20,6 +20,12 @@ export interface ManifestComponent {
   kind: "flow" | "text";
   children: "none" | "inline" | "blocks";
   description: string;
+  /** Where the insert menu lists it, e.g. "Media". */
+  category?: string;
+  /** "image": its picture is chosen in the block, from the library, generated or uploaded. */
+  picker?: "image";
+  /** An animation: "block" is a setting on any block, "number" animates a number in a sentence. */
+  motion?: "block" | "number";
   props: JsonSchema;
   examples?: { title?: string; props: Record<string, unknown>; children?: string }[];
 }
@@ -44,4 +50,6 @@ export interface EditorActions {
   generate(input: { prompt: string; styleId?: string; aspectRatio?: string }): Promise<{ jobId?: string; error?: string }>;
   job(jobId: string): Promise<GenerationJob | { status: "failed"; error: string }>;
   importAsset(input: { url: string; name?: string }): Promise<{ path?: string; width?: number; height?: number; error?: string }>;
+  /** A file from the person's computer, as FormData with "file". */
+  upload(form: FormData): Promise<{ path?: string; width?: number; height?: number; error?: string }>;
 }

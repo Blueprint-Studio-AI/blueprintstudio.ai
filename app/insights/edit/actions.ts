@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   blueprintStudio,
   docToMdx,
+  importMediaBytes,
   savePost,
   writeComments,
   type Comment,
@@ -107,6 +108,20 @@ export async function importAssetAction({ url, name }: { url: string; name?: str
   if (!/^https:\/\//.test(url)) return { error: "Only https images can be added" };
   try {
     const media = await importMedia(galley, cwd, { url, name });
+    return { path: media.path, width: media.width, height: media.height };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** A file from the person's computer, saved with the site as optimised WebP. */
+export async function uploadAction(form: FormData) {
+  guard();
+  const file = form.get("file");
+  if (!(file instanceof File)) return { error: "No file" };
+  if (file.size > 20 * 1024 * 1024) return { error: "That file is over 20 MB" };
+  try {
+    const media = await importMediaBytes(galley, cwd, { bytes: Buffer.from(await file.arrayBuffer()), type: file.type, name: file.name });
     return { path: media.path, width: media.width, height: media.height };
   } catch (error) {
     return failure(error);

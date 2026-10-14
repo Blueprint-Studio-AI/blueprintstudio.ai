@@ -16,6 +16,8 @@
       "kind": "flow",
       "children": "inline",
       "description": "A picture with an optional caption between the tags. Use for every image that has a caption or a known size.",
+      "category": "Media",
+      "picker": "image",
       "props": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -63,6 +65,7 @@
       "kind": "flow",
       "children": "none",
       "description": "An embedded YouTube video.",
+      "category": "Media",
       "props": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -101,6 +104,7 @@
       "kind": "flow",
       "children": "blocks",
       "description": "A highlighted box for a note, tip or warning. Paragraphs and lists go between the tags.",
+      "category": "Text",
       "props": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -135,6 +139,7 @@
       "kind": "flow",
       "children": "none",
       "description": "A headline figure with what it measures and where it comes from. Use it for the one number a section turns on, not for every number.",
+      "category": "Data",
       "props": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

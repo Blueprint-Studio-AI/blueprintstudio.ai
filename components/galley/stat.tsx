@@ -6,6 +6,7 @@ import { z } from "zod";
 const Stat = defineContract({
   name: "Stat",
   kind: "flow",
+  category: "Data",
   children: "none",
   description:
     "A headline figure with what it measures and where it comes from. Use it for the one number a section turns on, not for every number.",

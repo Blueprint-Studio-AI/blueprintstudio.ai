@@ -4,37 +4,40 @@ import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useEditor } from "@tiptap/react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { anchorOf, findAnchor } from "./anchors";
+import type { Uploaded } from "./chooser";
 import { extensions } from "./extensions";
-import { ASSET_TYPE, BlocksPanel, CommentsPanel, GeneratePanel, LibraryPanel } from "./panels";
+import { CommentsPanel } from "./panels";
 import { ServicesContext, type Services } from "./services";
 import { EDITOR_CSS } from "./styles";
 import type { Comment, DocNode, EditorActions, EditorPost, LibraryAsset, ManifestComponent, SaveResult } from "./types";
 
 // Edit mode for a post, on the site's own page. The site renders its normal post layout
-// and puts editable pieces where the title, cover and body go (editable.tsx); this holds
-// the document, saves it as you type (checked by Galley on the server), and adds a small
-// bar and a drawer for comments, the brand's library, the Asset Generator and components.
+// and puts editable pieces where the title, cover and body go (editable.tsx). This holds
+// the document and saves it as you type (checked by Galley on the server). Things are
+// added where they go: "+" or "/" for a new block, and a picture is chosen inside its
+// image block. The bar holds only what's about the whole post: adding, comments, done.
 
-type Panel = "comments" | "library" | "generate" | "blocks";
 type SaveState = { kind: "saved" | "dirty" | "saving" } | { kind: "error"; result: Extract<SaveResult, { ok: false }> };
-type Target =
-  | { kind: "insert"; pos: number | null }
-  | { kind: "replace"; pos: number }
-  | { kind: "frontmatter"; field: string; shape: "image" | "src" };
+export type ImageShape = "image" | "src";
+
+/** Where the insert menu is open: at `pos`, replacing the empty paragraph there if `replace`. */
+export type InsertAt = { pos: number; replace: boolean; left: number; top: number };
 
 export interface EditSession {
   editor: TiptapEditor | null;
-  /** The site's prose class for the body, so it looks like the live post. */
-  setProseClass(className: string): void;
+  components: ManifestComponent[];
   frontmatter: Record<string, unknown>;
   setField(field: string, value: unknown): void;
-  /** Open the library to choose an image for a front matter field, e.g. the cover. */
-  pickFieldImage(field: string, shape?: "image" | "src"): void;
-  /** Open the generator to make options for a front matter image. */
-  generateFieldImage(field: string, shape?: "image" | "src"): void;
+  /** The site's prose class for the body, so it looks like the live post. */
+  setProseClass(className: string): void;
+  /** A prompt for an image at `pos` (or for the cover, with null), from the post around it. */
+  contextFor(pos: number | null): string;
+  /** Use a library or generated image for a front matter field (cover, hero). */
+  chooseFieldImage(field: string, shape: ImageShape, asset: LibraryAsset): Promise<void>;
+  uploadedFieldImage(field: string, shape: ImageShape, file: Uploaded): void;
+  insertAt: InsertAt | null;
+  openInsert(at: InsertAt | null): void;
   startComment(): void;
-  openGenerate(pos: number): void;
-  openPanel(panel: Panel): void;
 }
 
 const SessionContext = createContext<EditSession | null>(null);
@@ -45,8 +48,11 @@ export function useEditSession(): EditSession {
   return session;
 }
 
-/** The document as the server reads it: plain objects, no highlights or editor-only attributes. */
-function cleanDoc(node: DocNode): DocNode {
+/**
+ * The document as the server reads it: plain objects, no highlights or editor-only
+ * attributes, and no image blocks still waiting for a picture.
+ */
+function cleanDoc(node: DocNode, pickers: Set<string>): DocNode {
   const out: DocNode = { ...node };
   if (node.marks) {
     const marks = node.marks
@@ -61,7 +67,11 @@ function cleanDoc(node: DocNode): DocNode {
     delete attrs.pending;
     out.attrs = attrs;
   }
-  if (node.content) out.content = node.content.map(cleanDoc);
+  if (node.content) {
+    out.content = node.content
+      .filter((c) => !(c.type === "galleyBlock" && pickers.has(String(c.attrs?.name)) && !(c.attrs?.props as { src?: string } | undefined)?.src))
+      .map((c) => cleanDoc(c, pickers));
+  }
   return out;
 }
 
@@ -70,36 +80,6 @@ export const blockEnd = (editor: TiptapEditor) => {
   const { $from, to } = editor.state.selection;
   return $from.depth > 0 ? $from.after(1) : to;
 };
-
-/** A prompt for an image at `pos`, from the post's title and the passage around it. */
-function contextAt(editor: TiptapEditor, pos: number | null, title: string) {
-  const at = pos ?? editor.state.selection.from;
-  let heading = "";
-  const passage: string[] = [];
-  editor.state.doc.forEach((node, offset) => {
-    if (offset > at && passage.length) return;
-    if (node.type.name === "heading") {
-      heading = node.textContent;
-      if (offset <= at) passage.length = 0;
-    } else if (node.isTextblock && node.textContent.trim()) {
-      if (offset <= at) {
-        passage.push(node.textContent);
-        if (passage.length > 2) passage.shift();
-      } else if (!passage.length) passage.push(node.textContent);
-    } else if (node.type.name === "galleyBlock" && Math.abs(offset - at) <= 1) {
-      const alt = (node.attrs.props as { alt?: string }).alt;
-      if (alt) passage.push(`The current image shows: ${alt}`);
-    }
-  });
-  const excerpt = passage.join(" ").replace(/\s+/g, " ").slice(0, 420);
-  return [
-    `An image for the article "${title}"${heading ? `, in the section "${heading}"` : ""}.`,
-    excerpt ? `The passage: ${excerpt}` : "",
-    "Editorial, no text in the image.",
-  ]
-    .filter(Boolean)
-    .join("\n\n");
-}
 
 const altFrom = (prompt: string) => {
   const first = prompt.replace(/\s+/g, " ").split(/(?<=[.!?])\s/)[0] ?? prompt;
@@ -111,6 +91,15 @@ const fileName = (text: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 40) || "image";
+
+/** A starting alt text from an uploaded file's name ("team-offsite_2026.jpg" → "Team offsite 2026"); people edit it. */
+const altFromFile = (name = "") => {
+  const words = name.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+  return words ? words[0].toUpperCase() + words.slice(1) : "";
+};
+
+const imageValue = (shape: ImageShape, src: string, alt: string, width?: number, height?: number) =>
+  shape === "src" ? src : { src, alt, width, height };
 
 export function EditSession({
   post,
@@ -136,9 +125,8 @@ export function EditSession({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [draft, setDraft] = useState<Comment | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
-  const [panel, setPanel] = useState<Panel | null>(null);
-  const [target, setTarget] = useState<Target>({ kind: "insert", pos: null });
-  const [generateContext, setGenerateContext] = useState("");
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [insertAt, setInsertAt] = useState<InsertAt | null>(null);
 
   const revision = useRef(post.revision);
   const frontmatterRef = useRef(frontmatter);
@@ -149,7 +137,9 @@ export function EditSession({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveRef = useRef<() => Promise<void>>(async () => {});
   const proseClass = useRef("");
+  const slashRef = useRef<(pos: number) => void>(() => {});
   const title = String(frontmatter.title ?? post.slug);
+  const pickers = useMemo(() => new Set(components.filter((c) => c.picker === "image").map((c) => c.name)), [components]);
 
   const schedule = () => {
     setSave({ kind: "dirty" });
@@ -165,14 +155,11 @@ export function EditSession({
       // A function, so ProseMirror applies the site's class on every update instead of
       // resetting it.
       attributes: () => ({ class: `gx-doc ${proseClass.current}`.trim(), spellcheck: "true" }),
-      handleDrop: (view, event) => {
-        const raw = event.dataTransfer?.getData(ASSET_TYPE);
-        if (!raw) return false;
-        event.preventDefault();
-        const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
-        if (!at) return true;
-        const $pos = view.state.doc.resolve(at.pos);
-        void insertImageRef.current(JSON.parse(raw) as LibraryAsset, $pos.depth > 0 ? $pos.after(1) : at.pos);
+      // "/" on an empty line opens the insert menu there.
+      handleTextInput: (view, from, _to, text) => {
+        const $from = view.state.doc.resolve(from);
+        if (text !== "/" || $from.depth !== 1 || $from.parent.type.name !== "paragraph" || $from.parent.content.size !== 0) return false;
+        slashRef.current($from.before(1));
         return true;
       },
     },
@@ -180,6 +167,14 @@ export function EditSession({
       if (!transaction.getMeta("galleyComment")) schedule();
     },
   });
+
+  useEffect(() => {
+    slashRef.current = (pos) => {
+      if (!editor) return;
+      const coords = editor.view.coordsAtPos(pos + 1);
+      setInsertAt({ pos, replace: true, left: coords.left, top: coords.bottom + 6 });
+    };
+  }, [editor]);
 
   // ---- Saving ----
 
@@ -189,7 +184,7 @@ export function EditSession({
     await saving.current;
     const run = (async () => {
       setSave({ kind: "saving" });
-      const doc = cleanDoc(JSON.parse(JSON.stringify(editor.getJSON())) as DocNode);
+      const doc = cleanDoc(JSON.parse(JSON.stringify(editor.getJSON())) as DocNode, pickers);
       const result = await actions
         .save(post.slug, { doc, frontmatter: frontmatterRef.current, revision: revision.current })
         .catch((e: Error): SaveResult => ({ ok: false, error: e.message }));
@@ -200,7 +195,7 @@ export function EditSession({
     })();
     saving.current = run;
     await run;
-  }, [editor, actions, post.slug]);
+  }, [editor, actions, post.slug, pickers]);
   useEffect(() => {
     saveRef.current = saveNow;
   }, [saveNow]);
@@ -274,7 +269,7 @@ export function EditSession({
     markComment(id, from, to);
     setDraft({ id, ...anchor, author, body: "", at: new Date().toISOString(), replies: [] });
     setActiveComment(id);
-    setPanel("comments");
+    setCommentsOpen(true);
   }, [editor, author, markComment]);
 
   useEffect(() => {
@@ -294,7 +289,7 @@ export function EditSession({
       const mark = editor.state.selection.$from.marks().find((m) => m.type.name === "comment");
       if (mark) {
         setActiveComment(mark.attrs.id);
-        setPanel("comments");
+        setCommentsOpen(true);
       }
     };
     editor.on("selectionUpdate", onSelection);
@@ -313,116 +308,132 @@ export function EditSession({
     }
   };
 
-  // ---- Images and components ----
+  // ---- Images ----
 
-  // The picked image shows at once (from Blueprint Studio), then becomes the site's own
-  // optimised copy when the import finishes.
-  const insertImage = useCallback(
-    async (asset: LibraryAsset, pos: number | null, replace = false) => {
-      if (!editor) return;
-      const pending = crypto.randomUUID();
-      const quick = { src: asset.thumbnail || asset.url, width: asset.width, height: asset.height };
-      if (replace && pos !== null && editor.state.doc.nodeAt(pos)?.type.name === "galleyBlock") {
-        const node = editor.state.doc.nodeAt(pos)!;
-        editor.view.dispatch(editor.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, props: { ...(node.attrs.props as object), ...quick }, pending }));
-      } else {
-        editor
-          .chain()
-          .insertContentAt(pos ?? blockEnd(editor), {
-            type: "galleyBlock",
-            attrs: {
-              name: "Image",
-              props: { src: quick.src, alt: altFrom(asset.prompt || title), width: quick.width, height: quick.height },
-              body: null,
-              pending,
-            },
-          })
-          .run();
+  const contextFor = useCallback(
+    (pos: number | null) => {
+      const summary = ["summary", "description", "excerpt"].map((k) => frontmatterRef.current[k]).find(Boolean);
+      if (pos === null || !editor) {
+        return [`A cover image for the article "${title}".`, summary ? `What it's about: ${String(summary)}` : "", "Editorial, wide, no text in the image."]
+          .filter(Boolean)
+          .join("\n\n");
       }
-      const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
-      let found = -1;
-      editor.state.doc.descendants((node, at) => {
-        if (node.attrs.pending === pending) found = at;
-        return found < 0;
+      let heading = "";
+      const passage: string[] = [];
+      editor.state.doc.forEach((node, offset) => {
+        if (offset > pos && passage.length) return;
+        if (node.type.name === "heading") {
+          heading = node.textContent;
+          if (offset <= pos) passage.length = 0;
+        } else if (node.isTextblock && node.textContent.trim()) {
+          if (offset < pos) {
+            passage.push(node.textContent);
+            if (passage.length > 2) passage.shift();
+          } else if (!passage.length) passage.push(node.textContent);
+        }
       });
-      if (found < 0) return;
-      if (imported.error || !imported.path) {
-        setSave({ kind: "error", result: { ok: false, error: imported.error ?? "The image couldn't be added" } });
-        return;
-      }
-      const node = editor.state.doc.nodeAt(found)!;
-      const props = { ...(node.attrs.props as object), src: imported.path, width: imported.width, height: imported.height };
-      editor.view.dispatch(editor.state.tr.setNodeMarkup(found, undefined, { ...node.attrs, props, pending: null }));
-    },
-    [editor, actions, title],
-  );
-  const insertImageRef = useRef(insertImage);
-  useEffect(() => {
-    insertImageRef.current = insertImage;
-  }, [insertImage]);
-
-  const useAsset = async (asset: LibraryAsset) => {
-    if (target.kind === "frontmatter") {
-      const { field, shape } = target;
-      const current = frontmatterRef.current[field] as { alt?: string } | string | null | undefined;
-      const alt = (typeof current === "object" && current?.alt) || altFrom(asset.prompt || title);
-      const value = (src: string, width?: number, height?: number) => (shape === "src" ? src : { src, alt, width, height });
-      setField(field, value(asset.thumbnail || asset.url, asset.width, asset.height));
-      const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
-      if (imported.path) setField(field, value(imported.path, imported.width, imported.height));
-    } else if (target.kind === "replace") await insertImage(asset, target.pos, true);
-    else await insertImage(asset, target.pos);
-    setTarget({ kind: "insert", pos: null });
-  };
-
-  const insertComponent = (component: ManifestComponent) => {
-    if (!editor) return;
-    const example = component.examples?.[0];
-    if (component.kind === "text") {
-      editor
-        .chain()
-        .focus()
-        .insertContent({ type: "galleyInline", attrs: { name: component.name, props: example?.props ?? {}, body: example?.children ?? null } })
-        .run();
-    } else {
-      editor
-        .chain()
-        .focus()
-        .insertContentAt(blockEnd(editor), {
-          type: "galleyBlock",
-          attrs: { name: component.name, props: example?.props ?? {}, body: example?.children ?? null, isNew: true },
-        })
-        .run();
-    }
-  };
-
-  const openGenerate = useCallback(
-    (pos: number, kind: "insert" | "replace" = "insert") => {
-      if (!editor) return;
-      setTarget(kind === "replace" ? { kind, pos } : { kind, pos });
-      setGenerateContext(contextAt(editor, pos, title));
-      setPanel("generate");
+      const excerpt = passage.join(" ").replace(/\s+/g, " ").slice(0, 420);
+      return [
+        `An image for the article "${title}"${heading ? `, in the section "${heading}"` : ""}.`,
+        excerpt ? `The passage: ${excerpt}` : "",
+        "Editorial, no text in the image.",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
     },
     [editor, title],
   );
 
+  // A picked image shows at once (from Blueprint Studio), then becomes the site's own
+  // optimised copy when the import finishes. Positions move while people type, so the
+  // block is found again by a marker rather than its old position.
+  const chooseImage = useCallback(
+    async (pos: number, asset: LibraryAsset) => {
+      if (!editor) return;
+      const node = editor.state.doc.nodeAt(pos);
+      if (node?.type.name !== "galleyBlock") return;
+      const pending = crypto.randomUUID();
+      const props = node.attrs.props as Record<string, unknown>;
+      const alt = (props.alt as string) || altFrom(asset.prompt || title);
+      editor.view.dispatch(
+        editor.state.tr.setNodeMarkup(pos, undefined, {
+          ...node.attrs,
+          props: { ...props, src: asset.thumbnail || asset.url, alt, width: asset.width, height: asset.height },
+          pending,
+          isNew: null,
+        }),
+      );
+      const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
+      let at = -1;
+      editor.state.doc.descendants((n, p) => {
+        if (n.attrs.pending === pending) at = p;
+        return at < 0;
+      });
+      if (at < 0) return;
+      if (imported.error || !imported.path) {
+        setSave({ kind: "error", result: { ok: false, error: imported.error ?? "The image couldn't be added" } });
+        return;
+      }
+      const current = editor.state.doc.nodeAt(at)!;
+      editor.view.dispatch(
+        editor.state.tr.setNodeMarkup(at, undefined, {
+          ...current.attrs,
+          props: { ...(current.attrs.props as object), src: imported.path, width: imported.width, height: imported.height },
+          pending: null,
+        }),
+      );
+    },
+    [editor, actions, title],
+  );
+
+  const setImage = useCallback(
+    (pos: number, file: Uploaded) => {
+      if (!editor) return;
+      const node = editor.state.doc.nodeAt(pos);
+      if (node?.type.name !== "galleyBlock") return;
+      const props = node.attrs.props as Record<string, unknown>;
+      editor.view.dispatch(
+        editor.state.tr.setNodeMarkup(pos, undefined, {
+          ...node.attrs,
+          props: { ...props, src: file.path, alt: (props.alt as string) || altFromFile(file.name), width: file.width, height: file.height },
+          isNew: null,
+        }),
+      );
+    },
+    [editor],
+  );
+
+  const chooseFieldImage = useCallback(
+    async (field: string, shape: ImageShape, asset: LibraryAsset) => {
+      const current = frontmatterRef.current[field] as { alt?: string } | string | null | undefined;
+      const alt = (typeof current === "object" && current?.alt) || altFrom(asset.prompt || title);
+      setField(field, imageValue(shape, asset.thumbnail || asset.url, alt, asset.width, asset.height));
+      const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
+      if (imported.path) setField(field, imageValue(shape, imported.path, alt, imported.width, imported.height));
+    },
+    [actions, title, setField],
+  );
+
+  const uploadedFieldImage = useCallback(
+    (field: string, shape: ImageShape, file: Uploaded) => {
+      const current = frontmatterRef.current[field] as { alt?: string } | string | null | undefined;
+      const alt = (typeof current === "object" && current?.alt) || altFromFile(file.name);
+      setField(field, imageValue(shape, file.path, alt, file.width, file.height));
+    },
+    [setField],
+  );
+
   const services = useMemo<Services>(
-    () => ({
-      slug: post.slug,
-      actions,
-      components,
-      pickImage: (pos) => {
-        setTarget({ kind: "replace", pos });
-        setPanel("library");
-      },
-      generateFor: (pos) => openGenerate(pos, "replace"),
-    }),
-    [post.slug, actions, components, openGenerate],
+    () => ({ slug: post.slug, actions, components, chooseImage, setImage, contextFor }),
+    [post.slug, actions, components, chooseImage, setImage, contextFor],
   );
 
   const session = useMemo<EditSession>(
     () => ({
       editor,
+      components,
+      frontmatter,
+      setField,
       setProseClass: (className) => {
         if (proseClass.current === className) return;
         proseClass.current = className;
@@ -430,43 +441,24 @@ export function EditSession({
           editor.view.dispatch(editor.state.tr.setMeta("galleyComment", true).setMeta("addToHistory", false));
         }
       },
-      frontmatter,
-      setField,
-      pickFieldImage: (field, shape = "image") => {
-        setTarget({ kind: "frontmatter", field, shape });
-        setPanel("library");
-      },
-      generateFieldImage: (field, shape = "image") => {
-        setTarget({ kind: "frontmatter", field, shape });
-        const summary = ["summary", "description", "excerpt"].map((k) => frontmatter[k]).find(Boolean);
-        setGenerateContext(
-          [`A cover image for the article "${title}".`, summary ? `What it's about: ${String(summary)}` : "", "Editorial, wide, no text in the image."]
-            .filter(Boolean)
-            .join("\n\n"),
-        );
-        setPanel("generate");
-      },
+      contextFor,
+      chooseFieldImage,
+      uploadedFieldImage,
+      insertAt,
+      openInsert: setInsertAt,
       startComment,
-      openGenerate: (pos) => openGenerate(pos),
-      openPanel: (p) => setPanel(p),
     }),
-    [editor, frontmatter, setField, startComment, openGenerate, title],
+    [editor, components, frontmatter, setField, contextFor, chooseFieldImage, uploadedFieldImage, insertAt, startComment],
   );
 
   const openCount = comments.filter((c) => !c.resolved).length + (draft ? 1 : 0);
-  const status = { saved: "Saved", dirty: "Editing", saving: "Saving…", error: "Not saved" }[save.kind];
-  const tabs: [Panel, string][] = [
-    ["comments", `Comments${openCount ? ` · ${openCount}` : ""}`],
-    ["library", "Library"],
-    ["generate", "✦ Generate"],
-    ["blocks", "Components"],
-  ];
+  const status = { saved: "Saved", dirty: "Unsaved", saving: "Saving…", error: "Not saved" }[save.kind];
 
   return (
     <SessionContext.Provider value={session}>
       <ServicesContext.Provider value={services}>
         <style>{EDITOR_CSS}</style>
-        <div className={`gx-session${panel ? " has-drawer" : ""}`}>{children}</div>
+        <div className={`gx-session${commentsOpen ? " has-drawer" : ""}`}>{children}</div>
 
         <div className="gx-bar" role="toolbar" aria-label="Edit mode">
           <a className="gx-bar-exit" href={listUrl} title="All posts">
@@ -478,19 +470,22 @@ export function EditSession({
             {status}
           </button>
           <span className="gx-bar-sep" />
-          {tabs.map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              className={`gx-bar-tab${panel === key ? " is-on" : ""}`}
-              onClick={() => {
-                if (key === "generate" && editor && panel !== "generate") openGenerate(blockEnd(editor));
-                else setPanel((p) => (p === key ? null : key));
-              }}
-            >
-              {label}
-            </button>
-          ))}
+          <button
+            type="button"
+            className="gx-bar-tab"
+            title="Add a block after the cursor (or type / on an empty line)"
+            onClick={() => {
+              if (!editor) return;
+              const pos = blockEnd(editor);
+              const coords = editor.view.coordsAtPos(Math.max(1, pos - 1));
+              setInsertAt({ pos, replace: false, left: coords.left, top: coords.bottom + 6 });
+            }}
+          >
+            + Add
+          </button>
+          <button type="button" className={`gx-bar-tab${commentsOpen ? " is-on" : ""}`} onClick={() => setCommentsOpen((o) => !o)}>
+            Comments{openCount ? ` · ${openCount}` : ""}
+          </button>
           <span className="gx-bar-sep" />
           <a className="gx-bar-done" href={viewUrl}>
             Done
@@ -508,61 +503,42 @@ export function EditSession({
           </div>
         ) : null}
 
-        {panel ? (
+        {commentsOpen ? (
           <aside className="gx-drawer" data-lenis-prevent>
             <header className="gx-drawer-head">
-              <nav className="gx-tabs">
-                {tabs.map(([key, label]) => (
-                  <button key={key} type="button" className={panel === key ? "is-on" : ""} onClick={() => setPanel(key)}>
-                    {label}
-                  </button>
-                ))}
-              </nav>
-              <button type="button" className="gx-drawer-close" onClick={() => setPanel(null)} aria-label="Close">
+              <b className="gx-drawer-title">Comments</b>
+              <button type="button" className="gx-drawer-close" onClick={() => setCommentsOpen(false)} aria-label="Close">
                 ×
               </button>
             </header>
-            {panel === "comments" ? (
-              <CommentsPanel
-                comments={comments}
-                draft={draft}
-                active={activeComment}
-                onFocus={focusComment}
-                onSubmitDraft={(body) => {
-                  if (!draft) return;
-                  persistComments([...comments, { ...draft, body }]);
-                  setDraft(null);
-                }}
-                onCancelDraft={() => {
-                  if (draft) unmarkComment(draft.id);
-                  setDraft(null);
-                }}
-                onReply={(id, body) =>
-                  persistComments(comments.map((c) => (c.id === id ? { ...c, replies: [...c.replies, { author, body, at: new Date().toISOString() }] } : c)))
-                }
-                onResolve={(id) => {
-                  unmarkComment(id);
-                  persistComments(comments.map((c) => (c.id === id ? { ...c, resolved: true } : c)));
-                }}
-                onReopen={(id) => {
-                  const c = comments.find((x) => x.id === id);
-                  const range = c && editor ? findAnchor(editor.state.doc, c) : null;
-                  if (range) markComment(id, range.from, range.to);
-                  persistComments(comments.map((x) => (x.id === id ? { ...x, resolved: false } : x)));
-                }}
-              />
-            ) : null}
-            {panel === "library" ? <LibraryPanel actions={actions} picking={target.kind !== "insert"} onUse={useAsset} /> : null}
-            {panel === "generate" ? (
-              <GeneratePanel
-                key={generateContext}
-                actions={actions}
-                context={generateContext || (editor ? contextAt(editor, null, title) : "")}
-                replacing={target.kind === "replace"}
-                onUse={useAsset}
-              />
-            ) : null}
-            {panel === "blocks" ? <BlocksPanel components={components} onInsert={insertComponent} /> : null}
+            <CommentsPanel
+              comments={comments}
+              draft={draft}
+              active={activeComment}
+              onFocus={focusComment}
+              onSubmitDraft={(body) => {
+                if (!draft) return;
+                persistComments([...comments, { ...draft, body }]);
+                setDraft(null);
+              }}
+              onCancelDraft={() => {
+                if (draft) unmarkComment(draft.id);
+                setDraft(null);
+              }}
+              onReply={(id, body) =>
+                persistComments(comments.map((c) => (c.id === id ? { ...c, replies: [...c.replies, { author, body, at: new Date().toISOString() }] } : c)))
+              }
+              onResolve={(id) => {
+                unmarkComment(id);
+                persistComments(comments.map((c) => (c.id === id ? { ...c, resolved: true } : c)));
+              }}
+              onReopen={(id) => {
+                const c = comments.find((x) => x.id === id);
+                const range = c && editor ? findAnchor(editor.state.doc, c) : null;
+                if (range) markComment(id, range.from, range.to);
+                persistComments(comments.map((x) => (x.id === id ? { ...x, resolved: false } : x)));
+              }}
+            />
           </aside>
         ) : null}
       </ServicesContext.Provider>
