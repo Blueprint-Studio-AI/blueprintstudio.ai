@@ -20,6 +20,7 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Footer } from "@/components/Footer/index";
 import type { BlogPost as BlogPostType } from "@/lib/blog";
+import { EditableImage, EditableText } from "@/components/galley-editor/editable";
 
 export type TocItem = { text: string; id: string };
 
@@ -130,10 +131,13 @@ export default function BlogPost({
   post,
   body,
   toc,
+  edit = false,
 }: {
   post: Omit<BlogPostType, "content">;
   body: ReactNode;
   toc: TocItem[];
+  /** Edit mode (/insights/<slug>/edit): the same page, with the title, summary and hero editable in place. */
+  edit?: boolean;
 }) {
 
   return (
@@ -180,25 +184,29 @@ export default function BlogPost({
               </div>
 
               <h1 className="font-medium text-black text-[clamp(32px,6vw,52px)] leading-[1.15] tracking-[-1.5px]">
-                {noWidow(post.title)}
+                {edit ? <EditableText field="title" placeholder="Title" /> : noWidow(post.title)}
               </h1>
 
               <p className="mt-4 text-neutral-500 text-base sm:text-lg leading-[1.5]">
-                {post.description}
+                {edit ? <EditableText field="description" placeholder="One or two sentences on what this is about" /> : post.description}
               </p>
             </header>
 
             {/* Hero image */}
-            {post.image && (
+            {(post.image || edit) && (
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 mb-12 sm:mb-16">
+                {edit ? (
+                  <EditableImage field="image" shape="src" label="hero image" />
+                ) : (
                 <Image
-                  src={post.image}
+                  src={post.image ?? ""}
                   alt={post.title}
                   fill
                   className="object-cover"
                   sizes="(max-width: 1000px) 100vw, 1000px"
                   priority
                 />
+                )}
               </div>
             )}
 
@@ -207,7 +215,7 @@ export default function BlogPost({
 
             {/* Article body + sticky TOC */}
             <div className="flex gap-12">
-              <article className="max-w-2xl flex-1 min-w-0 text-neutral-700 leading-[1.75] space-y-6">
+              <article className={`max-w-2xl flex-1 min-w-0 text-neutral-700 leading-[1.75] ${edit ? "" : "space-y-6"}`}>
                 {body}
               </article>
 

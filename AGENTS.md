@@ -24,7 +24,7 @@ and reason.
 | Components and front matter as JSON Schema, for agents and CI | `.galley/manifest.json` (generated) |
 | The Galley package the site installs | `vendor/blueprint-studio-galley-<version>.tgz` |
 | Every component with its examples | `/galley` on the running site |
-| A visual editor for posts (dev only) | `/galley/edit` |
+| Edit mode: the post page itself, editable in place (dev only for now) | `/insights/edit`, `/insights/<slug>/edit` (code in `components/galley-editor/`) |
 
 ### Commands
 
