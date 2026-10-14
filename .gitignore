@@ -43,3 +43,6 @@ aireadme.txt
 
 # brand-page download zips — generated from the loose files by scripts/build-zips.mjs
 public/**/*.zip
+
+# Galley preview screenshots
+/.galley/preview-*

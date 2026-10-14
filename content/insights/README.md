@@ -12,8 +12,11 @@ pnpm galley preview <slug>  # a screenshot of the post (needs `pnpm dev` running
 ```
 
 Agents: `.mcp.json` starts `galley mcp`, with tools to list, read, edit, check and preview
-posts and import images. `/galley` on the running site shows every component.
+posts and import images. `/galley` on the running site shows every component. The full
+guide, including how to add a component, is in `AGENTS.md` at the repo root.
 
 Front matter (`lib/blog-frontmatter.ts`): `title`, `description`, `date` (YYYY-MM-DD),
 optional `image` (16:9 hero) and `ogImage` (1200×630, falls back to the hero), `author`.
-Images live in `public/insights/`.
+New images go in `public/insights/media/` as WebP; older posts keep theirs in
+`public/insights/<slug>/`. After changing a component or the front matter, run
+`pnpm galley manifest` and commit `.galley/manifest.json`.
