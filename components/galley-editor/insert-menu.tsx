@@ -151,6 +151,7 @@ export function InsertMenu({
         ))}
         {!items.length ? <p className="gx-empty">Nothing called that. Try image, quote or heading.</p> : null}
       </div>
+      <div className="gx-insert-foot">↑↓ to choose · ↵ to add · esc to close</div>
     </div>
   );
 }

@@ -7,9 +7,10 @@ import { anchorOf, findAnchor } from "./anchors";
 import type { Uploaded } from "./chooser";
 import { extensions } from "./extensions";
 import { CommentsPanel } from "./panels";
+import { Field } from "./props-form";
 import { ServicesContext, type Services } from "./services";
 import { EDITOR_CSS } from "./styles";
-import type { Comment, DocNode, EditorActions, EditorPost, LibraryAsset, ManifestComponent, SaveResult } from "./types";
+import type { Comment, DocNode, EditorActions, EditorPost, JsonSchema, LibraryAsset, ManifestComponent, SaveResult } from "./types";
 
 // Edit mode for a post, on the site's own page. The site renders its normal post layout
 // and puts editable pieces where the title, cover and body go (editable.tsx). This holds
@@ -109,6 +110,8 @@ export function EditSession({
   author,
   viewUrl,
   listUrl,
+  frontmatterSchema,
+  inlineFields = ["title"],
   children,
 }: {
   post: EditorPost;
@@ -118,6 +121,10 @@ export function EditSession({
   author: string;
   viewUrl: string;
   listUrl: string;
+  /** The front matter's JSON Schema (from the site's manifest), for the Details panel. */
+  frontmatterSchema?: JsonSchema;
+  /** Front matter fields edited on the page itself, left out of Details. */
+  inlineFields?: string[];
   children: React.ReactNode;
 }) {
   const [frontmatter, setFrontmatter] = useState(post.frontmatter);
@@ -125,7 +132,10 @@ export function EditSession({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [draft, setDraft] = useState<Comment | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [drawer, setDrawer] = useState<"comments" | "details" | null>(null);
+  const commentsOpen = drawer === "comments";
+  const setCommentsOpen = (open: boolean | ((o: boolean) => boolean)) =>
+    setDrawer((d) => ((typeof open === "function" ? open(d === "comments") : open) ? "comments" : d === "comments" ? null : d));
   const [insertAt, setInsertAt] = useState<InsertAt | null>(null);
 
   const revision = useRef(post.revision);
@@ -452,20 +462,19 @@ export function EditSession({
   );
 
   const openCount = comments.filter((c) => !c.resolved).length + (draft ? 1 : 0);
-  const status = { saved: "Saved", dirty: "Unsaved", saving: "Saving…", error: "Not saved" }[save.kind];
+  const status = { saved: "Saved", dirty: "Saving…", saving: "Saving…", error: "Not saved" }[save.kind];
 
   return (
     <SessionContext.Provider value={session}>
       <ServicesContext.Provider value={services}>
         <style>{EDITOR_CSS}</style>
-        <div className={`gx-session${commentsOpen ? " has-drawer" : ""}`}>{children}</div>
+        <div className={`gx-session${drawer ? " has-drawer" : ""}`}>{children}</div>
 
         <div className="gx-bar" role="toolbar" aria-label="Edit mode">
-          <a className="gx-bar-exit" href={listUrl} title="All posts">
+          <a className="gx-bar-exit" href={listUrl} title="All posts" aria-label="All posts">
             ←
           </a>
-          <span className="gx-bar-mode">Editing</span>
-          <button type="button" className={`gx-bar-status is-${save.kind}`} onClick={() => void saveNow()} title="Save now (⌘S)">
+          <button type="button" className={`gx-bar-status is-${save.kind}`} onClick={() => void saveNow()} title="Changes save as you type. Click to save now (⌘S).">
             <i />
             {status}
           </button>
@@ -473,7 +482,7 @@ export function EditSession({
           <button
             type="button"
             className="gx-bar-tab"
-            title="Add a block after the cursor (or type / on an empty line)"
+            title="Add a block after the cursor. Or type / on an empty line."
             onClick={() => {
               if (!editor) return;
               const pos = blockEnd(editor);
@@ -481,13 +490,21 @@ export function EditSession({
               setInsertAt({ pos, replace: false, left: coords.left, top: coords.bottom + 6 });
             }}
           >
-            + Add
+            <span className="gx-long">+ Add</span>
+            <span className="gx-short">+</span>
           </button>
+          {frontmatterSchema ? (
+            <button type="button" className={`gx-bar-tab${drawer === "details" ? " is-on" : ""}`} onClick={() => setDrawer((d) => (d === "details" ? null : "details"))}>
+              <span className="gx-long">Details</span>
+              <span className="gx-short">⚙</span>
+            </button>
+          ) : null}
           <button type="button" className={`gx-bar-tab${commentsOpen ? " is-on" : ""}`} onClick={() => setCommentsOpen((o) => !o)}>
-            Comments{openCount ? ` · ${openCount}` : ""}
+            <span className="gx-long">Comments{openCount ? ` · ${openCount}` : ""}</span>
+            <span className="gx-short">💬{openCount ? ` ${openCount}` : ""}</span>
           </button>
           <span className="gx-bar-sep" />
-          <a className="gx-bar-done" href={viewUrl}>
+          <a className="gx-bar-done" href={viewUrl} title="See the post">
             Done
           </a>
         </div>
@@ -501,6 +518,49 @@ export function EditSession({
               </div>
             ))}
           </div>
+        ) : null}
+
+        {drawer === "details" && frontmatterSchema ? (
+          <aside className="gx-drawer" data-lenis-prevent>
+            <header className="gx-drawer-head">
+              <b className="gx-drawer-title">Details</b>
+              <button type="button" className="gx-drawer-close" onClick={() => setDrawer(null)} aria-label="Close">
+                ×
+              </button>
+            </header>
+            <div className="gx-details" onKeyDown={(e) => e.stopPropagation()}>
+              <p className="gx-panel-help">Everything about the post that isn&apos;t on the page. Changes save as you go.</p>
+              {(() => {
+                const entries = Object.entries(frontmatterSchema.properties ?? {}).filter(([name]) => !inlineFields.includes(name));
+                const nested = (schema: JsonSchema) => {
+                  const s = schema.anyOf?.find((x) => x.type !== "null") ?? schema;
+                  return s.type === "object" || (s.type === "array" && !(s.items?.enum || s.items?.anyOf?.some((x) => x.enum)));
+                };
+                const field = ([name, schema]: [string, JsonSchema]) => (
+                  <Field
+                    key={name}
+                    name={name}
+                    schema={schema}
+                    value={frontmatter[name]}
+                    required={(frontmatterSchema.required ?? []).includes(name)}
+                    onChange={(value) => setField(name, value)}
+                  />
+                );
+                const advanced = entries.filter(([, schema]) => nested(schema));
+                return (
+                  <>
+                    {entries.filter(([, schema]) => !nested(schema)).map(field)}
+                    {advanced.length ? (
+                      <details className="gx-advanced">
+                        <summary>Advanced</summary>
+                        {advanced.map(field)}
+                      </details>
+                    ) : null}
+                  </>
+                );
+              })()}
+            </div>
+          </aside>
         ) : null}
 
         {commentsOpen ? (

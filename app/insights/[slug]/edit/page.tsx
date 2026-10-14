@@ -9,7 +9,7 @@ import { outline } from "@blueprint-studio/galley/render";
 import BlogPost from "@/components/Blog/BlogPost";
 import { EditableBody } from "@/components/galley-editor/editable";
 import { EditSession } from "@/components/galley-editor/session";
-import type { ManifestComponent } from "@/components/galley-editor/types";
+import type { JsonSchema, ManifestComponent } from "@/components/galley-editor/types";
 import galley from "@/galley.config";
 import { getPostBySlug } from "@/lib/blog";
 import {
@@ -42,6 +42,7 @@ function whoAmI() {
 export default async function EditInsight({ params }: { params: Promise<{ slug: string }> }) {
   if (!editorEnabled()) notFound();
   const { slug } = await params;
+  const manifest = buildManifest(galley);
   const cwd = process.cwd();
   const post = getPostBySlug(slug);
   const editing = await openPost(new FsPostStore(path.join(cwd, galley.postsDir)), slug, galley);
@@ -51,7 +52,9 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
     <EditSession
       post={editing}
       initialComments={await readComments(cwd, slug)}
-      components={JSON.parse(JSON.stringify(buildManifest(galley).components)) as ManifestComponent[]}
+      components={JSON.parse(JSON.stringify(manifest.components)) as ManifestComponent[]}
+      frontmatterSchema={JSON.parse(JSON.stringify(manifest.frontmatter)) as JsonSchema}
+      inlineFields={["title", "description", "image"]}
       author={whoAmI()}
       viewUrl={`/insights/${slug}`}
       listUrl="/insights/edit"

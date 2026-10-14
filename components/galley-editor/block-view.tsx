@@ -36,8 +36,11 @@ function usePreview(attrs: BlockAttrs, skip: boolean) {
 
 export type Motion = { name: string; props: Record<string, unknown>; group: string } | null;
 
-/** The animation setting for a block: none, or one of the site's motion components. */
-export function MotionSelect({
+/**
+ * The animation setting for a block. With one motion component it's an on/off button
+ * ("✦ Reveal"); with several, a short list. Nothing shows if the site has none.
+ */
+export function MotionToggle({
   motion,
   options,
   onChange,
@@ -46,23 +49,45 @@ export function MotionSelect({
   options: ManifestComponent[];
   onChange(motion: Motion): void;
 }) {
+  const [open, setOpen] = useState(false);
   if (!options.length) return null;
+  const set = (name: string | null) => {
+    onChange(name ? { name, props: {}, group: crypto.randomUUID() } : null);
+    setOpen(false);
+  };
+  if (options.length === 1) {
+    const name = options[0].name;
+    return (
+      <button type="button" className={motion?.name === name ? "is-on" : ""} title={`Animate in as the reader scrolls (${name})`} onClick={() => set(motion?.name === name ? null : name)}>
+        ✦ {name}
+      </button>
+    );
+  }
   return (
-    <select
-      className="gx-motion-select"
-      value={motion?.name ?? ""}
-      title="Animation"
-      onChange={(e) => onChange(e.target.value ? { name: e.target.value, props: {}, group: crypto.randomUUID() } : null)}
-    >
-      <option value="">No animation</option>
-      {options.map((c) => (
-        <option key={c.name} value={c.name}>
-          ✦ {c.name}
-        </option>
-      ))}
-    </select>
+    <span style={{ position: "relative" }}>
+      <button type="button" className={motion ? "is-on" : ""} onClick={() => setOpen((o) => !o)}>
+        ✦ {motion?.name ?? "Animate"}
+      </button>
+      {open ? (
+        <span className="gx-motion-pop gx-menu-list">
+          <button type="button" className={!motion ? "is-on" : ""} onClick={() => set(null)}>
+            No animation
+          </button>
+          {options.map((c) => (
+            <button key={c.name} type="button" className={motion?.name === c.name ? "is-on" : ""} onClick={() => set(c.name)}>
+              {c.name}
+            </button>
+          ))}
+        </span>
+      ) : null}
+    </span>
   );
 }
+
+/** A component's name as people read it: "LinkCard" → "Link card"; "YouTube" stays. */
+export const nameOf = (name: string) =>
+  ({ YouTube: "YouTube", LinkCard: "Link card", Tweet: "Post from X", CountUp: "Count up" })[name] ??
+  name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/ (\w)/g, (_, c: string) => ` ${c.toLowerCase()}`);
 
 export function BlockView({ node, updateAttributes, deleteNode, selected, getPos }: ReactNodeViewProps) {
   const services = useServices();
@@ -99,34 +124,34 @@ export function BlockView({ node, updateAttributes, deleteNode, selected, getPos
   );
 
   return (
-    <NodeViewWrapper className={`gx-block${selected ? " is-selected" : ""}${editing || choosing ? " is-editing" : ""}`}>
-      <div className="gx-block-bar" contentEditable={false} data-drag-handle>
-        <span className="gx-block-name">
-          {attrs.name}
-          {motion?.name ? <span className="gx-motion-chip">✦ {motion.name}</span> : null}
-        </span>
-        <span className="gx-block-tools">
+    <NodeViewWrapper
+      className={`gx-block${selected ? " is-selected" : ""}${editing || choosing ? " is-editing" : ""}${isPicker && !src ? " is-choosing" : ""}`}
+      data-motion={motion?.name}
+    >
+      <div className="gx-block-dock" contentEditable={false}>
+        <div className="gx-block-bar" contentEditable={false}>
+          <span className="gx-block-name" data-drag-handle title="Drag to move">
+            {nameOf(attrs.name)}
+          </span>
           {isPicker ? (
-            src ? (
-              <>
-                <button type="button" onClick={() => setChoosing((c) => !c)}>
-                  {choosing ? "Close" : "Change image"}
-                </button>
-                <button type="button" onClick={() => setEditing((e) => !e)}>
-                  Caption & alt
-                </button>
-              </>
-            ) : null
+            <>
+              <button type="button" className={choosing ? "is-on" : ""} onClick={() => setChoosing((c) => !c)}>
+                Replace
+              </button>
+              <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
+                Alt & caption
+              </button>
+            </>
           ) : (
-            <button type="button" onClick={() => setEditing((e) => !e)}>
-              {editing ? "Close" : "Edit"}
+            <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
+              Edit
             </button>
           )}
-          <MotionSelect motion={motion} options={motions} onChange={(m) => updateAttributes({ motion: m })} />
-          <button type="button" className="gx-danger" onClick={() => deleteNode()}>
+          <MotionToggle motion={motion} options={motions} onChange={(m) => updateAttributes({ motion: m })} />
+          <button type="button" className="gx-danger" title="Remove" onClick={() => deleteNode()}>
             Remove
           </button>
-        </span>
+        </div>
       </div>
 
       {isPicker && !src ? (
@@ -183,8 +208,8 @@ export function InlineView({ node, updateAttributes, selected }: ReactNodeViewPr
   const props = attrs.props ?? {};
   const label =
     component?.motion === "number"
-      ? `↑ ${String(props.prefix ?? "")}${formatNumber(props.to)}${String(props.suffix ?? "")}`
-      : `${attrs.name} ${Object.values(props)
+      ? `${String(props.prefix ?? "")}${formatNumber(props.to)}${String(props.suffix ?? "")}`
+      : `${nameOf(attrs.name)} ${Object.values(props)
           .map((v) => (typeof v === "string" ? v : JSON.stringify(v)))
           .join(" · ")}`;
   return (
@@ -193,7 +218,7 @@ export function InlineView({ node, updateAttributes, selected }: ReactNodeViewPr
         type="button"
         className={`gx-inline-chip${component?.motion ? " is-motion" : ""}`}
         contentEditable={false}
-        title={component?.motion === "number" ? `${attrs.name}: counts up when it scrolls into view` : attrs.name}
+        title={component?.motion === "number" ? "Counts up from zero as the reader scrolls to it. Click to change." : nameOf(attrs.name)}
         onClick={() => setEditing((e) => !e)}
       >
         {label}
@@ -221,16 +246,18 @@ export function RawView({ node, updateAttributes, selected, deleteNode }: ReactN
   const [text, setText] = useState(String(node.attrs.mdx ?? ""));
   return (
     <NodeViewWrapper className={`gx-block gx-raw${selected ? " is-selected" : ""}`}>
-      <div className="gx-block-bar" contentEditable={false} data-drag-handle>
-        <span className="gx-block-name">MDX</span>
-        <span className="gx-block-tools">
-          <button type="button" onClick={() => setEditing((e) => !e)}>
-            {editing ? "Close" : "Edit"}
+      <div className="gx-block-dock" contentEditable={false}>
+        <div className="gx-block-bar" contentEditable={false}>
+          <span className="gx-block-name" data-drag-handle title="Drag to move">
+            MDX
+          </span>
+          <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
+            Edit source
           </button>
           <button type="button" className="gx-danger" onClick={() => deleteNode()}>
             Remove
           </button>
-        </span>
+        </div>
       </div>
       {editing ? (
         <div contentEditable={false} className="gx-form">

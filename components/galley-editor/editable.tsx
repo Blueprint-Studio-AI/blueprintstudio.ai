@@ -6,7 +6,7 @@ import { EditorContent, useEditorState, type Editor as TiptapEditor } from "@tip
 import { BubbleMenu } from "@tiptap/react/menus";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { MotionSelect, type Motion } from "./block-view";
+import type { Motion } from "./block-view";
 import { ImageChooser } from "./chooser";
 import { InsertMenu } from "./insert-menu";
 import { useServices } from "./services";
@@ -192,27 +192,40 @@ function BlockMenu({
     onClose();
   };
 
+  const current = (node.attrs.motion as Motion) ?? null;
   return (
-    <div className="gx-menu" ref={ref} style={{ left: at.left, top: Math.min(at.top, window.innerHeight - 320) }}>
+    <div className="gx-menu" ref={ref} style={{ left: at.left, top: Math.min(at.top, window.innerHeight - 360) }}>
       {textual ? (
         <>
           <p className="gx-insert-group">Turn into</p>
-          <div className="gx-menu-row">
-            <button type="button" onClick={() => turnInto("p")}>Text</button>
-            <button type="button" onClick={() => turnInto("h2")}>Heading</button>
-            <button type="button" onClick={() => turnInto("h3")}>Subheading</button>
-            <button type="button" onClick={() => turnInto("quote")}>Quote</button>
+          <div className="gx-menu-list">
+            <button type="button" className={node.type.name === "paragraph" ? "is-on" : ""} onClick={() => turnInto("p")}>Text</button>
+            <button type="button" className={node.type.name === "heading" && node.attrs.level === 2 ? "is-on" : ""} onClick={() => turnInto("h2")}>Heading</button>
+            <button type="button" className={node.type.name === "heading" && node.attrs.level === 3 ? "is-on" : ""} onClick={() => turnInto("h3")}>Subheading</button>
+            <button type="button" className={node.type.name === "blockquote" ? "is-on" : ""} onClick={() => turnInto("quote")}>Quote</button>
           </div>
         </>
       ) : null}
       {motions.length ? (
         <>
           <p className="gx-insert-group">Animation</p>
-          <MotionSelect motion={(node.attrs.motion as Motion) ?? null} options={motions} onChange={setMotion} />
+          <div className="gx-menu-list">
+            <button type="button" className={!current ? "is-on" : ""} onClick={() => setMotion(null)}>None</button>
+            {motions.map((c) => (
+              <button
+                key={c.name}
+                type="button"
+                className={current?.name === c.name ? "is-on" : ""}
+                onClick={() => setMotion({ name: c.name, props: {}, group: crypto.randomUUID() })}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
         </>
       ) : null}
       <p className="gx-insert-group">Block</p>
-      <div className="gx-menu-row">
+      <div className="gx-menu-list">
         <button
           type="button"
           onClick={() => {
