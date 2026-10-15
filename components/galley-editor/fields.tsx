@@ -156,6 +156,10 @@ export function TermPicker({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => void pick(row)}
             >
+              {row.term.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="gx-picker-thumb" src={row.term.image} alt="" loading="lazy" />
+              ) : null}
               <b>{row.term.name}</b>
               {row.term.description ? <span>{row.term.description}</span> : null}
             </button>
@@ -173,13 +177,28 @@ export function TermPicker({
 }
 
 /** A single choice from the vocabulary, shown as its name; click to change. */
-function TermSelect({ terms, value, onChange, onAdd, required }: { terms: Term[]; value: unknown; onChange(v: unknown): void; onAdd?: (name: string) => Promise<Term | { error: string }>; required: boolean }) {
+function TermSelect({
+  terms,
+  value,
+  onChange,
+  onAdd,
+  required,
+  empty = "Choose…",
+}: {
+  terms: Term[];
+  value: unknown;
+  onChange(v: unknown): void;
+  onAdd?: (name: string) => Promise<Term | { error: string }>;
+  required: boolean;
+  /** What an empty choice reads as. */
+  empty?: string;
+}) {
   const [open, setOpen] = useState(false);
   const current = terms.find((t) => t.slug === value);
   return (
     <div className="gx-termselect">
       <button type="button" className="gx-termselect-value" onClick={() => setOpen((o) => !o)}>
-        {current?.name ?? (value ? String(value) : "Choose…")}
+        {current?.name ?? (value ? String(value) : empty)}
         <span aria-hidden>▾</span>
       </button>
       {open ? (
@@ -210,19 +229,45 @@ function TermSelect({ terms, value, onChange, onAdd, required }: { terms: Term[]
   );
 }
 
-/** Several choices from the vocabulary, as chips; add from the picker. */
-function TermChips({ terms, value, onChange, onAdd }: { terms: Term[]; value: unknown; onChange(v: unknown): void; onAdd?: (name: string) => Promise<Term | { error: string }> }) {
+/** Several choices from the vocabulary, as chips (or rows, for posts); add from the picker. */
+function TermChips({
+  terms,
+  value,
+  onChange,
+  onAdd,
+  max,
+}: {
+  terms: Term[];
+  value: unknown;
+  onChange(v: unknown): void;
+  onAdd?: (name: string) => Promise<Term | { error: string }>;
+  max?: number;
+}) {
   const [open, setOpen] = useState(false);
   const chosen = Array.isArray(value) ? (value as string[]) : [];
+  const full = max !== undefined && chosen.length >= max;
+  const rows = terms.some((t) => t.image);
   return (
-    <div className="gx-chips">
-      {chosen.map((slug) => (
-        <button key={slug} type="button" className="is-on" title="Remove" onClick={() => onChange(chosen.filter((s) => s !== slug))}>
-          {terms.find((t) => t.slug === slug)?.name ?? slug} ×
-        </button>
-      ))}
-      <span className="gx-termselect">
-        <button type="button" onClick={() => setOpen((o) => !o)}>
+    <div className={rows ? "gx-term-rows" : "gx-chips"}>
+      {chosen.map((slug) => {
+        const term = terms.find((t) => t.slug === slug);
+        return rows ? (
+          <span key={slug} className="gx-term-row">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {term?.image ? <img src={term.image} alt="" /> : <i />}
+            <b>{term?.name ?? slug}</b>
+            <button type="button" title="Remove" onClick={() => onChange(chosen.filter((s) => s !== slug))}>
+              ×
+            </button>
+          </span>
+        ) : (
+          <button key={slug} type="button" className="is-on" title="Remove" onClick={() => onChange(chosen.filter((s) => s !== slug))}>
+            {term?.name ?? slug} ×
+          </button>
+        );
+      })}
+      <span className="gx-termselect" hidden={full}>
+        <button type="button" className={rows ? "gx-button" : ""} onClick={() => setOpen((o) => !o)}>
           + Add
         </button>
         {open ? (
@@ -260,7 +305,9 @@ export function Field({
   const schema = plain(raw);
   const id = `gx-${component ?? "post"}-${path.replace(/\W/g, "-")}`;
   const items = schema.items ? plain(schema.items) : undefined;
-  const vocab = context.vocabulary?.[path];
+  // Vocabulary by the field's place in the post ("series.slug"), or named by its schema ("posts").
+  const named = schema.vocabulary ?? items?.vocabulary;
+  const vocab = context.vocabulary?.[path] ?? (named ? context.vocabulary?.[named] : undefined);
   const onAdd =
     vocab && context.addTerm
       ? async (termName: string) => {
@@ -273,9 +320,21 @@ export function Field({
   let input: React.ReactNode;
 
   if (vocab && schema.type === "array") {
-    input = <TermChips terms={vocab.terms} value={value} onChange={onChange} onAdd={onAdd} />;
+    input = <TermChips terms={vocab.terms} value={value} onChange={onChange} onAdd={onAdd} max={schema.maxItems} />;
   } else if (vocab) {
-    input = <TermSelect terms={vocab.terms} value={value} onChange={onChange} onAdd={onAdd} required={required} />;
+    // An empty default means the site picks (e.g. the newest post), so empty reads "Automatic".
+    input = <TermSelect terms={vocab.terms} value={value} onChange={onChange} onAdd={onAdd} required={required} empty={schema.default === "" ? "Automatic" : undefined} />;
+  } else if (schema.enum && schema.enum.length <= 4) {
+    // A few choices read best side by side.
+    input = (
+      <div className="gx-segmented" id={id} role="radiogroup">
+        {schema.enum.map((option) => (
+          <button key={String(option)} type="button" role="radio" aria-checked={value === option} className={value === option ? "is-on" : ""} onClick={() => onChange(option)}>
+            {labelOf(String(option))}
+          </button>
+        ))}
+      </div>
+    );
   } else if (schema.enum) {
     input = (
       <select id={id} value={value === undefined || value === null ? "" : String(value)} onChange={(e) => onChange(e.target.value || undefined)}>
@@ -304,10 +363,23 @@ export function Field({
     );
   } else if (schema.type === "boolean") {
     input = (
-      <label className="gx-switch">
-        <input id={id} type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />
-        <span>{value ? "Yes" : "No"}</span>
-      </label>
+      <button id={id} type="button" role="switch" aria-checked={Boolean(value)} className={`gx-toggle${value ? " is-on" : ""}`} onClick={() => onChange(!value)}>
+        <i />
+      </button>
+    );
+  } else if (schema.type === "integer" && schema.minimum !== undefined && schema.maximum !== undefined && schema.maximum - schema.minimum <= 30) {
+    // A small whole number: a stepper.
+    const n = typeof value === "number" ? value : Number(schema.default ?? schema.minimum);
+    input = (
+      <div className="gx-stepper" id={id}>
+        <button type="button" aria-label="Fewer" disabled={n <= schema.minimum} onClick={() => onChange(Math.max(schema.minimum!, n - 1))}>
+          −
+        </button>
+        <b>{n}</b>
+        <button type="button" aria-label="More" disabled={n >= schema.maximum} onClick={() => onChange(Math.min(schema.maximum!, n + 1))}>
+          +
+        </button>
+      </div>
     );
   } else if (schema.type === "integer" || schema.type === "number") {
     input = (
@@ -441,11 +513,22 @@ export function Field({
   }
 
   const nested = schema.type === "object" || (schema.type === "array" && items?.type === "object");
+  const label = schema.title ?? labelOf(name, component);
+  if (schema.type === "boolean") {
+    // A switch sits beside its label.
+    return (
+      <div className="gx-field gx-field-switch">
+        <label htmlFor={id}>{label}</label>
+        {input}
+        {schema.description ? <span className="gx-hint">{schema.description}</span> : null}
+      </div>
+    );
+  }
   return (
     <div className={`gx-field${nested ? " gx-field-group" : ""}`}>
       <label htmlFor={id}>
-        {schema.title ?? labelOf(name, component)}
-        {required || schema.type === "boolean" ? "" : <span className="gx-optional"> optional</span>}
+        {label}
+        {required || schema.default !== undefined ? "" : <span className="gx-optional"> optional</span>}
       </label>
       {input}
       {schema.description && !nested ? <span className="gx-hint">{schema.description}</span> : null}

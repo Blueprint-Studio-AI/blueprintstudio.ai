@@ -13,6 +13,11 @@ type JsonSchema = {
   items?: JsonSchema;
   anyOf?: JsonSchema[];
   format?: string;
+  minimum?: number;
+  maximum?: number;
+  maxItems?: number;
+  /** The site vocabulary a value comes from ("posts", "topics"…), set with zod's .meta(). */
+  vocabulary?: string;
 };
 export type { JsonSchema };
 
@@ -33,7 +38,7 @@ export interface ManifestComponent {
 }
 
 /** A term from the site's vocabulary: a category, type, topic or series. */
-export type Term = { slug: string; name: string; description?: string };
+export type Term = { slug: string; name: string; description?: string; /** A thumbnail, for posts. */ image?: string };
 /** Vocabulary by front matter path ("category", "topics", "series.slug"), with the kind to add new terms to. */
 export type Vocabulary = Record<string, { kind: string; terms: Term[] }>;
 
