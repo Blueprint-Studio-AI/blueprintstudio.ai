@@ -4,6 +4,7 @@ export type { Comment, DocNode, EditorPost, GenerationJob, LibraryAsset, Library
 
 type JsonSchema = {
   type?: string;
+  default?: unknown;
   enum?: unknown[];
   description?: string;
   properties?: Record<string, JsonSchema>;
@@ -30,6 +31,11 @@ export interface ManifestComponent {
   examples?: { title?: string; props: Record<string, unknown>; children?: string }[];
 }
 
+/** A term from the site's vocabulary: a category, type, topic or series. */
+export type Term = { slug: string; name: string; description?: string };
+/** Vocabulary by front matter path ("category", "topics", "series.slug"), with the kind to add new terms to. */
+export type Vocabulary = Record<string, { kind: string; terms: Term[] }>;
+
 export interface BlockAttrs {
   name: string;
   props: Record<string, unknown>;
@@ -50,6 +56,8 @@ export interface EditorActions {
   generate(input: { prompt: string; styleId?: string; aspectRatio?: string }): Promise<{ jobId?: string; error?: string }>;
   job(jobId: string): Promise<GenerationJob | { status: "failed"; error: string }>;
   importAsset(input: { url: string; name?: string }): Promise<{ path?: string; width?: number; height?: number; error?: string }>;
+  /** Add a term to the site's vocabulary (sites that have one). */
+  addTerm?(kind: string, name: string): Promise<Term | { error: string }>;
   /** A file from the person's computer, as FormData with "file". */
   upload(form: FormData): Promise<{ path?: string; width?: number; height?: number; error?: string }>;
 }

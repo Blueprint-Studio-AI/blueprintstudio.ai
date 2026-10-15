@@ -43,6 +43,8 @@ const componentAttributes = () => ({
   isNew: hidden(),
   /** Marks an image still being copied into the site; never saved. */
   pending: hidden(),
+  /** Which panel the block shows (edit, replace, options); never saved. */
+  ui: hidden(),
 });
 
 /** A site component on its own line: rendered for real, edited with a form. */
@@ -77,7 +79,7 @@ export const RawBlock = Node.create({
   group: "block",
   atom: true,
   draggable: true,
-  addAttributes: () => ({ mdx: hidden("") }),
+  addAttributes: () => ({ mdx: hidden(""), ui: hidden() }),
   parseHTML: () => [{ tag: "galley-raw" }],
   renderHTML: ({ HTMLAttributes }) => ["galley-raw", mergeAttributes(HTMLAttributes)],
   addNodeView: () => ReactNodeViewRenderer(RawView),

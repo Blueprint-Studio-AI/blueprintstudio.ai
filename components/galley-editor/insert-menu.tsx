@@ -75,7 +75,7 @@ export function InsertMenu({
           const fresh = c.picker === "image";
           block(e, where, {
             type: "galleyBlock",
-            attrs: { name: c.name, props: fresh ? {} : (example?.props ?? {}), body: fresh ? null : (example?.children ?? null), isNew: true },
+            attrs: { name: c.name, props: fresh ? {} : (example?.props ?? {}), body: fresh ? null : (example?.children ?? null), ui: fresh ? null : "edit" },
           });
         },
       }));

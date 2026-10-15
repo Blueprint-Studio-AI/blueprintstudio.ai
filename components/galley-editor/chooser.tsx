@@ -17,6 +17,7 @@ export function ImageChooser({
   onPick,
   onUploaded,
   onClose,
+  onGenerate,
   title = "Choose an image",
 }: {
   actions: EditorActions;
@@ -25,6 +26,8 @@ export function ImageChooser({
   onPick(asset: LibraryAsset): Promise<void> | void;
   onUploaded(file: Uploaded): void;
   onClose?: () => void;
+  /** Make new options in place instead (an image block shows them as a strip under it). */
+  onGenerate?: () => void;
   title?: string;
 }) {
   const [tab, setTab] = useState<Tab>("library");
@@ -48,7 +51,7 @@ export function ImageChooser({
               ["upload", "Upload"],
             ] as [Tab, string][]
           ).map(([key, label]) => (
-            <button key={key} type="button" className={tab === key ? "is-on" : ""} onClick={() => setTab(key)}>
+            <button key={key} type="button" className={tab === key ? "is-on" : ""} onClick={() => (key === "generate" && onGenerate ? onGenerate() : setTab(key))}>
               {label}
               {key === "generate" && tiles.length ? ` · ${tiles.length}` : ""}
             </button>

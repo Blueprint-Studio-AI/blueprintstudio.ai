@@ -7,10 +7,10 @@ import { anchorOf, findAnchor } from "./anchors";
 import type { Uploaded } from "./chooser";
 import { extensions } from "./extensions";
 import { CommentsPanel } from "./panels";
-import { Field } from "./props-form";
+import { Field, type FieldContext } from "./fields";
 import { ServicesContext, type Services } from "./services";
 import { EDITOR_CSS } from "./styles";
-import type { Comment, DocNode, EditorActions, EditorPost, JsonSchema, LibraryAsset, ManifestComponent, SaveResult } from "./types";
+import type { Comment, DocNode, EditorActions, EditorPost, JsonSchema, LibraryAsset, ManifestComponent, SaveResult, Term, Vocabulary } from "./types";
 
 // Edit mode for a post, on the site's own page. The site renders its normal post layout
 // and puts editable pieces where the title, cover and body go (editable.tsx). This holds
@@ -39,6 +39,9 @@ export interface EditSession {
   insertAt: InsertAt | null;
   openInsert(at: InsertAt | null): void;
   startComment(): void;
+  /** The site's vocabulary (categories, topics…), for picking terms on the page. */
+  vocabulary: Vocabulary;
+  addTerm?(kind: string, name: string): Promise<Term | { error: string }>;
 }
 
 const SessionContext = createContext<EditSession | null>(null);
@@ -62,10 +65,11 @@ function cleanDoc(node: DocNode, pickers: Set<string>): DocNode {
     if (marks.length) out.marks = marks;
     else delete out.marks;
   }
-  if (node.attrs && ("isNew" in node.attrs || "pending" in node.attrs)) {
+  if (node.attrs && ("isNew" in node.attrs || "pending" in node.attrs || "ui" in node.attrs)) {
     const attrs = { ...node.attrs };
     delete attrs.isNew;
     delete attrs.pending;
+    delete attrs.ui;
     out.attrs = attrs;
   }
   if (node.content) {
@@ -99,6 +103,22 @@ const altFromFile = (name = "") => {
   return words ? words[0].toUpperCase() + words.slice(1) : "";
 };
 
+/** The rail's icons, drawn inline so the editor brings no icon set with it. */
+function Icon({ name }: { name: "back" | "plus" | "details" | "comment" | "check" }) {
+  const paths = {
+    back: "M15 18l-6-6 6-6",
+    plus: "M12 5v14M5 12h14",
+    details: "M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6",
+    comment: "M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z",
+    check: "M5 12.5l4.5 4.5L19 7.5",
+  };
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={paths[name]} />
+    </svg>
+  );
+}
+
 const imageValue = (shape: ImageShape, src: string, alt: string, width?: number, height?: number) =>
   shape === "src" ? src : { src, alt, width, height };
 
@@ -112,6 +132,8 @@ export function EditSession({
   listUrl,
   frontmatterSchema,
   inlineFields = ["title"],
+  vocabulary = {},
+  placeholders = {},
   children,
 }: {
   post: EditorPost;
@@ -125,6 +147,10 @@ export function EditSession({
   frontmatterSchema?: JsonSchema;
   /** Front matter fields edited on the page itself, left out of Details. */
   inlineFields?: string[];
+  /** Choices from the site's vocabulary, by front matter path ("category", "series.slug"). */
+  vocabulary?: Vocabulary;
+  /** What an empty field falls back to, e.g. the summary's first paragraph. */
+  placeholders?: Record<string, string>;
   children: React.ReactNode;
 }) {
   const [frontmatter, setFrontmatter] = useState(post.frontmatter);
@@ -371,6 +397,7 @@ export function EditSession({
           props: { ...props, src: asset.thumbnail || asset.url, alt, width: asset.width, height: asset.height },
           pending,
           isNew: null,
+          ui: null,
         }),
       );
       const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
@@ -407,6 +434,7 @@ export function EditSession({
           ...node.attrs,
           props: { ...props, src: file.path, alt: (props.alt as string) || altFromFile(file.name), width: file.width, height: file.height },
           isNew: null,
+          ui: null,
         }),
       );
     },
@@ -433,9 +461,22 @@ export function EditSession({
     [setField],
   );
 
+  // Which panel a block shows lives on the block (never saved), so it follows the block
+  // when things above it move.
+  const setUi = useCallback(
+    (pos: number, ui: "edit" | "replace" | "options" | null) => {
+      const node = editor?.state.doc.nodeAt(pos);
+      if (!editor || !node) return;
+      editor.view.dispatch(
+        editor.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, ui }).setMeta("galleyComment", true).setMeta("addToHistory", false),
+      );
+    },
+    [editor],
+  );
+
   const services = useMemo<Services>(
-    () => ({ slug: post.slug, actions, components, chooseImage, setImage, contextFor }),
-    [post.slug, actions, components, chooseImage, setImage, contextFor],
+    () => ({ slug: post.slug, actions, components, chooseImage, setImage, contextFor, setUi }),
+    [post.slug, actions, components, chooseImage, setImage, contextFor, setUi],
   );
 
   const session = useMemo<EditSession>(
@@ -457,11 +498,14 @@ export function EditSession({
       insertAt,
       openInsert: setInsertAt,
       startComment,
+      vocabulary,
+      addTerm: actions.addTerm,
     }),
-    [editor, components, frontmatter, setField, contextFor, chooseFieldImage, uploadedFieldImage, insertAt, startComment],
+    [editor, components, frontmatter, setField, contextFor, chooseFieldImage, uploadedFieldImage, insertAt, startComment, vocabulary, actions.addTerm],
   );
 
   const openCount = comments.filter((c) => !c.resolved).length + (draft ? 1 : 0);
+  const fieldContext: FieldContext = { vocabulary, addTerm: actions.addTerm, placeholders };
   const status = { saved: "Saved", dirty: "Saving…", saving: "Saving…", error: "Not saved" }[save.kind];
 
   return (
@@ -470,44 +514,59 @@ export function EditSession({
         <style>{EDITOR_CSS}</style>
         <div className={`gx-session${drawer ? " has-drawer" : ""}`}>{children}</div>
 
-        <div className="gx-bar" role="toolbar" aria-label="Edit mode">
-          <a className="gx-bar-exit" href={listUrl} title="All posts" aria-label="All posts">
-            ←
+        <nav className="gx-rail" aria-label="Edit mode">
+          <a className="gx-rail-btn" href={listUrl} aria-label="All posts" data-tip="All posts">
+            <Icon name="back" />
           </a>
-          <button type="button" className={`gx-bar-status is-${save.kind}`} onClick={() => void saveNow()} title="Changes save as you type. Click to save now (⌘S).">
-            <i />
-            {status}
-          </button>
-          <span className="gx-bar-sep" />
           <button
             type="button"
-            className="gx-bar-tab"
-            title="Add a block after the cursor. Or type / on an empty line."
-            onClick={() => {
+            className={`gx-rail-btn gx-rail-status is-${save.kind}`}
+            aria-label={status}
+            data-tip={save.kind === "saved" ? "Saved. Changes save as you type." : status}
+            onClick={() => void saveNow()}
+          >
+            <i />
+          </button>
+          <span className="gx-rail-sep" />
+          <button
+            type="button"
+            className="gx-rail-btn"
+            aria-label="Add"
+            data-tip="Add a block (or type / on an empty line)"
+            onClick={(e) => {
               if (!editor) return;
-              const pos = blockEnd(editor);
-              const coords = editor.view.coordsAtPos(Math.max(1, pos - 1));
-              setInsertAt({ pos, replace: false, left: coords.left, top: coords.bottom + 6 });
+              const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              setInsertAt({ pos: blockEnd(editor), replace: false, left: Math.max(12, r.left - 316), top: r.top });
             }}
           >
-            <span className="gx-long">+ Add</span>
-            <span className="gx-short">+</span>
+            <Icon name="plus" />
           </button>
           {frontmatterSchema ? (
-            <button type="button" className={`gx-bar-tab${drawer === "details" ? " is-on" : ""}`} onClick={() => setDrawer((d) => (d === "details" ? null : "details"))}>
-              <span className="gx-long">Details</span>
-              <span className="gx-short">⚙</span>
+            <button
+              type="button"
+              className={`gx-rail-btn${drawer === "details" ? " is-on" : ""}`}
+              aria-label="Details"
+              data-tip="Details: search, filing, authors"
+              onClick={() => setDrawer((d) => (d === "details" ? null : "details"))}
+            >
+              <Icon name="details" />
             </button>
           ) : null}
-          <button type="button" className={`gx-bar-tab${commentsOpen ? " is-on" : ""}`} onClick={() => setCommentsOpen((o) => !o)}>
-            <span className="gx-long">Comments{openCount ? ` · ${openCount}` : ""}</span>
-            <span className="gx-short">💬{openCount ? ` ${openCount}` : ""}</span>
+          <button
+            type="button"
+            className={`gx-rail-btn${commentsOpen ? " is-on" : ""}`}
+            aria-label="Comments"
+            data-tip="Comments"
+            onClick={() => setCommentsOpen((o) => !o)}
+          >
+            <Icon name="comment" />
+            {openCount ? <em className="gx-rail-count">{openCount}</em> : null}
           </button>
-          <span className="gx-bar-sep" />
-          <a className="gx-bar-done" href={viewUrl} title="See the post">
-            Done
+          <span className="gx-rail-sep" />
+          <a className="gx-rail-btn gx-rail-done" href={viewUrl} aria-label="Done" data-tip="Done: see the post">
+            <Icon name="check" />
           </a>
-        </div>
+        </nav>
 
         {save.kind === "error" ? (
           <div className="gx-toast" role="alert">
@@ -529,36 +588,20 @@ export function EditSession({
               </button>
             </header>
             <div className="gx-details" onKeyDown={(e) => e.stopPropagation()}>
-              <p className="gx-panel-help">Everything about the post that isn&apos;t on the page. Changes save as you go.</p>
-              {(() => {
-                const entries = Object.entries(frontmatterSchema.properties ?? {}).filter(([name]) => !inlineFields.includes(name));
-                const nested = (schema: JsonSchema) => {
-                  const s = schema.anyOf?.find((x) => x.type !== "null") ?? schema;
-                  return s.type === "object" || (s.type === "array" && !(s.items?.enum || s.items?.anyOf?.some((x) => x.enum)));
-                };
-                const field = ([name, schema]: [string, JsonSchema]) => (
+              <p className="gx-panel-help">What isn&apos;t on the page: how the post shows up in search and link previews, how it&apos;s filed, and who wrote it. Changes save as you go.</p>
+              {Object.entries(frontmatterSchema.properties ?? {})
+                .filter(([name]) => !inlineFields.includes(name))
+                .map(([name, schema]) => (
                   <Field
                     key={name}
                     name={name}
                     schema={schema}
                     value={frontmatter[name]}
                     required={(frontmatterSchema.required ?? []).includes(name)}
+                    context={fieldContext}
                     onChange={(value) => setField(name, value)}
                   />
-                );
-                const advanced = entries.filter(([, schema]) => nested(schema));
-                return (
-                  <>
-                    {entries.filter(([, schema]) => !nested(schema)).map(field)}
-                    {advanced.length ? (
-                      <details className="gx-advanced">
-                        <summary>Advanced</summary>
-                        {advanced.map(field)}
-                      </details>
-                    ) : null}
-                  </>
-                );
-              })()}
+                ))}
             </div>
           </aside>
         ) : null}

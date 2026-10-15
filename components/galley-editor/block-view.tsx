@@ -3,9 +3,10 @@
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { useEffect, useState } from "react";
 import { ImageChooser } from "./chooser";
+import { OptionsStrip } from "./options";
 import { PropsForm } from "./props-form";
 import { useServices } from "./services";
-import type { BlockAttrs, ManifestComponent } from "./types";
+import type { BlockAttrs, LibraryAsset, ManifestComponent } from "./types";
 
 // How components look in edit mode: rendered by the site itself (a server action runs
 // the site's real component), with a small bar to change them. An image block is where
@@ -89,91 +90,87 @@ export const nameOf = (name: string) =>
   ({ YouTube: "YouTube", LinkCard: "Link card", Tweet: "Post from X", CountUp: "Count up" })[name] ??
   name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/ (\w)/g, (_, c: string) => ` ${c.toLowerCase()}`);
 
-export function BlockView({ node, updateAttributes, deleteNode, selected, getPos }: ReactNodeViewProps) {
+export type BlockUi = "edit" | "replace" | "options" | null;
+
+export function BlockView({ node, deleteNode, updateAttributes, selected, getPos }: ReactNodeViewProps) {
   const services = useServices();
   const attrs = node.attrs as BlockAttrs;
+  const ui = (node.attrs.ui as BlockUi) ?? null;
   const motion = node.attrs.motion as Motion;
   const component = services.components.find((c) => c.name === attrs.name);
-  const motions = services.components.filter((c) => c.motion === "block");
   const isPicker = component?.picker === "image";
   const src = (attrs.props as { src?: string })?.src;
-  const [choosing, setChoosing] = useState(isPicker && !src);
-  const [editing, setEditing] = useState(!isPicker && Boolean(node.attrs.isNew));
-  const preview = usePreview(attrs, isPicker && !src);
+  // An option being tried in place: shown as the site's own image, not saved until kept.
+  const [previewing, setPreviewing] = useState<LibraryAsset | null>(null);
+  const shown = previewing
+    ? { ...attrs, props: { ...attrs.props, src: previewing.thumbnail, width: previewing.width, height: previewing.height } }
+    : attrs;
+  const preview = usePreview(shown, isPicker && !src && !previewing);
   const pos = () => (typeof getPos === "function" ? getPos() : undefined);
-
-  const chooser = (
-    <ImageChooser
-      actions={services.actions}
-      context={services.contextFor(pos() ?? null)}
-      title={src ? "Change image" : "Choose an image"}
-      onPick={async (asset) => {
-        const at = pos();
-        if (at === undefined) return;
-        setChoosing(false);
-        await services.chooseImage(at, asset);
-      }}
-      onUploaded={(file) => {
-        const at = pos();
-        if (at === undefined) return;
-        services.setImage(at, file);
-        setChoosing(false);
-      }}
-      onClose={() => (src ? setChoosing(false) : deleteNode())}
-    />
-  );
+  const setUi = (next: BlockUi) => {
+    const at = pos();
+    if (at !== undefined) services.setUi(at, next);
+  };
+  const choosing = isPicker && ((!src && ui !== "options") || ui === "replace");
+  const showPreview = !isPicker || Boolean(src) || Boolean(previewing);
 
   return (
     <NodeViewWrapper
-      className={`gx-block${selected ? " is-selected" : ""}${editing || choosing ? " is-editing" : ""}${isPicker && !src ? " is-choosing" : ""}`}
+      className={`gx-block${selected ? " is-selected" : ""}${ui ? " is-editing" : ""}${isPicker && !src && !previewing ? " is-choosing" : ""}`}
       data-motion={motion?.name}
     >
-      <div className="gx-block-dock" contentEditable={false}>
-        <div className="gx-block-bar" contentEditable={false}>
-          <span className="gx-block-name" data-drag-handle title="Drag to move">
-            {nameOf(attrs.name)}
-          </span>
-          {isPicker ? (
-            <>
-              <button type="button" className={choosing ? "is-on" : ""} onClick={() => setChoosing((c) => !c)}>
-                Replace
-              </button>
-              <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
-                Alt & caption
-              </button>
-            </>
+      {showPreview ? (
+        <div className="gx-block-preview" contentEditable={false}>
+          {preview === undefined ? (
+            <div className="gx-skeleton" />
+          ) : preview.error ? (
+            <div className="gx-block-error">
+              {nameOf(attrs.name)} can&apos;t show yet: {preview.error}
+            </div>
           ) : (
-            <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
-              Edit
-            </button>
+            preview.node
           )}
-          <MotionToggle motion={motion} options={motions} onChange={(m) => updateAttributes({ motion: m })} />
-          <button type="button" className="gx-danger" title="Remove" onClick={() => deleteNode()}>
-            Remove
-          </button>
         </div>
-      </div>
+      ) : null}
 
-      {isPicker && !src ? (
-        chooser
-      ) : (
-        <>
-          <div className="gx-block-preview" contentEditable={false}>
-            {preview === undefined ? (
-              <div className="gx-skeleton" />
-            ) : preview.error ? (
-              <div className="gx-block-error">
-                {attrs.name} can&apos;t show yet: {preview.error}
-              </div>
-            ) : (
-              preview.node
-            )}
-          </div>
-          {choosing ? chooser : null}
-        </>
-      )}
+      {choosing ? (
+        <ImageChooser
+          actions={services.actions}
+          context={services.contextFor(pos() ?? null)}
+          title={src ? "Replace image" : "Choose an image"}
+          onPick={async (asset) => {
+            const at = pos();
+            if (at !== undefined) await services.chooseImage(at, asset);
+          }}
+          onUploaded={(file) => {
+            const at = pos();
+            if (at !== undefined) services.setImage(at, file);
+          }}
+          onGenerate={() => setUi("options")}
+          onClose={() => (src ? setUi(null) : deleteNode())}
+        />
+      ) : null}
 
-      {editing && component ? (
+      {ui === "options" && isPicker ? (
+        <OptionsStrip
+          actions={services.actions}
+          context={services.contextFor(pos() ?? null)}
+          current={src ? { thumbnail: src } : null}
+          previewing={previewing}
+          onPreview={setPreviewing}
+          onKeep={async (asset) => {
+            setPreviewing(null);
+            const at = pos();
+            if (at !== undefined) await services.chooseImage(at, asset);
+          }}
+          onClose={() => {
+            setPreviewing(null);
+            setUi(src ? null : "replace");
+          }}
+        />
+      ) : null}
+
+      {ui === "edit" && component ? (
         <div contentEditable={false}>
           <PropsForm
             component={component}
@@ -182,14 +179,13 @@ export function BlockView({ node, updateAttributes, deleteNode, selected, getPos
             error={preview?.error}
             hide={isPicker ? ["src", "width", "height"] : []}
             onApply={(props, body) => {
-              updateAttributes({ props: { ...attrs.props, ...props }, body, isNew: null });
-              setEditing(false);
+              updateAttributes({ props: { ...attrs.props, ...props }, body, ui: null, isNew: null });
             }}
-            onCancel={() => setEditing(false)}
+            onCancel={() => setUi(null)}
           />
         </div>
       ) : null}
-      {editing && !component ? (
+      {ui === "edit" && !component ? (
         <p className="gx-block-error" contentEditable={false}>
           {attrs.name} isn&apos;t one of this site&apos;s components any more.
         </p>
@@ -241,37 +237,20 @@ export function InlineView({ node, updateAttributes, selected }: ReactNodeViewPr
   );
 }
 
-export function RawView({ node, updateAttributes, selected, deleteNode }: ReactNodeViewProps) {
-  const [editing, setEditing] = useState(false);
+export function RawView({ node, updateAttributes, selected }: ReactNodeViewProps) {
+  const ui = (node.attrs.ui as BlockUi) ?? null;
   const [text, setText] = useState(String(node.attrs.mdx ?? ""));
   return (
-    <NodeViewWrapper className={`gx-block gx-raw${selected ? " is-selected" : ""}`}>
-      <div className="gx-block-dock" contentEditable={false}>
-        <div className="gx-block-bar" contentEditable={false}>
-          <span className="gx-block-name" data-drag-handle title="Drag to move">
-            MDX
-          </span>
-          <button type="button" className={editing ? "is-on" : ""} onClick={() => setEditing((e) => !e)}>
-            Edit source
-          </button>
-          <button type="button" className="gx-danger" onClick={() => deleteNode()}>
-            Remove
-          </button>
-        </div>
-      </div>
-      {editing ? (
+    <NodeViewWrapper className={`gx-block gx-raw${selected ? " is-selected" : ""}${ui ? " is-editing" : ""}`}>
+      {ui === "edit" ? (
         <div contentEditable={false} className="gx-form">
           <textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />
           <div className="gx-form-actions">
-            <button
-              type="button"
-              className="gx-button gx-primary"
-              onClick={() => {
-                updateAttributes({ mdx: text });
-                setEditing(false);
-              }}
-            >
-              Apply
+            <button type="button" className="gx-button" onClick={() => updateAttributes({ ui: null })}>
+              Cancel
+            </button>
+            <button type="button" className="gx-button gx-primary" onClick={() => updateAttributes({ mdx: text, ui: null })}>
+              Done
             </button>
           </div>
         </div>
