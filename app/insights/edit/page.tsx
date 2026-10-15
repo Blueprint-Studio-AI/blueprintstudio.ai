@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllPosts } from "@/lib/blog";
 import BlogIndex from "@/components/Blog/BlogIndex";
-import { EditPage } from "@/components/galley-editor/page-session";
+import { EditPage } from "@blueprint-studio/galley/editor-ui";
 import { editorEnabled } from "./enabled";
 
 // Insights in edit mode: the same page as /insights, where any post opens in edit mode.

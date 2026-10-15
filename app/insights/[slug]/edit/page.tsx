@@ -6,9 +6,9 @@ import { mdxToDoc, openPost, readComments, readVersion } from "@blueprint-studio
 import { FsPostStore } from "@blueprint-studio/galley/ops";
 import { outline } from "@blueprint-studio/galley/render";
 import BlogPost from "@/components/Blog/BlogPost";
-import { EditableBody } from "@/components/galley-editor/editable";
-import { EditSession } from "@/components/galley-editor/session";
-import type { JsonSchema, ManifestComponent } from "@/components/galley-editor/types";
+import { EditableBody } from "@blueprint-studio/galley/editor-ui";
+import { EditSession } from "@blueprint-studio/galley/editor-ui";
+import type { JsonSchema, ManifestComponent } from "@blueprint-studio/galley/editor-ui";
 import galley from "@/galley.config";
 import { getPostBySlug } from "@/lib/blog";
 import {

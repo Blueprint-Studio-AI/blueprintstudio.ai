@@ -12,8 +12,8 @@ importers:
         specifier: ^0.36.3
         version: 0.36.3
       '@blueprint-studio/galley':
-        specifier: file:vendor/blueprint-studio-galley-0.8.0.tgz
-        version: file:vendor/blueprint-studio-galley-0.8.0.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)
+        specifier: file:vendor/blueprint-studio-galley-0.9.0.tgz
+        version: file:vendor/blueprint-studio-galley-0.9.0.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)
       '@calcom/atoms':
         specifier: ^1.10.0
         version: 1.12.1(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
@@ -307,17 +307,35 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.8.0.tgz':
-    resolution: {integrity: sha512-yL9e1JVrWskdsi8AJqa+oKHmXsWjuegbKx13G0rDJ02fhDpZr89DgQjh5ChUIirJYwE3ct/rnFWrAUFSwn0Vug==, tarball: file:vendor/blueprint-studio-galley-0.8.0.tgz}
-    version: 0.8.0
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.9.0.tgz':
+    resolution: {integrity: sha512-2pUebpQkEhfNB02udNSDmbiyJzYi6U9hfVQpfGjbY1M9kAVVquEdIzo7mpNdHKGbBv7nMZuoPgcIO+rT6GINNA==, tarball: file:vendor/blueprint-studio-galley-0.9.0.tgz}
+    version: 0.9.0
     engines: {node: '>=22.18'}
     hasBin: true
     peerDependencies:
+      '@tiptap/core': ^3.32.0
+      '@tiptap/extension-drag-handle-react': ^3.32.0
+      '@tiptap/extensions': ^3.32.0
+      '@tiptap/pm': ^3.32.0
+      '@tiptap/react': ^3.32.0
+      '@tiptap/starter-kit': ^3.32.0
       playwright-core: '>=1.50'
       react: ^19
       sharp: '>=0.33'
       zod: ^4.1
     peerDependenciesMeta:
+      '@tiptap/core':
+        optional: true
+      '@tiptap/extension-drag-handle-react':
+        optional: true
+      '@tiptap/extensions':
+        optional: true
+      '@tiptap/pm':
+        optional: true
+      '@tiptap/react':
+        optional: true
+      '@tiptap/starter-kit':
+        optional: true
       playwright-core:
         optional: true
       sharp:
@@ -5947,7 +5965,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.8.0.tgz(playwright-core@1.64.0)(react@19.2.4)(sharp@0.35.5(@types/node@20.19.33))(zod@4.6.7)':
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.9.0.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.32.1(zod@4.6.7)
       hast-util-to-jsx-runtime: 2.3.6
@@ -5970,6 +5988,12 @@ snapshots:
       yaml: 2.9.1
       zod: 4.6.7
     optionalDependencies:
+      '@tiptap/core': 3.32.0(@tiptap/pm@3.32.0)
+      '@tiptap/extension-drag-handle-react': 3.32.0(@tiptap/extension-drag-handle@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/extension-collaboration@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@tiptap/y-tiptap@3.0.10(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(yjs@13.6.33))(@tiptap/extension-node-range@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@tiptap/y-tiptap@3.0.10(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)))(@tiptap/pm@3.32.0)(@tiptap/react@3.32.0(@floating-ui/dom@1.7.5)(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@tiptap/extensions': 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)
+      '@tiptap/pm': 3.32.0
+      '@tiptap/react': 3.32.0(@floating-ui/dom@1.7.5)(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@tiptap/starter-kit': 3.32.0
       playwright-core: 1.64.0
       sharp: 0.35.5(@types/node@20.19.33)
     transitivePeerDependencies:

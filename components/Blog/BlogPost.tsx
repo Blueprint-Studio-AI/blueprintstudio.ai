@@ -20,7 +20,7 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Footer } from "@/components/Footer/index";
 import type { BlogPost as BlogPostType } from "@/lib/blog";
-import { EditableImage, EditableText } from "@/components/galley-editor/editable";
+import { EditableImage, EditableText } from "@blueprint-studio/galley/editor-ui";
 
 export type TocItem = { text: string; id: string };
 
