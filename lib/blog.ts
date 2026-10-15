@@ -22,6 +22,8 @@ export type BlogPost = {
   image?: string;
   ogImage: string;
   author: string;
+  /** Not on Insights yet: left out of the index and sitemap. Edit mode shows it. */
+  draft: boolean;
   /** The post's MDX, without its front matter. */
   content: string;
 };
@@ -43,17 +45,23 @@ function load(file: string): BlogPost {
     image: f.image,
     ogImage: f.ogImage ?? f.image ?? "/og-image.jpg",
     author: f.author,
+    draft: f.draft ?? false,
     content: splitFrontmatter(source).body,
   };
 }
 
-export function getAllPosts(): BlogPost[] {
+/** Published posts, newest first; `{ drafts: true }` (edit mode) includes drafts. */
+export function getAllPosts({ drafts = false }: { drafts?: boolean } = {}): BlogPost[] {
   return fs
     .readdirSync(BLOG_DIR)
     .filter((f) => f.endsWith(".mdx"))
     .map(load)
+    .filter((p) => drafts || !p.draft)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
+
+/** Whether readers may see a post: published, or a draft on this machine's dev server (so edit mode's Done shows it). */
+export const isPublic = (post: BlogPost) => !post.draft || process.env.NODE_ENV === "development";
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
   if (!/^[a-z0-9-]+$/.test(slug)) return undefined;

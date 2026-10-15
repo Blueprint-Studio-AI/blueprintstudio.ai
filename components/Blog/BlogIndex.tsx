@@ -58,6 +58,7 @@ function PostCard({ post, edit = false }: { post: BlogPost; edit?: boolean }) {
           <time dateTime={post.date}>{formatDate(post.date)}</time>
           <span className="text-neutral-300">|</span>
           <span>{post.author}</span>
+          {post.draft ? <span className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">Draft</span> : null}
         </div>
 
         {/* Title */}

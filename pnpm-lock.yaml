@@ -12,8 +12,8 @@ importers:
         specifier: ^0.36.3
         version: 0.36.3
       '@blueprint-studio/galley':
-        specifier: file:vendor/blueprint-studio-galley-0.9.0.tgz
-        version: file:vendor/blueprint-studio-galley-0.9.0.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)
+        specifier: file:vendor/blueprint-studio-galley-0.10.1.tgz
+        version: file:vendor/blueprint-studio-galley-0.10.1.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)
       '@calcom/atoms':
         specifier: ^1.10.0
         version: 1.12.1(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
@@ -307,9 +307,9 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.9.0.tgz':
-    resolution: {integrity: sha512-2pUebpQkEhfNB02udNSDmbiyJzYi6U9hfVQpfGjbY1M9kAVVquEdIzo7mpNdHKGbBv7nMZuoPgcIO+rT6GINNA==, tarball: file:vendor/blueprint-studio-galley-0.9.0.tgz}
-    version: 0.9.0
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.10.1.tgz':
+    resolution: {integrity: sha512-isHC5CH2o/bNOtKvnZCtSfxwCwdPu26YVhyS9EahVyOuyadazp3EeMraJHc9vI3z5R+ydFuodDMp7u9hcNGuvA==, tarball: file:vendor/blueprint-studio-galley-0.10.1.tgz}
+    version: 0.10.1
     engines: {node: '>=22.18'}
     hasBin: true
     peerDependencies:
@@ -5965,7 +5965,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.9.0.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)':
+  '@blueprint-studio/galley@file:vendor/blueprint-studio-galley-0.10.1.tgz(3ygftxqxcr6jm4z3pnzoo4usuu)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.32.1(zod@4.6.7)
       hast-util-to-jsx-runtime: 2.3.6

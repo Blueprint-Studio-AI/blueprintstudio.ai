@@ -63,6 +63,7 @@ export default async function EditInsight({ params, searchParams }: Props) {
       fallbacks={{ ogImage: ["image"] }}
       sharing={{ url: `blueprintstudio.ai/insights/${slug}`, title: ["title"], description: ["description"], image: ["ogImage", "image"] }}
       version={version ? { id: version.id, at: version.at, author: version.author, note: version.note } : undefined}
+      publish={{ field: "draft", dateField: "date" }}
       author={whoAmI()}
       viewUrl={`/insights/${slug}`}
       listUrl="/insights/edit"

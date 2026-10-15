@@ -3,6 +3,7 @@
 import path from "node:path";
 import {
   blueprintStudio,
+  createPost,
   docToMdx,
   importMediaBytes,
   listVersions,
@@ -53,6 +54,22 @@ export async function savePostAction(
   const after = await store().read(slug);
   if (after !== null) await recordSave(cwd, `posts/${slug}`, { before, after, author: whoAmI() });
   return { ok: true as const, revision: result.revision };
+}
+
+/**
+ * A new post from its title, as a draft (not on Insights until it's published), dated
+ * today, with a description to replace. Edit mode opens it.
+ */
+export async function createPostAction(title: string) {
+  guard();
+  const made = await createPost(galley, store(), {
+    title,
+    frontmatter: { description: "One or two sentences on what this is about.", date: new Date().toLocaleDateString("en-CA"), draft: true },
+  });
+  if (!made.ok) return { error: made.error };
+  const source = await store().read(made.slug);
+  if (source !== null) await recordSave(cwd, `posts/${made.slug}`, { before: null, after: source, author: whoAmI() });
+  return { href: `/insights/${made.slug}/edit` };
 }
 
 /** The post's versions, newest first. */

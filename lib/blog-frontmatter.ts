@@ -14,6 +14,7 @@ export const PostFrontmatter = z
     image: src().optional().describe("Hero image at the top of the post, 16:9."),
     ogImage: src().optional().describe("Social card, 1200×630. Falls back to the hero image."),
     author: z.string().min(1).default("Blueprint Studio"),
+    draft: z.boolean().optional().describe("A draft isn't on Insights (or in the sitemap) until it's published."),
   })
   .strict();
 

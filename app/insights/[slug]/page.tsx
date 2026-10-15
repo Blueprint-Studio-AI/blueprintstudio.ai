@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { outline, renderPost } from "@blueprint-studio/galley/render";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { getAllPosts, getPostBySlug, isPublic } from "@/lib/blog";
 import BlogPost from "@/components/Blog/BlogPost";
 import { elements } from "@/components/galley/elements";
 import galley from "@/galley.config";
@@ -19,7 +19,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) return {};
+  if (!post || !isPublic(post)) return {};
 
   return {
     title: post.title,
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function InsightsPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post || !isPublic(post)) notFound();
   const { content, ...meta } = post;
 
   const jsonLd = {

@@ -217,6 +217,10 @@
         "default": "Blueprint Studio",
         "type": "string",
         "minLength": 1
+      },
+      "draft": {
+        "description": "A draft isn't on Insights (or in the sitemap) until it's published.",
+        "type": "boolean"
       }
     },
     "required": [
