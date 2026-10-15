@@ -1,14 +1,20 @@
 "use client";
 
+import { redoDepth, undoDepth } from "@tiptap/pm/history";
+import type { Transaction } from "@tiptap/pm/state";
 import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useEditor } from "@tiptap/react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { anchorOf, findAnchor } from "./anchors";
+import { BlockPanel, type BlockChange } from "./block-panel";
+import { nameOf, playMotion, type Motion } from "./block-view";
 import { ImagePanel, type Uploaded } from "./chooser";
+import { SharePreview } from "./share-preview";
 import { extensions } from "./extensions";
 import { CommentsPanel } from "./panels";
 import { Field, type FieldContext } from "./fields";
 import { FieldsContext, type Fields } from "./fields-context";
+import { HistoryPanel, VersionBar, type VersionInfo } from "./history";
 import { Icon } from "./icons";
 import { ServicesContext, type Services } from "./services";
 import { EDITOR_CSS } from "./styles";
@@ -110,8 +116,41 @@ const altFromFile = (name = "") => {
   return words ? words[0].toUpperCase() + words.slice(1) : "";
 };
 
+/**
+ * Change some of a block's attributes, one step per attribute. Replacing the whole node
+ * (setNodeMarkup) would cut it out of the undo history, so earlier changes to it couldn't
+ * be undone.
+ */
+function withAttrs(tr: Transaction, pos: number, patch: Record<string, unknown>): Transaction {
+  for (const [key, value] of Object.entries(patch)) tr.setNodeAttribute(pos, key, value);
+  return tr;
+}
+
 const imageValue = (shape: ImageShape, src: string, alt: string, width?: number, height?: number) =>
   shape === "src" ? src : { src, alt, width, height };
+
+/** A value at a dotted path in the front matter ("seo.image"). */
+const getPath = (values: Record<string, unknown>, path: string): unknown =>
+  path.split(".").reduce<unknown>((v, key) => (v && typeof v === "object" ? (v as Record<string, unknown>)[key] : undefined), values);
+
+/** The front matter with one value changed at a dotted path; an emptied group goes. */
+function setPath(values: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+  const [key, ...rest] = path.split(".");
+  if (!rest.length) return { ...values, [key]: value };
+  const inner = setPath((values[key] as Record<string, unknown> | undefined) ?? {}, rest.join("."), value);
+  for (const [k, v] of Object.entries(inner)) if (v === undefined) delete inner[k];
+  return { ...values, [key]: Object.keys(inner).length ? inner : undefined };
+}
+
+/** The first of these fields that has something, as text (a picture gives its address). */
+const firstSet = (values: Record<string, unknown>, placeholders: Record<string, string>, paths: string[]) => {
+  for (const path of paths) {
+    const v = getPath(values, path) ?? placeholders[path];
+    const text = v && typeof v === "object" ? (v as { src?: string }).src : v;
+    if (typeof text === "string" && text.trim()) return text;
+  }
+  return "";
+};
 
 export function EditSession({
   post,
@@ -125,6 +164,10 @@ export function EditSession({
   inlineFields = ["title"],
   vocabulary = {},
   placeholders = {},
+  fallbacks = {},
+  hiddenFields = [],
+  sharing,
+  version,
   children,
 }: {
   post: EditorPost;
@@ -142,6 +185,14 @@ export function EditSession({
   vocabulary?: Vocabulary;
   /** What an empty field falls back to, e.g. the summary's first paragraph. */
   placeholders?: Record<string, string>;
+  /** Fields that fall back to other fields when empty, by path: { "seo.title": ["title"] }. Shown as their placeholder. */
+  fallbacks?: Record<string, string[]>;
+  /** Front matter fields Details leaves out, e.g. a choice that changes nothing yet. */
+  hiddenFields?: string[];
+  /** How the post shows up when shared: the fields that make its title, description and picture, first that's set wins. */
+  sharing?: { url: string; title: string[]; description: string[]; image: string[] };
+  /** An earlier version, shown read-only with a bar to restore it. */
+  version?: VersionInfo;
   children: React.ReactNode;
 }) {
   const [frontmatter, setFrontmatter] = useState(post.frontmatter);
@@ -149,7 +200,7 @@ export function EditSession({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [draft, setDraft] = useState<Comment | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
-  const [drawer, setDrawer] = useState<"comments" | "details" | "image" | null>(null);
+  const [drawer, setDrawer] = useState<"comments" | "details" | "image" | "block" | "history" | null>(null);
   // Choosing a picture: for the image block marked ui "replace", or for a front matter
   // field. `trying` is shown in the post until it's kept.
   const [fieldPick, setFieldPick] = useState<{ field: string; shape: ImageShape; label: string } | null>(null);
@@ -163,11 +214,11 @@ export function EditSession({
   }, [drawer]);
   const closePictureRef = useRef<() => void>(() => {});
   const leavePicture = () => {
-    if (drawerRef.current === "image") closePictureRef.current();
+    if (drawerRef.current === "image" || drawerRef.current === "block") closePictureRef.current();
   };
   const setCommentsOpen = useCallback((open: boolean | ((o: boolean) => boolean)) => {
     const next = typeof open === "function" ? open(drawerRef.current === "comments") : open;
-    if (next && drawerRef.current === "image") closePictureRef.current();
+    if (next && (drawerRef.current === "image" || drawerRef.current === "block")) closePictureRef.current();
     setDrawer((d) => (next ? "comments" : d === "comments" ? null : d));
   }, []);
   const [insertAt, setInsertAt] = useState<InsertAt | null>(null);
@@ -186,6 +237,7 @@ export function EditSession({
   const pickers = useMemo(() => new Set(components.filter((c) => c.picker === "image").map((c) => c.name)), [components]);
 
   const schedule = () => {
+    if (version) return;
     setSave({ kind: "dirty" });
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => void saveRef.current(), 1200);
@@ -194,6 +246,7 @@ export function EditSession({
   const editor = useEditor({
     extensions,
     content: post.doc,
+    editable: !version,
     immediatelyRender: false,
     editorProps: {
       // A function, so ProseMirror applies the site's class on every update instead of
@@ -275,10 +328,36 @@ export function EditSession({
     return () => window.removeEventListener("keydown", onKey);
   }, [saveNow]);
 
-  const setField = useCallback((field: string, value: unknown) => {
-    setFrontmatter((f) => ({ ...f, [field]: value }));
+  // Undo covers the post and its details together: details changes are kept here (typing
+  // in one field coalesces), the post's own in the editor's history, and Undo takes back
+  // whichever came last.
+  const fieldUndo = useRef<{ at: number; field: string; before: Record<string, unknown>; after: Record<string, unknown> }[]>([]);
+  const fieldRedo = useRef<{ at: number; field: string; before: Record<string, unknown>; after: Record<string, unknown> }[]>([]);
+  const lastDocChange = useRef(0);
+  const lastDocUndo = useRef(0);
+
+  const applyFields = useCallback((next: Record<string, unknown>) => {
+    frontmatterRef.current = next;
+    setFrontmatter(next);
     schedule();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const setField = useCallback(
+    (field: string, value: unknown) => {
+      if (version) return;
+      const before = frontmatterRef.current;
+      const next = setPath(before, field, value);
+      const last = fieldUndo.current.at(-1);
+      if (last && last.field === field && Date.now() - last.at < 1500) {
+        last.after = next;
+        last.at = Date.now();
+      } else fieldUndo.current.push({ at: Date.now(), field, before, after: next });
+      fieldRedo.current = [];
+      applyFields(next);
+    },
+    [version, applyFields],
+  );
 
   // ---- Comments ----
 
@@ -420,14 +499,14 @@ export function EditSession({
       const props = node.attrs.props as Record<string, unknown>;
       const alt = (props.alt as string) || altFrom(asset.prompt || title);
       editor.view.dispatch(
-        editor.state.tr.setNodeMarkup(pos, undefined, {
-          ...node.attrs,
+        withAttrs(editor.state.tr, pos, {
           props: { ...props, src: asset.thumbnail || asset.url, alt, width: asset.width, height: asset.height },
           pending,
           isNew: null,
-          ui: null,
         }),
       );
+      // Back to the block's panel, which isn't something to undo.
+      editor.view.dispatch(editor.state.tr.setNodeAttribute(pos, "ui", "edit").setMeta("addToHistory", false));
       const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
       let at = -1;
       editor.state.doc.descendants((n, p) => {
@@ -440,12 +519,12 @@ export function EditSession({
         return;
       }
       const current = editor.state.doc.nodeAt(at)!;
+      // The site's own copy replaces the remote one; one Undo takes back the whole choice.
       editor.view.dispatch(
-        editor.state.tr.setNodeMarkup(at, undefined, {
-          ...current.attrs,
+        withAttrs(editor.state.tr, at, {
           props: { ...(current.attrs.props as object), src: imported.path, width: imported.width, height: imported.height },
           pending: null,
-        }),
+        }).setMeta("addToHistory", false),
       );
     },
     [editor, actions, title],
@@ -458,20 +537,19 @@ export function EditSession({
       if (node?.type.name !== "galleyBlock") return;
       const props = node.attrs.props as Record<string, unknown>;
       editor.view.dispatch(
-        editor.state.tr.setNodeMarkup(pos, undefined, {
-          ...node.attrs,
+        withAttrs(editor.state.tr, pos, {
           props: { ...props, src: file.path, alt: (props.alt as string) || altFromFile(file.name), width: file.width, height: file.height },
           isNew: null,
-          ui: null,
         }),
       );
+      editor.view.dispatch(editor.state.tr.setNodeAttribute(pos, "ui", "edit").setMeta("addToHistory", false));
     },
     [editor],
   );
 
   const chooseFieldImage = useCallback(
     async (field: string, shape: ImageShape, asset: LibraryAsset) => {
-      const current = frontmatterRef.current[field] as { alt?: string } | string | null | undefined;
+      const current = getPath(frontmatterRef.current, field) as { alt?: string } | string | null | undefined;
       const alt = (typeof current === "object" && current?.alt) || altFrom(asset.prompt || title);
       setField(field, imageValue(shape, asset.thumbnail || asset.url, alt, asset.width, asset.height));
       const imported = await actions.importAsset({ url: asset.url, name: fileName(asset.prompt || title) });
@@ -482,7 +560,7 @@ export function EditSession({
 
   const uploadedFieldImage = useCallback(
     (field: string, shape: ImageShape, file: Uploaded) => {
-      const current = frontmatterRef.current[field] as { alt?: string } | string | null | undefined;
+      const current = getPath(frontmatterRef.current, field) as { alt?: string } | string | null | undefined;
       const alt = (typeof current === "object" && current?.alt) || altFromFile(file.name);
       setField(field, imageValue(shape, file.path, alt, file.width, file.height));
     },
@@ -496,85 +574,165 @@ export function EditSession({
     fieldPickRef.current = next;
     setFieldPick(next);
   }, []);
+  // A block's panel is open while the block is marked ui "edit" (its settings) or
+  // "replace" (choosing its picture). One block at a time.
   const setUi = useCallback(
     (pos: number, ui: "edit" | "replace" | null) => {
       const node = editor?.state.doc.nodeAt(pos);
-      if (!editor || !node) return;
+      if (!editor || !node || version) return;
       const tr = editor.state.tr;
-      if (ui === "replace") {
+      if (ui) {
+        let other = false;
         editor.state.doc.forEach((n, offset) => {
-          if (offset !== pos && n.attrs.ui === "replace") tr.setNodeMarkup(offset, undefined, { ...n.attrs, ui: null });
+          if (offset !== pos && n.attrs.ui) {
+            tr.setNodeAttribute(offset, "ui", null);
+            other = true;
+          }
         });
         fieldPickRef.current = null;
         setFieldPick(null);
         setTrying(null);
-        setPickKey((k) => k + 1);
-        setDrawer("image");
+        if (other || !node.attrs.ui) setPickKey((k) => k + 1);
+        setDrawer("block");
       }
-      editor.view.dispatch(tr.setNodeMarkup(pos, undefined, { ...node.attrs, ui }).setMeta("galleyComment", true).setMeta("addToHistory", false));
+      editor.view.dispatch(tr.setNodeAttribute(pos, "ui", ui).setMeta("galleyComment", true).setMeta("addToHistory", false));
     },
-    [editor],
+    [editor, version],
   );
 
   // ---- Choosing a picture, in the panel ----
 
-  /** Where the image block being chosen for is: the one marked ui "replace". */
-  const pickingBlock = useCallback((): number | null => {
+  /** The block whose panel is open: the one marked ui "edit" or "replace". */
+  const panelBlock = useCallback((): number | null => {
     if (!editor) return null;
     const { doc } = editor.state;
     for (let i = 0, offset = 0; i < doc.childCount; offset += doc.child(i).nodeSize, i++) {
-      const node = doc.child(i);
-      if (node.type.name === "galleyBlock" && node.attrs.ui === "replace") return offset;
+      if (doc.child(i).attrs.ui) return offset;
     }
     return null;
   }, [editor]);
+  /** The image block being chosen for (its panel open on the picture). */
+  const pickingBlock = useCallback((): number | null => {
+    const at = panelBlock();
+    return at !== null && editor?.state.doc.nodeAt(at)?.attrs.ui === "replace" ? at : null;
+  }, [editor, panelBlock]);
 
-  // The panel follows the document: a new image block (inserted marked "replace") opens
-  // it, and keeping a picture, deleting the block or undoing closes it.
-  const blockPicking = useRef(false);
+  // The panel follows the document: a block marked for it (clicked, or just inserted) opens
+  // it, and deleting the block or undoing its insertion closes it. It also keeps track of
+  // when the post last changed, for Undo.
+  const blockOpen = useRef(false);
+  const [, setTick] = useState(0);
   useEffect(() => {
     if (!editor) return;
-    const sync = () => {
-      const at = pickingBlock();
+    let depth = undoDepth(editor.state);
+    const sync = ({ transaction }: { transaction: { docChanged: boolean } }) => {
+      const nextDepth = undoDepth(editor.state);
+      if (transaction.docChanged && nextDepth >= depth) lastDocChange.current = Date.now();
+      depth = nextDepth;
+      setTick((t) => t + 1);
+      const at = panelBlock();
       const now = at !== null;
-      if (now === blockPicking.current) return;
-      blockPicking.current = now;
+      if (now === blockOpen.current) return;
+      blockOpen.current = now;
       if (now) {
         fieldPickRef.current = null;
         setFieldPick(null);
-        setTrying(null);
-        setPickKey((k) => k + 1);
-        setDrawer("image");
-        // Bring the picture into view beside the panel, once the page has made room for it.
+        setDrawer("block");
+        // Bring the block into view beside the panel, once the page has made room for it.
         setTimeout(() => {
-          const pos = pickingBlock();
+          const pos = panelBlock();
           const dom = pos === null ? null : (editor.view.nodeDOM(pos) as HTMLElement | null);
-          dom?.scrollIntoView({ block: "center", behavior: "smooth" });
+          dom?.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }, 260);
-      } else if (!fieldPickRef.current) {
+      } else {
         setTrying(null);
-        setDrawer((d) => (d === "image" ? null : d));
+        setDrawer((d) => (d === "block" ? null : d));
       }
     };
     editor.on("transaction", sync);
     return () => {
       editor.off("transaction", sync);
     };
-  }, [editor, pickingBlock]);
+  }, [editor, panelBlock]);
+
+  const undo = () => {
+    if (!editor) return;
+    const field = fieldUndo.current.at(-1);
+    const docUndo = undoDepth(editor.state) > 0;
+    if (field && (!docUndo || field.at > lastDocChange.current)) {
+      fieldUndo.current.pop();
+      fieldRedo.current.push({ ...field, at: Date.now() });
+      applyFields(field.before);
+    } else if (docUndo) {
+      editor.commands.undo();
+      lastDocUndo.current = Date.now();
+    }
+    setTick((t) => t + 1);
+  };
+  const redo = () => {
+    if (!editor) return;
+    const field = fieldRedo.current.at(-1);
+    const docRedo = redoDepth(editor.state) > 0;
+    if (field && (!docRedo || field.at > lastDocUndo.current)) {
+      fieldRedo.current.pop();
+      fieldUndo.current.push({ ...field, at: Date.now() });
+      applyFields(field.after);
+    } else if (docRedo) editor.commands.redo();
+    setTick((t) => t + 1);
+  };
+  const canUndo = Boolean(editor && (undoDepth(editor.state) > 0 || fieldUndo.current.length));
+  const canRedo = Boolean(editor && (redoDepth(editor.state) > 0 || fieldRedo.current.length));
+
+  // The open block's changes, from its panel.
+  const updateBlock = (change: BlockChange) => {
+    const at = panelBlock();
+    const node = at === null ? null : editor?.state.doc.nodeAt(at);
+    if (!editor || at === null || !node) return;
+    editor.view.dispatch(withAttrs(editor.state.tr, at, change));
+  };
+  const setBlockMotion = (motion: Motion) => {
+    const at = panelBlock();
+    if (!editor || at === null) return;
+    editor.view.dispatch(editor.state.tr.setNodeAttribute(at, "motion", motion));
+    if (motion) requestAnimationFrame(() => playMotion(editor.view.nodeDOM(at) as Element | null));
+  };
+  const duplicateBlock = () => {
+    const at = panelBlock();
+    const node = at === null ? null : editor?.state.doc.nodeAt(at);
+    if (!editor || at === null || !node) return;
+    editor.chain().insertContentAt(at + node.nodeSize, { ...node.toJSON(), attrs: { ...node.attrs, ui: null } }).run();
+  };
+  const deleteBlock = () => {
+    const at = panelBlock();
+    const node = at === null ? null : editor?.state.doc.nodeAt(at);
+    if (!editor || at === null || !node) return;
+    editor.chain().focus().deleteRange({ from: at, to: at + node.nodeSize }).run();
+  };
+  /** Close a block's panel. A new picture block that never got a picture goes. */
+  const closeBlock = () => {
+    setTrying(null);
+    const at = panelBlock();
+    const node = at === null ? null : editor?.state.doc.nodeAt(at);
+    if (!editor || at === null || !node) return setDrawer(null);
+    if (node.type.name === "galleyBlock" && components.find((c) => c.name === node.attrs.name)?.picker === "image" && !(node.attrs.props as { src?: string })?.src) {
+      editor.view.dispatch(editor.state.tr.delete(at, at + node.nodeSize));
+    } else setUi(at, null);
+  };
 
   const pickFieldImage = useCallback(
     (field: string, shape: ImageShape, label: string) => {
-      const at = pickingBlock();
+      if (version) return;
+      const at = panelBlock();
       pickField({ field, shape, label });
       if (at !== null && editor) {
         const node = editor.state.doc.nodeAt(at)!;
-        editor.view.dispatch(editor.state.tr.setNodeMarkup(at, undefined, { ...node.attrs, ui: null }).setMeta("galleyComment", true).setMeta("addToHistory", false));
+        editor.view.dispatch(editor.state.tr.setNodeAttribute(at, "ui", null).setMeta("galleyComment", true).setMeta("addToHistory", false));
       }
       setTrying(null);
       setPickKey((k) => k + 1);
       setDrawer("image");
     },
-    [editor, pickingBlock, pickField],
+    [editor, panelBlock, pickField, version],
   );
 
   const keepPicture = async (asset: LibraryAsset) => {
@@ -582,7 +740,7 @@ export function EditSession({
     const field = fieldPickRef.current;
     if (field) {
       pickField(null);
-      setDrawer(null);
+      setDrawer(field.field.includes(".") ? "details" : null);
       await chooseFieldImage(field.field, field.shape, asset);
       return;
     }
@@ -595,7 +753,7 @@ export function EditSession({
     const field = fieldPickRef.current;
     if (field) {
       pickField(null);
-      setDrawer(null);
+      setDrawer(field.field.includes(".") ? "details" : null);
       uploadedFieldImage(field.field, field.shape, file);
       return;
     }
@@ -603,25 +761,26 @@ export function EditSession({
     if (at !== null) setImage(at, file);
   };
 
-  /** Close the panel without changing the picture. A new image block with none goes. */
+  /** Leave the picture chooser without changing the picture: back to the block's panel (or Details). A new image block with none goes. */
   const closePicture = () => {
     setTrying(null);
-    if (fieldPickRef.current) {
+    const field = fieldPickRef.current;
+    if (field) {
       pickField(null);
-      setDrawer(null);
+      setDrawer(field.field.includes(".") ? "details" : null);
       return;
     }
     const at = pickingBlock();
-    if (at === null || !editor) return setDrawer(null);
+    if (at === null || !editor) return closeBlock();
     const node = editor.state.doc.nodeAt(at)!;
-    if ((node.attrs.props as { src?: string })?.src) setUi(at, null);
-    else editor.view.dispatch(editor.state.tr.delete(at, at + node.nodeSize));
+    if ((node.attrs.props as { src?: string })?.src) setUi(at, "edit");
+    else closeBlock();
   };
   useEffect(() => {
     closePictureRef.current = closePicture;
   });
   useEffect(() => {
-    if (drawer !== "image") return;
+    if (drawer !== "image" && drawer !== "block") return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closePictureRef.current();
     };
@@ -659,9 +818,23 @@ export function EditSession({
     [editor, components, frontmatter, setField, contextFor, pickFieldImage, fieldPick, trying, insertAt, startComment, vocabulary, actions.addTerm],
   );
 
-  const fields = useMemo<Fields>(() => ({ values: frontmatter, setField }), [frontmatter, setField]);
+  const fields = useMemo<Fields>(() => ({ values: frontmatter, setField, readOnly: Boolean(version) }), [frontmatter, setField, version]);
   const openCount = comments.filter((c) => !c.resolved).length + (draft ? 1 : 0);
-  const fieldContext: FieldContext = { vocabulary, addTerm: actions.addTerm, placeholders };
+  // Empty fields show what they fall back to.
+  const shownPlaceholders = { ...placeholders };
+  for (const [path, from] of Object.entries(fallbacks)) {
+    const text = firstSet(frontmatter, placeholders, from);
+    if (text) shownPlaceholders[path] = text;
+  }
+  const fieldContext: FieldContext = {
+    vocabulary,
+    addTerm: actions.addTerm,
+    placeholders: shownPlaceholders,
+    pickImage: (path) => pickFieldImage(path, "image", "picture"),
+  };
+  const blockAt = panelBlock();
+  const blockNode = blockAt !== null ? (editor?.state.doc.nodeAt(blockAt) ?? null) : null;
+  const loadVersions = useCallback(() => (actions.versions ? actions.versions(post.slug) : Promise.resolve([])), [actions, post.slug]);
   const status = { saved: "Saved", dirty: "Saving…", saving: "Saving…", error: "Not saved" }[save.kind];
 
   return (
@@ -669,8 +842,18 @@ export function EditSession({
       <FieldsContext.Provider value={fields}>
       <ServicesContext.Provider value={services}>
         <style>{EDITOR_CSS}</style>
-        <div className={`gx-session${drawer ? " has-drawer" : ""}`}>{children}</div>
+        <div className={`gx-session${drawer ? " has-drawer" : ""}${version ? " is-version" : ""}`}>{children}</div>
 
+        {version ? (
+          <VersionBar
+            version={version}
+            backHref={`${viewUrl}/edit`}
+            onRestore={async () => {
+              const result = actions.restore ? await actions.restore(post.slug, version.id) : { error: "This site can't restore versions" };
+              return "error" in result ? result.error : null;
+            }}
+          />
+        ) : (
         <nav className="gx-rail" aria-label="Edit mode">
           <a className="gx-rail-btn" href={listUrl} aria-label="All posts" data-tip="All posts">
             <Icon name="back" />
@@ -683,6 +866,12 @@ export function EditSession({
             onClick={() => void saveNow()}
           >
             <i />
+          </button>
+          <button type="button" className="gx-rail-btn" aria-label="Undo" data-tip="Undo (⌘Z)" disabled={!canUndo} onClick={undo}>
+            <Icon name="undo" />
+          </button>
+          <button type="button" className="gx-rail-btn" aria-label="Redo" data-tip="Redo (⇧⌘Z)" disabled={!canRedo} onClick={redo}>
+            <Icon name="redo" />
           </button>
           <span className="gx-rail-sep" />
           <button
@@ -722,11 +911,26 @@ export function EditSession({
             <Icon name="comment" />
             {openCount ? <em className="gx-rail-count">{openCount}</em> : null}
           </button>
+          {actions.versions ? (
+            <button
+              type="button"
+              className={`gx-rail-btn${drawer === "history" ? " is-on" : ""}`}
+              aria-label="Version history"
+              data-tip="Version history"
+              onClick={() => {
+                if (drawer !== "history") leavePicture();
+                setDrawer((d) => (d === "history" ? null : "history"));
+              }}
+            >
+              <Icon name="history" />
+            </button>
+          ) : null}
           <span className="gx-rail-sep" />
           <a className="gx-rail-btn gx-rail-done" href={viewUrl} aria-label="Done" data-tip="Done: see the post">
             <Icon name="check" />
           </a>
         </nav>
+        )}
 
         {save.kind === "error" ? (
           <div className="gx-toast" role="alert">
@@ -739,10 +943,80 @@ export function EditSession({
           </div>
         ) : null}
 
-        {drawer === "image" ? (
+        {drawer === "block" && blockNode ? (
+          <aside className="gx-drawer" data-lenis-prevent>
+            {blockNode.attrs.ui === "replace" ? (
+              <>
+                <header className="gx-drawer-head">
+                  {(blockNode.attrs.props as { src?: string })?.src ? (
+                    <button type="button" className="gx-drawer-close" onClick={closePicture} aria-label="Back" title="Back">
+                      ‹
+                    </button>
+                  ) : null}
+                  <b className="gx-drawer-title">Choose a picture</b>
+                  <button type="button" className="gx-drawer-close" onClick={closeBlock} aria-label="Close">
+                    ×
+                  </button>
+                </header>
+                <ImagePanel
+                  key={`pick-${pickKey}`}
+                  actions={actions}
+                  context={contextFor(pickingBlock())}
+                  trying={trying}
+                  onTry={setTrying}
+                  onKeep={(asset) => void keepPicture(asset)}
+                  onUploaded={keepUpload}
+                />
+              </>
+            ) : (
+              <>
+                <header className="gx-drawer-head">
+                  <b className="gx-drawer-title">{blockNode.type.name === "rawBlock" ? "Source" : nameOf(String(blockNode.attrs.name))}</b>
+                  <button type="button" className="gx-drawer-close" onClick={closeBlock} aria-label="Close">
+                    ×
+                  </button>
+                </header>
+                <BlockPanel
+                  key={`block-${pickKey}`}
+                  node={blockNode}
+                  components={components}
+                  context={fieldContext}
+                  onChange={updateBlock}
+                  onMotion={setBlockMotion}
+                  onReplace={() => {
+                    const at = panelBlock();
+                    if (at !== null) setUi(at, "replace");
+                  }}
+                  onDuplicate={duplicateBlock}
+                  onDelete={deleteBlock}
+                />
+              </>
+            )}
+          </aside>
+        ) : null}
+
+        {drawer === "history" && actions.versions ? (
           <aside className="gx-drawer" data-lenis-prevent>
             <header className="gx-drawer-head">
-              <b className="gx-drawer-title">{fieldPick ? `Choose the ${fieldPick.label}` : "Choose a picture"}</b>
+              <b className="gx-drawer-title">Version history</b>
+              <button type="button" className="gx-drawer-close" onClick={() => setDrawer(null)} aria-label="Close">
+                ×
+              </button>
+            </header>
+            <HistoryPanel
+              load={loadVersions}
+              onOpen={async (id) => {
+                await saveNow();
+                window.location.href = `${viewUrl}/edit?version=${id}`;
+              }}
+            />
+          </aside>
+        ) : null}
+
+        {drawer === "image" && fieldPick ? (
+          <aside className="gx-drawer" data-lenis-prevent>
+            <header className="gx-drawer-head">
+              <b className="gx-drawer-title">{`Choose the ${fieldPick.label}`}</b>
               <button type="button" className="gx-drawer-close" onClick={closePicture} aria-label="Close">
                 ×
               </button>
@@ -750,7 +1024,7 @@ export function EditSession({
             <ImagePanel
               key={pickKey}
               actions={actions}
-              context={contextFor(fieldPick ? null : pickingBlock())}
+              context={contextFor(null)}
               trying={trying}
               onTry={setTrying}
               onKeep={(asset) => void keepPicture(asset)}
@@ -769,8 +1043,16 @@ export function EditSession({
             </header>
             <div className="gx-details" onKeyDown={(e) => e.stopPropagation()}>
               <p className="gx-panel-help">What isn&apos;t on the page: how the post shows up in search and link previews, how it&apos;s filed, and who wrote it. Changes save as you go.</p>
+              {sharing ? (
+                <SharePreview
+                  url={sharing.url}
+                  title={firstSet(frontmatter, shownPlaceholders, sharing.title)}
+                  description={firstSet(frontmatter, shownPlaceholders, sharing.description)}
+                  image={firstSet(frontmatter, shownPlaceholders, sharing.image)}
+                />
+              ) : null}
               {Object.entries(frontmatterSchema.properties ?? {})
-                .filter(([name]) => !inlineFields.includes(name))
+                .filter(([name]) => !inlineFields.includes(name) && !hiddenFields.includes(name))
                 .map(([name, schema]) => (
                   <Field
                     key={name}

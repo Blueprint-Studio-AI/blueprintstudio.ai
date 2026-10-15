@@ -5,17 +5,21 @@ import {
   blueprintStudio,
   docToMdx,
   importMediaBytes,
+  listVersions,
+  readVersion,
+  recordSave,
   savePost,
   writeComments,
   type Comment,
   type DocNode,
 } from "@blueprint-studio/galley/editor";
 import { importMedia } from "@blueprint-studio/galley/media";
-import { FsPostStore } from "@blueprint-studio/galley/ops";
+import { FsPostStore, revisionOf, writePost } from "@blueprint-studio/galley/ops";
 import { renderPost } from "@blueprint-studio/galley/render";
 import { elements } from "@/components/galley/elements";
 import galley from "@/galley.config";
 import { editorEnabled } from "./enabled";
+import { whoAmI } from "./who";
 
 // What the post editor (/galley/edit) asks the server to do. Everything is checked by
 // Galley before it touches a file; the Blueprint Studio key never leaves the server.
@@ -43,8 +47,30 @@ export async function savePostAction(
   input: { doc: DocNode; frontmatter: Record<string, unknown>; revision: string | null },
 ) {
   guard();
+  const before = await store().read(slug);
   const result = await savePost(galley, store(), slug, input, { message: `Edit ${slug} in the editor` });
-  return result.ok ? { ok: true as const, revision: result.revision } : result;
+  if (!result.ok) return result;
+  const after = await store().read(slug);
+  if (after !== null) await recordSave(cwd, `posts/${slug}`, { before, after, author: whoAmI() });
+  return { ok: true as const, revision: result.revision };
+}
+
+/** The post's versions, newest first. */
+export async function versionsAction(slug: string) {
+  guard();
+  return listVersions(cwd, `posts/${slug}`);
+}
+
+/** Make an earlier version the post again (it's checked like any save, and becomes the newest version). */
+export async function restoreAction(slug: string, id: string) {
+  guard();
+  const version = await readVersion(cwd, `posts/${slug}`, id);
+  if (!version) return { error: "That version isn't kept any more" };
+  const before = await store().read(slug);
+  const written = await writePost(galley, store(), slug, version.source, before === null ? null : revisionOf(before), { message: `Restore ${slug} to a version` });
+  if (!written.ok) return { error: written.error };
+  await recordSave(cwd, `posts/${slug}`, { before, after: version.source, author: whoAmI() });
+  return { ok: true as const };
 }
 
 export async function saveCommentsAction(slug: string, comments: Comment[]) {

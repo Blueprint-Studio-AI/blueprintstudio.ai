@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { notFound } from "next/navigation";
-import { buildManifest } from "@blueprint-studio/galley";
-import { openPost, readComments } from "@blueprint-studio/galley/editor";
+import { buildManifest, splitFrontmatter } from "@blueprint-studio/galley";
+import { mdxToDoc, openPost, readComments, readVersion } from "@blueprint-studio/galley/editor";
 import { FsPostStore } from "@blueprint-studio/galley/ops";
 import { outline } from "@blueprint-studio/galley/render";
 import BlogPost from "@/components/Blog/BlogPost";
@@ -18,35 +17,41 @@ import {
   jobAction,
   libraryAction,
   renderBlockAction,
+  restoreAction,
   saveCommentsAction,
   savePostAction,
   stylesAction,
   uploadAction,
+  versionsAction,
 } from "../../edit/actions";
 import { editorEnabled } from "../../edit/enabled";
+import { whoAmI } from "../../edit/who";
 
 // A post in edit mode: the same page as /insights/<slug>, with the title, summary, hero
-// and body editable in place.
+// and body editable in place. ?version=<id> shows an earlier version, read-only, to restore.
 
 export const metadata: Metadata = { title: "Editing", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-function whoAmI() {
-  try {
-    return execFileSync("git", ["config", "user.name"], { encoding: "utf8" }).trim() || "You";
-  } catch {
-    return "You";
-  }
-}
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ version?: string }> };
 
-export default async function EditInsight({ params }: { params: Promise<{ slug: string }> }) {
+export default async function EditInsight({ params, searchParams }: Props) {
   if (!editorEnabled()) notFound();
-  const { slug } = await params;
+  const [{ slug }, { version: versionId }] = await Promise.all([params, searchParams]);
   const manifest = buildManifest(galley);
   const cwd = process.cwd();
   const post = getPostBySlug(slug);
-  const editing = await openPost(new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)), slug, galley);
-  if (!post || !editing) notFound();
+  const current = await openPost(new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)), slug, galley);
+  if (!post || !current) notFound();
+  // An earlier version: its front matter and body, in place of the current ones.
+  const version = versionId ? await readVersion(cwd, `posts/${slug}`, versionId) : null;
+  const motion = galley.components.filter((c) => c.motion === "block").map((c) => c.name);
+  const editing = version
+    ? (() => {
+        const { data, body } = splitFrontmatter(version.source);
+        return { ...current, frontmatter: (data ?? {}) as Record<string, unknown>, doc: mdxToDoc(body, { motion }) };
+      })()
+    : current;
   const { content, ...meta } = post;
   return (
     <EditSession
@@ -55,6 +60,9 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
       components={JSON.parse(JSON.stringify(manifest.components)) as ManifestComponent[]}
       frontmatterSchema={JSON.parse(JSON.stringify(manifest.frontmatter)) as JsonSchema}
       inlineFields={["title", "description", "image"]}
+      fallbacks={{ ogImage: ["image"] }}
+      sharing={{ url: `blueprintstudio.ai/insights/${slug}`, title: ["title"], description: ["description"], image: ["ogImage", "image"] }}
+      version={version ? { id: version.id, at: version.at, author: version.author, note: version.note } : undefined}
       author={whoAmI()}
       viewUrl={`/insights/${slug}`}
       listUrl="/insights/edit"
@@ -68,6 +76,8 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
         job: jobAction,
         importAsset: importAssetAction,
         upload: uploadAction,
+        versions: versionsAction,
+        restore: restoreAction,
       }}
     >
       <BlogPost

@@ -5,10 +5,9 @@ import type { Node as PMNode } from "@tiptap/pm/model";
 import { NodeSelection } from "@tiptap/pm/state";
 import { EditorContent, type Editor as TiptapEditor } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MotionToggle, nameOf, playMotion, type Motion } from "./block-view";
+import { MotionToggle, playMotion, type Motion } from "./block-view";
 import { TermPicker } from "./fields";
 import { InsertMenu } from "./insert-menu";
-import { useServices } from "./services";
 import { useFields } from "./fields-context";
 import { useEditSession, type ImageShape } from "./session";
 import type { ManifestComponent } from "./types";
@@ -80,7 +79,6 @@ type Target = { kind: "text" | "component" | "raw" | "block"; block: number; nod
  */
 function ContextBar({ editor, components }: { editor: TiptapEditor; components: ManifestComponent[] }) {
   const { startComment } = useEditSession();
-  const services = useServices();
   const ref = useRef<HTMLDivElement>(null);
   const [target, setTarget] = useState<Target | null>(null);
   const [place, setPlace] = useState<{ top: number; left: number } | null>(null);
@@ -140,10 +138,9 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
     setMenu(null);
   }
 
-  if (!target || !place) return null;
+  // Components and source blocks are changed in their panel, not a toolbar.
+  if (!target || !place || target.kind === "component" || target.kind === "raw") return null;
   const { node, block } = target;
-  const component = node.type.name === "galleyBlock" ? components.find((c) => c.name === node.attrs.name) : undefined;
-  const isPicker = component?.picker === "image";
   const textual = ["paragraph", "heading", "blockquote"].includes(node.type.name);
   const motion = (node.attrs.motion as Motion) ?? null;
   const setMotion = (m: Motion) => {
@@ -194,9 +191,6 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
         </form>
       ) : (
         <>
-          {target.kind === "component" || target.kind === "raw" ? (
-            <span className="gx-ctx-name">{target.kind === "raw" ? "MDX" : nameOf(String(node.attrs.name))}</span>
-          ) : null}
           {textual ? (
             <span className="gx-ctx-turn">
               <button type="button" className={menu === "turn" ? "is-on" : ""} onClick={() => setMenu((m) => (m === "turn" ? null : "turn"))}>
@@ -259,27 +253,7 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
               </button>
             </>
           ) : null}
-          {target.kind === "component" && isPicker ? (
-            <>
-              <button type="button" onClick={() => services.setUi(block, "replace")}>
-                Replace
-              </button>
-              <button type="button" onClick={() => services.setUi(block, "edit")}>
-                Alt & caption
-              </button>
-            </>
-          ) : null}
-          {target.kind === "component" && !isPicker ? (
-            <button type="button" onClick={() => services.setUi(block, "edit")}>
-              Edit
-            </button>
-          ) : null}
-          {target.kind === "raw" ? (
-            <button type="button" onClick={() => services.setUi(block, "edit")}>
-              Edit source
-            </button>
-          ) : null}
-          {target.kind !== "raw" && motions.length ? (
+          {motions.length ? (
             <>
               <span className="gx-ctx-sep" />
               <MotionToggle motion={motion} options={motions} onChange={setMotion} />
@@ -324,12 +298,18 @@ export function EditableText({
   placeholder?: string;
   multiline?: boolean;
 }) {
-  const { values, setField } = useFields();
+  const { values, setField, readOnly } = useFields();
   const ref = useRef<HTMLElement>(null);
-  const initial = useRef(String(values[field] ?? ""));
+  const value = String(values[field] ?? "");
+  const initial = useRef(value);
   useEffect(() => {
     if (ref.current) ref.current.textContent = initial.current;
   }, []);
+  // Changed elsewhere (Undo, Details): show it, unless it's being typed here.
+  useEffect(() => {
+    const el = ref.current;
+    if (el && document.activeElement !== el && (multiline ? el.innerText.trim() : el.textContent) !== value) el.textContent = value;
+  }, [value, multiline]);
   const read = (el: HTMLElement) =>
     multiline
       ? el.innerText.replace(/[ \t]+/g, " ").replace(/ ?\n ?/g, "\n").replace(/\n{2,}/g, "\n").trim()
@@ -338,7 +318,7 @@ export function EditableText({
     <Tag
       ref={ref as never}
       className={`gx-editable${multiline ? " gx-multiline" : ""} ${className}`}
-      contentEditable="plaintext-only"
+      contentEditable={readOnly ? undefined : "plaintext-only"}
       suppressContentEditableWarning
       data-placeholder={placeholder}
       spellCheck
@@ -489,5 +469,71 @@ export function EditableTerms({ field, className = "", addLabel = "+ Add" }: { f
         ) : null}
       </span>
     </>
+  );
+}
+
+type Person = { name: string; role?: string; avatar?: { src: string; alt?: string } };
+
+/**
+ * The byline's people, edited where the byline is: remove someone, or add someone who has
+ * written here before (from the "authors" vocabulary, with their role and picture) or
+ * someone new. `fallback` is who the site shows when the post names nobody.
+ */
+export function EditableAuthors({ field = "authors", fallback = [], className = "" }: { field?: string; fallback?: Person[]; className?: string }) {
+  const { values, setField, readOnly } = useFields();
+  const { vocabulary } = useEditSession();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useOutside(ref, open, close);
+  const people = Array.isArray(values[field]) ? (values[field] as Person[]) : fallback;
+  const known = vocabulary[field]?.terms ?? [];
+  const toPeople = (names: string[]): Person[] =>
+    names.map((name) => {
+      const existing = people.find((p) => p.name === name);
+      if (existing) return existing;
+      const term = known.find((t) => t.slug === name);
+      return { name, ...(term?.description ? { role: term.description } : {}), ...(term?.image ? { avatar: { src: term.image, alt: name } } : {}) };
+    });
+  return (
+    <span className={`gx-byline ${className}`}>
+      {people.map((p, i) => (
+        <span key={p.name} className="gx-term">
+          <span className="gx-term-chip gx-person">
+            {p.name}
+            {!readOnly ? (
+              <button type="button" className="gx-term-x" title="Remove" onClick={() => setField(field, people.filter((x) => x.name !== p.name))}>
+                ×
+              </button>
+            ) : null}
+          </span>
+          {i < people.length - 1 ? ", " : ""}
+        </span>
+      ))}
+      {!readOnly ? (
+        <span className="gx-term" ref={ref}>
+          <button type="button" className="gx-term-chip gx-term-add gx-person" onClick={() => setOpen((o) => !o)}>
+            + Add
+          </button>
+          {open ? (
+            <span className="gx-term-pop">
+              <TermPicker
+                autoFocus
+                multiple
+                terms={known}
+                value={people.map((p) => p.name)}
+                placeholder="Find someone, or type a new name…"
+                onChange={(names) => setField(field, toPeople(Array.isArray(names) ? names : []))}
+                onAdd={async (name) => {
+                  const clean = name.replace(/\s+/g, " ").trim();
+                  return clean ? { slug: clean, name: clean } : { error: "Type a name" };
+                }}
+                onDone={close}
+              />
+            </span>
+          ) : null}
+        </span>
+      ) : null}
+    </span>
   );
 }

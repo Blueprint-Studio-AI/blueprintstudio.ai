@@ -6,6 +6,8 @@ import { createContext, useContext } from "react";
 export interface Fields {
   values: Record<string, unknown>;
   setField(field: string, value: unknown): void;
+  /** An earlier version, shown but not editable. */
+  readOnly?: boolean;
 }
 
 export const FieldsContext = createContext<Fields | null>(null);

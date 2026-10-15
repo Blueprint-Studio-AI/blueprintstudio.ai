@@ -2,6 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Field } from "./fields";
+import { HistoryPanel, VersionBar, type VersionInfo } from "./history";
 import { Icon } from "./icons";
 import { SectionScope, type SectionScopeValue } from "./section-text";
 import { EDITOR_CSS } from "./styles";
@@ -29,6 +30,10 @@ export interface PageActions {
   save(page: { sections: PageSection[] }, revision: string): Promise<PageSaveResult>;
   /** The section at `index`, rendered by the site; `page` holds it and the sections above it. */
   render(page: { sections: PageSection[] }, index: number): Promise<{ node?: React.ReactNode; error?: string }>;
+  /** The page's versions, newest first (sites that keep history). */
+  versions?(): Promise<VersionInfo[]>;
+  /** Make an earlier version the page again. */
+  restore?(id: string): Promise<{ ok: true } | { error: string }>;
 }
 
 type Rendered = { node?: React.ReactNode; error?: string };
@@ -77,6 +82,7 @@ function SectionView({
   actions,
   label,
   selected,
+  readOnly = false,
   onSelect,
   onShow,
   onText,
@@ -88,6 +94,8 @@ function SectionView({
   actions: PageActions;
   label: string;
   selected: boolean;
+  /** An earlier version: words aren't editable. */
+  readOnly?: boolean;
   onSelect(): void;
   onShow(): void;
   onText(prop: string, value: string): void;
@@ -117,7 +125,7 @@ function SectionView({
           {label} can&apos;t show yet: {preview.error}
         </p>
       ) : (
-        <SectionScope.Provider value={scope}>{preview.node}</SectionScope.Provider>
+        <SectionScope.Provider value={readOnly ? null : scope}>{preview.node}</SectionScope.Provider>
       )}
     </div>
   );
@@ -130,10 +138,17 @@ const boxOf = (el: Element | null | undefined): Box | null => {
   const r = el.getBoundingClientRect();
   return { top: r.top, bottom: r.bottom, left: r.left, right: r.right };
 };
-/** A section's own box: its first element (the site's container), else the whole band. */
-const sectionBox = (id: string) => {
-  const el = document.querySelector(`[data-sec="${id}"]`);
-  return boxOf(el?.firstElementChild ?? el);
+/**
+ * A section's outline: as wide as its content (the site's container), as tall as its own
+ * band of the page, inset a little. Bands don't overlap, so neither do outlines.
+ */
+const sectionBox = (id: string): Box | null => {
+  const band = document.querySelector(`[data-sec="${id}"]`);
+  if (!band) return null;
+  const outer = band.getBoundingClientRect();
+  if (band.classList.contains("gx-sec-hidden")) return boxOf(band);
+  const inner = (band.firstElementChild ?? band).getBoundingClientRect();
+  return { top: outer.top + 4, bottom: outer.bottom - 4, left: Math.max(outer.left + 4, inner.left - 14), right: Math.min(outer.right - 4, inner.right + 14) };
 };
 
 export function PageEditor({
@@ -145,6 +160,8 @@ export function PageEditor({
   viewUrl,
   editLinks,
   mainClassName = "",
+  editUrl,
+  version,
   children,
 }: {
   page: { sections: PageSection[] };
@@ -159,13 +176,17 @@ export function PageEditor({
   editLinks?: { from: string; to: string };
   /** The class of the site's <main> on this page. */
   mainClassName?: string;
+  /** Edit mode's own address, for going back from an earlier version. */
+  editUrl: string;
+  /** An earlier version, shown read-only with a bar to restore it. */
+  version?: VersionInfo;
   /** What comes after the page's main (its footer). */
   children?: React.ReactNode;
 }) {
   const [sections, setSections] = useState(page.sections);
   const [snapshot, setSnapshot] = useState(page.sections);
   const [selected, setSelected] = useState<string | null>(null);
-  const [drawer, setDrawer] = useState<"list" | "settings" | null>(null);
+  const [drawer, setDrawer] = useState<"list" | "settings" | "history" | null>(null);
   const [adding, setAdding] = useState<{ index: number; left: number; top: number } | null>(null);
   const [state, setState] = useState<"saved" | "dirty" | "saving" | "error">("saved");
   const [error, setError] = useState<string | null>(null);
@@ -192,9 +213,14 @@ export function PageEditor({
     }
   }, [actions]);
 
-  /** Change the page. Words typed in place pass `quiet`: no new render, the page already shows them. */
-  const change = useCallback(
-    (next: PageSection[], quiet = false) => {
+  // Undo and Redo: the page as it was before each change. Typing in one place counts as one change.
+  const past = useRef<PageSection[][]>([]);
+  const future = useRef<PageSection[][]>([]);
+  const lastTyping = useRef(0);
+  const [, setTick] = useState(0);
+
+  const apply = useCallback(
+    (next: PageSection[], quiet: boolean) => {
       latest.current = next;
       setSections(next);
       if (!quiet) setSnapshot(next);
@@ -204,6 +230,48 @@ export function PageEditor({
     },
     [flush],
   );
+
+  /** Change the page. Words typed in place pass `quiet`: no new render, the page already shows them. */
+  const change = useCallback(
+    (next: PageSection[], quiet = false) => {
+      if (version) return;
+      const typing = quiet && Date.now() - lastTyping.current < 1500;
+      if (!typing) past.current.push(latest.current);
+      lastTyping.current = quiet ? Date.now() : 0;
+      future.current = [];
+      apply(next, quiet);
+      setTick((t) => t + 1);
+    },
+    [apply, version],
+  );
+  const undo = useCallback(() => {
+    const prev = past.current.pop();
+    if (!prev) return;
+    future.current.push(latest.current);
+    lastTyping.current = 0;
+    apply(prev, false);
+    setTick((t) => t + 1);
+  }, [apply]);
+  const redo = useCallback(() => {
+    const next = future.current.pop();
+    if (!next) return;
+    past.current.push(latest.current);
+    apply(next, false);
+    setTick((t) => t + 1);
+  }, [apply]);
+  // ⌘Z and ⇧⌘Z, unless they're for a text box.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "z") return;
+      const t = e.target as HTMLElement;
+      if (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) return;
+      e.preventDefault();
+      if (e.shiftKey) redo();
+      else undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo]);
 
   const update = (id: string, patch: Partial<PageSection>, quiet = false) =>
     change(
@@ -282,23 +350,28 @@ export function PageEditor({
   // ---- What's on screen: the toolbar over the selected section, a tag on the hovered one,
   // and "Edit post" on links to posts ----
 
-  const [toolbar, setToolbar] = useState<{ top: number; left: number } | null>(null);
+  const [toolbar, setToolbar] = useState<{ top: number; left: number; box: Box } | null>(null);
   const [hover, setHover] = useState<{ id: string; box: Box } | null>(null);
+  const hoverId = useRef<string | null>(null);
   const [postLink, setPostLink] = useState<{ href: string; box: Box } | null>(null);
   const bar = useRef<HTMLDivElement>(null);
   const linkPattern = useMemo(() => (editLinks ? new RegExp(editLinks.from) : null), [editLinks]);
 
   useEffect(() => {
+    // The toolbar sits inside the selected section's outline, top right, and stays in view
+    // while the section is on screen.
     const place = () => {
       const box = selected ? sectionBox(selected) : null;
       if (!box || box.bottom < 100 || box.top > window.innerHeight - 40) return setToolbar(null);
       const width = bar.current?.offsetWidth ?? 420;
-      const top = Math.min(Math.max(box.top - 22, 92), box.bottom - 50);
-      setToolbar({ top, left: Math.min(Math.max(8, (box.left + box.right) / 2 - width / 2), window.innerWidth - width - 8) });
+      const top = Math.min(Math.max(box.top + 10, 92), box.bottom - 50);
+      setToolbar({ top, left: Math.min(Math.max(8, box.right - width - 10), window.innerWidth - width - 8), box });
+      const id = hoverId.current;
+      const hovered = id ? sectionBox(id) : null;
+      setHover(id && hovered ? { id, box: hovered } : null);
     };
     const onScroll = () => {
       place();
-      setHover(null);
       setPostLink(null);
     };
     place();
@@ -316,6 +389,7 @@ export function PageEditor({
     const target = e.target as Element;
     const sec = target.closest("[data-sec]");
     const id = sec?.getAttribute("data-sec") ?? null;
+    hoverId.current = id;
     if (!id) setHover(null);
     else if (hover?.id !== id) {
       const box = sectionBox(id);
@@ -333,12 +407,20 @@ export function PageEditor({
   const status = { saved: "Saved", dirty: "Saving…", saving: "Saving…", error: "Not saved" }[state];
 
   const openLibrary = (index: number, at: { left: number; top: number }) =>
-    setAdding({ index, left: Math.min(Math.max(12, at.left), window.innerWidth - 372), top: Math.min(at.top, window.innerHeight - 440) });
+    setAdding({ index, left: Math.min(Math.max(12, at.left), window.innerWidth - 812), top: Math.min(at.top, window.innerHeight - 460) });
+  const loadVersions = useCallback(() => (actions.versions ? actions.versions() : Promise.resolve([])), [actions]);
 
   return (
     <>
       <style>{EDITOR_CSS}</style>
-      <div className={`gx-session gx-pageedit${drawer ? " has-drawer" : ""}`} onMouseOver={onOver} onMouseLeave={() => setHover(null)}>
+      <div
+        className={`gx-session gx-pageedit${drawer ? " has-drawer" : ""}${version ? " is-version" : ""}`}
+        onMouseOver={onOver}
+        onMouseLeave={() => {
+          hoverId.current = null;
+          setHover(null);
+        }}
+      >
         <main
           className={mainClassName}
           // Links and forms on the page are the site's; in edit mode clicking selects instead.
@@ -357,7 +439,10 @@ export function PageEditor({
                 actions={actions}
                 label={labelOf(entry)}
                 selected={selected === entry.id}
-                onSelect={() => setSelected(entry.id)}
+                readOnly={Boolean(version)}
+                onSelect={() => {
+                  if (!version) setSelected(entry.id);
+                }}
                 onShow={() => update(entry.id, { hidden: false })}
                 onText={(prop, value) => setProp(entry.id, prop, value, true)}
               />
@@ -370,9 +455,15 @@ export function PageEditor({
       </div>
 
       {hover && hover.id !== selected ? (
-        <span className="gx-sec-tag" style={{ top: Math.max(84, hover.box.top - 30), left: hover.box.left }}>
-          {labelOf(sections.find((s) => s.id === hover.id) ?? { id: "", type: "", props: {} })}
-        </span>
+        <div className="gx-sec-box" style={{ top: hover.box.top, left: hover.box.left, width: hover.box.right - hover.box.left, height: hover.box.bottom - hover.box.top }}>
+          <span className="gx-sec-tag">{labelOf(sections.find((s) => s.id === hover.id) ?? { id: "", type: "", props: {} })}</span>
+        </div>
+      ) : null}
+      {selectedEntry && toolbar ? (
+        <div
+          className="gx-sec-box is-selected"
+          style={{ top: toolbar.box.top, left: toolbar.box.left, width: toolbar.box.right - toolbar.box.left, height: toolbar.box.bottom - toolbar.box.top }}
+        />
       ) : null}
 
       {postLink ? (
@@ -414,14 +505,32 @@ export function PageEditor({
           library={library}
           present={new Set(sections.map((s) => s.type))}
           at={adding}
+          mainClassName={mainClassName}
+          preview={(type) => actions.render({ sections: [{ id: "preview", type, props: byName.get(type)?.defaults ?? {} }] }, 0)}
           onPick={(type) => add(type, adding.index)}
           onClose={() => setAdding(null)}
         />
       ) : null}
 
+      {version ? (
+        <VersionBar
+          version={version}
+          backHref={editUrl}
+          onRestore={async () => {
+            const result = actions.restore ? await actions.restore(version.id) : { error: "This site can't restore versions" };
+            return "error" in result ? result.error : null;
+          }}
+        />
+      ) : (
       <nav className="gx-rail" aria-label="Edit mode">
         <button type="button" className={`gx-rail-btn gx-rail-status is-${state}`} aria-label={status} data-tip={state === "saved" ? "Saved. Changes save as you go." : status} onClick={() => void flush()}>
           <i />
+        </button>
+        <button type="button" className="gx-rail-btn" aria-label="Undo" data-tip="Undo (⌘Z)" disabled={!past.current.length} onClick={undo}>
+          <Icon name="undo" />
+        </button>
+        <button type="button" className="gx-rail-btn" aria-label="Redo" data-tip="Redo (⇧⌘Z)" disabled={!future.current.length} onClick={redo}>
+          <Icon name="redo" />
         </button>
         <span className="gx-rail-sep" />
         <button
@@ -445,11 +554,41 @@ export function PageEditor({
         >
           <Icon name="layers" />
         </button>
+        {actions.versions ? (
+          <button
+            type="button"
+            className={`gx-rail-btn${drawer === "history" ? " is-on" : ""}`}
+            aria-label="Version history"
+            data-tip="Version history"
+            onClick={() => setDrawer((d) => (d === "history" ? null : "history"))}
+          >
+            <Icon name="history" />
+          </button>
+        ) : null}
         <span className="gx-rail-sep" />
         <a className="gx-rail-btn gx-rail-done" href={viewUrl} aria-label="Done" data-tip="Done: see the page">
           <Icon name="check" />
         </a>
       </nav>
+      )}
+
+      {drawer === "history" && actions.versions ? (
+        <aside className="gx-drawer" data-lenis-prevent>
+          <header className="gx-drawer-head">
+            <b className="gx-drawer-title">Version history</b>
+            <button type="button" className="gx-drawer-close" onClick={() => setDrawer(null)} aria-label="Close">
+              ×
+            </button>
+          </header>
+          <HistoryPanel
+            load={loadVersions}
+            onOpen={async (id) => {
+              await flush();
+              window.location.href = `${editUrl}?version=${id}`;
+            }}
+          />
+        </aside>
+      ) : null}
 
       {error ? (
         <div className="gx-toast" role="alert">
@@ -554,21 +693,39 @@ function Gap({ onAdd, last = false }: { onAdd(at: { left: number; top: number })
   );
 }
 
-/** The site's sections, to add one. */
+const previews = new Map<string, Promise<Rendered>>();
+
+/** The site's sections, to add one. Hovering one shows it, rendered by the site with its starting settings. */
 function SectionLibrary({
   library,
   present,
   at,
+  mainClassName,
+  preview,
   onPick,
   onClose,
 }: {
   library: LibrarySection[];
   present: Set<string>;
   at: { left: number; top: number };
+  mainClassName: string;
+  preview(type: string): Promise<Rendered>;
   onPick(type: string): void;
   onClose(): void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState<string>(library[0]?.name ?? "");
+  const [rendered, setRendered] = useState<{ type: string; result: Rendered } | null>(null);
+  useEffect(() => {
+    if (!shown) return;
+    let live = true;
+    if (!previews.has(shown)) previews.set(shown, preview(shown).catch((e: Error) => ({ error: e.message })));
+    void previews.get(shown)!.then((result) => live && setRendered({ type: shown, result }));
+    return () => {
+      live = false;
+    };
+  }, [shown, preview]);
+  const current = library.find((s) => s.name === shown);
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
@@ -592,7 +749,15 @@ function SectionLibrary({
             {items.map((s) => {
               const taken = Boolean(s.single && present.has(s.name));
               return (
-                <button key={s.name} type="button" className="gx-insert-item" disabled={taken} onClick={() => onPick(s.name)}>
+                <button
+                  key={s.name}
+                  type="button"
+                  className={`gx-insert-item${shown === s.name ? " is-on" : ""}`}
+                  disabled={taken}
+                  onMouseEnter={() => setShown(s.name)}
+                  onFocus={() => setShown(s.name)}
+                  onClick={() => onPick(s.name)}
+                >
                   <b>{s.label}</b>
                   <span>{taken ? "Already on this page (one per page)" : s.description}</span>
                 </button>
@@ -600,6 +765,25 @@ function SectionLibrary({
             })}
           </Fragment>
         ))}
+      </div>
+      <div className="gx-library-preview">
+        <div className="gx-library-frame">
+          {rendered?.type === shown && rendered.result.node ? (
+            <div className={`${mainClassName} gx-library-page`} inert>
+              {rendered.result.node}
+            </div>
+          ) : rendered?.type === shown && rendered.result.error ? (
+            <p className="gx-block-error">{rendered.result.error}</p>
+          ) : (
+            <div className="gx-skeleton" />
+          )}
+        </div>
+        {current ? (
+          <p className="gx-library-about">
+            <b>{current.label}</b> {current.description}
+          </p>
+        ) : null}
+        <p className="gx-library-more">New kinds of section are built into the site&apos;s code, by Blueprint or an agent working in the site&apos;s repo.</p>
       </div>
     </div>
   );

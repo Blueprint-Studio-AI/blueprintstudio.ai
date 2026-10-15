@@ -101,7 +101,7 @@ export const nameOf = (name: string) =>
 
 export type BlockUi = "edit" | "replace" | null;
 
-export function BlockView({ node, updateAttributes, selected, getPos }: ReactNodeViewProps) {
+export function BlockView({ node, selected, getPos }: ReactNodeViewProps) {
   const services = useServices();
   const attrs = node.attrs as BlockAttrs;
   const ui = (node.attrs.ui as BlockUi) ?? null;
@@ -163,8 +163,9 @@ export function BlockView({ node, updateAttributes, selected, getPos }: ReactNod
           {picking ? "Pick a picture in the panel" : "Choose a picture"}
         </button>
       ) : (
-        // Grab a component anywhere to move it (a text block moves by its handle).
-        <div ref={previewRef} className="gx-block-preview" contentEditable={false} data-drag-handle draggable={ui !== "edit" ? true : undefined}>
+        // Grab a component anywhere to move it (a text block moves by its handle); click it,
+        // or its Edit button, for its panel.
+        <div ref={previewRef} className="gx-block-preview" contentEditable={false} data-drag-handle draggable onClick={() => !ui && setUi("edit")}>
           {preview === undefined ? (
             <div className="gx-skeleton" />
           ) : preview.error ? (
@@ -176,26 +177,10 @@ export function BlockView({ node, updateAttributes, selected, getPos }: ReactNod
           )}
         </div>
       )}
-
-      {ui === "edit" && component ? (
-        <div contentEditable={false}>
-          <PropsForm
-            component={component}
-            props={attrs.props}
-            body={attrs.body}
-            error={preview?.error}
-            hide={isPicker ? ["src", "width", "height"] : []}
-            onApply={(props, body) => {
-              updateAttributes({ props: { ...attrs.props, ...props }, body, ui: null, isNew: null });
-            }}
-            onCancel={() => setUi(null)}
-          />
-        </div>
-      ) : null}
-      {ui === "edit" && !component ? (
-        <p className="gx-block-error" contentEditable={false}>
-          {attrs.name} isn&apos;t one of this site&apos;s components any more.
-        </p>
+      {!empty && !ui ? (
+        <button type="button" className="gx-block-edit" contentEditable={false} onClick={() => setUi("edit")}>
+          Edit {isPicker ? "image" : nameOf(attrs.name).toLowerCase()}
+        </button>
       ) : null}
     </NodeViewWrapper>
   );
@@ -244,28 +229,24 @@ export function InlineView({ node, updateAttributes, selected }: ReactNodeViewPr
   );
 }
 
-export function RawView({ node, updateAttributes, selected }: ReactNodeViewProps) {
+/** Source the editor keeps as written (a table, footnotes): shown as it is; click to edit it in the panel. */
+export function RawView({ node, selected, getPos }: ReactNodeViewProps) {
+  const services = useServices();
   const ui = (node.attrs.ui as BlockUi) ?? null;
-  const [text, setText] = useState(String(node.attrs.mdx ?? ""));
   return (
     <NodeViewWrapper className={`gx-block gx-raw${selected ? " is-selected" : ""}${ui ? " is-editing" : ""}`}>
-      {ui === "edit" ? (
-        <div contentEditable={false} className="gx-form">
-          <textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.stopPropagation()} />
-          <div className="gx-form-actions">
-            <button type="button" className="gx-button" onClick={() => updateAttributes({ ui: null })}>
-              Cancel
-            </button>
-            <button type="button" className="gx-button gx-primary" onClick={() => updateAttributes({ mdx: text, ui: null })}>
-              Done
-            </button>
-          </div>
-        </div>
-      ) : (
-        <pre className="gx-raw-source" contentEditable={false} data-drag-handle draggable>
-          {String(node.attrs.mdx)}
-        </pre>
-      )}
+      <pre
+        className="gx-raw-source"
+        contentEditable={false}
+        data-drag-handle
+        draggable
+        onClick={() => {
+          const at = typeof getPos === "function" ? getPos() : undefined;
+          if (at !== undefined && !ui) services.setUi(at, "edit");
+        }}
+      >
+        {String(node.attrs.mdx)}
+      </pre>
     </NodeViewWrapper>
   );
 }

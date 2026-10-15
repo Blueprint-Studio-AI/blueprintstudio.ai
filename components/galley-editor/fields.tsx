@@ -60,6 +60,8 @@ const formatDate = (iso: string) => {
 export interface FieldContext {
   /** Vocabulary for a field path, e.g. "category", "topics", "series.slug". */
   vocabulary?: Vocabulary;
+  /** Open the picture panel for an image field at this path ("seo.image"). */
+  pickImage?(path: string): void;
   addTerm?(kind: string, name: string): Promise<Term | { error: string }>;
   /** Placeholder text for empty fields, e.g. the summary's fallback. */
   placeholders?: Record<string, string>;
@@ -411,9 +413,34 @@ export function Field({
         </button>
       </div>
     );
+  } else if (schema.type === "object" && schema.properties?.src && schema.properties.alt && context.pickImage) {
+    // A picture: shown, with Change (the picture panel) and, if it has a default, Use the default.
+    const img = (value && typeof value === "object" ? value : null) as { src?: string } | null;
+    const fallback = context.placeholders?.[path];
+    const shown = img?.src ?? fallback;
+    input = (
+      <div className="gx-pic">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {shown ? <img src={shown} alt="" /> : <span className="gx-pic-empty">No picture</span>}
+        <span className="gx-pic-actions">
+          {!img?.src && fallback ? <small>Uses the default</small> : null}
+          <button type="button" className="gx-button" onClick={() => context.pickImage!(path)}>
+            Change
+          </button>
+          {img?.src ? (
+            <button type="button" className="gx-link-button" onClick={() => onChange(nullable(raw) ? null : undefined)}>
+              {fallback ? "Use the default" : "Remove"}
+            </button>
+          ) : null}
+        </span>
+      </div>
+    );
   } else if (schema.type === "object" && schema.properties) {
     const obj = (value && typeof value === "object" ? value : null) as Record<string, unknown> | null;
-    if (!obj && (nullable(raw) || !required)) {
+    // A group whose parts are all optional (search and sharing) is always open: empty parts
+    // fall back to something, and filling one in starts the group.
+    const allOptional = !(schema.required ?? []).length;
+    if (!obj && !allOptional && (nullable(raw) || !required)) {
       input = (
         <button type="button" className="gx-button" onClick={() => onChange({})}>
           + Add {labelOf(name).toLowerCase()}
@@ -434,12 +461,12 @@ export function Field({
               context={context}
               onChange={(v) => {
                 const next = { ...(obj ?? {}), [key]: v };
-                if (v === undefined) delete next[key];
-                onChange(next);
+                if (v === undefined || v === null || v === "") delete next[key];
+                onChange(allOptional && !Object.keys(next).length ? undefined : next);
               }}
             />
           ))}
-          {nullable(raw) || !required ? (
+          {(nullable(raw) || !required) && !allOptional ? (
             <button type="button" className="gx-link-button" onClick={() => onChange(nullable(raw) ? null : undefined)}>
               Remove {labelOf(name).toLowerCase()}
             </button>

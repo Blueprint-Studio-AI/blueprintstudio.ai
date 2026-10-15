@@ -66,4 +66,8 @@ export interface EditorActions {
   addTerm?(kind: string, name: string): Promise<Term | { error: string }>;
   /** A file from the person's computer, as FormData with "file". */
   upload(form: FormData): Promise<{ path?: string; width?: number; height?: number; error?: string }>;
+  /** The post's versions, newest first (sites that keep history). */
+  versions?(slug: string): Promise<{ id: string; at: string; author: string; note?: string; words?: number }[]>;
+  /** Make an earlier version the post again. */
+  restore?(slug: string, id: string): Promise<{ ok: true } | { error: string }>;
 }

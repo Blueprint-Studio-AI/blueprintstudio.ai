@@ -23,7 +23,7 @@ const FRIENDLY: Record<string, { label?: string; hint: string }> = {
 };
 
 const labelOf = (name: string) => FRIENDLY[name]?.label ?? name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/ (\w)/g, (_, c: string) => ` ${c.toLowerCase()}`);
-const hintOf = (c: ManifestComponent) =>
+export const hintOf = (c: ManifestComponent) =>
   FRIENDLY[c.name]?.hint ??
   c.description
     .split(/(?<=\.)\s/)[0]
