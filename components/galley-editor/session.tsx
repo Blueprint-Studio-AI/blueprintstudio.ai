@@ -4,10 +4,12 @@ import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useEditor } from "@tiptap/react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { anchorOf, findAnchor } from "./anchors";
-import type { Uploaded } from "./chooser";
+import { ImagePanel, type Uploaded } from "./chooser";
 import { extensions } from "./extensions";
 import { CommentsPanel } from "./panels";
 import { Field, type FieldContext } from "./fields";
+import { FieldsContext, type Fields } from "./fields-context";
+import { Icon } from "./icons";
 import { ServicesContext, type Services } from "./services";
 import { EDITOR_CSS } from "./styles";
 import type { Comment, DocNode, EditorActions, EditorPost, JsonSchema, LibraryAsset, ManifestComponent, SaveResult, Term, Vocabulary } from "./types";
@@ -15,8 +17,9 @@ import type { Comment, DocNode, EditorActions, EditorPost, JsonSchema, LibraryAs
 // Edit mode for a post, on the site's own page. The site renders its normal post layout
 // and puts editable pieces where the title, cover and body go (editable.tsx). This holds
 // the document and saves it as you type (checked by Galley on the server). Things are
-// added where they go: "+" or "/" for a new block, and a picture is chosen inside its
-// image block. The bar holds only what's about the whole post: adding, comments, done.
+// added where they go: "+" or "/" for a new block. The rail down the right holds what's
+// about the whole post, and its panels open beside it: details, comments, and the picture
+// being chosen for an image block or the cover.
 
 type SaveState = { kind: "saved" | "dirty" | "saving" } | { kind: "error"; result: Extract<SaveResult, { ok: false }> };
 export type ImageShape = "image" | "src";
@@ -33,9 +36,10 @@ export interface EditSession {
   setProseClass(className: string): void;
   /** A prompt for an image at `pos` (or for the cover, with null), from the post around it. */
   contextFor(pos: number | null): string;
-  /** Use a library or generated image for a front matter field (cover, hero). */
-  chooseFieldImage(field: string, shape: ImageShape, asset: LibraryAsset): Promise<void>;
-  uploadedFieldImage(field: string, shape: ImageShape, file: Uploaded): void;
+  /** Open the picture panel for a front matter image (the cover, a hero). */
+  pickFieldImage(field: string, shape: ImageShape, label: string): void;
+  /** The picture being tried for that field, while the panel is open for it. */
+  tryingFor(field: string): LibraryAsset | null;
   insertAt: InsertAt | null;
   openInsert(at: InsertAt | null): void;
   startComment(): void;
@@ -87,6 +91,9 @@ export const blockEnd = (editor: TiptapEditor) => {
 };
 
 const altFrom = (prompt: string) => {
+  // Prompts edit mode wrote ("An image for the article …") say where a picture went, not
+  // what it shows, so they make no alt text.
+  if (/^(An|A cover) image for the article/.test(prompt.trim())) return "";
   const first = prompt.replace(/\s+/g, " ").split(/(?<=[.!?])\s/)[0] ?? prompt;
   return first.length > 120 ? `${first.slice(0, 117)}…` : first;
 };
@@ -102,22 +109,6 @@ const altFromFile = (name = "") => {
   const words = name.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
   return words ? words[0].toUpperCase() + words.slice(1) : "";
 };
-
-/** The rail's icons, drawn inline so the editor brings no icon set with it. */
-function Icon({ name }: { name: "back" | "plus" | "details" | "comment" | "check" }) {
-  const paths = {
-    back: "M15 18l-6-6 6-6",
-    plus: "M12 5v14M5 12h14",
-    details: "M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6",
-    comment: "M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z",
-    check: "M5 12.5l4.5 4.5L19 7.5",
-  };
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d={paths[name]} />
-    </svg>
-  );
-}
 
 const imageValue = (shape: ImageShape, src: string, alt: string, width?: number, height?: number) =>
   shape === "src" ? src : { src, alt, width, height };
@@ -158,10 +149,27 @@ export function EditSession({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [draft, setDraft] = useState<Comment | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
-  const [drawer, setDrawer] = useState<"comments" | "details" | null>(null);
+  const [drawer, setDrawer] = useState<"comments" | "details" | "image" | null>(null);
+  // Choosing a picture: for the image block marked ui "replace", or for a front matter
+  // field. `trying` is shown in the post until it's kept.
+  const [fieldPick, setFieldPick] = useState<{ field: string; shape: ImageShape; label: string } | null>(null);
+  const [trying, setTrying] = useState<LibraryAsset | null>(null);
+  const [pickKey, setPickKey] = useState(0);
   const commentsOpen = drawer === "comments";
-  const setCommentsOpen = (open: boolean | ((o: boolean) => boolean)) =>
-    setDrawer((d) => ((typeof open === "function" ? open(d === "comments") : open) ? "comments" : d === "comments" ? null : d));
+  // Opening another panel puts a picture that's only being tried back.
+  const drawerRef = useRef(drawer);
+  useEffect(() => {
+    drawerRef.current = drawer;
+  }, [drawer]);
+  const closePictureRef = useRef<() => void>(() => {});
+  const leavePicture = () => {
+    if (drawerRef.current === "image") closePictureRef.current();
+  };
+  const setCommentsOpen = useCallback((open: boolean | ((o: boolean) => boolean)) => {
+    const next = typeof open === "function" ? open(drawerRef.current === "comments") : open;
+    if (next && drawerRef.current === "image") closePictureRef.current();
+    setDrawer((d) => (next ? "comments" : d === "comments" ? null : d));
+  }, []);
   const [insertAt, setInsertAt] = useState<InsertAt | null>(null);
 
   const revision = useRef(post.revision);
@@ -217,6 +225,17 @@ export function EditSession({
   const saveNow = useCallback(async () => {
     if (!editor) return;
     if (timer.current) clearTimeout(timer.current);
+    // A picture still being copied into the site would be saved by its remote address;
+    // wait for it.
+    let importing = false;
+    editor.state.doc.descendants((n) => {
+      if (n.attrs.pending) importing = true;
+      return !importing;
+    });
+    if (importing) {
+      timer.current = setTimeout(() => void saveRef.current(), 800);
+      return;
+    }
     await saving.current;
     const run = (async () => {
       setSave({ kind: "saving" });
@@ -235,6 +254,15 @@ export function EditSession({
   useEffect(() => {
     saveRef.current = saveNow;
   }, [saveNow]);
+
+  // Leaving with changes not yet saved asks first.
+  const unsaved = save.kind !== "saved";
+  useEffect(() => {
+    if (!unsaved) return;
+    const onLeave = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", onLeave);
+    return () => window.removeEventListener("beforeunload", onLeave);
+  }, [unsaved]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -306,7 +334,7 @@ export function EditSession({
     setDraft({ id, ...anchor, author, body: "", at: new Date().toISOString(), replies: [] });
     setActiveComment(id);
     setCommentsOpen(true);
-  }, [editor, author, markComment]);
+  }, [editor, author, markComment, setCommentsOpen]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -332,7 +360,7 @@ export function EditSession({
     return () => {
       editor.off("selectionUpdate", onSelection);
     };
-  }, [editor]);
+  }, [editor, setCommentsOpen]);
 
   const focusComment = (id: string) => {
     setActiveComment(id);
@@ -462,21 +490,148 @@ export function EditSession({
   );
 
   // Which panel a block shows lives on the block (never saved), so it follows the block
-  // when things above it move.
+  // when things above it move. Only one image block is chosen for at a time.
+  const fieldPickRef = useRef(fieldPick);
+  const pickField = useCallback((next: { field: string; shape: ImageShape; label: string } | null) => {
+    fieldPickRef.current = next;
+    setFieldPick(next);
+  }, []);
   const setUi = useCallback(
-    (pos: number, ui: "edit" | "replace" | "options" | null) => {
+    (pos: number, ui: "edit" | "replace" | null) => {
       const node = editor?.state.doc.nodeAt(pos);
       if (!editor || !node) return;
-      editor.view.dispatch(
-        editor.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, ui }).setMeta("galleyComment", true).setMeta("addToHistory", false),
-      );
+      const tr = editor.state.tr;
+      if (ui === "replace") {
+        editor.state.doc.forEach((n, offset) => {
+          if (offset !== pos && n.attrs.ui === "replace") tr.setNodeMarkup(offset, undefined, { ...n.attrs, ui: null });
+        });
+        fieldPickRef.current = null;
+        setFieldPick(null);
+        setTrying(null);
+        setPickKey((k) => k + 1);
+        setDrawer("image");
+      }
+      editor.view.dispatch(tr.setNodeMarkup(pos, undefined, { ...node.attrs, ui }).setMeta("galleyComment", true).setMeta("addToHistory", false));
     },
     [editor],
   );
 
+  // ---- Choosing a picture, in the panel ----
+
+  /** Where the image block being chosen for is: the one marked ui "replace". */
+  const pickingBlock = useCallback((): number | null => {
+    if (!editor) return null;
+    const { doc } = editor.state;
+    for (let i = 0, offset = 0; i < doc.childCount; offset += doc.child(i).nodeSize, i++) {
+      const node = doc.child(i);
+      if (node.type.name === "galleyBlock" && node.attrs.ui === "replace") return offset;
+    }
+    return null;
+  }, [editor]);
+
+  // The panel follows the document: a new image block (inserted marked "replace") opens
+  // it, and keeping a picture, deleting the block or undoing closes it.
+  const blockPicking = useRef(false);
+  useEffect(() => {
+    if (!editor) return;
+    const sync = () => {
+      const at = pickingBlock();
+      const now = at !== null;
+      if (now === blockPicking.current) return;
+      blockPicking.current = now;
+      if (now) {
+        fieldPickRef.current = null;
+        setFieldPick(null);
+        setTrying(null);
+        setPickKey((k) => k + 1);
+        setDrawer("image");
+        // Bring the picture into view beside the panel, once the page has made room for it.
+        setTimeout(() => {
+          const pos = pickingBlock();
+          const dom = pos === null ? null : (editor.view.nodeDOM(pos) as HTMLElement | null);
+          dom?.scrollIntoView({ block: "center", behavior: "smooth" });
+        }, 260);
+      } else if (!fieldPickRef.current) {
+        setTrying(null);
+        setDrawer((d) => (d === "image" ? null : d));
+      }
+    };
+    editor.on("transaction", sync);
+    return () => {
+      editor.off("transaction", sync);
+    };
+  }, [editor, pickingBlock]);
+
+  const pickFieldImage = useCallback(
+    (field: string, shape: ImageShape, label: string) => {
+      const at = pickingBlock();
+      pickField({ field, shape, label });
+      if (at !== null && editor) {
+        const node = editor.state.doc.nodeAt(at)!;
+        editor.view.dispatch(editor.state.tr.setNodeMarkup(at, undefined, { ...node.attrs, ui: null }).setMeta("galleyComment", true).setMeta("addToHistory", false));
+      }
+      setTrying(null);
+      setPickKey((k) => k + 1);
+      setDrawer("image");
+    },
+    [editor, pickingBlock, pickField],
+  );
+
+  const keepPicture = async (asset: LibraryAsset) => {
+    setTrying(null);
+    const field = fieldPickRef.current;
+    if (field) {
+      pickField(null);
+      setDrawer(null);
+      await chooseFieldImage(field.field, field.shape, asset);
+      return;
+    }
+    const at = pickingBlock();
+    if (at !== null) await chooseImage(at, asset);
+  };
+
+  const keepUpload = (file: Uploaded) => {
+    setTrying(null);
+    const field = fieldPickRef.current;
+    if (field) {
+      pickField(null);
+      setDrawer(null);
+      uploadedFieldImage(field.field, field.shape, file);
+      return;
+    }
+    const at = pickingBlock();
+    if (at !== null) setImage(at, file);
+  };
+
+  /** Close the panel without changing the picture. A new image block with none goes. */
+  const closePicture = () => {
+    setTrying(null);
+    if (fieldPickRef.current) {
+      pickField(null);
+      setDrawer(null);
+      return;
+    }
+    const at = pickingBlock();
+    if (at === null || !editor) return setDrawer(null);
+    const node = editor.state.doc.nodeAt(at)!;
+    if ((node.attrs.props as { src?: string })?.src) setUi(at, null);
+    else editor.view.dispatch(editor.state.tr.delete(at, at + node.nodeSize));
+  };
+  useEffect(() => {
+    closePictureRef.current = closePicture;
+  });
+  useEffect(() => {
+    if (drawer !== "image") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closePictureRef.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawer]);
+
   const services = useMemo<Services>(
-    () => ({ slug: post.slug, actions, components, chooseImage, setImage, contextFor, setUi }),
-    [post.slug, actions, components, chooseImage, setImage, contextFor, setUi],
+    () => ({ slug: post.slug, actions, components, chooseImage, setImage, contextFor, setUi, trying }),
+    [post.slug, actions, components, chooseImage, setImage, contextFor, setUi, trying],
   );
 
   const session = useMemo<EditSession>(
@@ -493,23 +648,25 @@ export function EditSession({
         }
       },
       contextFor,
-      chooseFieldImage,
-      uploadedFieldImage,
+      pickFieldImage,
+      tryingFor: (field) => (fieldPick?.field === field ? trying : null),
       insertAt,
       openInsert: setInsertAt,
       startComment,
       vocabulary,
       addTerm: actions.addTerm,
     }),
-    [editor, components, frontmatter, setField, contextFor, chooseFieldImage, uploadedFieldImage, insertAt, startComment, vocabulary, actions.addTerm],
+    [editor, components, frontmatter, setField, contextFor, pickFieldImage, fieldPick, trying, insertAt, startComment, vocabulary, actions.addTerm],
   );
 
+  const fields = useMemo<Fields>(() => ({ values: frontmatter, setField }), [frontmatter, setField]);
   const openCount = comments.filter((c) => !c.resolved).length + (draft ? 1 : 0);
   const fieldContext: FieldContext = { vocabulary, addTerm: actions.addTerm, placeholders };
   const status = { saved: "Saved", dirty: "Saving…", saving: "Saving…", error: "Not saved" }[save.kind];
 
   return (
     <SessionContext.Provider value={session}>
+      <FieldsContext.Provider value={fields}>
       <ServicesContext.Provider value={services}>
         <style>{EDITOR_CSS}</style>
         <div className={`gx-session${drawer ? " has-drawer" : ""}`}>{children}</div>
@@ -547,7 +704,10 @@ export function EditSession({
               className={`gx-rail-btn${drawer === "details" ? " is-on" : ""}`}
               aria-label="Details"
               data-tip="Details: search, filing, authors"
-              onClick={() => setDrawer((d) => (d === "details" ? null : "details"))}
+              onClick={() => {
+                if (drawer !== "details") leavePicture();
+                setDrawer((d) => (d === "details" ? null : "details"));
+              }}
             >
               <Icon name="details" />
             </button>
@@ -577,6 +737,26 @@ export function EditSession({
               </div>
             ))}
           </div>
+        ) : null}
+
+        {drawer === "image" ? (
+          <aside className="gx-drawer" data-lenis-prevent>
+            <header className="gx-drawer-head">
+              <b className="gx-drawer-title">{fieldPick ? `Choose the ${fieldPick.label}` : "Choose a picture"}</b>
+              <button type="button" className="gx-drawer-close" onClick={closePicture} aria-label="Close">
+                ×
+              </button>
+            </header>
+            <ImagePanel
+              key={pickKey}
+              actions={actions}
+              context={contextFor(fieldPick ? null : pickingBlock())}
+              trying={trying}
+              onTry={setTrying}
+              onKeep={(asset) => void keepPicture(asset)}
+              onUploaded={keepUpload}
+            />
+          </aside>
         ) : null}
 
         {drawer === "details" && frontmatterSchema ? (
@@ -645,6 +825,7 @@ export function EditSession({
           </aside>
         ) : null}
       </ServicesContext.Provider>
+      </FieldsContext.Provider>
     </SessionContext.Provider>
   );
 }

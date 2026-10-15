@@ -15,8 +15,10 @@ export interface Services {
   setImage(pos: number, file: Uploaded): void;
   /** A prompt for an image at `pos`, from the passage around it. */
   contextFor(pos: number | null): string;
-  /** Show a panel on the block at `pos` (its form, image chooser or options), or none. */
-  setUi(pos: number, ui: "edit" | "replace" | "options" | null): void;
+  /** Open the block at `pos`'s form ("edit"), or the picture panel for it ("replace"), or neither. */
+  setUi(pos: number, ui: "edit" | "replace" | null): void;
+  /** The picture being tried in the block being chosen for, until it's kept. */
+  trying: LibraryAsset | null;
 }
 
 export const ServicesContext = createContext<Services | null>(null);

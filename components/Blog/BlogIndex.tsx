@@ -28,9 +28,9 @@ function formatDate(dateStr: string) {
   });
 }
 
-function PostCard({ post }: { post: BlogPost }) {
+function PostCard({ post, edit = false }: { post: BlogPost; edit?: boolean }) {
   return (
-    <Link href={`/insights/${post.slug}`} className="group block">
+    <Link href={edit ? `/insights/${post.slug}/edit` : `/insights/${post.slug}`} className="group block">
       <article className="flex flex-col gap-4">
         {/* Image */}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
@@ -45,6 +45,12 @@ function PostCard({ post }: { post: BlogPost }) {
           ) : (
             <div className="absolute inset-0 bg-neutral-100" />
           )}
+          {/* Edit mode (/insights/edit): every post opens in edit mode, and says so on hover. */}
+          {edit ? (
+            <span className="absolute left-3 top-3 rounded-lg bg-neutral-900/90 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+              Edit
+            </span>
+          ) : null}
         </div>
 
         {/* Meta */}
@@ -68,7 +74,8 @@ function PostCard({ post }: { post: BlogPost }) {
   );
 }
 
-export default function BlogIndex({ posts }: { posts: BlogPost[] }) {
+/** The Insights index. `edit` is edit mode (/insights/edit): the same page, with every post opening in edit mode. */
+export default function BlogIndex({ posts, edit = false }: { posts: BlogPost[]; edit?: boolean }) {
   return (
     <div>
       <Section className="relative z-20 bg-neutral-50 min-h-fit">
@@ -114,7 +121,7 @@ export default function BlogIndex({ posts }: { posts: BlogPost[] }) {
             {/* Posts grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 sm:gap-y-16">
               {posts.map((post) => (
-                <PostCard key={post.slug} post={post} />
+                <PostCard key={post.slug} post={post} edit={edit} />
               ))}
             </div>
 

@@ -444,8 +444,8 @@ export function Field({
   return (
     <div className={`gx-field${nested ? " gx-field-group" : ""}`}>
       <label htmlFor={id}>
-        {labelOf(name, component)}
-        {required ? "" : <span className="gx-optional"> optional</span>}
+        {schema.title ?? labelOf(name, component)}
+        {required || schema.type === "boolean" ? "" : <span className="gx-optional"> optional</span>}
       </label>
       {input}
       {schema.description && !nested ? <span className="gx-hint">{schema.description}</span> : null}

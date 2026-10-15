@@ -43,7 +43,7 @@ const componentAttributes = () => ({
   isNew: hidden(),
   /** Marks an image still being copied into the site; never saved. */
   pending: hidden(),
-  /** Which panel the block shows (edit, replace, options); never saved. */
+  /** Which panel is open for the block: its form ("edit") or the picture panel ("replace"); never saved. */
   ui: hidden(),
 });
 
@@ -111,6 +111,7 @@ export const extensions = [
   StarterKit.configure({
     underline: false,
     link: { openOnClick: false, autolink: true, HTMLAttributes: { target: null, rel: null } },
+    dropcursor: { color: "#4b7bec", width: 3, class: "gx-dropcursor" },
   }),
   Placeholder.configure({ placeholder: "Write, or drop an image here…" }),
   GalleyAttributes,

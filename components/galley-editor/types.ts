@@ -4,6 +4,7 @@ export type { Comment, DocNode, EditorPost, GenerationJob, LibraryAsset, Library
 
 type JsonSchema = {
   type?: string;
+  title?: string;
   default?: unknown;
   enum?: unknown[];
   description?: string;

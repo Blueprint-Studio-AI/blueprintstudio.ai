@@ -1,16 +1,14 @@
 "use client";
 
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
-import { useEffect, useState } from "react";
-import { ImageChooser } from "./chooser";
-import { OptionsStrip } from "./options";
+import { useEffect, useRef, useState } from "react";
 import { PropsForm } from "./props-form";
 import { useServices } from "./services";
-import type { BlockAttrs, LibraryAsset, ManifestComponent } from "./types";
+import type { BlockAttrs, ManifestComponent } from "./types";
 
 // How components look in edit mode: rendered by the site itself (a server action runs
-// the site's real component), with a small bar to change them. An image block is where
-// its picture is chosen: the library, new generated options, or an upload, in place.
+// the site's real component). The toolbar over a selected block changes it; an image
+// block's picture is chosen in the panel beside the post, and tried here until it's kept.
 
 const rendered = new Map<string, { node?: React.ReactNode; error?: string }>();
 
@@ -38,8 +36,9 @@ function usePreview(attrs: BlockAttrs, skip: boolean) {
 export type Motion = { name: string; props: Record<string, unknown>; group: string } | null;
 
 /**
- * The animation setting for a block. With one motion component it's an on/off button
- * ("✦ Reveal"); with several, a short list. Nothing shows if the site has none.
+ * The animation setting for a block: "Animate in" plays as the reader scrolls to it. With
+ * one motion component it's an on/off button; with several, a short list. Turning one on
+ * plays it once on the block, so you see what it does. Nothing shows if the site has none.
  */
 export function MotionToggle({
   motion,
@@ -57,17 +56,18 @@ export function MotionToggle({
     setOpen(false);
   };
   if (options.length === 1) {
-    const name = options[0].name;
+    const only = options[0];
+    const on = motion?.name === only.name;
     return (
-      <button type="button" className={motion?.name === name ? "is-on" : ""} title={`Animate in as the reader scrolls (${name})`} onClick={() => set(motion?.name === name ? null : name)}>
-        ✦ {name}
+      <button type="button" className={on ? "is-on" : ""} title={`${only.description.split(". ")[0].replace(/\.$/, "")}. Click to ${on ? "turn it off" : "see it"}.`} onClick={() => set(on ? null : only.name)}>
+        ✦ Animate in
       </button>
     );
   }
   return (
     <span style={{ position: "relative" }}>
       <button type="button" className={motion ? "is-on" : ""} onClick={() => setOpen((o) => !o)}>
-        ✦ {motion?.name ?? "Animate"}
+        ✦ {motion ? motion.name : "Animate in"} ▾
       </button>
       {open ? (
         <span className="gx-motion-pop gx-menu-list">
@@ -75,7 +75,7 @@ export function MotionToggle({
             No animation
           </button>
           {options.map((c) => (
-            <button key={c.name} type="button" className={motion?.name === c.name ? "is-on" : ""} onClick={() => set(c.name)}>
+            <button key={c.name} type="button" className={motion?.name === c.name ? "is-on" : ""} title={c.description} onClick={() => set(c.name)}>
               {c.name}
             </button>
           ))}
@@ -85,14 +85,23 @@ export function MotionToggle({
   );
 }
 
+/** Play a block's animation once (edit mode doesn't run the site's motion), so its effect is seen. */
+export function playMotion(dom: Element | null) {
+  if (!(dom instanceof HTMLElement)) return;
+  dom.classList.remove("gx-motion-play");
+  void dom.offsetWidth;
+  dom.classList.add("gx-motion-play");
+  setTimeout(() => dom.classList.remove("gx-motion-play"), 1000);
+}
+
 /** A component's name as people read it: "LinkCard" → "Link card"; "YouTube" stays. */
 export const nameOf = (name: string) =>
   ({ YouTube: "YouTube", LinkCard: "Link card", Tweet: "Post from X", CountUp: "Count up" })[name] ??
   name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/ (\w)/g, (_, c: string) => ` ${c.toLowerCase()}`);
 
-export type BlockUi = "edit" | "replace" | "options" | null;
+export type BlockUi = "edit" | "replace" | null;
 
-export function BlockView({ node, deleteNode, updateAttributes, selected, getPos }: ReactNodeViewProps) {
+export function BlockView({ node, updateAttributes, selected, getPos }: ReactNodeViewProps) {
   const services = useServices();
   const attrs = node.attrs as BlockAttrs;
   const ui = (node.attrs.ui as BlockUi) ?? null;
@@ -100,27 +109,62 @@ export function BlockView({ node, deleteNode, updateAttributes, selected, getPos
   const component = services.components.find((c) => c.name === attrs.name);
   const isPicker = component?.picker === "image";
   const src = (attrs.props as { src?: string })?.src;
-  // An option being tried in place: shown as the site's own image, not saved until kept.
-  const [previewing, setPreviewing] = useState<LibraryAsset | null>(null);
-  const shown = previewing
-    ? { ...attrs, props: { ...attrs.props, src: previewing.thumbnail, width: previewing.width, height: previewing.height } }
+  const picking = isPicker && ui === "replace";
+  // A picture being tried from the panel shows as the site's own image, not saved until kept.
+  const trying = picking ? services.trying : null;
+  // Its thumbnail shows at once (the panel has loaded it); the full picture replaces it
+  // once the browser has it.
+  const [sharp, setSharp] = useState<{ id: string; src: string } | null>(null);
+  useEffect(() => {
+    if (!trying?.url || trying.url === trying.thumbnail) return;
+    const img = new Image();
+    img.onload = () => setSharp({ id: trying.id, src: trying.url });
+    img.src = trying.url;
+    return () => {
+      img.onload = null;
+    };
+  }, [trying]);
+  const shown = trying
+    ? { ...attrs, props: { ...attrs.props, src: sharp?.id === trying.id ? sharp.src : trying.thumbnail, width: trying.width, height: trying.height } }
     : attrs;
-  const preview = usePreview(shown, isPicker && !src && !previewing);
-  const pos = () => (typeof getPos === "function" ? getPos() : undefined);
+  const empty = isPicker && !src && !trying;
+  const fresh = usePreview(shown, empty);
+  // While a new version renders, the last one stays, so the page doesn't jump.
+  const [last, setLast] = useState(fresh);
+  if (fresh !== undefined && fresh !== last) setLast(fresh);
+  const preview = fresh ?? last;
+  // A new picture shows at once: until the site's render of it arrives, the last render
+  // gets the new address.
+  const previewRef = useRef<HTMLDivElement>(null);
+  const shownProps = shown.props as { src?: string; width?: number; height?: number };
+  useEffect(() => {
+    if (!isPicker || fresh !== undefined || !shownProps.src) return;
+    const img = previewRef.current?.querySelector("img");
+    if (!img || img.getAttribute("src") === shownProps.src) return;
+    img.removeAttribute("srcset");
+    img.src = shownProps.src;
+    if (shownProps.width && shownProps.height) {
+      img.setAttribute("width", String(shownProps.width));
+      img.setAttribute("height", String(shownProps.height));
+    }
+  }, [isPicker, fresh, shownProps.src, shownProps.width, shownProps.height]);
   const setUi = (next: BlockUi) => {
-    const at = pos();
+    const at = typeof getPos === "function" ? getPos() : undefined;
     if (at !== undefined) services.setUi(at, next);
   };
-  const choosing = isPicker && ((!src && ui !== "options") || ui === "replace");
-  const showPreview = !isPicker || Boolean(src) || Boolean(previewing);
 
   return (
     <NodeViewWrapper
-      className={`gx-block${selected ? " is-selected" : ""}${ui ? " is-editing" : ""}${isPicker && !src && !previewing ? " is-choosing" : ""}`}
+      className={`gx-block${selected ? " is-selected" : ""}${ui ? " is-editing" : ""}${picking ? " is-picking" : ""}`}
       data-motion={motion?.name}
     >
-      {showPreview ? (
-        <div className="gx-block-preview" contentEditable={false}>
+      {empty ? (
+        <button type="button" className="gx-block-empty" contentEditable={false} onClick={() => setUi("replace")}>
+          {picking ? "Pick a picture in the panel" : "Choose a picture"}
+        </button>
+      ) : (
+        // Grab a component anywhere to move it (a text block moves by its handle).
+        <div ref={previewRef} className="gx-block-preview" contentEditable={false} data-drag-handle draggable={ui !== "edit" ? true : undefined}>
           {preview === undefined ? (
             <div className="gx-skeleton" />
           ) : preview.error ? (
@@ -131,44 +175,7 @@ export function BlockView({ node, deleteNode, updateAttributes, selected, getPos
             preview.node
           )}
         </div>
-      ) : null}
-
-      {choosing ? (
-        <ImageChooser
-          actions={services.actions}
-          context={services.contextFor(pos() ?? null)}
-          title={src ? "Replace image" : "Choose an image"}
-          onPick={async (asset) => {
-            const at = pos();
-            if (at !== undefined) await services.chooseImage(at, asset);
-          }}
-          onUploaded={(file) => {
-            const at = pos();
-            if (at !== undefined) services.setImage(at, file);
-          }}
-          onGenerate={() => setUi("options")}
-          onClose={() => (src ? setUi(null) : deleteNode())}
-        />
-      ) : null}
-
-      {ui === "options" && isPicker ? (
-        <OptionsStrip
-          actions={services.actions}
-          context={services.contextFor(pos() ?? null)}
-          current={src ? { thumbnail: src } : null}
-          previewing={previewing}
-          onPreview={setPreviewing}
-          onKeep={async (asset) => {
-            setPreviewing(null);
-            const at = pos();
-            if (at !== undefined) await services.chooseImage(at, asset);
-          }}
-          onClose={() => {
-            setPreviewing(null);
-            setUi(src ? null : "replace");
-          }}
-        />
-      ) : null}
+      )}
 
       {ui === "edit" && component ? (
         <div contentEditable={false}>
@@ -255,7 +262,7 @@ export function RawView({ node, updateAttributes, selected }: ReactNodeViewProps
           </div>
         </div>
       ) : (
-        <pre className="gx-raw-source" contentEditable={false}>
+        <pre className="gx-raw-source" contentEditable={false} data-drag-handle draggable>
           {String(node.attrs.mdx)}
         </pre>
       )}

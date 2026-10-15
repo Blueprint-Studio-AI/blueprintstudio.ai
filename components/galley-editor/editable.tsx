@@ -5,12 +5,11 @@ import type { Node as PMNode } from "@tiptap/pm/model";
 import { NodeSelection } from "@tiptap/pm/state";
 import { EditorContent, type Editor as TiptapEditor } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { MotionToggle, nameOf, type Motion } from "./block-view";
-import { ImageChooser } from "./chooser";
+import { MotionToggle, nameOf, playMotion, type Motion } from "./block-view";
 import { TermPicker } from "./fields";
 import { InsertMenu } from "./insert-menu";
 import { useServices } from "./services";
+import { useFields } from "./fields-context";
 import { useEditSession, type ImageShape } from "./session";
 import type { ManifestComponent } from "./types";
 
@@ -52,15 +51,16 @@ export function EditableBody({ className = "" }: { className?: string }) {
           >
             +
           </button>
-          <div
-            className="gx-grip"
-            title="Drag to move · click to select"
-            onClick={() => {
-              if (hovered) editor.chain().focus().setNodeSelection(hovered.pos).run();
-            }}
-          >
-            ⠿
-          </div>
+          {/* Components are dragged by grabbing them; text, which you select by dragging, moves by this. */}
+          {hovered && !hovered.node.isAtom ? (
+            <div
+              className="gx-grip"
+              title="Drag to move · click to select"
+              onClick={() => editor.chain().focus().setNodeSelection(hovered.pos).run()}
+            >
+              ⠿
+            </div>
+          ) : null}
         </div>
       </DragHandle>
 
@@ -146,7 +146,10 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
   const isPicker = component?.picker === "image";
   const textual = ["paragraph", "heading", "blockquote"].includes(node.type.name);
   const motion = (node.attrs.motion as Motion) ?? null;
-  const setMotion = (m: Motion) => editor.view.dispatch(editor.state.tr.setNodeAttribute(block, "motion", m));
+  const setMotion = (m: Motion) => {
+    editor.view.dispatch(editor.state.tr.setNodeAttribute(block, "motion", m));
+    if (m) requestAnimationFrame(() => playMotion(editor.view.nodeDOM(block) as Element | null));
+  };
   const selectedText = editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to).trim();
   const number = target.kind === "text" && numberMotion ? NUMBER.exec(selectedText) : null;
 
@@ -261,9 +264,6 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
               <button type="button" onClick={() => services.setUi(block, "replace")}>
                 Replace
               </button>
-              <button type="button" onClick={() => services.setUi(block, "options")}>
-                ✦ New options
-              </button>
               <button type="button" onClick={() => services.setUi(block, "edit")}>
                 Alt & caption
               </button>
@@ -307,35 +307,44 @@ function ContextBar({ editor, components }: { editor: TiptapEditor; components: 
   );
 }
 
-/** A front matter text field edited in place, inside the site's own heading or paragraph. */
+/**
+ * A text field edited in place, inside the site's own heading or paragraph: a post's front
+ * matter, or a page's setting. `multiline` keeps line breaks (Enter adds one).
+ */
 export function EditableText({
   field,
   as: Tag = "span",
   className = "",
   placeholder,
+  multiline = false,
 }: {
   field: string;
   as?: "h1" | "h2" | "p" | "div" | "span";
   className?: string;
   placeholder?: string;
+  multiline?: boolean;
 }) {
-  const { frontmatter, setField } = useEditSession();
+  const { values, setField } = useFields();
   const ref = useRef<HTMLElement>(null);
-  const initial = useRef(String(frontmatter[field] ?? ""));
+  const initial = useRef(String(values[field] ?? ""));
   useEffect(() => {
     if (ref.current) ref.current.textContent = initial.current;
   }, []);
+  const read = (el: HTMLElement) =>
+    multiline
+      ? el.innerText.replace(/[ \t]+/g, " ").replace(/ ?\n ?/g, "\n").replace(/\n{2,}/g, "\n").trim()
+      : (el.textContent ?? "").replace(/\s+/g, " ").trim();
   return (
     <Tag
       ref={ref as never}
-      className={`gx-editable ${className}`}
+      className={`gx-editable${multiline ? " gx-multiline" : ""} ${className}`}
       contentEditable="plaintext-only"
       suppressContentEditableWarning
       data-placeholder={placeholder}
       spellCheck
-      onInput={(e) => setField(field, (e.currentTarget.textContent ?? "").replace(/\s+/g, " ").trim())}
+      onInput={(e) => setField(field, read(e.currentTarget))}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !multiline) {
           e.preventDefault();
           (e.currentTarget as HTMLElement).blur();
         }
@@ -345,9 +354,10 @@ export function EditableText({
 }
 
 /**
- * A front matter image (a cover or hero) in the site's own frame. Clicking Change opens
- * the same chooser as an image block. `shape` is how the site stores it: an object
- * ({ src, alt, width, height }) or just the path.
+ * A front matter image (a cover or hero) in the site's own frame. Change opens the same
+ * picture panel as an image block, and the picture being tried shows here until it's
+ * kept. `shape` is how the site stores it: an object ({ src, alt, width, height }) or
+ * just the path.
  */
 export function EditableImage({
   field,
@@ -358,67 +368,40 @@ export function EditableImage({
   shape?: ImageShape;
   label?: string;
 }) {
-  const { frontmatter, setField, contextFor, chooseFieldImage, uploadedFieldImage } = useEditSession();
-  const { actions } = useServices();
-  const [choosing, setChoosing] = useState(false);
+  const { frontmatter, setField, pickFieldImage, tryingFor } = useEditSession();
   const value = frontmatter[field] as { src?: string; alt?: string } | string | null | undefined;
-  const src = typeof value === "string" ? value : value?.src;
+  const trying = tryingFor(field);
+  const src = trying ? trying.url || trying.thumbnail : typeof value === "string" ? value : value?.src;
   const alt = typeof value === "object" && value ? (value.alt ?? "") : "";
-
-  const dialog =
-    choosing && typeof document !== "undefined"
-      ? createPortal(
-          <div className="gx-dialog" onMouseDown={(e) => e.target === e.currentTarget && setChoosing(false)} data-lenis-prevent>
-            <div className="gx-dialog-card">
-              <ImageChooser
-                actions={actions}
-                context={contextFor(null)}
-                title={src ? `Change the ${label}` : `Choose a ${label}`}
-                onPick={async (asset) => {
-                  setChoosing(false);
-                  await chooseFieldImage(field, shape, asset);
-                }}
-                onUploaded={(file) => {
-                  uploadedFieldImage(field, shape, file);
-                  setChoosing(false);
-                }}
-                onClose={() => setChoosing(false)}
-              />
-            </div>
-          </div>,
-          document.body,
-        )
-      : null;
 
   if (!src) {
     return (
       <div className="gx-image-empty">
-        <button type="button" onClick={() => setChoosing(true)}>
+        <button type="button" onClick={() => pickFieldImage(field, shape, label)}>
           Add a {label}
         </button>
-        {dialog}
       </div>
     );
   }
   return (
-    <div className="gx-image">
+    <div className={`gx-image${trying ? " is-trying" : ""}`}>
+      {/* The thumbnail sits behind a picture being tried until the full one loads. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- the site's own image component returns once saved */}
-      <img src={src} alt={alt} />
+      <img src={src} alt={alt} style={trying ? { backgroundImage: `url("${trying.thumbnail}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />
       <div className="gx-image-tools">
-        <button type="button" onClick={() => setChoosing(true)}>
+        <button type="button" onClick={() => pickFieldImage(field, shape, label)}>
           Change {label}
         </button>
         <button type="button" onClick={() => setField(field, shape === "src" ? undefined : null)}>
           Remove
         </button>
       </div>
-      {dialog}
     </div>
   );
 }
 
 /** Close a popover when someone clicks outside it. */
-function useOutside(ref: React.RefObject<HTMLElement | null>, open: boolean, close: () => void) {
+export function useOutside(ref: React.RefObject<HTMLElement | null>, open: boolean, close: () => void) {
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {

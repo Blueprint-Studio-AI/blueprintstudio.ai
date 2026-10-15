@@ -75,7 +75,8 @@ export function InsertMenu({
           const fresh = c.picker === "image";
           block(e, where, {
             type: "galleyBlock",
-            attrs: { name: c.name, props: fresh ? {} : (example?.props ?? {}), body: fresh ? null : (example?.children ?? null), ui: fresh ? null : "edit" },
+            // A picture block opens the picture panel; anything else opens its form.
+            attrs: { name: c.name, props: fresh ? {} : (example?.props ?? {}), body: fresh ? null : (example?.children ?? null), ui: fresh ? "replace" : "edit" },
           });
         },
       }));
