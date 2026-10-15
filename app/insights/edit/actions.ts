@@ -21,7 +21,10 @@ import { editorEnabled } from "./enabled";
 // Galley before it touches a file; the Blueprint Studio key never leaves the server.
 
 const cwd = process.cwd();
-const store = () => new FsPostStore(path.join(cwd, galley.postsDir));
+// Edit mode works on the files on disk, in development. The turbopackIgnore stops the build
+// tracing that path, which would pack the whole project into this server function (past
+// Vercel's 250 MB limit); deployed editing goes through GitHub instead.
+const store = () => new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir));
 
 function guard() {
   if (!editorEnabled()) throw new Error("The editor is off on this deployment");

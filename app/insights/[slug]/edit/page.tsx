@@ -45,7 +45,7 @@ export default async function EditInsight({ params }: { params: Promise<{ slug: 
   const manifest = buildManifest(galley);
   const cwd = process.cwd();
   const post = getPostBySlug(slug);
-  const editing = await openPost(new FsPostStore(path.join(cwd, galley.postsDir)), slug, galley);
+  const editing = await openPost(new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)), slug, galley);
   if (!post || !editing) notFound();
   const { content, ...meta } = post;
   return (
