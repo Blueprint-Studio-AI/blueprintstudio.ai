@@ -60,8 +60,8 @@ export function getAllPosts({ drafts = false }: { drafts?: boolean } = {}): Blog
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-/** Whether readers may see a post: published, or a draft on this machine's dev server (so edit mode's Done shows it). */
-export const isPublic = (post: BlogPost) => !post.draft || process.env.NODE_ENV === "development";
+/** Whether readers may see a post: only once it's published. Edit mode (/insights/<slug>/edit) shows drafts. */
+export const isPublic = (post: BlogPost) => !post.draft;
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
   if (!/^[a-z0-9-]+$/.test(slug)) return undefined;

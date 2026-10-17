@@ -15,4 +15,7 @@ export default defineConfig({
   frontmatter: PostFrontmatter,
   media: { dir: "public/insights/media", url: "/insights/media" },
   preview: { baseUrl: "http://localhost:3000", post: "/insights/{slug}", components: "/galley" },
+  // Edits wait as drafts (in .galley/drafts/) until they're published; a post that isn't on
+  // Insights says draft: true, and is dated when it's first published.
+  publish: { draftField: "draft", dateField: "date" },
 });

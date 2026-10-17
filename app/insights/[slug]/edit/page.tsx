@@ -3,6 +3,7 @@ import path from "node:path";
 import { notFound } from "next/navigation";
 import { buildManifest, splitFrontmatter } from "@blueprint-studio/galley";
 import { mdxToDoc, openPost, readComments, readVersion } from "@blueprint-studio/galley/editor";
+import { DraftPostStore } from "@blueprint-studio/galley/drafts";
 import { FsPostStore } from "@blueprint-studio/galley/ops";
 import { outline } from "@blueprint-studio/galley/render";
 import BlogPost from "@/components/Blog/BlogPost";
@@ -12,15 +13,18 @@ import type { JsonSchema, ManifestComponent } from "@blueprint-studio/galley/edi
 import galley from "@/galley.config";
 import { getPostBySlug } from "@/lib/blog";
 import {
+  discardPostAction,
   generateAction,
   importAssetAction,
   jobAction,
   libraryAction,
+  publishPostAction,
   renderBlockAction,
   restoreAction,
   saveCommentsAction,
   savePostAction,
   stylesAction,
+  unpublishPostAction,
   uploadAction,
   versionsAction,
 } from "../../edit/actions";
@@ -41,7 +45,12 @@ export default async function EditInsight({ params, searchParams }: Props) {
   const manifest = buildManifest(galley);
   const cwd = process.cwd();
   const post = getPostBySlug(slug);
-  const current = await openPost(new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)), slug, galley);
+  // What edit mode has: the post's draft, if its changes aren't on Insights yet.
+  const store = new DraftPostStore(new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)), cwd, {
+    draftField: galley.publish?.draftField ?? "draft",
+    dateField: galley.publish?.dateField,
+  });
+  const current = await openPost(store, slug, galley);
   if (!post || !current) notFound();
   // An earlier version: its front matter and body, in place of the current ones.
   const version = versionId ? await readVersion(cwd, `posts/${slug}`, versionId) : null;
@@ -79,6 +88,9 @@ export default async function EditInsight({ params, searchParams }: Props) {
         upload: uploadAction,
         versions: versionsAction,
         restore: restoreAction,
+        publish: publishPostAction,
+        unpublish: unpublishPostAction,
+        discard: discardPostAction,
       }}
     >
       <BlogPost

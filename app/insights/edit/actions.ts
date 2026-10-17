@@ -7,14 +7,17 @@ import {
   docToMdx,
   importMediaBytes,
   listVersions,
+  publishPost,
   readVersion,
   recordSave,
   savePost,
+  unpublishPost,
   writeComments,
   type Comment,
   type DocNode,
 } from "@blueprint-studio/galley/editor";
 import { importMedia } from "@blueprint-studio/galley/media";
+import { DraftPostStore } from "@blueprint-studio/galley/drafts";
 import { FsPostStore, revisionOf, writePost } from "@blueprint-studio/galley/ops";
 import { renderPost } from "@blueprint-studio/galley/render";
 import { elements } from "@/components/galley/elements";
@@ -28,8 +31,15 @@ import { whoAmI } from "./who";
 const cwd = process.cwd();
 // Edit mode works on the files on disk, in development. The turbopackIgnore stops the build
 // tracing that path, which would pack the whole project into this server function (past
-// Vercel's 250 MB limit); deployed editing goes through GitHub instead.
-const store = () => new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir));
+// Vercel's 250 MB limit); deployed editing goes through GitHub instead. Changes to a post
+// that's on Insights wait in .galley/drafts/ until it's published.
+const store = () =>
+  new DraftPostStore(
+    new FsPostStore(path.join(/*turbopackIgnore: true*/ cwd, galley.postsDir)),
+    cwd,
+    { draftField: galley.publish?.draftField ?? "draft", dateField: galley.publish?.dateField },
+    galley,
+  );
 
 function guard() {
   if (!editorEnabled()) throw new Error("The editor is off on this deployment");
@@ -53,7 +63,26 @@ export async function savePostAction(
   if (!result.ok) return result;
   const after = await store().read(slug);
   if (after !== null) await recordSave(cwd, `posts/${slug}`, { before, after, author: whoAmI() });
-  return { ok: true as const, revision: result.revision };
+  return { ok: true as const, revision: result.revision, state: result.state };
+}
+
+/** Put the post on Insights as it is in edit mode (dated today if it's never been published), noted in its history. */
+export async function publishPostAction(slug: string) {
+  guard();
+  return publishPost(store(), slug, { author: whoAmI() });
+}
+
+/** Take the post off Insights. It stays here as a draft. */
+export async function unpublishPostAction(slug: string) {
+  guard();
+  return unpublishPost(store(), slug, { author: whoAmI() });
+}
+
+/** Throw away the post's changes that aren't on Insights. */
+export async function discardPostAction(slug: string) {
+  guard();
+  await store().discard(slug);
+  return { ok: true as const, state: await store().state(slug) };
 }
 
 /**
