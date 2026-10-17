@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
 
 function noWidow(text: string, minTail = 15) {
   let i = text.length;
@@ -21,27 +20,9 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Footer } from "@/components/Footer/index";
 import type { BlogPost as BlogPostType } from "@/lib/blog";
+import { EditableImage, EditableText } from "@blueprint-studio/galley/editor-ui";
 
-type TocItem = { text: string; id: string };
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function extractToc(content: string): TocItem[] {
-  return content
-    .split("\n")
-    .filter((line) => /^## /.test(line))
-    .map((line) => {
-      const text = line.replace(/^## /, "").replace(/\*\*/g, "");
-      return { text, id: slugify(text) };
-    });
-}
+export type TocItem = { text: string; id: string };
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr + "T00:00:00");
@@ -143,8 +124,21 @@ function StickyToc({ toc }: { toc: TocItem[] }) {
   );
 }
 
-export default function BlogPost({ post }: { post: BlogPostType }) {
-  const toc = extractToc(post.content);
+// The post's body is rendered on the server by Galley (app/insights/[slug]/page.tsx), with
+// the site's prose styles from components/galley/elements.tsx; the contents list comes
+// from the same headings, so its links always match.
+export default function BlogPost({
+  post,
+  body,
+  toc,
+  edit = false,
+}: {
+  post: Omit<BlogPostType, "content">;
+  body: ReactNode;
+  toc: TocItem[];
+  /** Edit mode (/insights/<slug>/edit): the same page, with the title, summary and hero editable in place. */
+  edit?: boolean;
+}) {
 
   return (
     <div>
@@ -190,25 +184,31 @@ export default function BlogPost({ post }: { post: BlogPostType }) {
               </div>
 
               <h1 className="font-medium text-black text-[clamp(32px,6vw,52px)] leading-[1.15] tracking-[-1.5px]">
-                {noWidow(post.title)}
+                {edit ? <EditableText field="title" placeholder="Title" /> : noWidow(post.title)}
               </h1>
 
-              <p className="mt-4 text-neutral-500 text-base sm:text-lg leading-[1.5]">
-                {post.description}
-              </p>
+              {edit || post.description ? (
+                <p className="mt-4 text-neutral-500 text-base sm:text-lg leading-[1.5]">
+                  {edit ? <EditableText field="description" placeholder="One or two sentences on what this is about" /> : post.description}
+                </p>
+              ) : null}
             </header>
 
             {/* Hero image */}
-            {post.image && (
+            {(post.image || edit) && (
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 mb-12 sm:mb-16">
+                {edit ? (
+                  <EditableImage field="image" shape="src" label="hero image" />
+                ) : (
                 <Image
-                  src={post.image}
+                  src={post.image ?? ""}
                   alt={post.title}
                   fill
                   className="object-cover"
                   sizes="(max-width: 1000px) 100vw, 1000px"
                   priority
                 />
+                )}
               </div>
             )}
 
@@ -217,81 +217,8 @@ export default function BlogPost({ post }: { post: BlogPostType }) {
 
             {/* Article body + sticky TOC */}
             <div className="flex gap-12">
-              <article className="max-w-2xl flex-1 min-w-0 text-neutral-700 leading-[1.75] space-y-6">
-                <ReactMarkdown
-                  components={{
-                    h2: ({ children }) => {
-                      const text = String(children).replace(/\*\*/g, "");
-                      const id = slugify(text);
-                      return (
-                        <h2 id={id} className="text-2xl sm:text-3xl font-medium text-neutral-900 tracking-[-0.5px] mt-14 mb-5 scroll-mt-24">
-                          {children}
-                        </h2>
-                      );
-                    },
-                    h3: ({ children }) => (
-                      <h3 className="text-lg sm:text-xl font-medium text-neutral-900 tracking-[-0.3px] mt-10 mb-3">
-                        {children}
-                      </h3>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-base sm:text-[17px] text-neutral-600 leading-[1.75]">
-                        {children}
-                      </p>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="font-medium text-neutral-900">{children}</strong>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-disc pl-5 my-4 marker:text-neutral-400">{children}</ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal pl-5 my-4 marker:text-neutral-400">{children}</ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="text-base sm:text-[17px] text-neutral-600 leading-[1.75] mb-2">
-                        {children}
-                      </li>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-2 border-neutral-300 pl-5 my-8 italic text-neutral-500">
-                        {children}
-                      </blockquote>
-                    ),
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-neutral-900 underline underline-offset-2 decoration-neutral-300 hover:decoration-neutral-900 transition-colors duration-200"
-                      >
-                        {children}
-                      </a>
-                    ),
-                    pre: ({ children }) => (
-                      <pre className="bg-neutral-100 border border-neutral-200 p-4 rounded-lg overflow-x-auto my-6 text-sm">
-                        {children}
-                      </pre>
-                    ),
-                    code: ({ children, className }) => {
-                      const isBlock = className?.includes("language-");
-                      return isBlock ? (
-                        <code>{children}</code>
-                      ) : (
-                        <code className="bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-sm text-neutral-800">
-                          {children}
-                        </code>
-                      );
-                    },
-                    hr: () => <hr className="border-neutral-200 my-10" />,
-                    img: ({ src, alt }) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={src} alt={alt || ""} className="max-w-full h-auto rounded-lg my-8" />
-                    ),
-                  }}
-                >
-                  {post.content}
-                </ReactMarkdown>
+              <article className={`max-w-2xl flex-1 min-w-0 text-neutral-700 leading-[1.75] ${edit ? "" : "space-y-6"}`}>
+                {body}
               </article>
 
               {/* Sticky TOC — lg+ only */}

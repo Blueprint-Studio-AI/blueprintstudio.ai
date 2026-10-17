@@ -43,3 +43,11 @@ aireadme.txt
 
 # brand-page download zips — generated from the loose files by scripts/build-zips.mjs
 public/**/*.zip
+
+# Galley preview screenshots
+/.galley/preview-*
+# Edit mode's version history, kept on this machine (git's history is the one that ships)
+/.galley/history/
+/.galley/drafts/
+/.galley/library.json
+/.galley/trash/

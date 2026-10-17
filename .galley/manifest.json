@@ -1,0 +1,478 @@
+{
+  "galley": 1,
+  "postsDir": "content/insights",
+  "media": {
+    "dir": "public/insights/media",
+    "url": "/insights/media"
+  },
+  "preview": {
+    "baseUrl": "http://localhost:3000",
+    "post": "/insights/{slug}",
+    "components": "/galley"
+  },
+  "components": [
+    {
+      "name": "Image",
+      "kind": "flow",
+      "children": "inline",
+      "description": "A picture with an optional caption between the tags. Use for every image that has a caption or a known size.",
+      "category": "Media",
+      "picker": "image",
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "src": {
+            "type": "string",
+            "pattern": "^(https:\\/\\/[^\\s]+|\\/[^\\s]*)$"
+          },
+          "alt": {
+            "type": "string",
+            "description": "What the image shows, for screen readers. Empty only if purely decorative."
+          },
+          "width": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 10000
+          },
+          "height": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "src",
+          "alt"
+        ]
+      },
+      "examples": [
+        {
+          "title": "With a caption",
+          "props": {
+            "src": "/insights/untapped-opportunities-in-mining-equipment-sales/hero.png",
+            "alt": "Mining equipment on a site at dusk",
+            "width": 1600,
+            "height": 900
+          },
+          "children": "Source: [Blueprint Studio](https://blueprintstudio.ai), March 2026",
+          "mdx": "<Image src=\"/insights/untapped-opportunities-in-mining-equipment-sales/hero.png\" alt=\"Mining equipment on a site at dusk\" width={1600} height={900}>\n  Source: [Blueprint Studio](https://blueprintstudio.ai), March 2026\n</Image>"
+        }
+      ]
+    },
+    {
+      "name": "YouTube",
+      "kind": "flow",
+      "children": "none",
+      "description": "An embedded YouTube video.",
+      "category": "Media",
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{11}$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "start": {
+            "description": "Start time in seconds",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "examples": [
+        {
+          "title": "A video",
+          "props": {
+            "id": "aqz-KE-bpKQ",
+            "title": "Big Buck Bunny"
+          },
+          "mdx": "<YouTube id=\"aqz-KE-bpKQ\" title=\"Big Buck Bunny\" />"
+        }
+      ]
+    },
+    {
+      "name": "Callout",
+      "kind": "flow",
+      "children": "blocks",
+      "description": "A highlighted box for a note, tip or warning. Paragraphs and lists go between the tags.",
+      "category": "Text",
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tone": {
+            "type": "string",
+            "enum": [
+              "note",
+              "tip",
+              "warning"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "examples": [
+        {
+          "title": "A tip",
+          "props": {
+            "tone": "tip",
+            "title": "Start with the website"
+          },
+          "children": "It handles the 70% of the buying journey that happens before anyone contacts you.",
+          "mdx": "<Callout tone=\"tip\" title=\"Start with the website\">\n  It handles the 70% of the buying journey that happens before anyone contacts you.\n</Callout>"
+        }
+      ]
+    },
+    {
+      "name": "Stat",
+      "kind": "flow",
+      "children": "none",
+      "description": "A headline figure with what it measures and where it comes from. Use it for the one number a section turns on, not for every number.",
+      "category": "Data",
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16,
+            "description": "The figure as readers see it: \"84%\", \"$187,500\", \"3×\"."
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the figure measures, in one sentence."
+          },
+          "source": {
+            "description": "Who published it and when, e.g. \"6sense, 2025\".",
+            "type": "string"
+          },
+          "href": {
+            "description": "A link to the source.",
+            "type": "string",
+            "pattern": "^(https:\\/\\/[^\\s]+|\\/[^\\s]*)$"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ]
+      },
+      "examples": [
+        {
+          "title": "With a linked source",
+          "props": {
+            "value": "84%",
+            "label": "of B2B deals are decided before the seller knows a buying journey has started.",
+            "source": "6sense, 2025",
+            "href": "https://6sense.com/newsroom/84-of-b2b-deals-are-decided-before-marketers-even-know-about-them/"
+          },
+          "mdx": "<Stat value=\"84%\" label=\"of B2B deals are decided before the seller knows a buying journey has started.\" source=\"6sense, 2025\" href=\"https://6sense.com/newsroom/84-of-b2b-deals-are-decided-before-marketers-even-know-about-them/\" />"
+        }
+      ]
+    }
+  ],
+  "frontmatter": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": {
+        "default": "",
+        "description": "One or two sentences, shown under the title, on the index and in search results. Needed before publishing.",
+        "type": "string"
+      },
+      "date": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+        "description": "Publish date, YYYY-MM-DD."
+      },
+      "image": {
+        "description": "Hero image at the top of the post, 16:9.",
+        "type": "string",
+        "pattern": "^(https:\\/\\/[^\\s]+|\\/[^\\s]*)$"
+      },
+      "ogImage": {
+        "description": "Social card, 1200×630. Falls back to the hero image.",
+        "type": "string",
+        "pattern": "^(https:\\/\\/[^\\s]+|\\/[^\\s]*)$"
+      },
+      "author": {
+        "default": "Blueprint Studio",
+        "type": "string",
+        "minLength": 1
+      },
+      "draft": {
+        "description": "A draft isn't on Insights (or in the sitemap) until it's published.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "title",
+      "date"
+    ],
+    "additionalProperties": false
+  },
+  "sections": [
+    {
+      "name": "InsightsHeading",
+      "label": "Heading",
+      "description": "The page's title, large.",
+      "category": "Text",
+      "single": true,
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "title": "Title"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "defaults": {
+        "title": "Insights"
+      }
+    },
+    {
+      "name": "Collection",
+      "label": "Posts",
+      "description": "Posts, chosen and ordered your way, in one of the site's layouts, with a card for each.",
+      "category": "Posts",
+      "collection": {
+        "layouts": [
+          {
+            "name": "grid",
+            "label": "Grid",
+            "capacity": {
+              "min": 1,
+              "max": 60
+            },
+            "slots": [
+              {
+                "match": "rest",
+                "accepts": [
+                  "card"
+                ],
+                "default": "card"
+              }
+            ],
+            "labels": [],
+            "paginates": false
+          }
+        ],
+        "cards": [
+          {
+            "name": "card",
+            "label": "Card",
+            "description": "Picture, date and author, title and description",
+            "span": 1
+          }
+        ]
+      },
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "heading": {
+            "default": "",
+            "title": "Heading",
+            "type": "string",
+            "maxLength": 80
+          },
+          "labels": {
+            "default": {},
+            "title": "Labels",
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^(first|last|rest|nth-[1-9]\\d*)$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "pinned": {
+            "default": [],
+            "title": "Pinned posts",
+            "vocabulary": "posts",
+            "description": "Shown first, in this order",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "default": [],
+            "title": "In categories",
+            "vocabulary": "categories",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "topics": {
+            "default": [],
+            "title": "On topics",
+            "vocabulary": "topics",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "featured": {
+            "default": false,
+            "title": "Only featured posts",
+            "type": "boolean"
+          },
+          "leadFeatured": {
+            "default": false,
+            "title": "Lead with the newest featured post",
+            "type": "boolean"
+          },
+          "sort": {
+            "default": "newest",
+            "title": "Order",
+            "options": {
+              "newest": {
+                "label": "Newest first"
+              },
+              "oldest": {
+                "label": "Oldest first"
+              },
+              "manual": {
+                "label": "Only pinned"
+              }
+            },
+            "type": "string",
+            "enum": [
+              "newest",
+              "oldest",
+              "manual"
+            ]
+          },
+          "limit": {
+            "default": 4,
+            "title": "Posts",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "skipShown": {
+            "default": true,
+            "title": "Leave out posts shown above",
+            "type": "boolean"
+          },
+          "layout": {
+            "default": "grid",
+            "title": "Layout",
+            "options": {
+              "grid": {
+                "label": "Grid",
+                "description": "Cards two to a row."
+              }
+            },
+            "type": "string",
+            "enum": [
+              "grid"
+            ]
+          },
+          "slots": {
+            "default": [],
+            "title": "Cards",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "match": {
+                  "type": "string",
+                  "pattern": "^(first|last|rest|nth-[1-9]\\d*)$"
+                },
+                "card": {
+                  "type": "string",
+                  "enum": [
+                    "card"
+                  ]
+                }
+              },
+              "required": [
+                "match",
+                "card"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "paginate": {
+            "title": "Every post, with page numbers",
+            "type": "object",
+            "properties": {
+              "perPage": {
+                "type": "integer",
+                "minimum": 3,
+                "maximum": 30,
+                "title": "Posts per page"
+              },
+              "search": {
+                "type": "boolean",
+                "title": "Search box"
+              },
+              "filters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Filter pills",
+                "vocabulary": "categories"
+              }
+            },
+            "required": [
+              "perPage",
+              "search",
+              "filters"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "defaults": {
+        "heading": "",
+        "labels": {},
+        "pinned": [],
+        "category": [],
+        "topics": [],
+        "featured": false,
+        "leadFeatured": false,
+        "sort": "newest",
+        "limit": 24,
+        "skipShown": false,
+        "layout": "grid",
+        "slots": []
+      }
+    }
+  ],
+  "pages": {
+    "insights": "content/pages/insights.json"
+  }
+}
