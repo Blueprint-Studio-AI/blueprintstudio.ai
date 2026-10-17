@@ -228,5 +228,251 @@
       "date"
     ],
     "additionalProperties": false
+  },
+  "sections": [
+    {
+      "name": "InsightsHeading",
+      "label": "Heading",
+      "description": "The page's title, large.",
+      "category": "Text",
+      "single": true,
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "title": "Title"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "defaults": {
+        "title": "Insights"
+      }
+    },
+    {
+      "name": "Collection",
+      "label": "Posts",
+      "description": "Posts, chosen and ordered your way, in one of the site's layouts, with a card for each.",
+      "category": "Posts",
+      "collection": {
+        "layouts": [
+          {
+            "name": "grid",
+            "label": "Grid",
+            "capacity": {
+              "min": 1,
+              "max": 60
+            },
+            "slots": [
+              {
+                "match": "rest",
+                "accepts": [
+                  "card"
+                ],
+                "default": "card"
+              }
+            ],
+            "labels": [],
+            "paginates": false
+          }
+        ],
+        "cards": [
+          {
+            "name": "card",
+            "label": "Card",
+            "description": "Picture, date and author, title and description",
+            "span": 1
+          }
+        ]
+      },
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "heading": {
+            "default": "",
+            "title": "Heading",
+            "type": "string",
+            "maxLength": 80
+          },
+          "labels": {
+            "default": {},
+            "title": "Labels",
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^(first|last|rest|nth-[1-9]\\d*)$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "pinned": {
+            "default": [],
+            "title": "Pinned posts",
+            "vocabulary": "posts",
+            "description": "Shown first, in this order",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "default": [],
+            "title": "In categories",
+            "vocabulary": "categories",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "topics": {
+            "default": [],
+            "title": "On topics",
+            "vocabulary": "topics",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "featured": {
+            "default": false,
+            "title": "Only featured posts",
+            "type": "boolean"
+          },
+          "leadFeatured": {
+            "default": false,
+            "title": "Lead with the newest featured post",
+            "type": "boolean"
+          },
+          "sort": {
+            "default": "newest",
+            "title": "Order",
+            "options": {
+              "newest": {
+                "label": "Newest first"
+              },
+              "oldest": {
+                "label": "Oldest first"
+              },
+              "manual": {
+                "label": "Only pinned"
+              }
+            },
+            "type": "string",
+            "enum": [
+              "newest",
+              "oldest",
+              "manual"
+            ]
+          },
+          "limit": {
+            "default": 4,
+            "title": "Posts",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "skipShown": {
+            "default": true,
+            "title": "Leave out posts shown above",
+            "type": "boolean"
+          },
+          "layout": {
+            "default": "grid",
+            "title": "Layout",
+            "options": {
+              "grid": {
+                "label": "Grid",
+                "description": "Cards two to a row."
+              }
+            },
+            "type": "string",
+            "enum": [
+              "grid"
+            ]
+          },
+          "slots": {
+            "default": [],
+            "title": "Cards",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "match": {
+                  "type": "string",
+                  "pattern": "^(first|last|rest|nth-[1-9]\\d*)$"
+                },
+                "card": {
+                  "type": "string",
+                  "enum": [
+                    "card"
+                  ]
+                }
+              },
+              "required": [
+                "match",
+                "card"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "paginate": {
+            "title": "Every post, with page numbers",
+            "type": "object",
+            "properties": {
+              "perPage": {
+                "type": "integer",
+                "minimum": 3,
+                "maximum": 30,
+                "title": "Posts per page"
+              },
+              "search": {
+                "type": "boolean",
+                "title": "Search box"
+              },
+              "filters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Filter pills",
+                "vocabulary": "categories"
+              }
+            },
+            "required": [
+              "perPage",
+              "search",
+              "filters"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "defaults": {
+        "heading": "",
+        "labels": {},
+        "pinned": [],
+        "category": [],
+        "topics": [],
+        "featured": false,
+        "leadFeatured": false,
+        "sort": "newest",
+        "limit": 24,
+        "skipShown": false,
+        "layout": "grid",
+        "slots": []
+      }
+    }
+  ],
+  "pages": {
+    "insights": "content/pages/insights.json"
   }
 }

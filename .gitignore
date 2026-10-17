@@ -50,3 +50,4 @@ public/**/*.zip
 /.galley/history/
 /.galley/drafts/
 /.galley/library.json
+/.galley/trash/

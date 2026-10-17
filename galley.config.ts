@@ -4,6 +4,7 @@ import { image } from "./components/galley/image";
 import { stat } from "./components/galley/stat";
 import { youtube } from "./components/galley/youtube";
 import { PostFrontmatter } from "./lib/blog-frontmatter";
+import { SECTIONS } from "./components/insights/sections";
 
 // Galley for blueprintstudio.ai/insights: where posts live, which components a post may
 // use, and the fields at the top of every post. `pnpm galley list` shows the components.
@@ -18,4 +19,7 @@ export default defineConfig({
   // Edits wait as drafts (in .galley/drafts/) until they're published; a post that isn't on
   // Insights says draft: true, and is dated when it's first published.
   publish: { draftField: "draft", dateField: "date" },
+  // The Insights page, built from sections: its heading and its posts.
+  sections: SECTIONS,
+  pages: { insights: "content/pages/insights.json" },
 });
