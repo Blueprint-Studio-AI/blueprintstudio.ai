@@ -18,6 +18,7 @@ import {
 } from "@blueprint-studio/galley/editor";
 import { importMedia } from "@blueprint-studio/galley/media";
 import { DraftPostStore } from "@blueprint-studio/galley/drafts";
+import { buildLibrary } from "@blueprint-studio/galley/library";
 import { FsPostStore, revisionOf, writePost } from "@blueprint-studio/galley/ops";
 import { renderPost } from "@blueprint-studio/galley/render";
 import { elements } from "@/components/galley/elements";
@@ -198,6 +199,17 @@ export async function uploadAction(form: FormData) {
   try {
     const media = await importMediaBytes(galley, cwd, { bytes: Buffer.from(await file.arrayBuffer()), type: file.type, name: file.name });
     return { path: media.path, width: media.width, height: media.height };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** Everything a post can use (Insights' blocks and media), for edit mode's Library. */
+export async function siteLibraryAction() {
+  guard();
+  try {
+    const { items } = await buildLibrary(galley, cwd);
+    return { items };
   } catch (error) {
     return failure(error);
   }

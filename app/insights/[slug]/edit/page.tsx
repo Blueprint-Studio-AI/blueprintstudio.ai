@@ -23,6 +23,7 @@ import {
   restoreAction,
   saveCommentsAction,
   savePostAction,
+  siteLibraryAction,
   stylesAction,
   unpublishPostAction,
   uploadAction,
@@ -91,6 +92,7 @@ export default async function EditInsight({ params, searchParams }: Props) {
         publish: publishPostAction,
         unpublish: unpublishPostAction,
         discard: discardPostAction,
+        siteLibrary: siteLibraryAction,
       }}
     >
       <BlogPost

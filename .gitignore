@@ -49,3 +49,4 @@ public/**/*.zip
 # Edit mode's version history, kept on this machine (git's history is the one that ships)
 /.galley/history/
 /.galley/drafts/
+/.galley/library.json
