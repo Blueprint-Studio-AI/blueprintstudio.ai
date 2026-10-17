@@ -193,9 +193,9 @@
         "minLength": 1
       },
       "description": {
-        "type": "string",
-        "minLength": 1,
-        "description": "One or two sentences, shown under the title, on the index and in search results."
+        "default": "",
+        "description": "One or two sentences, shown under the title, on the index and in search results. Needed before publishing.",
+        "type": "string"
       },
       "date": {
         "type": "string",
@@ -225,7 +225,6 @@
     },
     "required": [
       "title",
-      "description",
       "date"
     ],
     "additionalProperties": false

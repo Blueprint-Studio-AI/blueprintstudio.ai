@@ -187,9 +187,11 @@ export default function BlogPost({
                 {edit ? <EditableText field="title" placeholder="Title" /> : noWidow(post.title)}
               </h1>
 
-              <p className="mt-4 text-neutral-500 text-base sm:text-lg leading-[1.5]">
-                {edit ? <EditableText field="description" placeholder="One or two sentences on what this is about" /> : post.description}
-              </p>
+              {edit || post.description ? (
+                <p className="mt-4 text-neutral-500 text-base sm:text-lg leading-[1.5]">
+                  {edit ? <EditableText field="description" placeholder="One or two sentences on what this is about" /> : post.description}
+                </p>
+              ) : null}
             </header>
 
             {/* Hero image */}

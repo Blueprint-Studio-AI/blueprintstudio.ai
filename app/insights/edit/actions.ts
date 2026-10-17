@@ -64,7 +64,7 @@ export async function createPostAction(title: string) {
   guard();
   const made = await createPost(galley, store(), {
     title,
-    frontmatter: { description: "One or two sentences on what this is about.", date: new Date().toLocaleDateString("en-CA"), draft: true },
+    frontmatter: { date: new Date().toLocaleDateString("en-CA"), draft: true },
   });
   if (!made.ok) return { error: made.error };
   const source = await store().read(made.slug);
