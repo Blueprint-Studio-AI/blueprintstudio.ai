@@ -49,6 +49,14 @@ const nextConfig = {
           { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
         ],
       },
+      {
+        // The Asset Generator's brand pages (tools.blueprintstudio.ai) draw each
+        // brand from /brands/<slug>/guide.json, and a browser fetches the guide's
+        // web fonts and nav logo masks only with CORS. Vercel already sends this
+        // for static files; saying it here keeps `next dev` the same.
+        source: '/brands/:path*',
+        headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
+      },
     ]
   },
 
