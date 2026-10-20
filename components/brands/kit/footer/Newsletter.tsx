@@ -2,13 +2,17 @@
 
 // Newsletter capture matching the site's EmailCapture states/copy. Now that this
 // lives inside the main app, it posts to the real same-origin /api/subscribe.
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useTurnstileToken } from "@/lib/use-turnstile";
 
 const ENDPOINT = "/api/subscribe";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
+  const [company, setCompany] = useState(""); // honeypot -- real people never fill this in
+  const mountedAtRef = useRef(Date.now());
+  const { token: turnstileToken, containerRef: turnstileRef } = useTurnstileToken();
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -25,7 +29,13 @@ export default function Newsletter() {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "jinba_footer_newsletter" }),
+        body: JSON.stringify({
+          email,
+          source: "jinba_footer_newsletter",
+          company,
+          elapsedMs: Date.now() - mountedAtRef.current,
+          turnstileToken,
+        }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Subscription failed");
       setStatus("done");
@@ -49,6 +59,22 @@ export default function Newsletter() {
         Join our newsletter for insights on design, web development, and digital innovation.
       </p>
       <form onSubmit={submit} className="flex gap-2 px-4 pb-4" noValidate>
+        <div
+          style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}
+          aria-hidden="true"
+        >
+          <label htmlFor="company">Company</label>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+        </div>
+        <div ref={turnstileRef} />
         <div className="relative w-full">
           <input
             type="email"

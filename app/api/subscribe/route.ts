@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { headers } from 'next/headers';
 import { validateEmail } from '@/lib/validation'; // Import the validation function
+import { honeypotTripped, submittedTooFast, verifyTurnstile } from '@/lib/spam-guard';
 
 export const runtime = 'edge';
 
@@ -37,6 +38,14 @@ function waitResponse(message: string, retryAfterSeconds: number) {
   );
 }
 
+/** What a bot sees instead of an error -- looks like a real sign-up, writes nothing. */
+function fakeSuccessResponse() {
+  return NextResponse.json({
+    success: true,
+    message: 'Successfully subscribed!'
+  });
+}
+
 export async function POST(request: Request) {
     try {
       // Rate limiting
@@ -53,7 +62,12 @@ export async function POST(request: Request) {
         );
       }
   
-      const { email, source = 'newsletter' } = await request.json();
+      const { email, source = 'newsletter', company, elapsedMs, turnstileToken } = await request.json();
+
+      // Honeypot and time-to-submit checks -- a bot trips these, a person won't.
+      if (honeypotTripped(company) || submittedTooFast(elapsedMs)) {
+        return fakeSuccessResponse();
+      }
 
       if (!email) {
         return NextResponse.json(
@@ -61,7 +75,7 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-  
+
       // Use the shared validation function
       const { isValid, message } = validateEmail(email);
       if (!isValid) {
@@ -70,7 +84,12 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-  
+
+      // Optional Turnstile check -- only active once the site/secret keys are configured
+      if (!(await verifyTurnstile(turnstileToken, ip))) {
+        return fakeSuccessResponse();
+      }
+
       // Check if email already exists
       const { data: existingSubscriber, error: queryError } = await supabase
         .from('email_subscribers')

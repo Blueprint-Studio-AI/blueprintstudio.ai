@@ -1,12 +1,16 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { validateEmail } from '@/lib/validation';
+import { useTurnstileToken } from '@/lib/use-turnstile';
 import Cookies from 'js-cookie';
 
 const COOKIE_NAME = 'blueprint_email_access';
 
 export default function EmailCapture() {
     const [email, setEmail] = useState('');
+    const [company, setCompany] = useState(''); // honeypot -- real people never fill this in
+    const mountedAtRef = useRef(Date.now());
+    const { token: turnstileToken, containerRef: turnstileRef } = useTurnstileToken();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [showSubscribe, setShowSubscribe] = useState(true);
@@ -44,7 +48,13 @@ export default function EmailCapture() {
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, source: 'footer_newsletter' }),
+                body: JSON.stringify({
+                    email,
+                    source: 'footer_newsletter',
+                    company,
+                    elapsedMs: Date.now() - mountedAtRef.current,
+                    turnstileToken,
+                }),
             });
 
             const data = await response.json();
@@ -91,6 +101,22 @@ export default function EmailCapture() {
         <div className="bg-neutral-800 rounded-xl border border-neutral-700 flex flex-col justify-between w-full max-w-[400px] h-36">
             <p className="text-neutral-300 px-4 pt-4">Join our newsletter for insights on design, web development, and digital innovation.</p>
             <form onSubmit={handleSubscribe} className="flex gap-2 px-4 pb-4" noValidate >
+                <div
+                    style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+                    aria-hidden="true"
+                >
+                    <label htmlFor="company">Company</label>
+                    <input
+                        id="company"
+                        name="company"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                    />
+                </div>
+                <div ref={turnstileRef} />
                 <div className="relative w-full">
                     <input
                         type="email"
