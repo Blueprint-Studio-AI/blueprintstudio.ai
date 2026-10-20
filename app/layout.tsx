@@ -155,7 +155,8 @@ export default function RootLayout({
         </SmoothScrollProvider>
         <Analytics />
         <SpeedInsights />
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
+        {/* The ID is only set on Vercel; without it, gtag.js would load as id=undefined. */}
+        {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
       </body>
     </html>
   );
