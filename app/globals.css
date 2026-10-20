@@ -339,6 +339,20 @@ html.lenis body {
     animation: hero-card-blur-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
+  /* Home loader (components/Home/Hero.tsx). Plain CSS so it plays from the
+     first paint, not once the page's JavaScript has loaded. Delays are inline. */
+  @keyframes loader-fade {
+    from { opacity: 0; }
+  }
+  @keyframes loader-word {
+    from { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+  }
+  .loader-fade { animation: loader-fade 500ms ease-out both; }
+  .loader-word { animation: loader-word 500ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .loader-fade, .loader-word { animation: none; }
+  }
+
   /* Forced-colors / high-contrast: the clipped gradient text renders
      transparent (invisible), so restore a solid system color. */
   @media (forced-colors: active) {

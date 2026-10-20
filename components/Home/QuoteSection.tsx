@@ -35,7 +35,7 @@ export default function QuoteSection() {
                 <OuterContainer>
                     <InnerContainer className="py-32 lg:py-40 text-center px-4">
                         <blockquote>
-                                <motion.h1
+                                <motion.h2
                                     className="font-medium text-neutral-800 mb-8 cursor-default"
                                     style={{
                                         fontSize: 'clamp(32px, 6vw, 56px)',
@@ -60,7 +60,7 @@ export default function QuoteSection() {
                                             {phrase}
                                         </motion.span>
                                     ))}
-                                </motion.h1>
+                                </motion.h2>
 
                                 <motion.p
                                     className="text-neutral-600 font-normal not-italic cursor-default"

@@ -1,5 +1,5 @@
 import { Footer } from "@/components/Footer/index";
-import HeroB from "./Hero-b";
+import Hero from "./Hero";
 import QuoteSection from "./QuoteSection";
 import Achievements from "./Achievements";
 import PortfolioBento from "./PortfolioBento";
@@ -14,7 +14,7 @@ export default function Home() {
     return (
         <div>
             <div id="hero">
-                <HeroB/>
+                <Hero/>
             </div>
             <div id="about">
                 <QuoteSection/>
