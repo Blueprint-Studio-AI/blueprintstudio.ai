@@ -2,7 +2,12 @@ export interface MediaAsset {
   type: 'image' | 'video';
   src: string;
   poster?: string;
+  /** Seconds into the reel the poster was taken; the /work pages start playback there, so poster and reel line up. */
+  posterTime?: number;
   alt: string;
+  /** Size as displayed. The /work pages size each frame from it, so nothing jumps when it loads. */
+  width?: number;
+  height?: number;
 }
 
 export interface ResponsiveMedia {
@@ -19,6 +24,26 @@ export interface ShowcaseMedia {
   caption?: string;
 }
 
+// What we made for the client. Each value has a /work/<deliverable> page once
+// at least two projects carry it (lib/work).
+export type Deliverable = 'websites' | 'apps' | 'branding' | 'launch-videos';
+
+// The client's field, as the project's own copy and media describe it.
+export type Industry = 'crypto' | 'ai' | 'gaming';
+
+export const deliverableLabels: Record<Deliverable, string> = {
+  websites: 'Websites',
+  apps: 'Apps',
+  branding: 'Branding',
+  'launch-videos': 'Launch videos',
+};
+
+export const industryLabels: Record<Industry, string> = {
+  crypto: 'Crypto',
+  ai: 'AI',
+  gaming: 'Gaming',
+};
+
 export interface PortfolioProject {
   id: string;
   title: string;
@@ -27,6 +52,14 @@ export interface PortfolioProject {
   link?: string;
   featuredMedia: ResponsiveMedia;
   showcaseMedia: ShowcaseMedia[];
+  deliverables: Deliverable[];
+  industries: Industry[];
+  /** The client's live site, where we know the address. */
+  liveUrl?: string;
+  /** Slug of the project's /brands/<slug> page, if it has one. */
+  brandPage?: string;
+  /** Media to lead with on one deliverable's wall instead of featuredMedia (e.g. the site, not the brand reel). */
+  deliverableMedia?: Partial<Record<Deliverable, ResponsiveMedia>>;
   metadata?: {
     client?: string;
     year?: string;
@@ -47,15 +80,21 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/living-ip/living-ip-horizontal-compressed.mp4',
         poster: '/media/projects/living-ip/living-ip-desktop-poster.jpg',
-        alt: 'LivingIP Project Reel'
+        alt: 'LivingIP Project Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/living-ip/living-ip-vertical-compressed.mp4',
         poster: '/media/projects/living-ip/living-ip-mobile-poster.jpg',
-        alt: 'LivingIP Project Reel'
+        alt: 'LivingIP Project Reel',
+        width: 720,
+        height: 1080
       }
     },
+    deliverables: ['apps'],
+    industries: ['crypto', 'ai'],
     showcaseMedia: [
       {
         id: 'livingip-votes',
@@ -95,14 +134,26 @@ export const portfolioProjects: PortfolioProject[] = [
       desktop: {
         type: 'video',
         src: '/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4',
-        alt: 'Huch Platform Redesign & Rebrand Reel'
+        poster: '/media/projects/huch/huch-desktop-poster.jpg',
+        posterTime: 1.6,
+        alt: 'Huch Platform Redesign & Rebrand Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/huch/huch-brand-overview-vertical-compressed.mp4',
-        alt: 'Huch Platform Redesign & Rebrand Reel'
+        poster: '/media/projects/huch/huch-mobile-poster.jpg',
+        posterTime: 1.6,
+        alt: 'Huch Platform Redesign & Rebrand Reel',
+        width: 720,
+        height: 1080
       }
     },
+    // The platform is a web app, so it sits under Apps; /launch's website
+    // picker also shows it as a site. Not tagged crypto: nothing in its copy says so.
+    deliverables: ['apps', 'branding'],
+    industries: ['gaming'],
     showcaseMedia: [
       {
         id: 'huch-asset-1',
@@ -142,14 +193,22 @@ export const portfolioProjects: PortfolioProject[] = [
       desktop: {
         type: 'image',
         src: '/media/projects/uni/uni-brand-overview-horizontal.png',
-        alt: 'UNI Brand Identity Overview'
+        alt: 'UNI Brand Identity Overview',
+        width: 5760,
+        height: 3240
       },
       mobile: {
         type: 'image',
         src: '/media/projects/uni/uni-brand-overview-vertical.png',
-        alt: 'UNI Brand Identity Overview'
+        alt: 'UNI Brand Identity Overview',
+        width: 1080,
+        height: 1620
       }
     },
+    // data/brandPortfolio.ts calls UNI a street-food brand; this entry (and the
+    // "Refined Stability" line in its artwork) says stablecoin.
+    deliverables: ['branding'],
+    industries: ['crypto'],
     showcaseMedia: [
       {
         id: 'uni-asset-1',
@@ -189,14 +248,22 @@ export const portfolioProjects: PortfolioProject[] = [
       desktop: {
         type: 'video',
         src: '/media/projects/bump/bump-brand-overview-horizontal-compressed.mp4',
-        alt: 'Bump Brand & Product Design Reel'
+        poster: '/media/projects/bump/bump-desktop-poster.jpg',
+        alt: 'Bump Brand & Product Design Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/bump/bump-brand-overview-vertical-compressed.mp4',
-        alt: 'Bump Brand & Product Design Reel'
+        poster: '/media/projects/bump/bump-mobile-poster.jpg',
+        alt: 'Bump Brand & Product Design Reel',
+        width: 720,
+        height: 1080
       }
     },
+    deliverables: ['branding', 'apps'],
+    industries: ['crypto'],
     showcaseMedia: [
       {
         id: 'bump-asset-1',
@@ -237,15 +304,24 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/arch-vegas/arch-vegas-horizontal-compressed.mp4',
         poster: '/media/projects/arch-vegas/arch-vegas-desktop-poster.jpg',
-        alt: 'Arch Network BTC All-In Summit Project Reel'
+        alt: 'Arch Network BTC All-In Summit Project Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/arch-vegas/arch-vegas-vertical-compressed.mp4',
         poster: '/media/projects/arch-vegas/arch-vegas-mobile-poster.jpg',
-        alt: 'Arch Network BTC All-In Summit Project Reel'
+        alt: 'Arch Network BTC All-In Summit Project Reel',
+        width: 720,
+        height: 1080
       }
     },
+    // Event branding and motion for a summit, not a product launch, so it's
+    // left off Launch videos.
+    deliverables: ['branding'],
+    industries: ['crypto'],
+    brandPage: 'arch',
     showcaseMedia: [
       {
         id: 'arch-screens',
@@ -286,14 +362,25 @@ export const portfolioProjects: PortfolioProject[] = [
       desktop: {
         type: 'video',
         src: '/media/projects/perena/perena-horizontal-compressed.mp4',
-        alt: 'Perena USD* Landing Page Project Reel'
+        poster: '/media/projects/perena/perena-desktop-poster.jpg',
+        posterTime: 1,
+        alt: 'Perena USD* Landing Page Project Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
+        // Stored 1920x1080 with tall pixels: it plays 2:3.
         type: 'video',
         src: '/media/projects/perena/perena-vertical-compressed.mp4',
-        alt: 'Perena USD* Landing Page Project Reel'
+        poster: '/media/projects/perena/perena-mobile-poster.jpg',
+        posterTime: 1,
+        alt: 'Perena USD* Landing Page Project Reel',
+        width: 720,
+        height: 1080
       }
     },
+    deliverables: ['websites', 'launch-videos'],
+    industries: ['crypto'],
     showcaseMedia: [
       {
         id: 'perena-asset-1',
@@ -320,7 +407,7 @@ export const portfolioProjects: PortfolioProject[] = [
     metadata: {
       client: 'Perena',
       year: '2026',
-      services: ['Motion Design', 'Event Graphics', 'Brand Design']
+      services: ['Landing Page Design', 'Web Development', 'Motion Media']
     }
   },
   {
@@ -334,13 +421,39 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/autara/autara-horizontal-compressed.mp4',
         poster: '/media/projects/autara/autara-desktop-poster.jpg',
-        alt: 'Autara on Arch Network Project Reel'
+        alt: 'Autara on Arch Network Project Reel',
+        width: 1620,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/autara/autara-vertical-compressed.mp4',
         poster: '/media/projects/autara/autara-mobile-poster.jpg',
-        alt: 'Autara on Arch Network Project Reel'
+        alt: 'Autara on Arch Network Project Reel',
+        width: 720,
+        height: 1080
+      }
+    },
+    // DeFi on Arch Network per /brand and the site in its media;
+    // data/brandPortfolio.ts calls it AI infrastructure.
+    deliverables: ['branding', 'websites'],
+    industries: ['crypto'],
+    deliverableMedia: {
+      websites: {
+        desktop: {
+          type: 'image',
+          src: '/media/projects/autara/recent-work-card.webp',
+          alt: 'Autara landing page on a laptop',
+          width: 2232,
+          height: 1712
+        },
+        mobile: {
+          type: 'image',
+          src: '/media/recent-work/autara-mobile.webp',
+          alt: 'Autara landing page on a laptop',
+          width: 1980,
+          height: 1596
+        }
       }
     },
     showcaseMedia: [
@@ -367,9 +480,9 @@ export const portfolioProjects: PortfolioProject[] = [
       }
     ],
     metadata: {
-      client: 'Perena',
+      client: 'Autara',
       year: '2025',
-      services: ['Landing Page Design', 'Web Development', 'Motion Media']
+      services: ['Brand Identity', 'Logo System', 'Framer Landing Page', 'Social Kit', 'Brand Deck']
     }
   },
   {
@@ -383,13 +496,46 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
         poster: '/images/work/idscanner.png',
-        alt: 'TokenWorks Design & Build Reel'
+        alt: 'TokenWorks Design & Build Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'video',
         src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4', // Using same video for now
         poster: '/media/projects/tokenworks-videos/tokenworks-mobile-poster.jpg',
-        alt: 'TokenWorks Design & Build Reel'
+        alt: 'TokenWorks Design & Build Reel',
+        width: 1920,
+        height: 1080
+      }
+    },
+    // The reel is product videos (on /launch-videos as AV3 and IDVisor). The
+    // e-commerce and app work in the description has no media here yet, and
+    // nothing places the client in one of the industries above.
+    deliverables: ['launch-videos'],
+    industries: [],
+    deliverableMedia: {
+      // The desktop poster above is a store page, and the reel opens on black,
+      // so the wall uses a frame from 6s in and starts the reel there.
+      'launch-videos': {
+        desktop: {
+          type: 'video',
+          src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
+          poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
+          posterTime: 6,
+          alt: 'TokenWorks product videos reel',
+          width: 1920,
+          height: 1080
+        },
+        mobile: {
+          type: 'video',
+          src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
+          poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
+          posterTime: 6,
+          alt: 'TokenWorks product videos reel',
+          width: 1920,
+          height: 1080
+        }
       }
     },
     showcaseMedia: [
@@ -431,14 +577,20 @@ export const portfolioProjects: PortfolioProject[] = [
       desktop: {
         type: 'image',
         src: '/media/projects/breeze/hero-breeze.jpg',
-        alt: 'Breeze on Arch Network Reel'
+        alt: 'Breeze on Arch Network Reel',
+        width: 1920,
+        height: 1080
       },
       mobile: {
         type: 'image',
         src: '/media/projects/breeze/hero-breeze-mobile.jpg',
-        alt: 'Breeze on Arch Network Reel'
+        alt: 'Breeze on Arch Network Reel',
+        width: 720,
+        height: 1080
       }
     },
+    deliverables: ['branding', 'websites'],
+    industries: ['crypto'],
     showcaseMedia: [
       {
         id: 'breeze-animation',
@@ -470,3 +622,112 @@ export const portfolioProjects: PortfolioProject[] = [
     }
   }
 ];
+
+// Projects shown on the /work pages but not in the home page's portfolio
+// (PortfolioBento renders every entry above). Both already appear on /brand as
+// recent work and have their own /brands pages; copy and media are reused from there.
+export const workOnlyProjects: PortfolioProject[] = [
+  {
+    id: 'honeyb',
+    title: 'HoneyB — Brand, Website & Deck',
+    description: 'From blank slate to market-ready in one package. We built HoneyB’s entire brand presence as a single cohesive system.',
+    category: 'Brand, Website, Deck',
+    featuredMedia: {
+      desktop: {
+        type: 'image',
+        src: '/launch-assets/web-design_assets/desktop-honeyb.png',
+        alt: 'HoneyB website on a laptop',
+        width: 1440,
+        height: 926
+      },
+      mobile: {
+        type: 'image',
+        src: '/launch-assets/web-design_assets/desktop-honeyb.png',
+        alt: 'HoneyB website on a laptop',
+        width: 1440,
+        height: 926
+      }
+    },
+    showcaseMedia: [],
+    deliverables: ['websites', 'branding'],
+    industries: ['crypto'],
+    liveUrl: 'https://www.honeybtc.com',
+    brandPage: 'honeyb',
+    deliverableMedia: {
+      branding: {
+        desktop: {
+          type: 'image',
+          src: '/media/hero/honeyb_brands-we-built.png',
+          alt: 'HoneyB brand identity',
+          width: 1080,
+          height: 984
+        },
+        mobile: {
+          type: 'image',
+          src: '/media/hero/honeyb_brands-we-built.png',
+          alt: 'HoneyB brand identity',
+          width: 1080,
+          height: 984
+        }
+      }
+    },
+    metadata: {
+      client: 'HoneyB',
+      year: '2026',
+      services: ['Brand Identity', 'Website', 'Pitch Deck']
+    }
+  },
+  {
+    id: 'jinba',
+    title: 'Jinba — Brand Identity & Website',
+    description: 'Brand identity for an enterprise automation platform serving regulated industries. Logo system, brand narrative, a refreshed website and a design system.',
+    category: 'Brand, Website, Design System',
+    featuredMedia: {
+      desktop: {
+        type: 'image',
+        src: '/media/recent-work/jinba-desktop.webp',
+        alt: 'Jinba website in a browser window',
+        width: 2232,
+        height: 1712
+      },
+      mobile: {
+        type: 'image',
+        src: '/media/recent-work/jinba-mobile.webp',
+        alt: 'Jinba website in a browser window',
+        width: 1980,
+        height: 1596
+      }
+    },
+    showcaseMedia: [],
+    deliverables: ['websites', 'branding'],
+    industries: ['ai'],
+    // The address in the browser bar of the site screenshot.
+    liveUrl: 'https://jinba.io',
+    brandPage: 'jinba',
+    deliverableMedia: {
+      branding: {
+        desktop: {
+          type: 'image',
+          src: '/brands/jinba/og-image.png',
+          alt: 'Jinba brand identity',
+          width: 1200,
+          height: 630
+        },
+        mobile: {
+          type: 'image',
+          src: '/brands/jinba/og-image.png',
+          alt: 'Jinba brand identity',
+          width: 1200,
+          height: 630
+        }
+      }
+    },
+    metadata: {
+      client: 'Jinba',
+      year: '2026',
+      services: ['Brand Identity', 'Website', 'Design System']
+    }
+  }
+];
+
+export const allWorkProjects: PortfolioProject[] = [...portfolioProjects, ...workOnlyProjects];
