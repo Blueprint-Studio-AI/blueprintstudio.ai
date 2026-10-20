@@ -89,6 +89,7 @@ const ROTATE_MS = 2400;
 const CHIP_SPRING = { type: "spring", visualDuration: 0.45, bounce: 0.15 } as const;
 // A touch quicker than the text, so a growing box stays ahead of the word coming in.
 const WIDTH_SPRING = { type: "spring", visualDuration: 0.32, bounce: 0.1 } as const;
+const TURN_SPRING = { type: "spring", visualDuration: 0.28, bounce: 0.05 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 /** The variant in the URL (?for=websites), if any. */
@@ -105,12 +106,16 @@ export function variantFromUrl(): VariantKey | null {
 export function SpringText({ text, slide = false, className = "" }: { text: string; slide?: boolean; className?: string }) {
     const reduceMotion = useReducedMotion();
     const sizerRef = useRef<HTMLSpanElement>(null);
-    const [width, setWidth] = useState<number>();
+    // The measured width for `text`, and whether it grew from the last one.
+    const [box, setBox] = useState<{ text: string; width: number; grow: boolean }>();
     useLayoutEffect(() => {
         const sizer = sizerRef.current;
         if (!sizer) return;
         // + 1: never shave the last glyph's edge. Measured again if the font size changes.
-        const measure = () => setWidth(Math.ceil(sizer.getBoundingClientRect().width) + 1);
+        const measure = () => {
+            const width = Math.ceil(sizer.getBoundingClientRect().width) + 1;
+            setBox((prev) => ({ text, width, grow: prev !== undefined && width > prev.width + 1 }));
+        };
         measure();
         const observer = new ResizeObserver(measure);
         observer.observe(sizer);
@@ -118,26 +123,29 @@ export function SpringText({ text, slide = false, className = "" }: { text: stri
     }, [text]);
 
     const move = slide && !reduceMotion;
+    // Growing: the box opens first and the word arrives into it. Shrinking: the
+    // word leaves first, then the box closes. Either way nothing spills past it.
+    const grow = box?.grow ?? false;
     return (
         <motion.span
             className={`relative inline-block whitespace-nowrap ${className}`}
             style={{ clipPath: "inset(0 -1em)" }}
             initial={false}
-            animate={width === undefined ? undefined : { width }}
-            transition={WIDTH_SPRING}
+            animate={box ? { width: box.width } : undefined}
+            transition={{ ...WIDTH_SPRING, delay: grow ? 0 : 0.12 }}
         >
             <AnimatePresence initial={false}>
                 <motion.span
                     key={text}
                     className="absolute left-0 top-0"
                     initial={move ? { y: "62%", opacity: 0, filter: "blur(6px)" } : { opacity: 0, filter: "blur(4px)" }}
-                    animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                    animate={box?.text === text ? { y: 0, opacity: 1, filter: "blur(0px)" } : undefined}
                     exit={
                         move
-                            ? { y: "-62%", opacity: 0, filter: "blur(6px)", transition: { duration: 0.24, ease: EASE_OUT } }
-                            : { opacity: 0, filter: "blur(4px)", transition: { duration: 0.16 } }
+                            ? { y: "-62%", opacity: 0, filter: "blur(6px)", transition: { duration: 0.2, ease: EASE_OUT } }
+                            : { opacity: 0, filter: "blur(4px)", transition: { duration: 0.14 } }
                     }
-                    transition={{ duration: 0.42, ease: EASE_OUT, delay: 0.04 }}
+                    transition={{ duration: 0.42, ease: EASE_OUT, delay: grow ? 0.2 : 0.06 }}
                 >
                     {text}
                 </motion.span>
@@ -176,11 +184,9 @@ export function VariantPicker({
     }, [cycling]);
 
     const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[index];
-    // With nothing picked, the open menu ticks Everything, so the chip says so too.
-    const word = open && value === null ? "everything" : shown.word;
+    const word = shown.word;
 
-    // The menu sits under the chip and is never narrower than it, following the
-    // chip as it springs to "everything" once the menu is open.
+    // The menu sits under the chip and is never narrower than it.
     const placeMenu = () => {
         const rect = chipRef.current?.getBoundingClientRect();
         if (rect) setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom + 10, width: Math.max(224, rect.width) });
@@ -201,15 +207,17 @@ export function VariantPicker({
         if (refocus) chipRef.current?.focus({ preventScroll: true });
     };
     const pick = (key: VariantKey | null) => {
-        onChange(key);
-        if (key === null) setIndex(0);
         close(true);
+        if (key === null) setIndex(0);
+        // Let the menu get out of the way before the copy under it changes.
+        setTimeout(() => onChange(key), 90);
     };
 
     // Close on outside click, scroll or Escape; arrow keys move through the options.
     useEffect(() => {
         if (!open) return;
-        listRef.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]')?.focus({ preventScroll: true });
+        // Start on the picked row, or on the word showing while it cycled.
+        listRef.current?.querySelector<HTMLButtonElement>(`[data-key="${value ?? shown.key}"]`)?.focus({ preventScroll: true });
         const onDown = (e: PointerEvent) => {
             const target = e.target as Node;
             if (!listRef.current?.contains(target) && !chipRef.current?.contains(target)) close(false);
@@ -250,7 +258,7 @@ export function VariantPicker({
                 <SpringText text={word} slide className="leading-[1.2em]" />
                 {/* Nudges down on hover; turns with a spring when the menu opens. */}
                 <span className="ml-[0.12em] inline-flex transition-transform duration-300 group-hover:translate-y-[0.04em]">
-                    <motion.span className="inline-flex" animate={{ rotate: open ? 180 : 0 }} transition={CHIP_SPRING}>
+                    <motion.span className="inline-flex" animate={{ rotate: open ? 180 : 0 }} transition={TURN_SPRING}>
                         <ChevronDown aria-hidden className="h-[0.3em] w-[0.3em] text-neutral-900/55" strokeWidth={3} />
                     </motion.span>
                 </span>
@@ -266,9 +274,9 @@ export function VariantPicker({
                                 aria-label="What we make"
                                 initial={{ opacity: 0, scale: 0.96, y: -4 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.97, y: -3, transition: { duration: 0.14 } }}
+                                exit={{ opacity: 0, scale: 0.97, y: -3, transition: { duration: 0.1 } }}
                                 transition={{ ...CHIP_SPRING, opacity: { duration: 0.12 } }}
-                                className="fixed z-[70] origin-top rounded-2xl border border-neutral-200 bg-white/95 p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+                                className="fixed z-[70] origin-top rounded-2xl border border-neutral-200 bg-white/[0.98] p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
                                 style={{ left: anchor.x - anchor.width / 2, top: anchor.y, width: anchor.width }}
                             >
                                 {[{ key: null, label: "Everything" }, ...VARIANTS].map((option) => {
@@ -276,6 +284,7 @@ export function VariantPicker({
                                     return (
                                         <button
                                             key={option.key ?? "all"}
+                                            data-key={option.key ?? "all"}
                                             type="button"
                                             role="option"
                                             aria-selected={selected}
@@ -283,7 +292,7 @@ export function VariantPicker({
                                             className="flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left outline-none transition-colors hover:bg-neutral-100 focus-visible:bg-neutral-100"
                                         >
                                             {option.label}
-                                            {selected && <Check aria-hidden className="h-4 w-4 text-[#2563EB]" strokeWidth={2.5} />}
+                                            {selected && value !== null && <Check aria-hidden className="h-4 w-4 text-[#2563EB]" strokeWidth={2.5} />}
                                         </button>
                                     );
                                 })}
