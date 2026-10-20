@@ -10,7 +10,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
-  const [company, setCompany] = useState(""); // honeypot -- real people never fill this in
+  const [nlCheck, setNlCheck] = useState(""); // honeypot: hidden, and named so browser autofill leaves it alone
   const mountedAtRef = useRef(Date.now());
   const { token: turnstileToken, containerRef: turnstileRef } = useTurnstileToken();
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
@@ -32,7 +32,7 @@ export default function Newsletter() {
         body: JSON.stringify({
           email,
           source: "jinba_footer_newsletter",
-          company,
+          nlCheck,
           elapsedMs: Date.now() - mountedAtRef.current,
           turnstileToken,
         }),
@@ -63,15 +63,15 @@ export default function Newsletter() {
           style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}
           aria-hidden="true"
         >
-          <label htmlFor="company">Company</label>
+          <label htmlFor="nl-check">Leave this field empty</label>
           <input
-            id="company"
-            name="company"
+            id="nl-check"
+            name="nl_check"
             type="text"
             tabIndex={-1}
             autoComplete="off"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
+            value={nlCheck}
+            onChange={(e) => setNlCheck(e.target.value)}
           />
         </div>
         <div ref={turnstileRef} />

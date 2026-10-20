@@ -8,7 +8,7 @@ const COOKIE_NAME = 'blueprint_email_access';
 
 export default function EmailCapture() {
     const [email, setEmail] = useState('');
-    const [company, setCompany] = useState(''); // honeypot -- real people never fill this in
+    const [nlCheck, setNlCheck] = useState(''); // honeypot: hidden, and named so browser autofill leaves it alone
     const mountedAtRef = useRef(Date.now());
     const { token: turnstileToken, containerRef: turnstileRef } = useTurnstileToken();
     const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ export default function EmailCapture() {
                 body: JSON.stringify({
                     email,
                     source: 'footer_newsletter',
-                    company,
+                    nlCheck,
                     elapsedMs: Date.now() - mountedAtRef.current,
                     turnstileToken,
                 }),
@@ -105,15 +105,15 @@ export default function EmailCapture() {
                     style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
                     aria-hidden="true"
                 >
-                    <label htmlFor="company">Company</label>
+                    <label htmlFor="nl-check">Leave this field empty</label>
                     <input
-                        id="company"
-                        name="company"
+                        id="nl-check"
+                        name="nl_check"
                         type="text"
                         tabIndex={-1}
                         autoComplete="off"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
+                        value={nlCheck}
+                        onChange={(e) => setNlCheck(e.target.value)}
                     />
                 </div>
                 <div ref={turnstileRef} />

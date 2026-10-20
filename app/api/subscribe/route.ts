@@ -38,7 +38,7 @@ function waitResponse(message: string, retryAfterSeconds: number) {
   );
 }
 
-/** What a bot sees instead of an error -- looks like a real sign-up, writes nothing. */
+/** What a bot sees instead of an error: looks like a real sign-up, writes nothing. */
 function fakeSuccessResponse() {
   return NextResponse.json({
     success: true,
@@ -62,10 +62,10 @@ export async function POST(request: Request) {
         );
       }
   
-      const { email, source = 'newsletter', company, elapsedMs, turnstileToken } = await request.json();
+      const { email, source = 'newsletter', nlCheck, elapsedMs, turnstileToken } = await request.json();
 
-      // Honeypot and time-to-submit checks -- a bot trips these, a person won't.
-      if (honeypotTripped(company) || submittedTooFast(elapsedMs)) {
+      // Honeypot and time-to-submit checks: a bot trips these, a person won't.
+      if (honeypotTripped(nlCheck) || submittedTooFast(elapsedMs)) {
         return fakeSuccessResponse();
       }
 
@@ -85,9 +85,13 @@ export async function POST(request: Request) {
         );
       }
 
-      // Optional Turnstile check -- only active once the site/secret keys are configured
+      // Optional Turnstile check, only once its keys are set. A failure here can
+      // be a real person (an expired token), so say so instead of faking success.
       if (!(await verifyTurnstile(turnstileToken, ip))) {
-        return fakeSuccessResponse();
+        return NextResponse.json(
+          { error: "We couldn't confirm you're not a bot. Please try again." },
+          { status: 400 }
+        );
       }
 
       // Check if email already exists

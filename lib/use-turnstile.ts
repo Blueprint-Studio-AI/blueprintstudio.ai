@@ -55,9 +55,9 @@ export function useTurnstileToken(): { token: string; containerRef: RefObject<HT
       .then(() => {
         if (cancelled || !window.turnstile || !containerRef.current) return;
         widgetId = window.turnstile.render(containerRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          size: 'invisible',
+          sitekey: TURNSTILE_SITE_KEY, // make it an Invisible widget in the Cloudflare dashboard
           callback: (t: string) => setToken(t),
+          'expired-callback': () => setToken(''),
         });
       })
       .catch((err) => console.error('Turnstile load error:', err));
