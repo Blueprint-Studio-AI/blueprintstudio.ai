@@ -10,6 +10,10 @@
     "post": "/insights/{slug}",
     "components": "/galley"
   },
+  "publish": {
+    "draftField": "draft",
+    "dateField": "date"
+  },
   "components": [
     {
       "name": "Image",
