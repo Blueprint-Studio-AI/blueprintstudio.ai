@@ -33,7 +33,7 @@ const REEL_SRC = {
     wide: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
     tall: "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4",
 };
-const LOADER_MIN_MS = 2500; // long enough to read the loader line
+const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands
 const CARD_RADIUS = 16;
@@ -45,6 +45,9 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
+
+/** False once the home page has mounted in this tab. */
+let firstLoad = true;
 
 /** The loader card's inset: inset-4 / sm:inset-8 / lg:inset-12. */
 const cardInset = (width: number) => (width >= 1024 ? 48 : width >= 640 ? 32 : 16);
@@ -62,8 +65,8 @@ export default function Hero() {
     const [src, setSrc] = useState<string>();
     const [hasFrame, setHasFrame] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
-    const [loaderStep, setLoaderStep] = useState(0); // 1 card, 2 logo, 3 text, 4 card fill
     const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+    const loaderShownAt = useRef<number>(undefined);
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const frameRef = useRef<HTMLDivElement>(null);
@@ -142,21 +145,21 @@ export default function Hero() {
         };
     }, [src]);
 
-    // Loader choreography.
+    // The loader animates in CSS from the first paint, so its minimum time
+    // counts from then (or from now, after a client-side navigation here).
     useEffect(() => {
         if (reduceMotion) {
-            setLoaderStep(4);
             setMinTimeElapsed(true);
             return;
         }
-        const timers = [
-            setTimeout(() => setLoaderStep(1), 100),
-            setTimeout(() => setLoaderStep(2), 300),
-            setTimeout(() => setLoaderStep(3), 600),
-            setTimeout(() => setLoaderStep(4), 1600),
-            setTimeout(() => setMinTimeElapsed(true), LOADER_MIN_MS),
-        ];
-        return () => timers.forEach(clearTimeout);
+        if (loaderShownAt.current === undefined) {
+            const paint = firstLoad ? performance.getEntriesByName("first-contentful-paint")[0]?.startTime : undefined;
+            loaderShownAt.current = paint ?? performance.now();
+            firstLoad = false;
+        }
+        const wait = loaderShownAt.current + LOADER_MIN_MS - performance.now();
+        const timer = setTimeout(() => setMinTimeElapsed(true), Math.max(0, wait));
+        return () => clearTimeout(timer);
     }, [reduceMotion]);
 
     // Loader done: the reel takes the screen. With reduced motion, or for a
@@ -171,6 +174,11 @@ export default function Hero() {
             setStage("reel");
         }
     }, [stage, videoReady, minTimeElapsed, reduceMotion, progress, setStage]);
+
+    // Once the reel is in place, the portfolio videos below can start loading.
+    useEffect(() => {
+        if (stage === "docked") window.dispatchEvent(new Event("bp:opening-landed"));
+    }, [stage]);
 
     const land = useCallback(() => {
         if (stageRef.current !== "reel") return;
@@ -275,15 +283,15 @@ export default function Hero() {
                         exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
                     >
                         <div
-                            className="absolute inset-4 flex items-center justify-center overflow-hidden rounded-2xl sm:inset-8 lg:inset-12"
-                            style={{ opacity: loaderStep >= 1 ? 1 : 0, transition: "opacity 500ms ease-out" }}
+                            className="loader-fade absolute inset-4 flex items-center justify-center overflow-hidden rounded-2xl sm:inset-8 lg:inset-12"
+                            style={{ animationDuration: "400ms" }}
                         >
                             <div
-                                className="absolute inset-0 rounded-2xl"
+                                className="loader-fade absolute inset-0 rounded-2xl"
                                 style={{
                                     backgroundColor: "#FBFBFB",
-                                    opacity: loaderStep >= 4 ? 1 : 0,
-                                    transition: "opacity 800ms ease-out",
+                                    animationDuration: "800ms",
+                                    animationDelay: "1100ms",
                                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.015)",
                                 }}
                             />
@@ -293,8 +301,8 @@ export default function Hero() {
                                     alt="Blueprint Studio"
                                     width={30}
                                     height={30}
-                                    className="mb-6 h-4 w-auto transition-opacity duration-700 sm:mb-8 sm:h-5"
-                                    style={{ opacity: loaderStep >= 2 ? 1 : 0 }}
+                                    className="loader-fade mb-6 h-4 w-auto sm:mb-8 sm:h-5"
+                                    style={{ animationDuration: "700ms", animationDelay: "150ms" }}
                                     priority
                                 />
                                 <p className="cursor-default text-center text-2xl font-medium leading-relaxed text-neutral-700 sm:text-4xl">
@@ -303,13 +311,8 @@ export default function Hero() {
                                             {line.split(" ").map((word, i) => (
                                                 <span
                                                     key={i}
-                                                    className="mr-1 inline-block transition-all duration-500"
-                                                    style={{
-                                                        opacity: loaderStep >= 3 ? 1 : 0,
-                                                        filter: loaderStep >= 3 ? "blur(0px)" : "blur(10px)",
-                                                        transform: loaderStep >= 3 ? "translateY(0)" : "translateY(10px)",
-                                                        transitionDelay: `${l * 240 + i * 60}ms`,
-                                                    }}
+                                                    className="loader-word mr-1 inline-block"
+                                                    style={{ animationDelay: `${300 + l * 240 + i * 60}ms` }}
                                                 >
                                                     {word}
                                                 </span>
