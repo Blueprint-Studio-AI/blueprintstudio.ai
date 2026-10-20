@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Image from "next/image";
 import {
     AnimatePresence,
+    LayoutGroup,
     animate,
     motion,
     useMotionValue,
@@ -19,6 +20,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
+import { CHIP_SPRING, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -63,6 +65,8 @@ export default function Hero() {
     }, []);
 
     const [src, setSrc] = useState<string>();
+    const [variantKey, setVariantKey] = useState<VariantKey | null>(null);
+    const variant = VARIANTS.find((v) => v.key === variantKey) ?? null;
     const [hasFrame, setHasFrame] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
     const [minTimeElapsed, setMinTimeElapsed] = useState(false);
@@ -111,6 +115,18 @@ export default function Hero() {
         window.addEventListener("resize", place);
         return () => window.removeEventListener("resize", place);
     }, [place]);
+
+    // A link like /?for=websites opens on that variant.
+    useEffect(() => setVariantKey(variantFromUrl()), []);
+
+    const chooseVariant = (key: VariantKey | null) => {
+        setVariantKey(key);
+        const url = new URL(window.location.href);
+        if (key) url.searchParams.set("for", key);
+        else url.searchParams.delete("for");
+        window.history.replaceState(window.history.state, "", url);
+        (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
+    };
 
     // The wide reel, or the tall one on phones.
     useEffect(() => {
@@ -389,7 +405,13 @@ export default function Hero() {
                                     textWrap: "balance",
                                 }}
                             >
-                                Design and development for&nbsp;founders.
+                                {/* One layout group, so the words glide as the chip changes width. */}
+                                <LayoutGroup>
+                                    <motion.span layout="position" transition={CHIP_SPRING} className="inline-block">
+                                        We design and build
+                                    </motion.span>{" "}
+                                    <VariantPicker value={variantKey} onChange={chooseVariant} rotate={revealed} />
+                                </LayoutGroup>
                             </motion.h1>
                             <motion.p
                                 {...rise(0.25)}
@@ -401,7 +423,18 @@ export default function Hero() {
                                     textWrap: "balance",
                                 }}
                             >
-                                Websites, products, brands and launch videos, from first sketch to&nbsp;launch.
+                                <AnimatePresence mode="wait" initial={false}>
+                                    <motion.span
+                                        key={variant?.key ?? "all"}
+                                        className="inline-block"
+                                        initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                        exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
+                                        transition={{ duration: 0.3, ease: EASE_OUT }}
+                                    >
+                                        {variant?.sub ?? "For founders, from first sketch to launch\u00A0video."}
+                                    </motion.span>
+                                </AnimatePresence>
                             </motion.p>
                             <motion.div {...rise(0.35)} className="mt-6 flex flex-wrap items-center justify-center gap-3">
                                 <motion.a
@@ -422,15 +455,17 @@ export default function Hero() {
                                     Book a call
                                 </motion.a>
                                 <motion.a
-                                    href="#work"
+                                    href={variant?.cta.href ?? "#work"}
                                     onClick={(e) => {
+                                        const href = variant?.cta.href ?? "#work";
+                                        if (!href.startsWith("#")) return;
                                         e.preventDefault();
-                                        scrollToId("work");
+                                        scrollToId(href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
                                     className="group flex h-12 items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
                                 >
-                                    See our work
+                                    {variant?.cta.label ?? "See our work"}
                                     <ArrowRight
                                         aria-hidden
                                         className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
@@ -475,6 +510,14 @@ export default function Hero() {
                                     playsInline
                                     preload="auto"
                                 />
+                                <AnimatePresence>
+                                    {variant?.video && src && (
+                                        <VariantVideo
+                                            key={variant.key}
+                                            src={src === REEL_SRC.wide ? variant.video.wide : variant.video.tall}
+                                        />
+                                    )}
+                                </AnimatePresence>
 
                                 {stage === "docked" && (
                                     <button
