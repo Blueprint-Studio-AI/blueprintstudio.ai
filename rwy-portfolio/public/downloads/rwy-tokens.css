@@ -1,0 +1,33 @@
+/* RWY — design tokens (brand deck palette; type from the landing site's components/dd/dd.css) */
+:root {
+  /* brand palette — Nectar Group brand deck, June 2026 */
+  --rwy-daymark: #FF3200;         /* primary */
+  --rwy-daymark-dark: #931504;    /* secondary */
+  --rwy-oyster-cracker: #FDEAD3;  /* secondary */
+  --rwy-sea-foam: #FDFCFB;        /* secondary */
+  --rwy-squid-ink: #1E2028;       /* text */
+  --rwy-ocean-breeze: #A4B6C6;    /* accent */
+  --rwy-ocean-fog: #E4E7ED;       /* secondary */
+
+  /* neutrals in use on the landing site */
+  --rwy-muted: #747474;
+  --rwy-muted-2: #5E5E5E;
+  --rwy-line: #DCDCDC;
+
+  /* type */
+  --rwy-font-display: "Hiragino Sans", "Hiragino Kaku Gothic ProN", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --rwy-font-text: "Geist", -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Display — Hiragino Sans, weight 500 */
+.rwy-headline    { font-family: var(--rwy-font-display); font-weight: 500; font-size: 96px; line-height: 1;    letter-spacing: -0.04em; }
+.rwy-heading-1   { font-family: var(--rwy-font-display); font-weight: 500; font-size: 64px; line-height: 1.1;  letter-spacing: -0.035em; }
+.rwy-heading-2   { font-family: var(--rwy-font-display); font-weight: 500; font-size: 48px; line-height: 1.13; letter-spacing: -0.03em; }
+.rwy-heading-3   { font-family: var(--rwy-font-display); font-weight: 500; font-size: 32px; line-height: 1.2;  letter-spacing: -0.03em; }
+
+/* Text — Geist */
+.rwy-title-large { font-family: var(--rwy-font-text); font-weight: 500; font-size: 30px; line-height: 1.13; letter-spacing: -0.03em; }
+.rwy-title       { font-family: var(--rwy-font-text); font-weight: 500; font-size: 24px; line-height: 1.2;  letter-spacing: -0.02em; }
+.rwy-body        { font-family: var(--rwy-font-text); font-weight: 400; font-size: 18px; line-height: 1.4;  letter-spacing: -0.02em; }
+.rwy-label       { font-family: var(--rwy-font-text); font-weight: 600; font-size: 16px; line-height: 1.2;  letter-spacing: -0.02em; }
+.rwy-caption     { font-family: var(--rwy-font-text); font-weight: 500; font-size: 15px; line-height: 1;    letter-spacing: -0.02em; }
