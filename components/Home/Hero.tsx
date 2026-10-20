@@ -4,7 +4,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Image from "next/image";
 import {
     AnimatePresence,
-    LayoutGroup,
     animate,
     motion,
     useMotionValue,
@@ -20,7 +19,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { CHIP_SPRING, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
+import { VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -32,8 +31,9 @@ import { CHIP_SPRING, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, typ
 // other element. "View fullscreen" runs the same path backwards.
 
 const REEL_SRC = {
-    wide: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
-    tall: "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4",
+    full: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
+    // Named "vertical", but it's a lighter 1280x720 cut of the same reel.
+    small: "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4",
 };
 const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
@@ -47,6 +47,14 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
+
+// Every subline and button label, so each can be stacked in one place and
+// crossfaded: the copy keeps its size whichever variant is showing.
+const SUBLINES = [
+    { key: "all", text: "For founders, from first sketch to launch\u00A0video." },
+    ...VARIANTS.map((v) => ({ key: v.key, text: v.sub })),
+];
+const LINKS = [{ key: "all", label: "See our work", href: "#work" }, ...VARIANTS.map((v) => ({ key: v.key, ...v.cta }))];
 
 /** False once the home page has mounted in this tab. */
 let firstLoad = true;
@@ -128,10 +136,10 @@ export default function Hero() {
         (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
     };
 
-    // The wide reel, or the tall one on phones.
+    // The full reel, or the lighter cut on phones. Both are 16:9, like the frame.
     useEffect(() => {
         const query = window.matchMedia("(min-width: 640px)");
-        const pick = () => setSrc(query.matches ? REEL_SRC.wide : REEL_SRC.tall);
+        const pick = () => setSrc(query.matches ? REEL_SRC.full : REEL_SRC.small);
         pick();
         query.addEventListener("change", pick);
         return () => query.removeEventListener("change", pick);
@@ -277,6 +285,7 @@ export default function Hero() {
     }, [locked, scroll, place]);
 
     const revealed = stage !== "loading" && stage !== "reel";
+    const link = LINKS.find((l) => l.key === (variant?.key ?? "all"))!;
     const fullscreen = stage === "expanded" || stage === "closing";
 
     const scrollToId = (id: string) => {
@@ -405,17 +414,13 @@ export default function Hero() {
                                     textWrap: "balance",
                                 }}
                             >
-                                {/* One layout group, so the words glide as the chip changes width. */}
-                                <LayoutGroup>
-                                    <motion.span layout="position" transition={CHIP_SPRING} className="inline-block">
-                                        We design and build
-                                    </motion.span>{" "}
-                                    <VariantPicker value={variantKey} onChange={chooseVariant} rotate={revealed} />
-                                </LayoutGroup>
+                                {/* The chip gets its own line, so a longer word never rewraps the headline. */}
+                                <span className="block">We design and build</span>
+                                <VariantPicker value={variantKey} onChange={chooseVariant} rotate={revealed} />
                             </motion.h1>
                             <motion.p
                                 {...rise(0.25)}
-                                className="mt-4 max-w-[680px] cursor-default text-neutral-600"
+                                className="mt-4 grid max-w-[680px] cursor-default text-neutral-600"
                                 style={{
                                     fontSize: "clamp(16px, 1.4vw, 19px)",
                                     lineHeight: 1.4,
@@ -423,20 +428,26 @@ export default function Hero() {
                                     textWrap: "balance",
                                 }}
                             >
-                                <AnimatePresence mode="wait" initial={false}>
-                                    <motion.span
-                                        key={variant?.key ?? "all"}
-                                        className="inline-block"
-                                        initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
-                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                        exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
-                                        transition={{ duration: 0.3, ease: EASE_OUT }}
-                                    >
-                                        {variant?.sub ?? "For founders, from first sketch to launch\u00A0video."}
-                                    </motion.span>
-                                </AnimatePresence>
+                                {SUBLINES.map((line) => {
+                                    const active = line.key === (variant?.key ?? "all");
+                                    return (
+                                        <motion.span
+                                            key={line.key}
+                                            aria-hidden={!active}
+                                            className="[grid-area:1/1]"
+                                            initial={false}
+                                            animate={active ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(4px)" }}
+                                            transition={{ duration: active ? 0.35 : 0.2, delay: active ? 0.08 : 0, ease: EASE_OUT }}
+                                        >
+                                            {line.text}
+                                        </motion.span>
+                                    );
+                                })}
                             </motion.p>
-                            <motion.div {...rise(0.35)} className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                            <motion.div
+                                {...rise(0.35)}
+                                className="mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center"
+                            >
                                 <motion.a
                                     href="#contact"
                                     onClick={(e) => {
@@ -444,7 +455,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center rounded-full px-6 text-[15px] font-medium text-white"
+                                    className="flex h-12 items-center justify-center rounded-full px-6 text-[15px] font-medium text-white"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -455,21 +466,34 @@ export default function Hero() {
                                     Book a call
                                 </motion.a>
                                 <motion.a
-                                    href={variant?.cta.href ?? "#work"}
+                                    href={link.href}
                                     onClick={(e) => {
-                                        const href = variant?.cta.href ?? "#work";
-                                        if (!href.startsWith("#")) return;
+                                        if (!link.href.startsWith("#")) return;
                                         e.preventDefault();
-                                        scrollToId(href.slice(1));
+                                        scrollToId(link.href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="group flex h-12 items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
+                                    className="group flex h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
                                 >
-                                    {variant?.cta.label ?? "See our work"}
-                                    <ArrowRight
-                                        aria-hidden
-                                        className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-                                    />
+                                    {/* Labels stacked like the sublines, so the button keeps its width. */}
+                                    <span className="grid justify-items-center">
+                                        {LINKS.map((option) => (
+                                            <motion.span
+                                                key={option.key}
+                                                aria-hidden={option.key !== link.key}
+                                                className="inline-flex items-center gap-1.5 [grid-area:1/1]"
+                                                initial={false}
+                                                animate={option.key === link.key ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(4px)" }}
+                                                transition={{ duration: option.key === link.key ? 0.35 : 0.2, ease: EASE_OUT }}
+                                            >
+                                                {option.label}
+                                                <ArrowRight
+                                                    aria-hidden
+                                                    className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                                                />
+                                            </motion.span>
+                                        ))}
+                                    </span>
                                 </motion.a>
                             </motion.div>
                         </div>
@@ -477,7 +501,7 @@ export default function Hero() {
                         {/* The reel's slot: as big as fits between the copy and the floating nav */}
                         <div
                             ref={slotRef}
-                            className="relative mt-8 aspect-[2/3] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                            className="relative mt-8 aspect-video w-full sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
                         >
                             <div
                                 ref={frameRef}
@@ -511,12 +535,7 @@ export default function Hero() {
                                     preload="auto"
                                 />
                                 <AnimatePresence>
-                                    {variant?.video && src && (
-                                        <VariantVideo
-                                            key={variant.key}
-                                            src={src === REEL_SRC.wide ? variant.video.wide : variant.video.tall}
-                                        />
-                                    )}
+                                    {variant && src && <VariantVideo key={variant.key} {...variant.video} />}
                                 </AnimatePresence>
 
                                 {stage === "docked" && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
@@ -17,8 +17,8 @@ export type Variant = {
     label: string;
     sub: string;
     cta: { label: string; href: string };
-    /** Shown in the hero frame over the reel; none keeps the reel. */
-    video?: { wide: string; tall: string };
+    /** Plays in the hero frame over the reel, from `start`; the poster shows while it loads. */
+    video: { src: string; poster: string; start: number };
 };
 
 export const VARIANTS: Variant[] = [
@@ -26,47 +26,55 @@ export const VARIANTS: Variant[] = [
         key: "apps",
         word: "apps",
         label: "Apps",
-        sub: "Products and platforms for founders, like LivingIP, Huch and Bump.",
+        sub: "For founders like LivingIP, Huch and Bump.",
         cta: { label: "See app work", href: "#work" },
         video: {
-            wide: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
-            tall: "/media/projects/living-ip/living-ip-vertical-compressed.mp4",
+            src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
+            poster: "/media/projects/living-ip/living-ip-hero-poster.jpg",
+            start: 1.2,
         },
     },
     {
         key: "websites",
         word: "websites",
         label: "Websites",
-        sub: "Sites and landing pages for founders, like Perena, Autara and Breeze.",
+        sub: "For founders like Perena, Autara and Breeze.",
         cta: { label: "See website work", href: "#work" },
         video: {
-            wide: "/media/projects/perena/perena-horizontal-compressed.mp4",
-            tall: "/media/projects/perena/perena-vertical-compressed.mp4",
+            src: "/media/projects/perena/perena-horizontal-compressed.mp4",
+            poster: "/media/projects/perena/perena-hero-poster.jpg",
+            start: 1,
         },
     },
     {
         key: "brands",
         word: "brands",
         label: "Brands",
-        sub: "Identities and brand systems for founders, like Arch Network, Jinba and HoneyB.",
+        sub: "For founders like Arch Network, Jinba and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
         video: {
-            wide: "/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4",
-            tall: "/media/projects/huch/huch-brand-overview-vertical-compressed.mp4",
+            src: "/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4",
+            poster: "/media/projects/huch/huch-hero-poster.jpg",
+            start: 3.2,
         },
     },
     {
         key: "launch-videos",
         word: "launch videos",
         label: "Launch videos",
-        sub: "Launch films for founders, like Jinba, Pyra and Logical.",
+        sub: "For founders like Jinba, Pyra and TokenWorks.",
         cta: { label: "See launch videos", href: "/launch-videos" },
+        // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
+        video: {
+            src: "/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4",
+            poster: "/media/projects/tokenworks-videos/tokenworks-hero-poster.jpg",
+            start: 4.6,
+        },
     },
 ];
 
 const ROTATE_MS = 2400;
-/** Shared with the words before the chip, so the line moves as one. */
-export const CHIP_SPRING = { type: "spring", visualDuration: 0.45, bounce: 0.15 } as const;
+const CHIP_SPRING = { type: "spring", visualDuration: 0.45, bounce: 0.15 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 /** The variant in the URL (?for=websites), if any. */
@@ -101,6 +109,20 @@ export function VariantPicker({
     }, [cycling]);
 
     const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[index];
+    const word = open && value === null ? "everything" : shown.word;
+
+    // Measure the word (in the H1's font) so its box can spring to it; again if the font size changes.
+    const sizerRef = useRef<HTMLSpanElement>(null);
+    const [width, setWidth] = useState<number>();
+    useLayoutEffect(() => {
+        const sizer = sizerRef.current;
+        if (!sizer) return;
+        const measure = () => setWidth(Math.ceil(sizer.getBoundingClientRect().width) + 1); // + 1: never shave the last glyph's edge
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(sizer);
+        return () => observer.disconnect();
+    }, [word]);
 
     const openMenu = () => {
         const rect = chipRef.current?.getBoundingClientRect();
@@ -150,39 +172,49 @@ export function VariantPicker({
             <motion.button
                 ref={chipRef}
                 type="button"
-                layout
-                transition={CHIP_SPRING}
                 onClick={() => (open ? close(false) : openMenu())}
                 onPointerEnter={() => setHovered(true)}
                 onPointerLeave={() => setHovered(false)}
                 whileTap={{ scale: 0.97 }}
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                aria-label={`${shown.word}. Choose what to see`}
-                className="relative inline-flex cursor-pointer items-baseline overflow-hidden whitespace-nowrap rounded-[0.28em] border border-neutral-300/80 bg-white/70 px-[0.22em] align-baseline shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:bg-white"
-                style={{ paddingBottom: "0.04em" }}
+                aria-label={`${word}. Choose what to see`}
+                className="group relative mt-[0.1em] inline-flex cursor-pointer items-center rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.14em] outline-none transition-colors duration-200 hover:bg-neutral-900/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB]"
             >
-                <AnimatePresence mode="popLayout" initial={false}>
-                    <motion.span
-                        key={shown.key}
-                        layout="position"
-                        initial={{ y: "70%", opacity: 0, filter: "blur(6px)" }}
-                        animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                        exit={{ y: "-70%", opacity: 0, filter: "blur(6px)" }}
-                        transition={{ duration: 0.45, ease: EASE_OUT }}
-                        className="inline-block"
-                    >
-                        {shown.word}
-                    </motion.span>
-                </AnimatePresence>
-                <motion.span layout="position" transition={CHIP_SPRING} className="ml-[0.12em] inline-block self-center">
-                    <ChevronDown
-                        aria-hidden
-                        className="h-[0.42em] w-[0.42em] text-neutral-500 transition-transform duration-300"
-                        style={{ transform: open ? "rotate(180deg)" : undefined }}
-                        strokeWidth={2.5}
-                    />
+                {/* The word's box springs to each word's width; the words slide through it. */}
+                <motion.span
+                    className="relative inline-block h-[1.18em] overflow-hidden whitespace-nowrap"
+                    initial={false}
+                    animate={width === undefined ? undefined : { width }}
+                    transition={CHIP_SPRING}
+                >
+                    <AnimatePresence initial={false}>
+                        <motion.span
+                            key={word}
+                            className="absolute left-0 top-0 leading-[1.18em]"
+                            initial={reduceMotion ? { opacity: 0 } : { y: "62%", opacity: 0, filter: "blur(6px)" }}
+                            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                            exit={
+                                reduceMotion
+                                    ? { opacity: 0, transition: { duration: 0.15 } }
+                                    : { y: "-62%", opacity: 0, filter: "blur(6px)", transition: { duration: 0.28, ease: EASE_OUT } }
+                            }
+                            transition={{ duration: 0.45, ease: EASE_OUT }}
+                        >
+                            {word}
+                        </motion.span>
+                    </AnimatePresence>
+                    {/* Sizes the box before the first measure, then measures each new word. */}
+                    <span ref={sizerRef} aria-hidden className="invisible inline-block whitespace-nowrap">
+                        {word}
+                    </span>
                 </motion.span>
+                <ChevronDown
+                    aria-hidden
+                    className="ml-[0.1em] h-[0.34em] w-[0.34em] shrink-0 text-neutral-900/45 transition-transform duration-300 group-hover:translate-y-[0.04em]"
+                    style={open ? { transform: "rotate(180deg)" } : undefined}
+                    strokeWidth={2.25}
+                />
             </motion.button>
 
             {typeof document !== "undefined" &&
@@ -197,7 +229,7 @@ export function VariantPicker({
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.96, y: -4, transition: { duration: 0.15 } }}
                                 transition={CHIP_SPRING}
-                                className="fixed z-[70] w-56 origin-top rounded-2xl border border-neutral-200 bg-white/90 p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+                                className="fixed z-[70] w-56 origin-top rounded-2xl border border-neutral-200 bg-white/95 p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
                                 style={{ left: anchor.x - 112, top: anchor.y }}
                             >
                                 {[{ key: null, label: "Everything" }, ...VARIANTS].map((option) => {
@@ -225,21 +257,24 @@ export function VariantPicker({
     );
 }
 
-/** A variant's clip over the reel, faded in once it can play. */
-export function VariantVideo({ src }: { src: string }) {
-    const [ready, setReady] = useState(false);
+/** A variant's clip over the reel: its poster at once, then the clip from `start`. */
+export function VariantVideo({ src, poster, start }: Variant["video"]) {
     return (
         <motion.video
             src={src}
+            poster={poster}
             className="absolute inset-0 h-full w-full object-cover"
             autoPlay
             loop
             muted
             playsInline
-            onLoadedData={() => setReady(true)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: ready ? 1 : 0 }}
-            exit={{ opacity: 0 }}
+            preload="auto"
+            onLoadedMetadata={(e) => {
+                e.currentTarget.currentTime = start;
+            }}
+            initial={{ opacity: 0, filter: "blur(6px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(6px)", transition: { duration: 0.25 } }}
             transition={{ duration: 0.45, ease: EASE_OUT }}
         />
     );
