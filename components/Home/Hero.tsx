@@ -129,8 +129,11 @@ export default function Hero() {
         video.setAttribute("fetchpriority", "high");
         setHasFrame(false);
         const frame = () => setHasFrame(true);
+        let resumed = false; // only the first canplay after a swap; later ones are seeks
         const playable = () => {
             setVideoReady(true);
+            if (resumed) return;
+            resumed = true;
             if (stageRef.current !== "loading") video.play().catch(() => {});
         };
         video.addEventListener("loadeddata", frame);
