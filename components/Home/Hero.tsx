@@ -19,7 +19,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
+import { SpringText, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -48,8 +48,8 @@ type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
 
-// Every subline and button label, so each can be stacked in one place and
-// crossfaded: the copy keeps its size whichever variant is showing.
+// Every subline, stacked in one place and crossfaded so the copy keeps its
+// height whichever variant is showing; and the second button's links.
 const SUBLINES = [
     { key: "all", text: "For founders, from first sketch to launch\u00A0video." },
     ...VARIANTS.map((v) => ({ key: v.key, text: v.sub })),
@@ -398,7 +398,7 @@ export default function Hero() {
                 />
 
                 <OuterContainer className="flex w-full flex-1 items-center justify-center">
-                    <InnerContainer className="relative flex w-full flex-col items-center px-6 pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
+                    <InnerContainer className="relative flex w-full flex-col items-center justify-center px-6 lg:justify-start pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
                         {/* Inner dashed vertical lines on desktop */}
                         <div className="line-dash-y absolute bottom-0 left-0 top-0 hidden custom:block" />
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
@@ -420,7 +420,7 @@ export default function Hero() {
                             </motion.h1>
                             <motion.p
                                 {...rise(0.25)}
-                                className="mt-4 grid max-w-[680px] cursor-default text-neutral-600"
+                                className="mt-4 grid max-w-[30ch] cursor-default text-neutral-600 sm:max-w-[680px]"
                                 style={{
                                     fontSize: "clamp(16px, 1.4vw, 19px)",
                                     lineHeight: 1.4,
@@ -446,7 +446,7 @@ export default function Hero() {
                             </motion.p>
                             <motion.div
                                 {...rise(0.35)}
-                                className="mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center"
+                                className="mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
                             >
                                 <motion.a
                                     href="#contact"
@@ -455,7 +455,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center justify-center rounded-full px-6 text-[15px] font-medium text-white"
+                                    className="flex h-12 items-center justify-center rounded-full px-6 text-[15px] font-medium text-white sm:justify-self-end"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -473,27 +473,14 @@ export default function Hero() {
                                         scrollToId(link.href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="group flex h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
+                                    className="group flex h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
                                 >
-                                    {/* Labels stacked like the sublines, so the button keeps its width. */}
-                                    <span className="grid justify-items-center">
-                                        {LINKS.map((option) => (
-                                            <motion.span
-                                                key={option.key}
-                                                aria-hidden={option.key !== link.key}
-                                                className="inline-flex items-center gap-1.5 [grid-area:1/1]"
-                                                initial={false}
-                                                animate={option.key === link.key ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(4px)" }}
-                                                transition={{ duration: option.key === link.key ? 0.35 : 0.2, ease: EASE_OUT }}
-                                            >
-                                                {option.label}
-                                                <ArrowRight
-                                                    aria-hidden
-                                                    className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-                                                />
-                                            </motion.span>
-                                        ))}
-                                    </span>
+                                    {/* Springs to each label, growing away from "Book a call", which never moves. */}
+                                    <SpringText text={link.label} />
+                                    <ArrowRight
+                                        aria-hidden
+                                        className="ml-1.5 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                                    />
                                 </motion.a>
                             </motion.div>
                         </div>
@@ -501,7 +488,7 @@ export default function Hero() {
                         {/* The reel's slot: as big as fits between the copy and the floating nav */}
                         <div
                             ref={slotRef}
-                            className="relative mt-8 aspect-video w-full sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
                         >
                             <div
                                 ref={frameRef}
@@ -535,8 +522,10 @@ export default function Hero() {
                                     preload="auto"
                                 />
                                 <AnimatePresence>
-                                    {variant && src && <VariantVideo key={variant.key} {...variant.video} />}
+                                    {variant && src && <VariantVideo key={variant.key} {...variant.video} compact={src === REEL_SRC.small} />}
                                 </AnimatePresence>
+                                {/* A hairline edge, so pale frames don't melt into the page. */}
+                                <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
                                 {stage === "docked" && (
                                     <button

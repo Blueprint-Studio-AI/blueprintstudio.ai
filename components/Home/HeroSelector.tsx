@@ -15,10 +15,15 @@ export type Variant = {
     key: VariantKey;
     word: string;
     label: string;
+    /** Leads with the client whose work is on screen. */
     sub: string;
     cta: { label: string; href: string };
-    /** Plays in the hero frame over the reel, from `start`; the poster shows while it loads. */
-    video: { src: string; poster: string; start: number };
+    /**
+     * Plays in the hero frame over the reel, looping from `start` to `end`, which
+     * skip each cut's dark lead-in and fade-out; the poster shows while it loads.
+     * `phone` is a tall cut for the 4:5 frame on phones, where one exists.
+     */
+    video: { src: string; phone?: string; poster: string; start: number; end: number };
 };
 
 export const VARIANTS: Variant[] = [
@@ -30,8 +35,10 @@ export const VARIANTS: Variant[] = [
         cta: { label: "See app work", href: "#work" },
         video: {
             src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
+            phone: "/media/projects/living-ip/living-ip-vertical-compressed.mp4",
             poster: "/media/projects/living-ip/living-ip-hero-poster.jpg",
             start: 1.2,
+            end: 13.5,
         },
     },
     {
@@ -43,44 +50,104 @@ export const VARIANTS: Variant[] = [
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
             poster: "/media/projects/perena/perena-hero-poster.jpg",
+            // The laptop and the deposit flow; after that the cut fades to cream on cream.
             start: 1,
+            end: 4.2,
         },
     },
     {
         key: "brands",
         word: "brands",
         label: "Brands",
-        sub: "For founders like Arch Network, Jinba and HoneyB.",
+        sub: "For founders like Huch, Arch Network and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
         video: {
             src: "/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4",
+            phone: "/media/projects/huch/huch-brand-overview-vertical-compressed.mp4",
             poster: "/media/projects/huch/huch-hero-poster.jpg",
             start: 3.2,
+            end: 10.6,
         },
     },
     {
         key: "launch-videos",
         word: "launch videos",
         label: "Launch videos",
-        sub: "For founders like Jinba, Pyra and TokenWorks.",
+        sub: "For founders like TokenWorks, Jinba and Pyra.",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
             src: "/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4",
             poster: "/media/projects/tokenworks-videos/tokenworks-hero-poster.jpg",
             start: 4.6,
+            end: 16.4,
         },
     },
 ];
 
 const ROTATE_MS = 2400;
 const CHIP_SPRING = { type: "spring", visualDuration: 0.45, bounce: 0.15 } as const;
+// A touch quicker than the text, so a growing box stays ahead of the word coming in.
+const WIDTH_SPRING = { type: "spring", visualDuration: 0.32, bounce: 0.1 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 /** The variant in the URL (?for=websites), if any. */
 export function variantFromUrl(): VariantKey | null {
     const key = new URLSearchParams(window.location.search).get("for");
     return VARIANTS.some((v) => v.key === key) ? (key as VariantKey) : null;
+}
+
+/**
+ * Text whose box springs to each new string's measured width while the strings
+ * crossfade through it (sliding up, with `slide`). It clips top and bottom only,
+ * so a word never shows cut off at the side while the box catches up.
+ */
+export function SpringText({ text, slide = false, className = "" }: { text: string; slide?: boolean; className?: string }) {
+    const reduceMotion = useReducedMotion();
+    const sizerRef = useRef<HTMLSpanElement>(null);
+    const [width, setWidth] = useState<number>();
+    useLayoutEffect(() => {
+        const sizer = sizerRef.current;
+        if (!sizer) return;
+        // + 1: never shave the last glyph's edge. Measured again if the font size changes.
+        const measure = () => setWidth(Math.ceil(sizer.getBoundingClientRect().width) + 1);
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(sizer);
+        return () => observer.disconnect();
+    }, [text]);
+
+    const move = slide && !reduceMotion;
+    return (
+        <motion.span
+            className={`relative inline-block whitespace-nowrap ${className}`}
+            style={{ clipPath: "inset(0 -1em)" }}
+            initial={false}
+            animate={width === undefined ? undefined : { width }}
+            transition={WIDTH_SPRING}
+        >
+            <AnimatePresence initial={false}>
+                <motion.span
+                    key={text}
+                    className="absolute left-0 top-0"
+                    initial={move ? { y: "62%", opacity: 0, filter: "blur(6px)" } : { opacity: 0, filter: "blur(4px)" }}
+                    animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                    exit={
+                        move
+                            ? { y: "-62%", opacity: 0, filter: "blur(6px)", transition: { duration: 0.24, ease: EASE_OUT } }
+                            : { opacity: 0, filter: "blur(4px)", transition: { duration: 0.16 } }
+                    }
+                    transition={{ duration: 0.42, ease: EASE_OUT, delay: 0.04 }}
+                >
+                    {text}
+                </motion.span>
+            </AnimatePresence>
+            {/* Sizes the box before the first measure. */}
+            <span ref={sizerRef} aria-hidden className="invisible inline-block">
+                {text}
+            </span>
+        </motion.span>
+    );
 }
 
 export function VariantPicker({
@@ -99,7 +166,7 @@ export function VariantPicker({
     const [hovered, setHovered] = useState(false);
     const chipRef = useRef<HTMLButtonElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
-    const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
+    const [anchor, setAnchor] = useState<{ x: number; y: number; width: number } | null>(null);
 
     const cycling = rotate && value === null && !open && !hovered && !reduceMotion;
     useEffect(() => {
@@ -109,27 +176,26 @@ export function VariantPicker({
     }, [cycling]);
 
     const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[index];
+    // With nothing picked, the open menu ticks Everything, so the chip says so too.
     const word = open && value === null ? "everything" : shown.word;
 
-    // Measure the word (in the H1's font) so its box can spring to it; again if the font size changes.
-    const sizerRef = useRef<HTMLSpanElement>(null);
-    const [width, setWidth] = useState<number>();
-    useLayoutEffect(() => {
-        const sizer = sizerRef.current;
-        if (!sizer) return;
-        const measure = () => setWidth(Math.ceil(sizer.getBoundingClientRect().width) + 1); // + 1: never shave the last glyph's edge
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(sizer);
-        return () => observer.disconnect();
-    }, [word]);
-
-    const openMenu = () => {
+    // The menu sits under the chip and is never narrower than it, following the
+    // chip as it springs to "everything" once the menu is open.
+    const placeMenu = () => {
         const rect = chipRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom + 10 });
+        if (rect) setAnchor({ x: rect.left + rect.width / 2, y: rect.bottom + 10, width: Math.max(224, rect.width) });
+    };
+    const openMenu = () => {
+        placeMenu();
         setOpen(true);
     };
+    useEffect(() => {
+        const chip = chipRef.current;
+        if (!open || !chip) return;
+        const observer = new ResizeObserver(placeMenu);
+        observer.observe(chip);
+        return () => observer.disconnect();
+    }, [open]);
     const close = (refocus: boolean) => {
         setOpen(false);
         if (refocus) chipRef.current?.focus({ preventScroll: true });
@@ -179,42 +245,15 @@ export function VariantPicker({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 aria-label={`${word}. Choose what to see`}
-                className="group relative mt-[0.1em] inline-flex cursor-pointer items-center rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.14em] outline-none transition-colors duration-200 hover:bg-neutral-900/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB]"
+                className="group relative mt-[0.16em] inline-flex cursor-pointer items-center rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.16em] outline-none transition-colors duration-200 hover:bg-neutral-900/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB]"
             >
-                {/* The word's box springs to each word's width; the words slide through it. */}
-                <motion.span
-                    className="relative inline-block h-[1.18em] overflow-hidden whitespace-nowrap"
-                    initial={false}
-                    animate={width === undefined ? undefined : { width }}
-                    transition={CHIP_SPRING}
-                >
-                    <AnimatePresence initial={false}>
-                        <motion.span
-                            key={word}
-                            className="absolute left-0 top-0 leading-[1.18em]"
-                            initial={reduceMotion ? { opacity: 0 } : { y: "62%", opacity: 0, filter: "blur(6px)" }}
-                            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                            exit={
-                                reduceMotion
-                                    ? { opacity: 0, transition: { duration: 0.15 } }
-                                    : { y: "-62%", opacity: 0, filter: "blur(6px)", transition: { duration: 0.28, ease: EASE_OUT } }
-                            }
-                            transition={{ duration: 0.45, ease: EASE_OUT }}
-                        >
-                            {word}
-                        </motion.span>
-                    </AnimatePresence>
-                    {/* Sizes the box before the first measure, then measures each new word. */}
-                    <span ref={sizerRef} aria-hidden className="invisible inline-block whitespace-nowrap">
-                        {word}
-                    </span>
-                </motion.span>
-                <ChevronDown
-                    aria-hidden
-                    className="ml-[0.1em] h-[0.34em] w-[0.34em] shrink-0 text-neutral-900/45 transition-transform duration-300 group-hover:translate-y-[0.04em]"
-                    style={open ? { transform: "rotate(180deg)" } : undefined}
-                    strokeWidth={2.25}
-                />
+                <SpringText text={word} slide className="leading-[1.2em]" />
+                {/* Nudges down on hover; turns with a spring when the menu opens. */}
+                <span className="ml-[0.12em] inline-flex transition-transform duration-300 group-hover:translate-y-[0.04em]">
+                    <motion.span className="inline-flex" animate={{ rotate: open ? 180 : 0 }} transition={CHIP_SPRING}>
+                        <ChevronDown aria-hidden className="h-[0.3em] w-[0.3em] text-neutral-900/55" strokeWidth={3} />
+                    </motion.span>
+                </span>
             </motion.button>
 
             {typeof document !== "undefined" &&
@@ -225,12 +264,12 @@ export function VariantPicker({
                                 ref={listRef}
                                 role="listbox"
                                 aria-label="What we make"
-                                initial={{ opacity: 0, scale: 0.94, y: -6 }}
+                                initial={{ opacity: 0, scale: 0.96, y: -4 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.96, y: -4, transition: { duration: 0.15 } }}
-                                transition={CHIP_SPRING}
-                                className="fixed z-[70] w-56 origin-top rounded-2xl border border-neutral-200 bg-white/95 p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
-                                style={{ left: anchor.x - 112, top: anchor.y }}
+                                exit={{ opacity: 0, scale: 0.97, y: -3, transition: { duration: 0.14 } }}
+                                transition={{ ...CHIP_SPRING, opacity: { duration: 0.12 } }}
+                                className="fixed z-[70] origin-top rounded-2xl border border-neutral-200 bg-white/95 p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+                                style={{ left: anchor.x - anchor.width / 2, top: anchor.y, width: anchor.width }}
                             >
                                 {[{ key: null, label: "Everything" }, ...VARIANTS].map((option) => {
                                     const selected = value === option.key;
@@ -257,11 +296,11 @@ export function VariantPicker({
     );
 }
 
-/** A variant's clip over the reel: its poster at once, then the clip from `start`. */
-export function VariantVideo({ src, poster, start }: Variant["video"]) {
+/** A variant's clip over the reel: its poster at once, then the clip, looping between `start` and `end`. */
+export function VariantVideo({ src, phone, poster, start, end, compact }: Variant["video"] & { compact: boolean }) {
     return (
         <motion.video
-            src={src}
+            src={compact && phone ? phone : src}
             poster={poster}
             className="absolute inset-0 h-full w-full object-cover"
             autoPlay
@@ -271,6 +310,11 @@ export function VariantVideo({ src, poster, start }: Variant["video"]) {
             preload="auto"
             onLoadedMetadata={(e) => {
                 e.currentTarget.currentTime = start;
+            }}
+            onTimeUpdate={(e) => {
+                // Also catches the browser's own loop back to 0, into the lead-in.
+                const t = e.currentTarget.currentTime;
+                if (t < start - 0.25 || t >= end) e.currentTarget.currentTime = start;
             }}
             initial={{ opacity: 0, filter: "blur(6px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
