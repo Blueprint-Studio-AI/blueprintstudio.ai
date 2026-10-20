@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
-    "@blueprint-studio/galley": "file:vendor/blueprint-studio-galley-0.28.0.tgz",
+    "@blueprint-studio/galley": "file:vendor/blueprint-studio-galley-0.29.0.tgz",
     "@calcom/atoms": "^1.10.0",
     "@calcom/embed-react": "^1.5.3",
     "@hookform/resolvers": "^5.9.1",
