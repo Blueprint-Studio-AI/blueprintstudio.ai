@@ -1,7 +1,8 @@
 import { Footer } from "@/components/Footer/index";
 import Hero from "./Hero";
+import Achievements from "./Achievements";
 import PortfolioBento from "./PortfolioBento";
-import HowWeWork from "./HowWeWork";
+import PricingSection from "./PricingSection";
 import TestimonialSection from "./TestimonialSection";
 import FAQSection from "./FAQSection";
 import ScheduleCallSection from "./ScheduleCallSection";
@@ -21,9 +22,9 @@ export default function Home() {
                 <div id="work">
                     <PortfolioBento/>
                 </div>
-                {/* #pricing kept for old links; the section itself is #how-we-work */}
+                <Achievements/>
                 <div id="pricing">
-                    <HowWeWork/>
+                    <PricingSection/>
                 </div>
                 <div id="testimonials">
                     <TestimonialSection/>

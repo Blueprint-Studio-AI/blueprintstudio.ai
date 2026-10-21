@@ -12,7 +12,7 @@ const clients: { name: string; logo: string; w: number; scale?: number; services
   { name: "TokenWorks", logo: "tokenworks", w: 636, services: ["Digital Transformation", "Service Design", "Development", "Product Videos"] },
   { name: "Arch Network", logo: "arch-network", w: 518, services: ["Service Design", "Branding", "Development", "Content Creation"] },
   { name: "Perena", logo: "perena", w: 682, services: ["Landing Page", "Service Design", "Development"] },
-  { name: "Jinba", logo: "jinba", w: 608, services: ["Branding", "Landing Page", "Launch Video"] },
+  { name: "Jinba", logo: "jinba", w: 561, services: ["Branding", "Landing Page", "Launch Video"] },
   { name: "Bump", logo: "bump", scale: 0.62, w: 264, services: ["Branding", "Product Design", "UX"] },
   { name: "Logical", logo: "logical", w: 580, services: ["Launch Video"] },
   { name: "Pyra", logo: "pyra", w: 476, services: ["Launch Videos x3", "Content Creation"] },

@@ -21,64 +21,124 @@ type Testimonial = {
   lead?: string;
 };
 
+// Quotes, names and titles as the site already has them: the ticker on /brand,
+// /launch and /launch-videos (with photos), then the home page's own. People
+// with photos come first.
 const featured: Testimonial = {
-  quote:
-    "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
-  lead: "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds.",
-  author: "Alex Escudero",
-  role: "Co-Founder",
-  company: "Project Metavision",
+  quote: "Anyone who sees the video buys the product. Working with you guys is like eating chocolate. We can't go back.",
+  lead: "Anyone who sees the video buys the product.",
+  author: "Daniel Greene",
+  role: "COO",
+  company: "TokenWorks",
+  image: "/testimonials/daniel-greene.jpg",
 };
 
-const pair: Testimonial[] = [
-  {
-    quote:
-      "Blueprint's design subscription gave us an affordable way to bring our digital vision to life. Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
-    author: "Andrew Jenkins",
-    role: "Former VP of Engineering, Credit Karma",
-    company: "Currently Startup Co-Founder",
-  },
-  {
-    quote:
-      "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
-    author: "Shina Foo",
-    role: "Head of Growth",
-    company: "Perena",
-    image: "/testimonials/shina-foo-perena.jpg",
-  },
+const shown: Testimonial[][] = [
+  [
+    {
+      quote:
+        "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
+      author: "Shina Foo",
+      role: "Head of Growth",
+      company: "Perena",
+      image: "/testimonials/shina-foo-perena.jpg",
+    },
+    {
+      quote: "I actually fucking love this version, I got goosebumps",
+      author: "Sina Meraji",
+      role: "CMO",
+      company: "Jinba · YC W26",
+      image: "/testimonials/sina.jpg",
+    },
+  ],
+  [
+    {
+      quote:
+        "Thanks again bro, you've really outdone yourselves again, especially with such a tight deadline. The video is doing bits on X, it looks sick!!!",
+      author: "Diego",
+      role: "CEO",
+      company: "Pyra · YC W25",
+      image: "/testimonials/diego.jpeg",
+    },
+    {
+      quote:
+        "You guys are getting great reviews. Even though we haven't started publicizing on social media. You guys did a great job!",
+      author: "Sam Karu",
+      role: "CEO",
+      company: "Logical · YC F25",
+      image: "/testimonials/sam-karu.jpg",
+    },
+  ],
 ];
 
-const more: Testimonial[] = [
-  {
-    quote:
-      "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft. We've been working with them the last two months and continue to do so.",
-    author: "Scott Zimmer",
-    role: "Former EVP of Innovation, Truist Bank",
-    company: "Currently Startup Co-Founder",
-  },
-  {
-    quote:
-      "Blueprint helped us turn our ideas into focused, effective marketing materials. They were fast, responsive, and the quality speaks for itself. We'll definitely be working with them again.",
-    author: "Ali Khalatpour",
-    role: "Founder",
-    company: "Piris Labs",
-    image: "/testimonials/ali-khalatpour.png",
-  },
-  {
-    quote:
-      "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
-    author: "Mauricio Manhaes",
-    role: "President",
-    company: "SDN Academic Task Force",
-  },
-  {
-    quote:
-      "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
-    author: "Steven Luis Howell",
-    role: "CEO & Co-Founder",
-    company: "Project Metavision",
-  },
+const more: Testimonial[][] = [
+  [
+    {
+      quote: "The AV3 launch was great, thanks to you guys!! Thanks for the hard work.",
+      author: "Charles Cagliostro",
+      role: "CEO",
+      company: "TokenWorks",
+      image: "/testimonials/charles.png",
+    },
+    {
+      quote: "I absolutely love the video and feel it captures our company impeccably.",
+      author: "Julia Zema",
+      role: "CMO",
+      company: "Hildene",
+      image: "/testimonials/julia.jpg",
+    },
+  ],
+  [
+    {
+      quote:
+        "It was great working with you guys. You helped us focus our ideas and the final product came out really well. We'll be back for sure 🙂",
+      author: "Ali Khalatpour",
+      role: "Founder",
+      company: "Pirus Labs · YC W26",
+      image: "/testimonials/ali-khalatpour.png",
+    },
+    {
+      quote:
+        "Blueprint's design subscription gave us an affordable way to bring our digital vision to life. Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
+      author: "Andrew Jenkins",
+      role: "Former VP of Engineering, Credit Karma",
+      company: "Currently Startup Co-Founder",
+    },
+  ],
+  [
+    {
+      quote:
+        "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
+      author: "Alex Escudero",
+      role: "Co-Founder",
+      company: "Project Metavision",
+    },
+    {
+      quote:
+        "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft. We've been working with them the last two months and continue to do so.",
+      author: "Scott Zimmer",
+      role: "Former EVP of Innovation, Truist Bank",
+      company: "Currently Startup Co-Founder",
+    },
+  ],
+  [
+    {
+      quote:
+        "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
+      author: "Mauricio Manhaes",
+      role: "President",
+      company: "SDN Academic Task Force",
+    },
+    {
+      quote:
+        "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
+      author: "Steven Luis Howell",
+      role: "CEO & Co-Founder",
+      company: "Project Metavision",
+    },
+  ],
 ];
+const moreCount = more.flat().length;
 
 function Avatar({ t, size }: { t: Testimonial; size: number }) {
   if (t.image)
@@ -192,10 +252,12 @@ export default function TestimonialSection() {
           </Reveal>
 
           <HRule />
-          <Reveal>
-            <Row items={pair} />
-          </Reveal>
-          <HRule />
+          {shown.map((row) => (
+            <Reveal key={row[0].author}>
+              <Row items={row} />
+              <HRule />
+            </Reveal>
+          ))}
 
           {/* The rest, on request: the page scrolls as normal throughout */}
           <AnimatePresence initial={false}>
@@ -209,10 +271,12 @@ export default function TestimonialSection() {
                 transition={reduceMotion ? { duration: 0 } : { height: { duration: 0.6, ease: EASE_OUT }, opacity: { duration: 0.4 } }}
                 className="overflow-hidden"
               >
-                <Row items={more.slice(0, 2)} />
-                <HRule />
-                <Row items={more.slice(2)} />
-                <HRule />
+                {more.map((row) => (
+                  <div key={row[0].author}>
+                    <Row items={row} />
+                    <HRule />
+                  </div>
+                ))}
               </motion.div>
             )}
           </AnimatePresence>
@@ -225,7 +289,7 @@ export default function TestimonialSection() {
               aria-controls="more-testimonials"
               className="group flex h-10 items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 text-[14px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
             >
-              {open ? "Show fewer" : `Read ${more.length} more`}
+              {open ? "Show fewer" : `Read ${moreCount} more`}
               <ChevronDown
                 aria-hidden
                 className={`h-4 w-4 text-neutral-500 transition-transform duration-500 ease-out ${open ? "rotate-180" : ""}`}
