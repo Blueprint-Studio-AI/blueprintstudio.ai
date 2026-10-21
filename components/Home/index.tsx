@@ -1,9 +1,7 @@
 import { Footer } from "@/components/Footer/index";
 import Hero from "./Hero";
-import QuoteSection from "./QuoteSection";
-import Achievements from "./Achievements";
 import PortfolioBento from "./PortfolioBento";
-import PricingSection from "./PricingSection";
+import HowWeWork from "./HowWeWork";
 import TestimonialSection from "./TestimonialSection";
 import FAQSection from "./FAQSection";
 import ScheduleCallSection from "./ScheduleCallSection";
@@ -16,20 +14,16 @@ export default function Home() {
             <div id="hero">
                 <Hero/>
             </div>
-            <div id="about">
-                <QuoteSection/>
-            </div>
-            {/* Spacer to create scroll space for revealing quote */}
-            <div className="h-screen" />
             <div className="relative z-30">
-                <ClientLogoTicker />
-                <AssetGeneratorBand />
+                <div id="logos">
+                    <ClientLogoTicker />
+                </div>
                 <div id="work">
                     <PortfolioBento/>
                 </div>
-                <Achievements/>
+                {/* #pricing kept for old links; the section itself is #how-we-work */}
                 <div id="pricing">
-                    <PricingSection/>
+                    <HowWeWork/>
                 </div>
                 <div id="testimonials">
                     <TestimonialSection/>
@@ -39,6 +33,9 @@ export default function Home() {
                 </div>
                 <div id="contact">
                     <ScheduleCallSection/>
+                </div>
+                <div id="asset-generator">
+                    <AssetGeneratorBand />
                 </div>
                 <Footer />
             </div>
