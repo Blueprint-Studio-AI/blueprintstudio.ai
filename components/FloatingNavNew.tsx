@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useState, useEffect, useRef } from 'react';
+import { Fragment, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSmoothScroll } from './SmoothScroll';
@@ -69,70 +69,113 @@ const NavLink = ({
 };
 
 // Blueprint Studio Asset Generator, the studio's own product on the tools
-// subdomain. Rendered twice: right after the logo on phones, where the pill
-// scrolls sideways and anything past Pricing starts off-screen, and after FAQ
-// from md up, where the whole pill fits.
-const AssetGeneratorNavLink = ({ className }: { className: string }) => (
+// subdomain. The pill renders it twice: right after the logo on phones, where
+// the pill scrolls sideways and anything past the first few links starts
+// off-screen, and after FAQ from md up, where the whole pill fits. The top nav
+// renders it too, so each caller brings its own look.
+export const AssetGeneratorNavLink = ({ className = '', ...props }: React.ComponentPropsWithoutRef<'a'>) => (
   <a
     href={assetGeneratorUrl('/asset-generator/landing', 'nav')}
     target="_blank"
     rel="noopener"
-    className={`items-center gap-1 flex-shrink-0 px-3 py-1.5 rounded-2xl whitespace-nowrap text-sm font-medium text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5 ${className}`}
-    style={{
-      transition: 'all 200ms cubic-bezier(.25, .46, .45, .94)'
-    }}
+    className={`items-center gap-1 flex-shrink-0 whitespace-nowrap text-sm font-medium ${className}`}
+    {...props}
   >
     Asset Generator
     <ArrowUpRight aria-hidden="true" className="h-3 w-3 opacity-60" strokeWidth={2.25} />
   </a>
 );
 
-// Routes where the floating nav should be hidden
+const PILL_LINK = 'px-3 py-1.5 rounded-2xl text-[rgba(29,29,31,0.66)] hover:text-[rgba(29,29,31,0.88)] hover:bg-black/5 transition-all duration-200 ease-[cubic-bezier(.25,.46,.45,.94)]';
+
+// Routes where the navs (this pill and the top nav) are hidden
 const HIDDEN_NAV_ROUTES = ['/launch-videos', '/launch', '/brand', '/insights', '/brands'];
+
+export const isNavHidden = (pathname: string) =>
+  HIDDEN_NAV_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'));
+
+// "How we work" replaces Pricing, which keeps its id as an alias; until the
+// new section lands, the link goes to Pricing.
+const SECTION_ALIASES: Record<string, string> = { 'how-we-work': 'pricing' };
+
+const sectionElement = (id: string) =>
+  document.getElementById(id) ?? (SECTION_ALIASES[id] ? document.getElementById(SECTION_ALIASES[id]) : null);
+
+// Goes to a home page section: Locomotive's eased scroll on the home page,
+// 80px clear of the top, or a load of /#section from any other page.
+export const useGoToSection = () => {
+  const pathname = usePathname();
+  const { scroll, isReady } = useSmoothScroll();
+  return (id: string) => {
+    if (pathname !== '/') {
+      window.location.href = `/#${id}`;
+      return;
+    }
+    const element = sectionElement(id);
+    if (!element) return;
+    if (isReady && scroll) {
+      scroll.scrollTo(element, { offset: -80, duration: 1.2 });
+    } else {
+      const y = element.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+};
+
+// Sections shown in the pill
+const NAV_SECTIONS = [
+  { id: 'hero', label: 'Home', icon: true },
+  { id: 'work', label: 'Work' },
+  { id: 'how-we-work', label: 'How we work' },
+  { id: 'testimonials', label: 'Testimonials' },
+  { id: 'faq', label: 'FAQ' },
+];
+
+// Sections to observe (contact too, so nothing stays lit over it)
+const OBSERVED_SECTIONS = [...NAV_SECTIONS.map((section) => section.id), 'contact'];
+
+// From md up the top nav leads, and the pill springs up once it has scrolled away.
+const PILL_SHOWN = { y: 0, opacity: 1, scale: 1, transition: { type: 'spring', visualDuration: 0.45, bounce: 0.22 } } as const;
+const PILL_HIDDEN = { y: 72, opacity: 0, scale: 0.96, transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] } } as const;
 
 export const FloatingNavNew = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const pathname = usePathname();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
-  const { scroll, isReady } = useSmoothScroll();
+  const goToSection = useGoToSection();
 
   // Check if nav should be hidden (used in return, not early return to preserve hook order)
-  const shouldHideNav = HIDDEN_NAV_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  );
+  const shouldHideNav = isNavHidden(pathname);
 
-  // Helper function to scroll to element using Locomotive Scroll or fallback
-  const scrollToElement = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    if (isReady && scroll) {
-      // Use Locomotive Scroll
-      scroll.scrollTo(element, {
-        offset: -80,
-        duration: 1.2,
-      });
-    } else {
-      // Fallback to native smooth scroll
-      const yOffset = -80;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+  // Phones keep the pill all the time. From md up it waits for the top nav
+  // to leave the screen. Null until measured: the server can't know the width.
+  const [desktop, setDesktop] = useState<boolean | null>(null);
+  const [topNavInView, setTopNavInView] = useState(true);
+  useLayoutEffect(() => {
+    const query = window.matchMedia('(min-width: 768px)');
+    const update = () => setDesktop(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  useEffect(() => {
+    const topNav = document.getElementById('top-nav');
+    if (!topNav) {
+      setTopNavInView(false);
+      return;
     }
-  };
+    const observer = new IntersectionObserver(([entry]) => setTopNavInView(entry.isIntersecting));
+    observer.observe(topNav);
+    return () => observer.disconnect();
+  }, [pathname]);
+  const shown = desktop !== true || !topNavInView;
 
-  // Sections shown in nav
-  const navSections = [
-    { id: 'hero', label: 'Home', icon: true },
-    { id: 'about', label: 'About' },
-    { id: 'work', label: 'Work' },
-    { id: 'pricing', label: 'Pricing' },
-    { id: 'testimonials', label: 'Testimonials' },
-    { id: 'faq', label: 'FAQ' },
-  ];
-
-  // All sections to observe (including contact for proper highlighting)
-  const allSections = [...navSections, { id: 'contact', label: 'Contact' }];
+  // Out of reach while it's away: no tabbing into it, no clicks.
+  const pillRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (pillRef.current) pillRef.current.inert = !shown;
+  }, [shown, desktop]);
 
   // On phones the links scroll sideways; fade the right edge while more are hidden.
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -144,12 +187,12 @@ export const FloatingNavNew = () => {
     updateScrollFade();
     window.addEventListener('resize', updateScrollFade);
     return () => window.removeEventListener('resize', updateScrollFade);
-  }, []);
+  }, [desktop]);
 
   // Auto-scroll to center active item on mobile
   useEffect(() => {
     if (window.innerWidth < 768 && scrollContainerRef.current) {
-      const activeIndex = navSections.findIndex(s => s.id === activeSection);
+      const activeIndex = NAV_SECTIONS.findIndex(s => s.id === activeSection);
       const activeElement = navItemsRef.current[activeIndex];
 
       if (activeElement && scrollContainerRef.current) {
@@ -165,9 +208,6 @@ export const FloatingNavNew = () => {
         });
       }
     }
-    // Only when the section changes: navSections is rebuilt every render, and
-    // re-running this on any render would snap the row back mid-scroll.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection]);
 
   useEffect(() => {
@@ -191,6 +231,9 @@ export const FloatingNavNew = () => {
       threshold: 0
     };
 
+    // Which section each observed element stands for (an alias stands for its section)
+    const sections = new Map<Element, string>();
+
     const observer = new IntersectionObserver((entries) => {
       // First check if we're at the top
       if (checkScrollPosition()) {
@@ -198,20 +241,18 @@ export const FloatingNavNew = () => {
       }
 
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          // Find which section this is
-          const sectionId = entry.target.id;
-          if (sectionId) {
-            setActiveSection(sectionId);
-          }
+        const sectionId = sections.get(entry.target);
+        if (entry.isIntersecting && sectionId) {
+          setActiveSection(sectionId);
         }
       });
     }, observerOptions);
 
     // Observe all sections including contact
-    allSections.forEach((section) => {
-      const element = document.getElementById(section.id);
+    OBSERVED_SECTIONS.forEach((id) => {
+      const element = sectionElement(id);
       if (element) {
+        sections.set(element, id);
         observer.observe(element);
       }
     });
@@ -227,15 +268,10 @@ export const FloatingNavNew = () => {
     checkScrollPosition();
 
     return () => {
-      allSections.forEach((section) => {
-        const element = document.getElementById(section.id);
-        if (element) {
-          observer.unobserve(element);
-        }
-      });
+      observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [pathname, allSections]);
+  }, [pathname]);
 
   // Hide nav on specific routes (after all hooks)
   if (shouldHideNav) {
@@ -246,14 +282,24 @@ export const FloatingNavNew = () => {
     <nav
       className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[800px] md:w-auto"
     >
-      <div className={`
-        relative
-        rounded-full
-        border border-white/20
-        bg-[rgba(244,244,247,0.80)]
-        shadow-lg
-        backdrop-blur-xl
-      `}>
+      {/* Remounted once the width is known, so it starts in place rather than sliding there */}
+      <motion.div
+        key={desktop === null ? 'unmeasured' : 'measured'}
+        ref={pillRef}
+        initial={false}
+        animate={shown ? PILL_SHOWN : PILL_HIDDEN}
+        aria-hidden={!shown || undefined}
+        className={`
+          relative
+          rounded-full
+          border border-white/20
+          bg-[rgba(244,244,247,0.80)]
+          shadow-lg
+          backdrop-blur-xl
+          ${desktop === null ? 'md:invisible' : ''}
+          ${shown ? '' : 'pointer-events-none'}
+        `}
+      >
         <div className="flex items-center px-1.5 py-1.5">
           {/* Scrollable container for mobile - nav items */}
           <div className="relative flex min-w-0 flex-1 items-center">
@@ -285,20 +331,14 @@ export const FloatingNavNew = () => {
               }
             `}</style>
             <div className="flex items-center flex-nowrap gap-1">
-              {navSections.map((section, index) => (
+              {NAV_SECTIONS.map((section, index) => (
                 <Fragment key={section.id}>
                   <a
                     ref={el => { navItemsRef.current[index] = el; }}
                     href={`#${section.id}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      // If we're not on home, navigate there first
-                      if (pathname !== '/') {
-                        window.location.href = `/#${section.id}`;
-                        return;
-                      }
-                      // Smooth scroll to section using Locomotive Scroll
-                      scrollToElement(section.id);
+                      goToSection(section.id);
                     }}
                     className={`
                       flex items-center justify-center flex-shrink-0
@@ -333,13 +373,13 @@ export const FloatingNavNew = () => {
                     )}
                   </a>
                   {/* Phones: right after the logo, so it's in view without scrolling the pill */}
-                  {section.icon && <AssetGeneratorNavLink className="flex md:hidden" />}
+                  {section.icon && <AssetGeneratorNavLink className={`flex md:hidden ${PILL_LINK}`} />}
                 </Fragment>
               ))}
 
               {/* md and up: after the section links, set apart by a divider */}
               <div aria-hidden="true" className="hidden md:block w-px h-4 bg-neutral-300/60 mx-1 flex-shrink-0" />
-              <AssetGeneratorNavLink className="hidden md:flex" />
+              <AssetGeneratorNavLink className={`hidden md:flex ${PILL_LINK}`} />
             </div>
           </div>
           </div>
@@ -352,11 +392,7 @@ export const FloatingNavNew = () => {
             href="#contact"
             onClick={(e) => {
               e.preventDefault();
-              if (pathname !== '/') {
-                window.location.href = '/#contact';
-                return;
-              }
-              scrollToElement('contact');
+              goToSection('contact');
             }}
             className="
               relative flex-shrink-0
@@ -448,7 +484,7 @@ export const FloatingNavNew = () => {
 
         {/* Fade indicator for mobile - only on left now */}
         <div className="md:hidden pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[rgba(244,244,247,0.80)] to-transparent rounded-l-full" />
-      </div>
+      </motion.div>
     </nav>
   );
 };
