@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --experimental-strip-types scripts/build-zips.mjs && next dev --turbo",
+    "dev": "node --experimental-strip-types scripts/build-zips.mjs && next dev --turbo -H 127.0.0.1",
     "build": "node --experimental-strip-types scripts/build-zips.mjs && next build",
     "zips": "node --experimental-strip-types scripts/build-zips.mjs",
     "start": "next start",

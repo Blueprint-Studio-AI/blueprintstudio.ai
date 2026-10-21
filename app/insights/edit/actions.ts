@@ -1,6 +1,7 @@
 "use server";
 
 import path from "node:path";
+import { headers } from "next/headers";
 import {
   blueprintStudio,
   createPost,
@@ -17,6 +18,7 @@ import {
   type Comment,
   type DocNode,
 } from "@blueprint-studio/galley/editor";
+import { localEditingAllowed } from "@blueprint-studio/galley/editor";
 import { importMedia } from "@blueprint-studio/galley/media";
 import { DraftPostStore, readDraft } from "@blueprint-studio/galley/drafts";
 import { discardPage, openPage, publishPage, readPage, renderSection, savePageDraft, validatePage, type PageSection } from "@blueprint-studio/galley/pages";
@@ -26,7 +28,6 @@ import { FsPostStore, revisionOf, writePost } from "@blueprint-studio/galley/ops
 import { renderPost } from "@blueprint-studio/galley/render";
 import { elements } from "@/components/galley/elements";
 import galley from "@/galley.config";
-import { editorEnabled } from "./enabled";
 import { whoAmI } from "./who";
 
 // What the post editor (/galley/edit) asks the server to do. Everything is checked by
@@ -45,8 +46,10 @@ const store = () =>
     galley,
   );
 
-function guard() {
-  if (!editorEnabled()) throw new Error("The editor is off on this deployment");
+// Edit mode writes the site's files with no sign-in, so only in development, and only for a
+// request addressed to this machine (a page elsewhere that points its own name here gets nothing).
+async function guard() {
+  if (!localEditingAllowed((await headers()).get("host"))) throw new Error("The editor is off here");
 }
 
 function studio() {
@@ -61,7 +64,7 @@ export async function savePostAction(
   slug: string,
   input: { doc: DocNode; frontmatter: Record<string, unknown>; revision: string | null },
 ) {
-  guard();
+  await guard();
   const before = await store().read(slug);
   const result = await savePost(galley, store(), slug, input, { message: `Edit ${slug} in the editor` });
   if (!result.ok) return result;
@@ -72,19 +75,19 @@ export async function savePostAction(
 
 /** Put the post on Insights as it is in edit mode (dated today if it's never been published), noted in its history. */
 export async function publishPostAction(slug: string) {
-  guard();
+  await guard();
   return publishPost(store(), slug, { author: whoAmI() });
 }
 
 /** Take the post off Insights. It stays here as a draft. */
 export async function unpublishPostAction(slug: string) {
-  guard();
+  await guard();
   return unpublishPost(store(), slug, { author: whoAmI() });
 }
 
 /** Throw away the post's changes that aren't on Insights. */
 export async function discardPostAction(slug: string) {
-  guard();
+  await guard();
   await store().discard(slug);
   return { ok: true as const, state: await store().state(slug) };
 }
@@ -94,7 +97,7 @@ export async function discardPostAction(slug: string) {
  * today, with a description to replace. Edit mode opens it.
  */
 export async function createPostAction(title: string) {
-  guard();
+  await guard();
   const made = await createPost(galley, store(), {
     title,
     frontmatter: { date: new Date().toLocaleDateString("en-CA"), draft: true },
@@ -107,13 +110,13 @@ export async function createPostAction(title: string) {
 
 /** The post's versions, newest first. */
 export async function versionsAction(slug: string) {
-  guard();
+  await guard();
   return listVersions(cwd, `posts/${slug}`);
 }
 
 /** Make an earlier version the post again (it's checked like any save, and becomes the newest version). */
 export async function restoreAction(slug: string, id: string) {
-  guard();
+  await guard();
   const version = await readVersion(cwd, `posts/${slug}`, id);
   if (!version) return { error: "That version isn't kept any more" };
   const before = await store().read(slug);
@@ -124,13 +127,13 @@ export async function restoreAction(slug: string, id: string) {
 }
 
 export async function saveCommentsAction(slug: string, comments: Comment[]) {
-  guard();
+  await guard();
   await writeComments(cwd, slug, comments);
 }
 
 /** A component rendered by the site itself, for the editor's preview of it. */
 export async function renderBlockAction(attrs: { name: string; props: Record<string, unknown>; body: string | null }) {
-  guard();
+  await guard();
   const component = galley.registry[attrs.name];
   if (!component) return { error: `${attrs.name} isn't a component on this site` };
   const checked = component.props.strict().safeParse(attrs.props);
@@ -146,7 +149,7 @@ export async function renderBlockAction(attrs: { name: string; props: Record<str
 }
 
 export async function libraryAction({ offset = 0 }: { offset?: number }) {
-  guard();
+  await guard();
   try {
     return await studio().library({ offset, limit: 40 });
   } catch (error) {
@@ -155,7 +158,7 @@ export async function libraryAction({ offset = 0 }: { offset?: number }) {
 }
 
 export async function stylesAction() {
-  guard();
+  await guard();
   try {
     return { styles: await studio().styles() };
   } catch (error) {
@@ -164,7 +167,7 @@ export async function stylesAction() {
 }
 
 export async function generateAction(input: { prompt: string; styleId?: string; aspectRatio?: string }) {
-  guard();
+  await guard();
   try {
     return await studio().generate(input);
   } catch (error) {
@@ -173,7 +176,7 @@ export async function generateAction(input: { prompt: string; styleId?: string; 
 }
 
 export async function jobAction(jobId: string) {
-  guard();
+  await guard();
   try {
     return await studio().job(jobId, 20);
   } catch (error) {
@@ -183,7 +186,7 @@ export async function jobAction(jobId: string) {
 
 /** Copies an image into the site's media folder as optimised WebP. */
 export async function importAssetAction({ url, name }: { url: string; name?: string }) {
-  guard();
+  await guard();
   if (!/^https:\/\//.test(url)) return { error: "Only https images can be added" };
   try {
     const media = await importMedia(galley, cwd, { url, name });
@@ -195,7 +198,7 @@ export async function importAssetAction({ url, name }: { url: string; name?: str
 
 /** A file from the person's computer, saved with the site as optimised WebP. */
 export async function uploadAction(form: FormData) {
-  guard();
+  await guard();
   const file = form.get("file");
   if (!(file instanceof File)) return { error: "No file" };
   if (file.size > 20 * 1024 * 1024) return { error: "That file is over 20 MB" };
@@ -209,7 +212,7 @@ export async function uploadAction(form: FormData) {
 
 /** Everything a post can use (Insights' blocks and media), for edit mode's Library. */
 export async function siteLibraryAction() {
-  guard();
+  await guard();
   try {
     const { items } = await buildLibrary(galley, cwd);
     return { items };
@@ -227,7 +230,7 @@ const pageText = async () => (await readDraft(cwd, `pages/${PAGE}`)) ?? (await r
 
 /** The page's sections, checked and saved as its draft if it hasn't changed since `revision`. */
 export async function savePageAction(page: { settings?: Record<string, unknown>; sections: PageSection[] }, revision: string) {
-  guard();
+  await guard();
   const before = await pageText().catch(() => null);
   const saved = await savePageDraft(cwd, PAGE, PAGE_FILE, page, revision, galley.sections ?? []);
   if (!saved.ok) return { ok: false as const, error: saved.error };
@@ -236,24 +239,24 @@ export async function savePageAction(page: { settings?: Record<string, unknown>;
 }
 
 export async function publishPageAction() {
-  guard();
+  await guard();
   const done = await publishPage(cwd, PAGE, PAGE_FILE, galley.sections ?? []);
   return done.ok ? { ok: true as const, state: "published" as const } : done;
 }
 
 export async function discardPageAction() {
-  guard();
+  await guard();
   await discardPage(cwd, PAGE);
   return { ok: true as const, state: "published" as const };
 }
 
 export async function pageVersionsAction() {
-  guard();
+  await guard();
   return listVersions(cwd, `pages/${PAGE}`);
 }
 
 export async function restorePageAction(id: string) {
-  guard();
+  await guard();
   const version = await readVersion(cwd, `pages/${PAGE}`, id);
   if (!version) return { error: "That version isn't kept any more" };
   const before = await pageText();
@@ -266,7 +269,7 @@ export async function restorePageAction(id: string) {
 
 /** One section of the page, rendered by the site for edit mode (with the sections above it, for what they show). */
 export async function renderSectionAction(page: { sections: PageSection[] }, index: number) {
-  guard();
+  await guard();
   const sections = galley.sections ?? [];
   const clean: PageSection[] = [];
   for (const [i, entry] of page.sections.entries()) {
@@ -284,19 +287,19 @@ export async function renderSectionAction(page: { sections: PageSection[] }, ind
 
 /** Ask Blueprint's design agent for something Insights doesn't have, as whoever's editing. */
 export async function requestDesignAction(input: { kind: RequestKind; title: string; description: string; examples: string[]; references: string[] }) {
-  guard();
+  await guard();
   return createRequest(cwd, input, whoAmI());
 }
 
 // ---- All posts ----
 
 export async function postRowsAction() {
-  guard();
+  await guard();
   return store().rows();
 }
 
 export async function duplicatePostAction(slug: string) {
-  guard();
+  await guard();
   const made = await duplicatePost(galley, store(), slug);
   if (!made.ok) return { error: made.error };
   const source = await store().read(made.slug);
@@ -305,11 +308,11 @@ export async function duplicatePostAction(slug: string) {
 }
 
 export async function trashPostAction(slug: string) {
-  guard();
+  await guard();
   return store().trash(slug);
 }
 
 export async function untrashPostAction(id: string) {
-  guard();
+  await guard();
   return store().untrash(id);
 }

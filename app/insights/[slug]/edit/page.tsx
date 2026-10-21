@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import path from "node:path";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { localEditingAllowed } from "@blueprint-studio/galley/editor";
 import { buildManifest, splitFrontmatter } from "@blueprint-studio/galley";
 import { mdxToDoc, openPost, readComments, readVersion } from "@blueprint-studio/galley/editor";
 import { DraftPostStore } from "@blueprint-studio/galley/drafts";
@@ -29,7 +31,6 @@ import {
   uploadAction,
   versionsAction,
 } from "../../edit/actions";
-import { editorEnabled } from "../../edit/enabled";
 import { whoAmI } from "../../edit/who";
 
 // A post in edit mode: the same page as /insights/<slug>, with the title, summary, hero
@@ -41,7 +42,7 @@ export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ version?: string }> };
 
 export default async function EditInsight({ params, searchParams }: Props) {
-  if (!editorEnabled()) notFound();
+  if (!localEditingAllowed((await headers()).get("host"))) notFound();
   const [{ slug }, { version: versionId }] = await Promise.all([params, searchParams]);
   const manifest = buildManifest(galley);
   const cwd = process.cwd();

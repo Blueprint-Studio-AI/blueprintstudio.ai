@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { localEditingAllowed } from "@blueprint-studio/galley/editor";
 import { readVersion } from "@blueprint-studio/galley/editor";
 import { openPage, sectionsManifest } from "@blueprint-studio/galley/pages";
 import { listRequests } from "@blueprint-studio/galley/requests";
@@ -25,7 +27,6 @@ import {
   unpublishPostAction,
   untrashPostAction,
 } from "./actions";
-import { editorEnabled } from "./enabled";
 import { whoAmI } from "./who";
 
 // The Insights page in edit mode: the same page as /insights, built from the sections in
@@ -36,7 +37,7 @@ export const metadata: Metadata = { title: "Edit Insights", robots: { index: fal
 export const dynamic = "force-dynamic";
 
 export default async function EditInsights({ searchParams }: { searchParams: Promise<{ version?: string }> }) {
-  if (!editorEnabled()) notFound();
+  if (!localEditingAllowed((await headers()).get("host"))) notFound();
   const { version: versionId } = await searchParams;
   const cwd = process.cwd();
   const { page: current, revision, state } = await openPage(cwd, "insights", galley.pages!.insights);
