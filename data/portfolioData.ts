@@ -427,6 +427,8 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/autara/autara-horizontal-compressed.mp4',
         poster: '/media/projects/autara/autara-desktop-poster.jpg',
+        // The triangle pattern into its homepage, as in the hero.
+        clip: [3.8, 7.8],
         alt: 'Autara on Arch Network Project Reel',
         width: 1620,
         height: 1080
@@ -742,12 +744,13 @@ export const allWorkProjects: PortfolioProject[] = [...portfolioProjects, ...wor
 
 // The home page's Featured Work (components/Home/PortfolioBento.tsx): the
 // projects each filter shows, in order, at most six. "All work" leads with
-// recent, live clients across all four kinds of work. Huch is no longer
-// trading, so it's left out of "All work" and comes last where it shows.
+// recent, live clients across all four kinds of work. Each filter opens on the
+// clients the hero names for it. Huch is no longer trading, so it's left out
+// of "All work" and comes last where it shows.
 export const featuredWork: Record<'all' | Deliverable, string[]> = {
   all: ['perena', 'arch-network', 'tokenworks', 'jinba', 'livingip', 'honeyb'],
   apps: ['livingip', 'bump', 'huch'],
-  websites: ['perena', 'jinba', 'honeyb', 'autara', 'breeze'],
-  branding: ['arch-network', 'jinba', 'honeyb', 'bump', 'uni', 'breeze'],
+  websites: ['perena', 'autara', 'breeze', 'jinba', 'honeyb'],
+  branding: ['autara', 'arch-network', 'honeyb', 'jinba', 'bump', 'uni'],
   'launch-videos': ['tokenworks', 'perena'],
 };
