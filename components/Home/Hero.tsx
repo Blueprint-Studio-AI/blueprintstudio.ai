@@ -19,7 +19,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { SpringText, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
+import { LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -124,8 +124,18 @@ export default function Hero() {
         return () => window.removeEventListener("resize", place);
     }, [place]);
 
-    // A link like /?for=websites opens on that variant.
-    useEffect(() => setVariantKey(variantFromUrl()), []);
+    // A link like /?for=websites opens on that variant; ?look= picks the headline look.
+    const [look, setLook] = useState<Look>("b");
+    useEffect(() => {
+        setVariantKey(variantFromUrl());
+        setLook(lookFromUrl());
+    }, []);
+    const chooseLook = (next: Look) => {
+        setLook(next);
+        const url = new URL(window.location.href);
+        url.searchParams.set("look", next);
+        window.history.replaceState(window.history.state, "", url);
+    };
 
     const chooseVariant = (key: VariantKey | null) => {
         setVariantKey(key);
@@ -354,6 +364,7 @@ export default function Hero() {
                 )}
             </AnimatePresence>
 
+            <LookSwitcher look={look} onChange={chooseLook} />
             <Section
                 className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
@@ -414,9 +425,15 @@ export default function Hero() {
                                     textWrap: "balance",
                                 }}
                             >
-                                {/* The chip gets its own line, so a longer word never rewraps the headline. */}
-                                <span className="block">We design and build</span>
-                                <VariantPicker value={variantKey} onChange={chooseVariant} rotate={revealed} />
+                                {look === "d" ? (
+                                    "Apps, websites and brands, designed and\u00A0built."
+                                ) : (
+                                    <>
+                                        {/* The chip gets its own line, so a longer word never rewraps the headline. */}
+                                        <span className="block">We design and build</span>
+                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
+                                    </>
+                                )}
                             </motion.h1>
                             <motion.p
                                 {...rise(0.25)}
@@ -527,6 +544,17 @@ export default function Hero() {
                                 {/* A hairline edge, so pale frames don't melt into the page. */}
                                 <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
+                                {/* Look d: the picker as a small frosted pill on the reel, like Pentagram's. */}
+                                {look === "d" && (
+                                    <div
+                                        className="absolute left-3 top-3 z-[3] flex items-center gap-0.5 rounded-full bg-white/80 py-1 pl-3 pr-1 text-[15px] font-medium text-neutral-500 shadow-[0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-md transition-opacity duration-500"
+                                        style={{ opacity: stage === "docked" ? 1 : 0, pointerEvents: stage === "docked" ? "auto" : "none" }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        Showing
+                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
+                                    </div>
+                                )}
                                 {stage === "docked" && (
                                     <button
                                         ref={maximizeRef}

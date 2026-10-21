@@ -87,11 +87,28 @@ export const VARIANTS: Variant[] = [
 ];
 
 const ROTATE_MS = 2400;
+// B and C run through the range once after landing, this long per word.
+const PASS_MS = 650;
 const CHIP_SPRING = { type: "spring", visualDuration: 0.45, bounce: 0.15 } as const;
 // A touch quicker than the text, so a growing box stays ahead of the word coming in.
 const WIDTH_SPRING = { type: "spring", visualDuration: 0.32, bounce: 0.1 } as const;
 const TURN_SPRING = { type: "spring", visualDuration: 0.28, bounce: 0.05 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Headline looks to compare on the dev server (?look=a|b|c):
+ * a, a tinted pill in Inter that cycles; b, a serif italic word with a dotted
+ * underline that rests on "businesses"; c, the same serif in a soft pill;
+ * d, a static headline, with the picker as a small "Showing [all work]" pill on the reel.
+ */
+export type Look = "a" | "b" | "c" | "d";
+
+export function lookFromUrl(): Look {
+    const look = new URLSearchParams(window.location.search).get("look");
+    return look === "a" || look === "c" || look === "d" ? look : "b";
+}
+
+const SERIF = { fontFamily: "'PP Editorial New', Georgia, serif", fontStyle: "italic", fontWeight: 400, letterSpacing: "-0.005em" } as const;
 
 /** The variant in the URL (?for=websites), if any. */
 export function variantFromUrl(): VariantKey | null {
@@ -163,11 +180,13 @@ export function VariantPicker({
     value,
     onChange,
     rotate,
+    look,
 }: {
     value: VariantKey | null;
     onChange: (key: VariantKey | null) => void;
-    /** Cycle the word while nothing is picked. */
+    /** The hero has landed: start cycling (a) or the one pass through the range (b, c). */
     rotate: boolean;
+    look: Look;
 }) {
     const reduceMotion = useReducedMotion();
     const [index, setIndex] = useState(0);
@@ -177,15 +196,39 @@ export function VariantPicker({
     const listRef = useRef<HTMLDivElement>(null);
     const [anchor, setAnchor] = useState<{ x: number; y: number; width: number } | null>(null);
 
-    const cycling = rotate && value === null && !open && !hovered && !reduceMotion;
+    const cycling = look === "a" && rotate && value === null && !open && !hovered && !reduceMotion;
     useEffect(() => {
         if (!cycling) return;
         const timer = setInterval(() => setIndex((i) => (i + 1) % VARIANTS.length), ROTATE_MS);
         return () => clearInterval(timer);
     }, [cycling]);
 
-    const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[index];
-    const word = shown.word;
+    // b and c: once, after landing, show the range, then rest on "businesses".
+    const [pass, setPass] = useState(-1);
+    const [passDone, setPassDone] = useState(false);
+    const passing = (look === "b" || look === "c") && rotate && value === null && !passDone && !reduceMotion;
+    useEffect(() => {
+        if (!passing) return;
+        let step = 0;
+        setPass(0);
+        const timer = setInterval(() => {
+            step += 1;
+            if (step < VARIANTS.length) setPass(step);
+            else {
+                setPass(-1);
+                setPassDone(true);
+            }
+        }, PASS_MS);
+        return () => {
+            clearInterval(timer);
+            setPass(-1);
+        };
+    }, [passing]);
+
+    const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[look === "a" ? index : Math.max(pass, 0)];
+    const rest = look === "d" ? "all work" : "businesses";
+    const word = value || look === "a" || pass >= 0 ? shown.word : rest;
+    const allLabel = look === "a" ? "Everything" : look === "d" ? "All work" : "Businesses";
 
     // The menu sits under the chip and is never narrower than it.
     const placeMenu = () => {
@@ -194,6 +237,7 @@ export function VariantPicker({
     };
     const openMenu = () => {
         placeMenu();
+        setPassDone(true); // opening the menu ends the pass
         setOpen(true);
     };
     useEffect(() => {
@@ -218,7 +262,7 @@ export function VariantPicker({
     useEffect(() => {
         if (!open) return;
         // Start on the picked row, or on the word showing while it cycled.
-        listRef.current?.querySelector<HTMLButtonElement>(`[data-key="${value ?? shown.key}"]`)?.focus({ preventScroll: true });
+        listRef.current?.querySelector<HTMLButtonElement>(`[data-key="${value ?? (look === "a" ? shown.key : "all")}"]`)?.focus({ preventScroll: true });
         const onDown = (e: PointerEvent) => {
             const target = e.target as Node;
             if (!listRef.current?.contains(target) && !chipRef.current?.contains(target)) close(false);
@@ -254,9 +298,29 @@ export function VariantPicker({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 aria-label={`${word}. Choose what to see`}
-                className="group relative mt-[0.16em] inline-flex cursor-pointer items-center rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.16em] outline-none transition-colors duration-200 hover:bg-neutral-900/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB]"
+                className={`group relative inline-flex cursor-pointer items-center outline-none transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB] ${
+                    look === "d"
+                        ? "rounded-full px-1.5 py-0.5 text-neutral-900 hover:bg-neutral-900/[0.06]"
+                        : look === "b"
+                        ? "mt-[0.06em] rounded-[0.12em]"
+                        : "mt-[0.16em] rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.16em] hover:bg-neutral-900/[0.1]"
+                }`}
             >
-                <SpringText text={word} slide className="leading-[1.2em]" />
+                {look === "a" || look === "d" ? (
+                    <SpringText text={word} slide className="leading-[1.2em]" />
+                ) : (
+                    <span style={SERIF}>
+                        <SpringText
+                            text={word}
+                            slide
+                            className={`leading-[1.2em] ${
+                                look === "b"
+                                    ? "bg-[linear-gradient(to_right,rgba(17,17,17,0.3)_33%,transparent_0)] bg-[length:0.18em_1.5px] bg-[position:0_94%] bg-repeat-x transition-[background-color] group-hover:bg-[linear-gradient(to_right,rgba(17,17,17,0.6)_33%,transparent_0)]"
+                                    : ""
+                            }`}
+                        />
+                    </span>
+                )}
                 {/* Nudges down on hover; turns with a spring when the menu opens. */}
                 <span className="ml-[0.12em] inline-flex transition-transform duration-300 group-hover:translate-y-[0.04em]">
                     <motion.span className="inline-flex" animate={{ rotate: open ? 180 : 0 }} transition={TURN_SPRING}>
@@ -280,7 +344,7 @@ export function VariantPicker({
                                 className="fixed z-[70] origin-top rounded-2xl border border-neutral-200 bg-white/[0.98] p-1.5 text-[15px] font-medium tracking-normal text-neutral-800 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
                                 style={{ left: anchor.x - anchor.width / 2, top: anchor.y, width: anchor.width }}
                             >
-                                {[{ key: null, label: "Everything" }, ...VARIANTS].map((option) => {
+                                {[{ key: null, label: allLabel }, ...VARIANTS].map((option) => {
                                     const selected = value === option.key;
                                     return (
                                         <button
@@ -293,7 +357,7 @@ export function VariantPicker({
                                             className="flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left outline-none transition-colors hover:bg-neutral-100 focus-visible:bg-neutral-100"
                                         >
                                             {option.label}
-                                            {selected && value !== null && <Check aria-hidden className="h-4 w-4 text-[#2563EB]" strokeWidth={2.5} />}
+                                            {selected && (value !== null || look !== "a") && <Check aria-hidden className="h-4 w-4 text-[#2563EB]" strokeWidth={2.5} />}
                                         </button>
                                     );
                                 })}
@@ -331,5 +395,25 @@ export function VariantVideo({ src, phone, poster, start, end, compact }: Varian
             exit={{ opacity: 0, filter: "blur(6px)", transition: { duration: 0.25 } }}
             transition={{ duration: 0.45, ease: EASE_OUT }}
         />
+    );
+}
+
+/** Dev server only: switch between the headline looks without editing the URL. */
+export function LookSwitcher({ look, onChange }: { look: Look; onChange: (look: Look) => void }) {
+    if (process.env.NODE_ENV !== "development") return null;
+    return (
+        <div className="fixed right-3 top-3 z-[80] flex items-center gap-1 rounded-full border border-neutral-200 bg-white/90 p-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur">
+            <span className="px-2">Look</span>
+            {(["a", "b", "c", "d"] as const).map((key) => (
+                <button
+                    key={key}
+                    type="button"
+                    onClick={() => onChange(key)}
+                    className={`h-7 w-7 rounded-full uppercase transition-colors ${look === key ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"}`}
+                >
+                    {key}
+                </button>
+            ))}
+        </div>
     );
 }
