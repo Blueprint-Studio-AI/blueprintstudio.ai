@@ -452,7 +452,7 @@ export default function Hero() {
                                 }
                             >
                                 {look === "e" ? (
-                                    <Statement revealed={revealed} />
+                                    <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
                                 ) : look === "d" ? (
                                     HEADLINES[headline]
                                 ) : (
@@ -506,7 +506,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center justify-center rounded-full px-6 text-[15px] font-medium text-white sm:justify-self-end"
+                                    className="flex h-12 items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -514,7 +514,14 @@ export default function Hero() {
                                         textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
                                     }}
                                 >
-                                    Book a call
+                                    <Image
+                                        src="/images/tyler-circle.png"
+                                        alt=""
+                                        width={36}
+                                        height={36}
+                                        className="h-9 w-9 rounded-full object-cover ring-2 ring-white/35"
+                                    />
+                                    Book a call with Tyler
                                 </motion.a>
                                 <motion.a
                                     href={link.href}
@@ -579,7 +586,7 @@ export default function Hero() {
                                 <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
                                 {/* Look d: the picker as a small frosted pill on the reel, like Pentagram's. */}
-                                {(look === "d" || look === "e") && (
+                                {look === "d" && (
                                     <div
                                         className="absolute left-3 top-3 z-[3] flex items-center gap-0.5 rounded-full bg-white/80 py-1 pl-3 pr-1 text-[15px] font-medium text-neutral-500 shadow-[0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-md transition-opacity duration-500"
                                         style={{ opacity: stage === "docked" ? 1 : 0, pointerEvents: stage === "docked" ? "auto" : "none" }}
@@ -639,40 +646,69 @@ export default function Hero() {
     );
 }
 
-// Look e: one statement, the first sentence in ink and the rest in grey, with
-// the clients in ink. Each word darkens into place once the reel has landed.
-const STATEMENT: { text: string; ink?: boolean }[] = [
-    { text: "The design and build partner for founders.", ink: true },
-    { text: " We make apps, websites, brands and launch videos, from first sketch to launch, for teams like " },
-    { text: "Arch\u00A0Network", ink: true },
-    { text: ", " },
-    { text: "Perena", ink: true },
-    { text: " and " },
-    { text: "Huch", ink: true },
-    { text: "." },
-];
+// Look e: one statement, the first sentence in ink and the rest in grey. What
+// we make doubles as the picker: each word, with a small picture of that work,
+// switches the reel. Words darken into place once the reel has landed.
+const LEAD = "The design and build partner for founders.";
+const TAIL = ", from first sketch to launch.";
 
-function Statement({ revealed }: { revealed: boolean }) {
+function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
     const reduceMotion = useReducedMotion();
     let index = 0;
+    const words = (text: string, ink: boolean) =>
+        text.split(/(\s+)/).map((word, w) => {
+            if (!word.trim()) return word;
+            const delay = 0.2 + index++ * 0.025;
+            return (
+                <motion.span
+                    key={`${text}-${w}`}
+                    initial={{ color: "#D4D4D4" }}
+                    animate={revealed ? { color: ink ? "#1C1C1E" : "#9A9AA0" } : undefined}
+                    transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay }}
+                >
+                    {word}
+                </motion.span>
+            );
+        });
     return (
         <>
-            {STATEMENT.map((part, p) =>
-                part.text.split(/(\s+)/).map((word, w) => {
-                    if (!word.trim()) return word;
-                    const delay = 0.2 + index++ * 0.025;
-                    return (
-                        <motion.span
-                            key={`${p}-${w}`}
-                            initial={{ color: "#D4D4D4" }}
-                            animate={revealed ? { color: part.ink ? "#1C1C1E" : "#9A9AA0" } : undefined}
-                            transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay }}
+            {words(LEAD, true)} {words("We make", false)}{" "}
+            {VARIANTS.map((v, i) => {
+                const active = value === v.key;
+                const delay = 0.2 + index++ * 0.025;
+                return (
+                    <span key={v.key}>
+                        <button
+                            type="button"
+                            onClick={() => onPick(active ? null : v.key)}
+                            aria-pressed={active}
+                            className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
                         >
-                            {word}
-                        </motion.span>
-                    );
-                }),
-            )}
+                            <motion.span
+                                className="mr-[0.16em] inline-block h-[0.78em] w-[1.12em] overflow-hidden rounded-[0.16em] align-[-0.06em] shadow-[0_0_0_1px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover/word:-rotate-3 group-hover/word:scale-110"
+                                initial={{ opacity: 0, scale: 0.6 }}
+                                animate={revealed ? { opacity: 1, scale: 1 } : undefined}
+                                transition={reduceMotion ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.25, delay }}
+                            >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={v.thumb} alt="" className="h-full w-full object-cover" />
+                            </motion.span>
+                            <motion.span
+                                className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
+                                    active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
+                                }`}
+                                initial={{ color: "#D4D4D4" }}
+                                animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
+                                transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
+                            >
+                                {v.word}
+                            </motion.span>
+                        </button>
+                        {i < VARIANTS.length - 2 ? <>{words(",", false)} </> : i === VARIANTS.length - 2 ? <> {words("and", false)} </> : null}
+                    </span>
+                );
+            })}
+            {words(TAIL, false)}
         </>
     );
 }
