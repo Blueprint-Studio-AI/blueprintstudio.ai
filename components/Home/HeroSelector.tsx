@@ -67,7 +67,7 @@ export const VARIANTS: Variant[] = [
             poster: "/media/projects/huch/huch-hero-poster.jpg",
             // The crates into the chest's glow, before the cut goes dark.
             start: 3.2,
-            end: 7.2,
+            end: 6.8, // the loop check runs about four times a second; stay clear of the dark reveal
         },
     },
     {
