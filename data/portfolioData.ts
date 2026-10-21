@@ -4,6 +4,8 @@ export interface MediaAsset {
   poster?: string;
   /** Seconds into the reel the poster was taken; the /work pages start playback there, so poster and reel line up. */
   posterTime?: number;
+  /** A strong stretch of the reel, [start, end] in seconds. The home page's small cards loop just this. */
+  clip?: [number, number];
   alt: string;
   /** Size as displayed. The /work pages size each frame from it, so nothing jumps when it loads. */
   width?: number;
@@ -80,6 +82,8 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/living-ip/living-ip-horizontal-compressed.mp4',
         poster: '/media/projects/living-ip/living-ip-desktop-poster.jpg',
+        // Analytics, then the app on a laptop and a phone; the rest is pale on white.
+        clip: [8.4, 12.3],
         alt: 'LivingIP Project Reel',
         width: 1920,
         height: 1080
@@ -364,6 +368,8 @@ export const portfolioProjects: PortfolioProject[] = [
         src: '/media/projects/perena/perena-horizontal-compressed.mp4',
         poster: '/media/projects/perena/perena-desktop-poster.jpg',
         posterTime: 1,
+        // The laptop and the deposit flow; from about 3.7s it fades to cream on cream.
+        clip: [0.75, 3.4],
         alt: 'Perena USD* Landing Page Project Reel',
         width: 1920,
         height: 1080
@@ -523,6 +529,8 @@ export const portfolioProjects: PortfolioProject[] = [
           src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
           poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
           posterTime: 6,
+          // Past the black opening, as in the hero.
+          clip: [4.6, 16.4],
           alt: 'TokenWorks product videos reel',
           width: 1920,
           height: 1080
@@ -623,9 +631,9 @@ export const portfolioProjects: PortfolioProject[] = [
   }
 ];
 
-// Projects shown on the /work pages but not in the home page's portfolio
-// (PortfolioBento renders every entry above). Both already appear on /brand as
-// recent work and have their own /brands pages; copy and media are reused from there.
+// Projects added for the /work pages, after the home page's original portfolio
+// above. Both already appear on /brand as recent work and have their own
+// /brands pages; copy and media are reused from there.
 export const workOnlyProjects: PortfolioProject[] = [
   {
     id: 'honeyb',
@@ -731,3 +739,15 @@ export const workOnlyProjects: PortfolioProject[] = [
 ];
 
 export const allWorkProjects: PortfolioProject[] = [...portfolioProjects, ...workOnlyProjects];
+
+// The home page's Featured Work (components/Home/PortfolioBento.tsx): the
+// projects each filter shows, in order, at most six. "All work" leads with
+// recent, live clients across all four kinds of work. Huch is no longer
+// trading, so it's left out of "All work" and comes last where it shows.
+export const featuredWork: Record<'all' | Deliverable, string[]> = {
+  all: ['perena', 'arch-network', 'tokenworks', 'jinba', 'livingip', 'honeyb'],
+  apps: ['livingip', 'bump', 'huch'],
+  websites: ['perena', 'jinba', 'honeyb', 'autara', 'breeze'],
+  branding: ['arch-network', 'jinba', 'honeyb', 'bump', 'uni', 'breeze'],
+  'launch-videos': ['tokenworks', 'perena'],
+};
