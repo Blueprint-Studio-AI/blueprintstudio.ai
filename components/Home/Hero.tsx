@@ -484,7 +484,7 @@ export default function Hero() {
                                     }}
                                 >
                                     <Image
-                                        src="/images/tyler-circle.png"
+                                        src="/images/tyler-face.jpg"
                                         alt=""
                                         width={36}
                                         height={36}

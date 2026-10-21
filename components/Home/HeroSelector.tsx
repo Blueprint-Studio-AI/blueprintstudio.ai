@@ -34,7 +34,7 @@ export const VARIANTS: Variant[] = [
         word: "apps",
         label: "Apps",
         sub: "For founders like LivingIP and Bump.",
-        thumb: "/media/projects/living-ip/living-ip-thumb.jpg",
+        thumb: "/media/hero-words/apps.jpg",
         cta: { label: "See app work", href: "#work" },
         video: {
             src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
@@ -49,14 +49,14 @@ export const VARIANTS: Variant[] = [
         word: "websites",
         label: "Websites",
         sub: "For founders like Perena, Autara and Breeze.",
-        thumb: "/media/projects/perena/perena-thumb.jpg",
+        thumb: "/media/hero-words/websites.jpg",
         cta: { label: "See website work", href: "#work" },
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
             poster: "/media/projects/perena/perena-hero-poster.jpg",
-            // The laptop and the deposit flow; after that the cut fades to cream on cream.
+            // The laptop and the deposit flow; from about 3.7s the page scrolls away to cream.
             start: 1,
-            end: 4.2,
+            end: 3.6,
         },
     },
     {
@@ -65,7 +65,7 @@ export const VARIANTS: Variant[] = [
         label: "Brands",
         sub: "For founders like Autara, Arch Network and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
-        thumb: "/media/projects/autara/autara-thumb.jpg",
+        thumb: "/media/hero-words/brands.jpg",
         // Autara's identity: the triangle pattern into its homepage.
         video: {
             src: "/media/projects/autara/autara-horizontal-compressed.mp4",
@@ -80,7 +80,7 @@ export const VARIANTS: Variant[] = [
         word: "launch videos",
         label: "Launch videos",
         sub: "For founders like TokenWorks, Jinba and Pyra.",
-        thumb: "/media/projects/tokenworks-videos/tokenworks-thumb.jpg",
+        thumb: "/media/hero-words/launch-videos.jpg",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
