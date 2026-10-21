@@ -65,8 +65,9 @@ export const VARIANTS: Variant[] = [
             src: "/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4",
             phone: "/media/projects/huch/huch-brand-overview-vertical-compressed.mp4",
             poster: "/media/projects/huch/huch-hero-poster.jpg",
+            // The crates into the chest's glow, before the cut goes dark.
             start: 3.2,
-            end: 10.6,
+            end: 7.2,
         },
     },
     {

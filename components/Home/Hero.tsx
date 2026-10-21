@@ -32,8 +32,8 @@ import { SpringText, VARIANTS, VariantPicker, VariantVideo, variantFromUrl, type
 
 const REEL_SRC = {
     full: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
-    // Named "vertical", but it's a lighter 1280x720 cut of the same reel.
-    small: "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4",
+    // A 2:3 reel for phones, cut from the projects' own vertical edits.
+    small: "/media/highlight-reel/highlight-reel-mobile-2x3.mp4",
 };
 const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
@@ -136,7 +136,7 @@ export default function Hero() {
         (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
     };
 
-    // The full reel, or the lighter cut on phones. Both are 16:9, like the frame.
+    // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
     useEffect(() => {
         const query = window.matchMedia("(min-width: 640px)");
         const pick = () => setSrc(query.matches ? REEL_SRC.full : REEL_SRC.small);
