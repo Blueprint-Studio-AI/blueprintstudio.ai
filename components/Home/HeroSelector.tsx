@@ -24,6 +24,8 @@ export type Variant = {
      * `phone` is a tall cut for the 4:5 frame on phones, where one exists.
      */
     video: { src: string; phone?: string; poster: string; start: number; end: number };
+    /** A small crop of the poster, for inline use in text. */
+    thumb: string;
 };
 
 export const VARIANTS: Variant[] = [
@@ -31,7 +33,8 @@ export const VARIANTS: Variant[] = [
         key: "apps",
         word: "apps",
         label: "Apps",
-        sub: "For founders like LivingIP, Huch and Bump.",
+        sub: "For founders like LivingIP and Bump.",
+        thumb: "/media/projects/living-ip/living-ip-thumb.jpg",
         cta: { label: "See app work", href: "#work" },
         video: {
             src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
@@ -46,6 +49,7 @@ export const VARIANTS: Variant[] = [
         word: "websites",
         label: "Websites",
         sub: "For founders like Perena, Autara and Breeze.",
+        thumb: "/media/projects/perena/perena-thumb.jpg",
         cta: { label: "See website work", href: "#work" },
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
@@ -59,15 +63,16 @@ export const VARIANTS: Variant[] = [
         key: "brands",
         word: "brands",
         label: "Brands",
-        sub: "For founders like Huch, Arch Network and HoneyB.",
+        sub: "For founders like Autara, Arch Network and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
+        thumb: "/media/projects/autara/autara-thumb.jpg",
+        // Autara's identity: the triangle pattern into its homepage.
         video: {
-            src: "/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4",
-            phone: "/media/projects/huch/huch-brand-overview-vertical-compressed.mp4",
-            poster: "/media/projects/huch/huch-hero-poster.jpg",
-            // The crates into the chest's glow, before the cut goes dark.
-            start: 3.2,
-            end: 6.8, // the loop check runs about four times a second; stay clear of the dark reveal
+            src: "/media/projects/autara/autara-horizontal-compressed.mp4",
+            phone: "/media/projects/autara/autara-vertical-compressed.mp4",
+            poster: "/media/projects/autara/autara-hero-poster.jpg",
+            start: 3.8,
+            end: 7.8,
         },
     },
     {
@@ -75,6 +80,7 @@ export const VARIANTS: Variant[] = [
         word: "launch videos",
         label: "Launch videos",
         sub: "For founders like TokenWorks, Jinba and Pyra.",
+        thumb: "/media/projects/tokenworks-videos/tokenworks-thumb.jpg",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
