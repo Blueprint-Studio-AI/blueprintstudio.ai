@@ -54,9 +54,9 @@ export const VARIANTS: Variant[] = [
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
             poster: "/media/projects/perena/perena-hero-poster.jpg",
-            // The laptop and the deposit flow; after that the cut fades to cream on cream.
+            // The laptop and the deposit flow; from about 3.7s the page scrolls away to cream.
             start: 1,
-            end: 4.2,
+            end: 3.6,
         },
     },
     {
