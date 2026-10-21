@@ -447,13 +447,11 @@ export function TopNav() {
                     >
                         <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-white/20 md:h-7 md:w-7 lg:h-8 lg:w-8">
                             <Image
-                                src="/images/tyler-circle.png"
+                                src="/images/tyler-face.jpg"
                                 alt=""
                                 fill
                                 sizes="64px"
-                                // Closer in, on his face rather than the whole photo
-                                style={{ transformOrigin: "64% 30%" }}
-                                className="scale-[1.6] object-cover transition-transform duration-300 ease-out group-hover:scale-[1.72]"
+                                className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.08]"
                             />
                         </span>
                         Book a call
