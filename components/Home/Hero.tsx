@@ -145,8 +145,20 @@ export default function Hero() {
         window.history.replaceState(window.history.state, "", url);
     };
 
+    // Other sections (Featured Work) follow the picker, and can set it:
+    // window "bp:variant" events carry { key, source }.
+    useEffect(() => {
+        const onVariant = (e: Event) => {
+            const { key, source } = (e as CustomEvent<{ key: VariantKey | null; source: string }>).detail;
+            if (source !== "hero") setVariantKey(key);
+        };
+        window.addEventListener("bp:variant", onVariant);
+        return () => window.removeEventListener("bp:variant", onVariant);
+    }, []);
+
     const chooseVariant = (key: VariantKey | null) => {
         setVariantKey(key);
+        window.dispatchEvent(new CustomEvent("bp:variant", { detail: { key, source: "hero" } }));
         const url = new URL(window.location.href);
         if (key) url.searchParams.set("for", key);
         else url.searchParams.delete("for");
