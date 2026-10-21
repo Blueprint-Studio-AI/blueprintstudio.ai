@@ -435,7 +435,7 @@ export function LookSwitcher({
 }) {
     if (process.env.NODE_ENV !== "development") return null;
     return (
-        <div className="fixed right-3 top-3 z-[80] flex flex-col items-end gap-1.5">
+        <div className="fixed right-3 top-1 z-[80] flex flex-col items-end gap-1.5 md:top-[76px]">
         <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white/90 p-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur">
             <span className="px-2">Look</span>
             {(["a", "b", "c", "d", "e"] as const).map((key) => (

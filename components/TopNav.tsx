@@ -95,9 +95,11 @@ export function TopNav() {
     useEffect(() => {
         if (!home) return;
         const land = () => setLanded(true);
+        window.addEventListener("bp:opening-landing", land);
         window.addEventListener("bp:opening-landed", land);
         const fallback = setTimeout(land, 10000); // never stay hidden if the hero stops saying so
         return () => {
+            window.removeEventListener("bp:opening-landing", land);
             window.removeEventListener("bp:opening-landed", land);
             clearTimeout(fallback);
             setLanded(false);
@@ -431,7 +433,8 @@ export function TopNav() {
                         </ul>
                     </nav>
 
-                    {/* A call with Tyler: his face on the button, so it reads as a person, not a form */}
+                    {/* A call with Tyler: his face on the button, so it reads as a person, not a form.
+                        On a phone's home page the hero already has this button, so the bar keeps just the logo. */}
                     <motion.a
                         href="/#contact"
                         onClick={(e) => {
@@ -440,7 +443,7 @@ export function TopNav() {
                         }}
                         whileTap={{ scale: 0.97 }}
                         transition={PRESS}
-                        className={`group flex h-8 items-center gap-2 justify-self-end whitespace-nowrap rounded-full bg-[#1C1C1E] pl-1 pr-3 text-[13px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.12),0_6px_16px_-6px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors duration-200 hover:bg-[#2C2C2E] md:h-9 md:pr-3.5 lg:h-10 lg:gap-2.5 lg:pr-4 lg:text-sm ${FOCUS}`}
+                        className={`group ${home ? "hidden md:flex" : "flex"} h-8 items-center gap-2 justify-self-end whitespace-nowrap rounded-full bg-[#1C1C1E] pl-1 pr-3 text-[13px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.12),0_6px_16px_-6px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors duration-200 hover:bg-[#2C2C2E] md:h-9 md:pr-3.5 lg:h-10 lg:gap-2.5 lg:pr-4 lg:text-sm ${FOCUS}`}
                     >
                         <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-white/20 md:h-7 md:w-7 lg:h-8 lg:w-8">
                             <Image

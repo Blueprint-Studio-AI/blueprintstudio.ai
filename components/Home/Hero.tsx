@@ -15,9 +15,6 @@ import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "../ui/SectionHeader";
-import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
-import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { HEADLINES, LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, headlineFromUrl, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
 
@@ -239,6 +236,8 @@ export default function Hero() {
 
     const land = useCallback(() => {
         if (stageRef.current !== "reel") return;
+        // The top nav arrives with the reel, not after it.
+        window.dispatchEvent(new Event("bp:opening-landing"));
         setStage("landing");
         animate(progress, 1, LAND).then(() => {
             if (stageRef.current === "landing") setStage("docked");
@@ -386,7 +385,7 @@ export default function Hero() {
 
             <LookSwitcher look={look} onChange={chooseLook} headline={headline} onHeadline={chooseHeadline} />
             <Section
-                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
+                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[calc(100svh-48px)] justify-between overflow-hidden bg-neutral-50 md:min-h-[calc(100svh-64px)]`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
@@ -398,36 +397,6 @@ export default function Hero() {
                     </div>
                 </div>
 
-                <SectionHeader
-                    leftText={
-                        revealed ? (
-                            <AnimatedCitySwitcher key="city-ready" startDelay={300} />
-                        ) : (
-                            <span aria-hidden="true" className="inline-block opacity-0" style={{ minWidth: "350px" }}>
-                                Los Angeles, California
-                            </span>
-                        )
-                    }
-                    centerContent={
-                        <motion.div
-                            initial={{ opacity: 0, y: -24, filter: "blur(6px)" }}
-                            animate={revealed ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
-                            transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT }}
-                        >
-                            <Image src="/blueprint-logo-dark.svg" alt="Blueprint Studio" width={80} height={20} className="h-3 w-auto sm:h-4" />
-                        </motion.div>
-                    }
-                    rightText={
-                        revealed ? (
-                            <AnimatedDate key="date-ready" startDelay={300} />
-                        ) : (
-                            <span aria-hidden="true" className="inline-block opacity-0" style={{ minWidth: "120px" }}>
-                                00.00.0000
-                            </span>
-                        )
-                    }
-                />
-
                 <OuterContainer className="flex w-full flex-1 items-center justify-center">
                     <InnerContainer className="relative flex w-full flex-col items-center justify-center px-6 lg:justify-start pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
                         {/* Inner dashed vertical lines on desktop */}
@@ -438,7 +407,7 @@ export default function Hero() {
                             className={
                                 look === "e"
                                     ? // As wide as the reel's slot below, so the statement and the frame share a left edge.
-                                      "flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                                      "flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-390px)*16/9)))]"
                                     : "flex flex-col items-center text-center"
                             }
                         >
@@ -546,7 +515,7 @@ export default function Hero() {
                         {/* The reel's slot: as big as fits between the copy and the floating nav */}
                         <div
                             ref={slotRef}
-                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-390px)*16/9)))]"
                         >
                             <div
                                 ref={frameRef}
@@ -650,7 +619,7 @@ export default function Hero() {
 // we make doubles as the picker: each word, with a small picture of that work,
 // switches the reel. Words darken into place once the reel has landed.
 const LEAD = "The design and build partner for founders.";
-const TAIL = ", from first sketch to launch.";
+const TAIL = "from first sketch to launch.";
 
 function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
     const reduceMotion = useReducedMotion();
@@ -676,35 +645,40 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
             {VARIANTS.map((v, i) => {
                 const active = value === v.key;
                 const delay = 0.2 + index++ * 0.025;
+                // Each word keeps its comma, so a comma never starts a line.
+                const comma = i !== VARIANTS.length - 2;
                 return (
                     <span key={v.key}>
-                        <button
-                            type="button"
-                            onClick={() => onPick(active ? null : v.key)}
-                            aria-pressed={active}
-                            className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-                        >
-                            <motion.span
-                                className="mr-[0.16em] inline-block h-[0.78em] w-[1.12em] overflow-hidden rounded-[0.16em] align-[-0.06em] shadow-[0_0_0_1px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover/word:-rotate-3 group-hover/word:scale-110"
-                                initial={{ opacity: 0, scale: 0.6 }}
-                                animate={revealed ? { opacity: 1, scale: 1 } : undefined}
-                                transition={reduceMotion ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.25, delay }}
+                        <span className="whitespace-nowrap">
+                            <button
+                                type="button"
+                                onClick={() => onPick(active ? null : v.key)}
+                                aria-pressed={active}
+                                className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
                             >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={v.thumb} alt="" className="h-full w-full object-cover" />
-                            </motion.span>
-                            <motion.span
-                                className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
-                                    active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
-                                }`}
-                                initial={{ color: "#D4D4D4" }}
-                                animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
-                                transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
-                            >
-                                {v.word}
-                            </motion.span>
-                        </button>
-                        {i < VARIANTS.length - 2 ? <>{words(",", false)} </> : i === VARIANTS.length - 2 ? <> {words("and", false)} </> : null}
+                                <motion.span
+                                    className="mr-[0.16em] inline-block h-[0.78em] w-[1.12em] overflow-hidden rounded-[0.16em] align-[-0.06em] shadow-[0_0_0_1px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover/word:-rotate-3 group-hover/word:scale-110"
+                                    initial={{ opacity: 0, scale: 0.6 }}
+                                    animate={revealed ? { opacity: 1, scale: 1 } : undefined}
+                                    transition={reduceMotion ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.25, delay }}
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={v.thumb} alt="" className="h-full w-full object-cover" />
+                                </motion.span>
+                                <motion.span
+                                    className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
+                                        active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
+                                    }`}
+                                    initial={{ color: "#D4D4D4" }}
+                                    animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
+                                    transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
+                                >
+                                    {v.word}
+                                </motion.span>
+                            </button>
+                            {comma && words(",", false)}
+                        </span>
+                        {comma ? " " : <> {words("and", false)} </>}
                     </span>
                 );
             })}
