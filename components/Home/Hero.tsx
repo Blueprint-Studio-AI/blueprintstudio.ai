@@ -19,7 +19,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
+import { HEADLINES, LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, headlineFromUrl, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -126,10 +126,18 @@ export default function Hero() {
 
     // A link like /?for=websites opens on that variant; ?look= picks the headline look.
     const [look, setLook] = useState<Look>("b");
+    const [headline, setHeadline] = useState(0);
     useEffect(() => {
         setVariantKey(variantFromUrl());
         setLook(lookFromUrl());
+        setHeadline(headlineFromUrl());
     }, []);
+    const chooseHeadline = (index: number) => {
+        setHeadline(index);
+        const url = new URL(window.location.href);
+        url.searchParams.set("h", String(index + 1));
+        window.history.replaceState(window.history.state, "", url);
+    };
     const chooseLook = (next: Look) => {
         setLook(next);
         const url = new URL(window.location.href);
@@ -364,7 +372,7 @@ export default function Hero() {
                 )}
             </AnimatePresence>
 
-            <LookSwitcher look={look} onChange={chooseLook} />
+            <LookSwitcher look={look} onChange={chooseLook} headline={headline} onHeadline={chooseHeadline} />
             <Section
                 className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
@@ -414,19 +422,27 @@ export default function Hero() {
                         <div className="line-dash-y absolute bottom-0 left-0 top-0 hidden custom:block" />
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
 
-                        <div className="flex flex-col items-center text-center">
+                        <div
+                            className={
+                                look === "e"
+                                    ? // As wide as the reel's slot below, so the statement and the frame share a left edge.
+                                      "flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                                    : "flex flex-col items-center text-center"
+                            }
+                        >
                             <motion.h1
                                 {...rise(0.15)}
                                 className="cursor-default font-medium text-neutral-800"
-                                style={{
-                                    fontSize: "clamp(36px, 4.2vw, 56px)",
-                                    lineHeight: 1.08,
-                                    letterSpacing: "-0.035em",
-                                    textWrap: "balance",
-                                }}
+                                style={
+                                    look === "e"
+                                        ? { fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }
+                                        : { fontSize: "clamp(36px, 4.2vw, 56px)", lineHeight: 1.08, letterSpacing: "-0.035em", textWrap: "balance" }
+                                }
                             >
-                                {look === "d" ? (
-                                    "Apps, websites and brands, designed and\u00A0built."
+                                {look === "e" ? (
+                                    <Statement revealed={revealed} />
+                                ) : look === "d" ? (
+                                    HEADLINES[headline]
                                 ) : (
                                     <>
                                         {/* The chip gets its own line, so a longer word never rewraps the headline. */}
@@ -435,6 +451,7 @@ export default function Hero() {
                                     </>
                                 )}
                             </motion.h1>
+                            {look !== "e" && (
                             <motion.p
                                 {...rise(0.25)}
                                 className="mt-4 grid max-w-[30ch] cursor-default text-neutral-600 sm:max-w-[680px]"
@@ -461,9 +478,14 @@ export default function Hero() {
                                     );
                                 })}
                             </motion.p>
+                            )}
                             <motion.div
                                 {...rise(0.35)}
-                                className="mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
+                                className={
+                                    look === "e"
+                                        ? "mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row"
+                                        : "mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
+                                }
                             >
                                 <motion.a
                                     href="#contact"
@@ -545,7 +567,7 @@ export default function Hero() {
                                 <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
                                 {/* Look d: the picker as a small frosted pill on the reel, like Pentagram's. */}
-                                {look === "d" && (
+                                {(look === "d" || look === "e") && (
                                     <div
                                         className="absolute left-3 top-3 z-[3] flex items-center gap-0.5 rounded-full bg-white/80 py-1 pl-3 pr-1 text-[15px] font-medium text-neutral-500 shadow-[0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-md transition-opacity duration-500"
                                         style={{ opacity: stage === "docked" ? 1 : 0, pointerEvents: stage === "docked" ? "auto" : "none" }}
@@ -601,6 +623,44 @@ export default function Hero() {
                     />
                 )}
             </Section>
+        </>
+    );
+}
+
+// Look e: one statement, the first sentence in ink and the rest in grey, with
+// the clients in ink. Each word darkens into place once the reel has landed.
+const STATEMENT: { text: string; ink?: boolean }[] = [
+    { text: "The design and build partner for founders.", ink: true },
+    { text: " We make apps, websites, brands and launch videos, from first sketch to launch, for teams like " },
+    { text: "Arch\u00A0Network", ink: true },
+    { text: ", " },
+    { text: "Perena", ink: true },
+    { text: " and " },
+    { text: "Huch", ink: true },
+    { text: "." },
+];
+
+function Statement({ revealed }: { revealed: boolean }) {
+    const reduceMotion = useReducedMotion();
+    let index = 0;
+    return (
+        <>
+            {STATEMENT.map((part, p) =>
+                part.text.split(/(\s+)/).map((word, w) => {
+                    if (!word.trim()) return word;
+                    const delay = 0.2 + index++ * 0.025;
+                    return (
+                        <motion.span
+                            key={`${p}-${w}`}
+                            initial={{ color: "#D4D4D4" }}
+                            animate={revealed ? { color: part.ink ? "#1C1C1E" : "#9A9AA0" } : undefined}
+                            transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay }}
+                        >
+                            {word}
+                        </motion.span>
+                    );
+                }),
+            )}
         </>
     );
 }

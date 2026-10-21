@@ -99,13 +99,14 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
  * Headline looks to compare on the dev server (?look=a|b|c):
  * a, a tinted pill in Inter that cycles; b, a serif italic word with a dotted
  * underline that rests on "businesses"; c, the same serif in a soft pill;
- * d, a static headline, with the picker as a small "Showing [all work]" pill on the reel.
+ * d, a static headline, with the picker as a small "Showing [all work]" pill on the reel;
+ * e, a left-aligned statement (like Anthropic's and Mouthwash's) with that same pill.
  */
-export type Look = "a" | "b" | "c" | "d";
+export type Look = "a" | "b" | "c" | "d" | "e";
 
 export function lookFromUrl(): Look {
     const look = new URLSearchParams(window.location.search).get("look");
-    return look === "a" || look === "c" || look === "d" ? look : "b";
+    return look === "a" || look === "c" || look === "d" || look === "e" ? look : "b";
 }
 
 const SERIF = { fontFamily: "'PP Editorial New', Georgia, serif", fontStyle: "italic", fontWeight: 400, letterSpacing: "-0.005em" } as const;
@@ -226,9 +227,10 @@ export function VariantPicker({
     }, [passing]);
 
     const shown = value ? VARIANTS.find((v) => v.key === value)! : VARIANTS[look === "a" ? index : Math.max(pass, 0)];
-    const rest = look === "d" ? "all work" : "businesses";
+    const onReel = look === "d" || look === "e";
+    const rest = onReel ? "all work" : "businesses";
     const word = value || look === "a" || pass >= 0 ? shown.word : rest;
-    const allLabel = look === "a" ? "Everything" : look === "d" ? "All work" : "Businesses";
+    const allLabel = look === "a" ? "Everything" : onReel ? "All work" : "Businesses";
 
     // The menu sits under the chip and is never narrower than it.
     const placeMenu = () => {
@@ -299,14 +301,14 @@ export function VariantPicker({
                 aria-expanded={open}
                 aria-label={`${word}. Choose what to see`}
                 className={`group relative inline-flex cursor-pointer items-center outline-none transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#2563EB] ${
-                    look === "d"
+                    onReel
                         ? "rounded-full px-1.5 py-0.5 text-neutral-900 hover:bg-neutral-900/[0.06]"
                         : look === "b"
                         ? "mt-[0.06em] rounded-[0.12em]"
                         : "mt-[0.16em] rounded-[0.22em] bg-neutral-900/[0.05] py-[0.02em] pl-[0.2em] pr-[0.16em] hover:bg-neutral-900/[0.1]"
                 }`}
             >
-                {look === "a" || look === "d" ? (
+                {look === "a" || onReel ? (
                     <SpringText text={word} slide className="leading-[1.2em]" />
                 ) : (
                     <span style={SERIF}>
@@ -398,13 +400,39 @@ export function VariantVideo({ src, phone, poster, start, end, compact }: Varian
     );
 }
 
-/** Dev server only: switch between the headline looks without editing the URL. */
-export function LookSwitcher({ look, onChange }: { look: Look; onChange: (look: Look) => void }) {
+/** Static headlines to compare under look d (?h=1..6). The first is the default. */
+export const HEADLINES = [
+    "Apps, websites and brands, designed and\u00A0built.",
+    "We design and build products and\u00A0services.",
+    "Your co-creation partner for digital products and\u00A0services.",
+    "We co-create products &\u00A0services.",
+    "Your design and build partner, from first sketch to\u00A0launch.",
+    "The design and build partner for\u00A0founders.",
+];
+
+export function headlineFromUrl(): number {
+    const h = Number(new URLSearchParams(window.location.search).get("h"));
+    return h >= 1 && h <= HEADLINES.length ? h - 1 : 0;
+}
+
+/** Dev server only: switch between the headline looks (and, under d, the headlines) without editing the URL. */
+export function LookSwitcher({
+    look,
+    onChange,
+    headline,
+    onHeadline,
+}: {
+    look: Look;
+    onChange: (look: Look) => void;
+    headline: number;
+    onHeadline: (index: number) => void;
+}) {
     if (process.env.NODE_ENV !== "development") return null;
     return (
-        <div className="fixed right-3 top-3 z-[80] flex items-center gap-1 rounded-full border border-neutral-200 bg-white/90 p-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur">
+        <div className="fixed right-3 top-3 z-[80] flex flex-col items-end gap-1.5">
+        <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white/90 p-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur">
             <span className="px-2">Look</span>
-            {(["a", "b", "c", "d"] as const).map((key) => (
+            {(["a", "b", "c", "d", "e"] as const).map((key) => (
                 <button
                     key={key}
                     type="button"
@@ -414,6 +442,23 @@ export function LookSwitcher({ look, onChange }: { look: Look; onChange: (look: 
                     {key}
                 </button>
             ))}
+        </div>
+        {look === "d" && (
+            <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white/90 p-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur">
+                <span className="px-2">Headline</span>
+                {HEADLINES.map((text, index) => (
+                    <button
+                        key={index}
+                        type="button"
+                        title={text}
+                        onClick={() => onHeadline(index)}
+                        className={`h-7 w-7 rounded-full transition-colors ${headline === index ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"}`}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
+            </div>
+        )}
         </div>
     );
 }
