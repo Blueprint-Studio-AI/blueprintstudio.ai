@@ -422,7 +422,7 @@ export function TopNav() {
                                     </motion.div>
                                 </div>
                             </li>
-                            {section("how-we-work", "How we work")}
+                            {section("pricing", "Pricing")}
                             {section("faq", "FAQ")}
                             <li aria-hidden className="mx-1.5 hidden h-4 w-px bg-neutral-300 lg:block" />
                             <li {...hoverable("asset-generator")} className="relative hidden lg:block">

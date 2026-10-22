@@ -94,12 +94,7 @@ const HIDDEN_NAV_ROUTES = ['/launch-videos', '/launch', '/brand', '/insights', '
 export const isNavHidden = (pathname: string) =>
   HIDDEN_NAV_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'));
 
-// "How we work" replaces Pricing, which keeps its id as an alias; until the
-// new section lands, the link goes to Pricing.
-const SECTION_ALIASES: Record<string, string> = { 'how-we-work': 'pricing' };
-
-const sectionElement = (id: string) =>
-  document.getElementById(id) ?? (SECTION_ALIASES[id] ? document.getElementById(SECTION_ALIASES[id]) : null);
+const sectionElement = (id: string) => document.getElementById(id);
 
 // Goes to a home page section: Locomotive's eased scroll on the home page,
 // 80px clear of the top, or a load of /#section from any other page.
@@ -126,7 +121,7 @@ export const useGoToSection = () => {
 const NAV_SECTIONS = [
   { id: 'hero', label: 'Home', icon: true },
   { id: 'work', label: 'Work' },
-  { id: 'how-we-work', label: 'How we work' },
+  { id: 'pricing', label: 'Pricing' },
   { id: 'testimonials', label: 'Testimonials' },
   { id: 'faq', label: 'FAQ' },
 ];
