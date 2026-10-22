@@ -4,7 +4,7 @@ export interface MediaAsset {
   poster?: string;
   /** Seconds into the reel the poster was taken; the /work pages start playback there, so poster and reel line up. */
   posterTime?: number;
-  /** A strong stretch of the reel, [start, end] in seconds. The home page's small cards loop just this. */
+  /** The strong stretch of a reel, [start, end] in seconds; the home page loops just this, skipping dark or empty parts. */
   clip?: [number, number];
   alt: string;
   /** Size as displayed. The /work pages size each frame from it, so nothing jumps when it loads. */
@@ -60,6 +60,8 @@ export interface PortfolioProject {
   liveUrl?: string;
   /** Slug of the project's /brands/<slug> page, if it has one. */
   brandPage?: string;
+  /** The client has closed: never in the home page's "All work", and last wherever else it shows. */
+  noLongerTrading?: boolean;
   /** Media to lead with on one deliverable's wall instead of featuredMedia (e.g. the site, not the brand reel). */
   deliverableMedia?: Partial<Record<Deliverable, ResponsiveMedia>>;
   metadata?: {
@@ -92,6 +94,8 @@ export const portfolioProjects: PortfolioProject[] = [
         type: 'video',
         src: '/media/projects/living-ip/living-ip-vertical-compressed.mp4',
         poster: '/media/projects/living-ip/living-ip-mobile-poster.jpg',
+        // Analytics, then the app on a laptop and a phone; the rest is pale on white.
+        clip: [8, 12.8],
         alt: 'LivingIP Project Reel',
         width: 720,
         height: 1080
@@ -158,6 +162,7 @@ export const portfolioProjects: PortfolioProject[] = [
     // picker also shows it as a site. Not tagged crypto: nothing in its copy says so.
     deliverables: ['apps', 'branding'],
     industries: ['gaming'],
+    noLongerTrading: true,
     showcaseMedia: [
       {
         id: 'huch-asset-1',
@@ -368,8 +373,8 @@ export const portfolioProjects: PortfolioProject[] = [
         src: '/media/projects/perena/perena-horizontal-compressed.mp4',
         poster: '/media/projects/perena/perena-desktop-poster.jpg',
         posterTime: 1,
-        // The laptop and the deposit flow; from about 3.7s it fades to cream on cream.
-        clip: [0.75, 3.4],
+        // The laptop and the deposit flow, as in the hero; from about 3.7s the page scrolls away to cream.
+        clip: [1, 3.6],
         alt: 'Perena USD* Landing Page Project Reel',
         width: 1920,
         height: 1080
@@ -380,6 +385,8 @@ export const portfolioProjects: PortfolioProject[] = [
         src: '/media/projects/perena/perena-vertical-compressed.mp4',
         poster: '/media/projects/perena/perena-mobile-poster.jpg',
         posterTime: 1,
+        // The laptop and the deposit flow; later stretches are near-empty cream.
+        clip: [0.5, 3.6],
         alt: 'Perena USD* Landing Page Project Reel',
         width: 720,
         height: 1080
@@ -542,6 +549,8 @@ export const portfolioProjects: PortfolioProject[] = [
           src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
           poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
           posterTime: 6,
+          // Past the black opening, as in the hero.
+          clip: [4.6, 16.4],
           alt: 'TokenWorks product videos reel',
           width: 1920,
           height: 1080
@@ -658,7 +667,30 @@ export const workOnlyProjects: PortfolioProject[] = [
         height: 926
       }
     },
-    showcaseMedia: [],
+    // Square crops of the /brands/honeyb mockups and artwork.
+    showcaseMedia: [
+      {
+        id: 'honeyb-laptop',
+        type: 'image',
+        src: '/media/projects/honeyb/square-laptop.jpg',
+        alt: 'HoneyB website on a laptop',
+        caption: 'Website'
+      },
+      {
+        id: 'honeyb-phone',
+        type: 'image',
+        src: '/media/projects/honeyb/square-phone.jpg',
+        alt: 'HoneyB website on a phone',
+        caption: 'Mobile site'
+      },
+      {
+        id: 'honeyb-coins',
+        type: 'image',
+        src: '/media/projects/honeyb/square-coins.jpg',
+        alt: 'HoneyB coin illustration',
+        caption: 'Brand artwork'
+      }
+    ],
     deliverables: ['websites', 'branding'],
     industries: ['crypto'],
     liveUrl: 'https://www.honeybtc.com',
@@ -708,7 +740,30 @@ export const workOnlyProjects: PortfolioProject[] = [
         height: 1596
       }
     },
-    showcaseMedia: [],
+    // Square crops of the /brands/jinba samples.
+    showcaseMedia: [
+      {
+        id: 'jinba-business-cards',
+        type: 'image',
+        src: '/media/projects/jinba/square-business-cards.jpg',
+        alt: 'Jinba business cards',
+        caption: 'Business cards'
+      },
+      {
+        id: 'jinba-stationery',
+        type: 'image',
+        src: '/media/projects/jinba/square-stationery.jpg',
+        alt: 'Jinba letterhead and envelope',
+        caption: 'Stationery'
+      },
+      {
+        id: 'jinba-logo',
+        type: 'image',
+        src: '/media/projects/jinba/square-logo.jpg',
+        alt: 'Jinba logo on a brand texture',
+        caption: 'Logo'
+      }
+    ],
     deliverables: ['websites', 'branding'],
     industries: ['ai'],
     // The address in the browser bar of the site screenshot.
@@ -742,15 +797,23 @@ export const workOnlyProjects: PortfolioProject[] = [
 
 export const allWorkProjects: PortfolioProject[] = [...portfolioProjects, ...workOnlyProjects];
 
-// The home page's Featured Work (components/Home/PortfolioBento.tsx): the
-// projects each filter shows, in order, at most six. "All work" leads with
-// recent, live clients across all four kinds of work. Each filter opens on the
-// clients the hero names for it. Huch is no longer trading, so it's left out
-// of "All work" and comes last where it shows.
-export const featuredWork: Record<'all' | Deliverable, string[]> = {
+// The home page's Featured Work (components/Home/PortfolioBento.tsx), at most
+// `max` projects. "All work" is the hand-picked `all`: recent, live clients
+// across all four kinds of work. A word picked in the hero shows every project
+// with that deliverable: `lead` first (the clients the hero names), then the
+// rest in their /work page's order, with any project that's no longer trading
+// last. So a new project needs only its entry above to show up under its words.
+export const featuredWork: {
+  max: number;
+  all: string[];
+  lead: Partial<Record<Deliverable, string[]>>;
+} = {
+  max: 6,
   all: ['perena', 'arch-network', 'tokenworks', 'jinba', 'livingip', 'honeyb'],
-  apps: ['livingip', 'bump', 'huch'],
-  websites: ['perena', 'autara', 'breeze', 'jinba', 'honeyb'],
-  branding: ['autara', 'arch-network', 'honeyb', 'jinba', 'bump', 'uni'],
-  'launch-videos': ['tokenworks', 'perena'],
+  lead: {
+    apps: ['livingip', 'bump'],
+    websites: ['perena', 'autara', 'breeze'],
+    branding: ['autara', 'arch-network', 'honeyb', 'jinba'],
+    'launch-videos': ['tokenworks'],
+  },
 };
