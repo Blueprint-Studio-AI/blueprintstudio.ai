@@ -1,15 +1,8 @@
 "use client";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Ref } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  AnimatePresence,
-  MotionConfig,
-  animate,
-  motion,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import { AnimatePresence, MotionConfig, animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { ArrowRight, Pause, Play } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -21,6 +14,8 @@ import {
   type Deliverable,
   type MediaAsset,
   type PortfolioProject,
+  type ResponsiveMedia,
+  type ShowcaseMedia,
 } from "@/data/portfolioData";
 import { hasWorkPage, mediaFor, projectsFor } from "@/lib/work";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
@@ -32,7 +27,7 @@ import { SpringText, type VariantKey } from "./HeroSelector";
 // Portfolio videos stay unloaded until the hero reel has landed (it sends
 // "bp:opening-landed"), so they don't compete with it. Then they load in page
 // order, two at a time. A card that comes near the screen loads straight away.
-type Waiter = { start: () => void; started: boolean };
+type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
 const waiting: Waiter[] = [];
 const MAX_LOADING = 2;
 let released = false;
@@ -43,20 +38,15 @@ function pump() {
     const next = waiting.find((w) => !w.started);
     if (!next) return;
     next.started = true;
-    loading++;
-    next.start();
+    if (next.start()) loading++;
   }
 }
 
-if (typeof window !== "undefined") {
-  window.addEventListener(
-    "bp:opening-landed",
-    () => {
-      released = true;
-      pump();
-    },
-    { once: true }
-  );
+if (typeof window !== 'undefined') {
+  window.addEventListener('bp:opening-landed', () => {
+    released = true;
+    pump();
+  }, { once: true });
 }
 
 type Filter = VariantKey | null;
@@ -85,229 +75,286 @@ const SEE_ALL: Record<"all" | VariantKey, string> = {
   "launch-videos": "See all launch videos",
 };
 
-const MAX_CARDS = 6;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
-const LAYOUT_SPRING = { type: "spring", visualDuration: 0.55, bounce: 0.12 } as const;
+const LAYOUT_SPRING = { type: "spring", visualDuration: 0.6, bounce: 0.1 } as const;
 const CHIP_SPRING = { type: "spring", visualDuration: 0.4, bounce: 0.18 } as const;
-const SIZES = "(min-width: 1124px) 470px, (min-width: 640px) 45vw, 92vw";
 
 function filterFromUrl(): Filter {
   const key = new URLSearchParams(window.location.search).get("for");
   return FILTERS.find((f) => f.key !== null && f.key === key)?.key ?? null;
 }
 
-type Card = { project: PortfolioProject; media: MediaAsset; href: string };
+type Item = { project: PortfolioProject; media: ResponsiveMedia; href: string };
 
-function cardsFor(filter: Filter): Card[] {
-  const ids = featuredWork[filter ? DELIVERABLE[filter] : "all"];
-  return ids
-    .flatMap((id) => {
-      const project = allWorkProjects.find((p) => p.id === id);
-      if (!project) return [];
-      // Under "All work" a card takes its first kind of work (Perena: websites) for its media and link.
-      const as = filter ? DELIVERABLE[filter] : project.deliverables.find((d) => hasWorkPage(d)) ?? project.deliverables[0];
-      // The /brands pages are the case studies; they fit "All work" and Brands.
-      const caseStudy = project.brandPage && (filter === null || filter === "brands");
-      const href = caseStudy
-        ? `/brands/${project.brandPage}`
-        : hasWorkPage(as)
-          ? `/work/${as}#${project.id}`
-          : "/work";
-      return [{ project, media: mediaFor(project, as).desktop, href }];
-    })
-    .slice(0, MAX_CARDS);
+const byId = (id: string) => allWorkProjects.find((p) => p.id === id);
+const isProject = (p: PortfolioProject | undefined): p is PortfolioProject => p !== undefined;
+
+/** What a filter shows, from featuredWork in the portfolio data. */
+function itemsFor(filter: Filter): Item[] {
+  let projects: PortfolioProject[];
+  if (filter === null) {
+    projects = featuredWork.all.map(byId).filter(isProject).filter((p) => !p.noLongerTrading);
+  } else {
+    const slug = DELIVERABLE[filter];
+    const lead = (featuredWork.lead[slug] ?? []).map(byId).filter(isProject).filter((p) => p.deliverables.includes(slug));
+    const rest = projectsFor(slug).filter((p) => !lead.includes(p));
+    // A stable sort: closed clients drop to the end, everything else keeps its place.
+    projects = [...lead, ...rest].sort((a, b) => Number(!!a.noLongerTrading) - Number(!!b.noLongerTrading));
+  }
+  return projects.slice(0, featuredWork.max).map((project) => {
+    // Under "All work" a project shows as its first kind of work (Perena: websites).
+    const as = filter ? DELIVERABLE[filter] : project.deliverables.find((d) => hasWorkPage(d)) ?? project.deliverables[0];
+    // The /brands pages are the case studies; they fit "All work" and Brands.
+    const caseStudy = project.brandPage && (filter === null || filter === "brands");
+    const href = caseStudy ? `/brands/${project.brandPage}` : hasWorkPage(as) ? `/work/${as}#${project.id}` : "/work";
+    return { project, media: mediaFor(project, as), href };
+  });
 }
 
 function seeAllFor(filter: Filter) {
   const slug = filter ? DELIVERABLE[filter] : null;
-  return {
-    label: SEE_ALL[filter ?? "all"],
-    href: slug && hasWorkPage(slug) ? `/work/${slug}` : "/work",
-    count: slug ? projectsFor(slug).length : null,
-  };
+  return { label: SEE_ALL[filter ?? "all"], href: slug && hasWorkPage(slug) ? `/work/${slug}` : "/work" };
 }
 
-/** A card's reel or still in a 16:10 frame; the reel fades in over its poster once it plays. */
-function CardMedia({ media }: { media: MediaAsset }) {
-  const reduce = usePrefersReducedMotion(); // false on the server and first render, so hydration matches
-  const frameRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const slotRef = useRef(false); // holds one of the MAX_LOADING slots
-  const isVideo = media.type === "video";
-  const still = isVideo ? media.poster : media.src;
-  const [queued, setQueued] = useState(false);
-  const [inView, setInView] = useState(false);
-  const [shown, setShown] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  // The visitor's own play/pause wins over scrolling in and out of view.
-  const [choice, setChoice] = useState<"auto" | "play" | "pause">("auto");
+interface MediaCardProps {
+  media: MediaAsset | ShowcaseMedia;
+  aspectRatio: string;
+  featured?: boolean;
+}
 
-  // Buffered enough (or gave up, or the card left): hand the slot to the next video.
-  const freeSlot = useCallback(() => {
-    if (!slotRef.current) return;
-    slotRef.current = false;
-    loading--;
-    pump();
-  }, []);
+function MediaCard({ media, aspectRatio, featured = false }: MediaCardProps) {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const slotRef = useRef(false); // holds one of the MAX_LOADING slots
+  const clip = "clip" in media ? media.clip : undefined;
 
   useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame || !isVideo || reduce) return;
+    const card = cardRef.current;
+    if (!card || media.type !== 'video') return;
     const waiter: Waiter = {
       started: false,
       start: () => {
+        // The phone or desktop copy that's hidden at this width: leave it to the
+        // observer below, which loads it if a resize ever shows it.
+        if (card.getClientRects().length === 0) {
+          waiter.started = false;
+          waiting.splice(waiting.indexOf(waiter), 1);
+          return false;
+        }
         slotRef.current = true;
-        setQueued(true);
+        setShouldLoad(true);
+        return true;
       },
     };
     waiting.push(waiter);
     pump();
-    const near = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
-        near.disconnect();
+        observer.disconnect();
         if (waiter.started) return;
         waiter.started = true; // jumps the queue without taking a slot
-        setQueued(true);
+        setShouldLoad(true);
       },
-      { rootMargin: "100% 0px" }
+      { rootMargin: '100% 0px' }
     );
-    near.observe(frame);
+    observer.observe(card);
     return () => {
-      near.disconnect();
-      const i = waiting.indexOf(waiter);
-      if (i !== -1) waiting.splice(i, 1);
-      freeSlot();
+      observer.disconnect();
+      if (waiting.includes(waiter)) waiting.splice(waiting.indexOf(waiter), 1);
+      // A filter can remove a card mid-load: give its slot back.
+      if (slotRef.current) {
+        slotRef.current = false;
+        loading--;
+        pump();
+      }
     };
-  }, [isVideo, reduce, freeSlot]);
+  }, [media.type]);
 
-  // Play only while on screen.
-  useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame || !isVideo) return;
-    const seen = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.1 });
-    seen.observe(frame);
-    return () => seen.disconnect();
-  }, [isVideo]);
+  // Buffered enough (or gave up): hand the slot to the next video.
+  const freeSlot = () => {
+    if (!slotRef.current) return;
+    slotRef.current = false;
+    loading--;
+    pump();
+  };
 
-  // With reduced motion a reel neither plays nor downloads until asked to.
-  const src = isVideo && (choice === "play" || (queued && !reduce)) ? media.src : undefined;
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !src) return;
-    if (inView && (choice === "play" || (choice === "auto" && !reduce))) video.play().catch(() => {});
-    else video.pause();
-  }, [src, inView, choice, reduce]);
+  const togglePlayPause = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   return (
-    <div className="relative">
-      <div
-        ref={frameRef}
-        className="relative isolate aspect-[16/10] overflow-hidden rounded-[14px] bg-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow duration-500 group-hover/card:shadow-[0_18px_40px_-20px_rgba(0,0,0,0.35)]"
-      >
-        <div className="absolute inset-0 transition-transform [transition-duration:900ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.03] motion-reduce:transform-none">
-          {/* Posters are a frame of a reel that replaces them; stills are the work itself. */}
-          {still && <Image src={still} alt={media.alt} fill sizes={SIZES} quality={isVideo ? 75 : 85} className="object-cover" />}
-          {isVideo && (
-            <video
-              ref={videoRef}
-              src={src}
-              muted
-              loop
-              playsInline
-              preload={src ? "auto" : "none"}
-              aria-hidden="true"
-              onLoadedMetadata={(e) => {
-                // Start on the strong stretch, or the poster's frame.
-                const from = media.clip?.[0] ?? media.posterTime;
-                if (from) e.currentTarget.currentTime = from;
-              }}
-              onTimeUpdate={(e) => {
-                // Loop just the clip; this also catches the browser's own loop back to 0.
-                const t = e.currentTarget.currentTime;
-                if (media.clip && (t < media.clip[0] - 0.25 || t >= media.clip[1])) e.currentTarget.currentTime = media.clip[0];
-              }}
-              onPlaying={() => {
-                setShown(true);
-                setPlaying(true);
-              }}
-              onPause={() => setPlaying(false)}
-              onCanPlayThrough={freeSlot}
-              onSuspend={freeSlot}
-              onError={freeSlot}
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${
-                shown ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          )}
-        </div>
-        <div className="pointer-events-none absolute inset-0 rounded-[14px] ring-1 ring-inset ring-black/[0.06]" />
-      </div>
+    <div ref={cardRef} className="relative">
+      <div className="relative">
+        <div
+          className="bg-neutral-200 absolute left-0 top-0 w-full rounded-md"
+          style={{ aspectRatio }}
+        />
+        <div className="relative mx-auto overflow-hidden transition-opacity duration-300 ease-out rounded-md">
 
-      {/* Shown on hover; on touch screens only when it's needed to start the reel. */}
-      {isVideo && (
-        <button
-          type="button"
-          onClick={() => setChoice(playing ? "pause" : "play")}
-          aria-label={playing ? "Pause video" : "Play video"}
-          className={`absolute bottom-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-[opacity,background-color] duration-200 hover:bg-black/60 focus-visible:opacity-100 ${
-            !playing && (reduce || choice === "pause")
-              ? "opacity-100"
-              : "opacity-0 [@media(hover:hover)]:group-hover/card:opacity-100 [@media(hover:none)]:pointer-events-none"
-          }`}
-        >
-          {playing ? <Pause className="h-3 w-3" fill="currentColor" /> : <Play className="h-3 w-3 translate-x-px" fill="currentColor" />}
-        </button>
-      )}
+          <div className="relative w-full" style={{ aspectRatio }}>
+            {media.type === 'video' ? (
+              <div
+                className="absolute left-0 top-0 h-full w-full object-cover overflow-hidden"
+                style={{ aspectRatio }}
+              >
+                <video
+                  ref={videoRef}
+                  src={shouldLoad ? media.src : undefined}
+                  autoPlay
+                  loop
+                  playsInline
+                  muted
+                  preload="none"
+                  poster={shouldLoad ? media.poster : undefined}
+                  onLoadedMetadata={(e) => {
+                    if (clip) e.currentTarget.currentTime = clip[0];
+                  }}
+                  onTimeUpdate={(e) => {
+                    // Loop just the clip; this also catches the browser's own loop back to 0.
+                    const t = e.currentTarget.currentTime;
+                    if (clip && (t < clip[0] - 0.25 || t >= clip[1])) e.currentTarget.currentTime = clip[0];
+                  }}
+                  onCanPlayThrough={freeSlot}
+                  onSuspend={freeSlot}
+                  onError={freeSlot}
+                  className="pointer-events-none h-full w-full object-cover"
+                />
+                {featured && (
+                  <button
+                    type="button"
+                    onClick={togglePlayPause}
+                    className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition duration-200 hover:bg-black/60 cursor-pointer opacity-0 group-hover/project:opacity-100 focus-visible:opacity-100"
+                    aria-label={isPlaying ? "Pause video" : "Play video"}
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-3 w-3" />
+                    ) : (
+                      <Play className="h-3 w-3" />
+                    )}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="h-full w-full">
+                <div className="group relative h-full w-full overflow-hidden rounded-none bg-transparent transition-colors duration-300" style={{ aspectRatio }}>
+                  <Image
+                    alt={media.alt}
+                    fill
+                    sizes={featured ? "(max-width: 768px) 100vw, (max-width: 1024px) 75vw, 750px" : "(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 250px"}
+                    quality={90}
+                    className="object-cover object-center"
+                    src={media.src}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-// A card's line: the description up to its first full stop or colon. The rest
-// is for the project's own page.
-function summary(description: string) {
-  const first = description.split(/\.\s|:\s/)[0].trim().replace(/\.$/, "");
-  return `${first}.`;
+/** A project's title and line. The title's link covers the featured media above it too. */
+function ProjectText({ project, href, textRef }: { project: PortfolioProject; href: string; textRef?: Ref<HTMLDivElement> }) {
+  return (
+    <div ref={textRef} className="text-black w-full pt-8">
+      <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2">
+        <Link
+          href={href}
+          className="outline-none after:absolute after:inset-0 after:rounded-md after:content-[''] focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-[#2563EB]"
+        >
+          {project.title}
+          <ArrowRight
+            aria-hidden
+            className="ml-2 inline-block h-[0.75em] w-[0.75em] -translate-y-[0.06em] text-neutral-400 transition-[color,transform] duration-300 ease-out group-hover/project:translate-x-1 group-hover/project:text-black"
+          />
+        </Link>
+      </h3>
+      <p className="text-neutral-600 text-base">{project.description}</p>
+    </div>
+  );
 }
 
-function WorkCard({ card }: { card: Card }) {
-  const { project, media, href } = card;
-  const [name, ...rest] = project.title.split(" — ");
+/** One project as the original bento: the featured reel, with its three squares beside it (below it on phones). */
+function ProjectSection({ item, first }: { item: Item; first: boolean }) {
+  const { project, media, href } = item;
+  const squares = project.showcaseMedia.slice(0, 3);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [spacer, setSpacer] = useState(100);
+
+  // The squares' column ends level with the bottom of the featured media.
+  useEffect(() => {
+    const text = textRef.current;
+    if (!text) return;
+    const measure = () => setSpacer(text.offsetHeight === 0 ? 100 : Math.max(0, text.offsetHeight - 24));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(text);
+    return () => observer.disconnect();
+  }, []);
+
+  // Phones use the media's own shape (the reels are cut 2:3); desktop is always 16:9.
+  const { width, height } = media.mobile;
+  const phoneRatio = width && height ? `${width}/${height}` : "2/3";
+
   return (
-    <article className="group/card relative">
-      <AnimatePresence initial={false} mode="popLayout">
-        {/* A filter can swap the media (Jinba's site for its brand): crossfade it. */}
-        <motion.div
-          key={media.src}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: EASE_OUT }}
-        >
-          <CardMedia media={media} />
-        </motion.div>
-      </AnimatePresence>
-      <div className="flex items-start justify-between gap-4 px-0.5 pt-4">
-        <div className="min-w-0">
-          <h3 className="text-[16px] font-medium leading-[1.3] tracking-[-0.015em] text-neutral-900">
-            {/* The whole card is the link. */}
-            <Link
-              href={href}
-              className="outline-none after:absolute after:inset-[-6px] after:rounded-[18px] after:content-[''] focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-[#2563EB]"
-            >
-              {name}
-              {rest.length > 0 && <span className="text-neutral-500"> {rest.join(" — ")}</span>}
-            </Link>
-          </h3>
-          <p className="mt-1 line-clamp-3 text-[14px] leading-[1.45] text-neutral-500">{summary(project.description)}</p>
+    <div className="w-full">
+      {!first && <div className="w-full line-dash-x" />}
+
+      <InnerContainer className="py-10 sm:py-16 lg:py-20 px-2.5 sm:px-6 relative">
+        <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+        <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+
+        <div className={squares.length > 0 ? "lg:grid lg:grid-cols-4 lg:gap-6" : ""}>
+          <div className="lg:col-span-3">
+            <div className="lg:sticky lg:top-24">
+              <div className="block lg:hidden">
+                <div className="group/project relative">
+                  <MediaCard media={media.mobile} aspectRatio={phoneRatio} featured />
+                  <ProjectText project={project} href={href} />
+                </div>
+                {squares.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-8">
+                    {squares.map((square) => (
+                      <MediaCard key={square.id} media={square} aspectRatio="1/1" />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="group/project relative hidden lg:block">
+                <MediaCard media={media.desktop} aspectRatio="16/9" featured />
+                <ProjectText project={project} href={href} textRef={textRef} />
+              </div>
+            </div>
+          </div>
+
+          {squares.length > 0 && (
+            <div className="hidden lg:block lg:col-span-1">
+              <div className="space-y-6">
+                {squares.map((square) => (
+                  <MediaCard key={square.id} media={square} aspectRatio="1/1" />
+                ))}
+                <div style={{ height: spacer }} />
+              </div>
+            </div>
+          )}
         </div>
-        <ArrowRight
-          aria-hidden
-          className="mt-[3px] h-4 w-4 shrink-0 text-neutral-400 transition-[color,transform] duration-300 ease-out group-hover/card:translate-x-0.5 group-hover/card:text-neutral-900"
-        />
-      </div>
-    </article>
+      </InnerContainer>
+    </div>
   );
 }
 
@@ -369,7 +416,7 @@ function Chips({ value, onPick }: { value: Filter; onPick: (key: Filter) => void
               onClick={() => onPick(filter.key)}
               onPointerEnter={(e) => e.pointerType === "mouse" && setHover({ key: id, on: true })}
               whileTap={{ scale: 0.96 }}
-              className={`relative h-9 shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3 text-[15px] font-medium sm:px-4 tracking-[-0.01em] outline-none transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB] ${
+              className={`relative h-9 shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3 text-[15px] font-medium tracking-[-0.01em] outline-none transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB] sm:px-4 ${
                 active ? "text-neutral-900" : "text-neutral-500 hover:text-neutral-900"
               }`}
             >
@@ -401,32 +448,33 @@ function Chips({ value, onPick }: { value: Filter; onPick: (key: Filter) => void
 }
 
 /**
- * The cards, and the link to the rest. Cards that stay glide to their new
- * places; the rest blur out and in. The box's height springs to fit, so the
- * page below follows smoothly instead of jumping.
+ * The projects, and the link to the rest. Projects that stay glide to their new
+ * places; the rest blur out and in. The list's height springs to fit, so the
+ * page below follows smoothly instead of jumping. It only clips while it
+ * springs (overflow: clip, which keeps the reels' sticky column working).
  */
-function WorkGrid({ filter }: { filter: Filter }) {
+function WorkList({ filter }: { filter: Filter }) {
   const reduce = usePrefersReducedMotion();
-  const cards = cardsFor(filter);
+  const items = itemsFor(filter);
   const seeAll = seeAllFor(filter);
-  // An odd number of cards leaves a gap in the two-column grid: the link fills it.
-  const tile = cards.length % 2 === 1;
 
   const innerRef = useRef<HTMLDivElement>(null);
+  const natural = useRef(0);
   const height = useMotionValue(-1);
   const heightStyle = useTransform(height, (h) => (h < 0 ? "auto" : h));
-  const animating = useRef(false);
+  const [clipping, setClipping] = useState(false);
   const first = useRef(true);
 
   useLayoutEffect(() => {
     const inner = innerRef.current;
     if (!inner) return;
+    natural.current = inner.offsetHeight;
     const observer = new ResizeObserver(() => {
-      if (!animating.current) height.jump(inner.offsetHeight);
+      natural.current = inner.offsetHeight;
     });
     observer.observe(inner);
     return () => observer.disconnect();
-  }, [height]);
+  }, []);
 
   useLayoutEffect(() => {
     if (first.current) {
@@ -435,92 +483,66 @@ function WorkGrid({ filter }: { filter: Filter }) {
     }
     const inner = innerRef.current;
     if (!inner) return;
+    const from = height.get() >= 0 ? height.get() : natural.current;
     const to = inner.offsetHeight;
-    if (reduce || height.get() < 0) {
-      height.jump(to);
+    natural.current = to;
+    if (reduce || Math.abs(from - to) < 1) {
+      height.jump(-1);
+      setClipping(false);
       return;
     }
-    animating.current = true;
+    height.jump(from);
+    setClipping(true);
     const controls = animate(height, to, {
       ...LAYOUT_SPRING,
       onComplete: () => {
-        animating.current = false;
-        height.jump(inner.offsetHeight);
+        height.jump(-1);
+        setClipping(false);
       },
     });
     return () => controls.stop();
   }, [filter, reduce, height]);
 
-  const enter = reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, filter: "blur(10px)" };
-  // Leaving cards drop beneath the ones gliding into place.
+  const enter = reduce ? { opacity: 0 } : { opacity: 0, y: 40, filter: "blur(10px)" };
+  const shown = { opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } };
+  // Leaving projects drop beneath the ones gliding into place.
   const exit = reduce
     ? { opacity: 0, transition: { duration: 0.15 } }
-    : { opacity: 0, scale: 0.96, filter: "blur(10px)", zIndex: 0, transition: { duration: 0.2, ease: EASE_OUT, zIndex: { duration: 0 } } };
-  const shown = { opacity: 1, scale: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } };
+    : { opacity: 0, filter: "blur(10px)", zIndex: 0, transition: { duration: 0.22, ease: EASE_OUT, zIndex: { duration: 0 } } };
 
   return (
-    // Padding inside the clip keeps focus rings and hover shadows clear of its edge.
-    <motion.div style={{ height: heightStyle }} className="-mx-3 overflow-hidden">
-      <div ref={innerRef} className="px-3 pb-3 pt-1">
-        <div className="relative grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 sm:gap-y-10 lg:gap-x-6 lg:gap-y-12">
-          <AnimatePresence initial={false} mode="popLayout">
-            {cards.map((card, i) => (
-              <motion.div
-                key={card.project.id}
-                layout
-                initial={enter}
-                animate={shown}
-                exit={exit}
-                transition={{ layout: LAYOUT_SPRING, default: { duration: 0.5, ease: EASE_OUT, delay: 0.06 + i * 0.045 } }}
-                className="relative z-[1]"
-              >
-                <WorkCard card={card} />
-              </motion.div>
-            ))}
-            {tile && (
-              <motion.div
-                key={`see-all-${seeAll.href}`}
-                layout
-                initial={enter}
-                animate={shown}
-                exit={exit}
-                transition={{ layout: LAYOUT_SPRING, default: { duration: 0.5, ease: EASE_OUT, delay: 0.06 + cards.length * 0.045 } }}
-                className="relative z-[1] hidden sm:block"
-              >
-                <Link
-                  href={seeAll.href}
-                  className="group/tile flex aspect-[16/10] flex-col items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-neutral-300 text-center outline-none transition-colors duration-300 hover:border-neutral-400 hover:bg-white/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-                >
-                  <span className="inline-flex items-center gap-1.5 text-[15px] font-medium tracking-[-0.01em] text-neutral-900">
-                    {seeAll.label}
-                    <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 ease-out group-hover/tile:translate-x-0.5" />
-                  </span>
-                  {seeAll.count !== null && (
-                    <span className="font-mono text-[11px] tabular-nums text-neutral-500">{seeAll.count} projects</span>
-                  )}
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+    <motion.div style={{ height: heightStyle, overflow: clipping ? "clip" : undefined }} className="w-full">
+      <div ref={innerRef} className="relative w-full">
+        <AnimatePresence initial={false} mode="popLayout">
+          {items.map((item, i) => (
+            <motion.div
+              key={item.project.id}
+              layout="position"
+              initial={enter}
+              animate={shown}
+              exit={exit}
+              transition={{ layout: LAYOUT_SPRING, default: { duration: 0.45, ease: EASE_OUT, delay: 0.03 + Math.min(i, 3) * 0.05 } }}
+              className="relative z-[1] w-full"
+            >
+              <ProjectSection item={item} first={i === 0} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
-        {/* Under the grid, unless the tile above has it (phones always show it here).
-            It glides with the cards rather than jumping ahead of them. */}
-        <motion.div
-          key={tile ? "under-tile" : "under"}
-          layout="position"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ layout: LAYOUT_SPRING, opacity: { duration: 0.3, delay: 0.15 } }}
-          className={`flex justify-center pt-10 sm:pt-12 ${tile ? "sm:hidden" : ""}`}
-        >
-          <Link
-            href={seeAll.href}
-            className="group/all inline-flex h-11 items-center gap-2 rounded-full border border-neutral-300 bg-white pl-5 pr-4 text-[15px] font-medium tracking-[-0.01em] text-neutral-900 outline-none transition-colors duration-200 hover:border-neutral-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-          >
-            <SpringText text={seeAll.label} />
-            <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 ease-out group-hover/all:translate-x-0.5" />
-          </Link>
+        {/* It glides with the projects rather than jumping ahead of them. */}
+        <motion.div layout="position" transition={{ layout: LAYOUT_SPRING }} className="w-full">
+          <div className="w-full line-dash-x" />
+          <InnerContainer className="relative flex justify-center px-2.5 py-10 sm:px-6 sm:py-14">
+            <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+            <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
+            <Link
+              href={seeAll.href}
+              className="group/all inline-flex h-11 items-center gap-2 rounded-full border border-neutral-300 bg-white pl-5 pr-4 text-[15px] font-medium tracking-[-0.01em] text-neutral-900 outline-none transition-colors duration-200 hover:border-neutral-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+            >
+              <SpringText text={seeAll.label} />
+              <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 ease-out group-hover/all:translate-x-0.5" />
+            </Link>
+          </InnerContainer>
         </motion.div>
       </div>
     </motion.div>
@@ -529,7 +551,7 @@ function WorkGrid({ filter }: { filter: Filter }) {
 
 export default function PortfolioBento() {
   const [filter, setFilter] = useState<Filter>(null);
-  // Bumped to remount the grid without animating, for a ?for= link.
+  // Bumped to remount the list without animating, for a ?for= link.
   const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
@@ -561,6 +583,7 @@ export default function PortfolioBento() {
 
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100">
+      {/* Background lines matching existing portfolio */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
@@ -573,32 +596,35 @@ export default function PortfolioBento() {
       <SectionHeader leftText="PORTFOLIO" rightText="design / dev" />
 
       <OuterContainer className="flex-1">
-        <InnerContainer className="relative px-2.5 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-12 lg:pb-24 lg:pt-16">
+        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 px-2.5 sm:px-6 relative">
+          {/* Inner dashed vertical lines on desktop - matching Achievements section */}
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
           <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
 
           <h2
             className="font-medium text-black text-center cursor-default"
             style={{
-              fontSize: "clamp(32px, 6vw, 48px)",
-              lineHeight: "clamp(97%, 1vw, 100%)",
-              letterSpacing: "-1.5px",
+              fontSize: 'clamp(32px, 6vw, 48px)',
+              lineHeight: 'clamp(97%, 1vw, 100%)',
+              letterSpacing: '-1.5px'
             }}
           >
             Featured Work
           </h2>
 
-          <div className="mb-8 mt-6 sm:mb-10 sm:mt-8">
+          <div className="mt-6 sm:mt-8">
             <Chips value={filter} onPick={pick} />
           </div>
           <p className="sr-only" aria-live="polite">
             {filter ? `Showing ${label.toLowerCase()}` : "Showing all work"}
           </p>
-
-          <MotionConfig reducedMotion="user">
-            <WorkGrid key={epoch} filter={filter} />
-          </MotionConfig>
         </InnerContainer>
+
+        <div className="w-full max-w-[1000px]">
+          <MotionConfig reducedMotion="user">
+            <WorkList key={epoch} filter={filter} />
+          </MotionConfig>
+        </div>
       </OuterContainer>
       <div className="w-full line-dash-x" />
     </Section>
