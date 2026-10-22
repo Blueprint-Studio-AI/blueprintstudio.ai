@@ -1,6 +1,7 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next'
 import { getAllPosts } from '@/lib/blog'
+import { workPages } from '@/lib/work'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://blueprintstudio.ai'
@@ -23,6 +24,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/brand`,         lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${base}/launch`,        lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${base}/launch-videos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    // Portfolio, one page per deliverable (only those with enough projects)
+    { url: `${base}/work`,          lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    ...workPages.map((page) => ({
+      url: `${base}/work/${page.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     // Case study
     { url: `${base}/brands/jinba`,  lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/brands/honeyb`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
