@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
     AnimatePresence,
@@ -9,7 +10,9 @@ import {
     useMotionValue,
     useMotionValueEvent,
     useReducedMotion,
+    useSpring,
     useTransform,
+    useVelocity,
 } from "framer-motion";
 import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
@@ -616,10 +619,13 @@ export default function Hero() {
 }
 
 // Look e: one statement, the first sentence in ink and the rest in grey. What
-// we make doubles as the picker: each word, with a small picture of that work,
-// switches the reel. Words darken into place once the reel has landed.
+// we make doubles as the picker: each word switches the reel. On a desktop,
+// resting on a word floats a still of that work by the cursor. Words darken
+// into place once the reel has landed.
 const LEAD = "The design and build partner for founders.";
 const TAIL = "from first sketch to launch.";
+const PEEK_FOLLOW = { stiffness: 380, damping: 30, mass: 0.6 };
+const PEEK_HIDE_MS = 140; // long enough to cross the gap between two words
 
 function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
     const reduceMotion = useReducedMotion();
@@ -639,6 +645,54 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 </motion.span>
             );
         });
+
+    // The peek: only where there's a real hover, so phones just tap the words.
+    const [canHover, setCanHover] = useState(false);
+    useEffect(() => {
+        const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+        const update = () => setCanHover(query.matches);
+        update();
+        query.addEventListener("change", update);
+        return () => query.removeEventListener("change", update);
+    }, []);
+    const [peek, setPeek] = useState<VariantKey | null>(null);
+    const peekShown = useRef(false);
+    const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const pointerX = useMotionValue(0);
+    const pointerY = useMotionValue(0);
+    const x = useSpring(pointerX, PEEK_FOLLOW);
+    const y = useSpring(pointerY, PEEK_FOLLOW);
+    // It leans the way it's travelling and settles when the cursor stops.
+    const lean = useTransform(useVelocity(x), [-1400, 0, 1400], [-8, 0, 8], { clamp: true });
+    const follow = useCallback(
+        (e: PointerEvent | React.PointerEvent) => {
+            pointerX.set(e.clientX);
+            pointerY.set(e.clientY);
+            if (!peekShown.current || reduceMotion) {
+                x.jump(e.clientX);
+                y.jump(e.clientY);
+            }
+        },
+        [pointerX, pointerY, x, y, reduceMotion],
+    );
+    useEffect(() => {
+        peekShown.current = peek !== null;
+        if (!peek) return;
+        window.addEventListener("pointermove", follow, { passive: true });
+        return () => window.removeEventListener("pointermove", follow);
+    }, [peek, follow]);
+    useEffect(() => () => clearTimeout(hideTimer.current), []);
+    const showPeek = (key: VariantKey, e: React.PointerEvent) => {
+        if (!canHover || e.pointerType !== "mouse") return;
+        clearTimeout(hideTimer.current);
+        follow(e);
+        setPeek(key);
+    };
+    const hidePeek = () => {
+        clearTimeout(hideTimer.current);
+        hideTimer.current = setTimeout(() => setPeek(null), PEEK_HIDE_MS);
+    };
+
     return (
         <>
             {words(LEAD, true)} {words("We make", false)}{" "}
@@ -653,18 +707,11 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                             <button
                                 type="button"
                                 onClick={() => onPick(active ? null : v.key)}
+                                onPointerEnter={(e) => showPeek(v.key, e)}
+                                onPointerLeave={hidePeek}
                                 aria-pressed={active}
                                 className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
                             >
-                                <motion.span
-                                    className="mr-[0.16em] inline-block h-[0.78em] w-[1.12em] overflow-hidden rounded-[0.16em] align-[-0.06em] shadow-[0_0_0_1px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover/word:-rotate-3 group-hover/word:scale-110"
-                                    initial={{ opacity: 0, scale: 0.6 }}
-                                    animate={revealed ? { opacity: 1, scale: 1 } : undefined}
-                                    transition={reduceMotion ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.25, delay }}
-                                >
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={v.thumb} alt="" className="h-full w-full object-cover" />
-                                </motion.span>
                                 <motion.span
                                     className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
                                         active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
@@ -683,6 +730,32 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 );
             })}
             {words(TAIL, false)}
+            {canHover &&
+                revealed &&
+                createPortal(
+                    <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
+                        <motion.div
+                            className="relative ml-5 mt-6 aspect-video w-[240px] overflow-hidden rounded-xl bg-neutral-200 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
+                            style={{ transformOrigin: "0% 0%" }}
+                            initial={false}
+                            animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+                            transition={reduceMotion ? { duration: 0.15 } : { type: "spring", visualDuration: 0.35, bounce: 0.25 }}
+                        >
+                            {VARIANTS.map((v) => (
+                                <motion.img
+                                    key={v.key}
+                                    src={v.still}
+                                    alt=""
+                                    className="absolute inset-0 h-full w-full object-cover"
+                                    initial={false}
+                                    animate={{ opacity: peek === v.key ? 1 : 0 }}
+                                    transition={{ duration: 0.2, ease: EASE_OUT }}
+                                />
+                            ))}
+                        </motion.div>
+                    </motion.div>,
+                    document.body,
+                )}
         </>
     );
 }
