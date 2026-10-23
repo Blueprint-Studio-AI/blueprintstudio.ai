@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, MotionConfig, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useSmoothScroll } from "./SmoothScroll";
-import { FoldingLogo, logoWidth, useLogoLook, type LogoGeometry } from "@/components/nav/logo";
+import { FoldingLogo, LOGO } from "@/components/nav/logo";
 import {
     ASSET_GENERATOR,
     CallButton,
@@ -43,13 +43,11 @@ export const FloatingNavNew = () => {
     const goToSection = useGoToSection();
     const section = useActiveSection();
     const { scroll } = useSmoothScroll();
-    const look = useLogoLook();
     const [open, setOpen] = useState(false);
 
-    // The logo stays folded here (BPSTU, or the fingerprint): the full name is in the bar
-    // at the top, and opened it wouldn't fit beside Close and Book a call.
+    // The logo stays folded to its mark here: the full logo is in the bar at the
+    // top, and opened it wouldn't fit beside Close and Book a call.
     const fold = useMotionValue(1);
-    const [geometry, setGeometry] = useState<LogoGeometry>({ kept: 52, runs: [0] });
 
     // The closed pill is as wide as its row with the logo folded; the sheet as wide as the screen allows.
     const rowRef = useRef<HTMLDivElement>(null);
@@ -79,7 +77,7 @@ export const FloatingNavNew = () => {
         window.addEventListener("resize", measure);
         return () => window.removeEventListener("resize", measure);
     }, []);
-    const pillW = size.rest + logoWidth(geometry, 1);
+    const pillW = size.rest + LOGO.mark;
 
     // While the sheet is open the page stays still, Escape closes it, and so does going somewhere else.
     useEffect(() => {
@@ -266,7 +264,7 @@ export const FloatingNavNew = () => {
                                 aria-label="Blueprint Studio"
                                 className={`flex h-11 items-center rounded-full px-3 active:bg-black/[0.05] ${FOCUS}`}
                             >
-                                <FoldingLogo look={look} fold={fold} onGeometry={setGeometry} />
+                                <FoldingLogo fold={fold} />
                             </motion.a>
                             <motion.button
                                 type="button"

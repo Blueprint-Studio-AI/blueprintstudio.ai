@@ -32,7 +32,7 @@ import {
     useNavReveal,
     type NavItem,
 } from "@/components/nav/shared";
-import { FoldingLogo, logoWidth, useLogoLook, type LogoGeometry } from "@/components/nav/logo";
+import { FoldingLogo, logoWidth } from "@/components/nav/logo";
 
 // The nav at the top of the page. From md up it's one nav with two shapes: a
 // bar across the top of the page, which stays put as the page scrolls, and,
@@ -103,18 +103,15 @@ const MotionLink = motion.create(Link);
 
 function Logo({
     fold,
-    onGeometry,
     onPointerEnter,
     onPointerLeave,
 }: {
     fold?: MotionValue<number>;
-    onGeometry?: (geometry: LogoGeometry) => void;
     onPointerEnter?: (e: React.PointerEvent) => void;
     onPointerLeave?: (e: React.PointerEvent) => void;
 }) {
     const home = usePathname() === "/";
     const goToSection = useGoToSection();
-    const look = useLogoLook();
     return (
         <MotionLink
             href="/"
@@ -130,7 +127,7 @@ function Logo({
             aria-label="Blueprint Studio"
             className={`flex w-fit shrink-0 items-center rounded-md ${FOCUS}`}
         >
-            <FoldingLogo look={look} fold={fold} onGeometry={onGeometry} />
+            <FoldingLogo fold={fold} />
         </MotionLink>
     );
 }
@@ -228,7 +225,6 @@ function DesktopNav() {
     const linksRef = useRef<HTMLUListElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
     const [parts, setParts] = useState({ links: 440, cta: 104 });
-    const [geometry, setGeometry] = useState<LogoGeometry>({ kept: 52, runs: [0] });
     useLayoutEffect(() => {
         const measure = () => {
             setVw(document.documentElement.clientWidth);
@@ -310,7 +306,7 @@ function DesktopNav() {
 
     const widthAt = (p: number, f: number) => {
         if (!vw) return 0;
-        const pillW = PILL_PAD.left + PILL_PAD.right + logoWidth(geometry, f) + gap + parts.links + gap + parts.cta;
+        const pillW = PILL_PAD.left + PILL_PAD.right + logoWidth(f) + gap + parts.links + gap + parts.cta;
         return mix(barW, pillW, p);
     };
     const width = useTransform(() => {
@@ -329,7 +325,7 @@ function DesktopNav() {
         const p = pillness.get();
         const f = fold.get();
         if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
-        const logo = logoWidth(geometry, f);
+        const logo = logoWidth(f);
         const q = clamp01(p);
         const free = Math.max(0, widthAt(p, f) - mix(barPad, PILL_PAD.left, q) - mix(barPad, PILL_PAD.right, q) - parts.links - 2 * gap);
         const centred = Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta));
@@ -678,7 +674,6 @@ function DesktopNav() {
                         <div ref={logoScope} className="w-fit">
                             <Logo
                                 fold={fold}
-                                onGeometry={setGeometry}
                                 onPointerEnter={(e) => e.pointerType === "mouse" && handMoved(e) && setLogoHover(true)}
                                 onPointerLeave={() => setLogoHover(false)}
                             />
