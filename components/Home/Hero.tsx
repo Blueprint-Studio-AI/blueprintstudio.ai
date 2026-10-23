@@ -498,7 +498,7 @@ export default function Hero() {
                                 {...rise(0.35)}
                                 className={
                                     look === "e"
-                                        ? "mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row"
+                                        ? "mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center"
                                         : "mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
                                 }
                             >
@@ -509,7 +509,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
+                                    className="flex h-12 shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -534,7 +534,7 @@ export default function Hero() {
                                         scrollToId(link.href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="group flex h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
+                                    className="group flex h-12 shrink-0 whitespace-nowrap items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
                                 >
                                     {/* Springs to each label, growing away from "Book a call", which never moves. */}
                                     <SpringText text={link.label} />
@@ -543,6 +543,7 @@ export default function Hero() {
                                         className="ml-1.5 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
                                     />
                                 </motion.a>
+                                {look === "e" && <HeroLogos />}
                             </motion.div>
                         </div>
 
@@ -646,6 +647,42 @@ export default function Hero() {
                 )}
             </Section>
         </>
+    );
+}
+
+// A quiet row of clients beside the buttons, so there's proof on the first
+// screen without shrinking the reel. Logos that don't fit wrap onto a hidden
+// second line, so only whole logos ever show. Each file sits on a 264px-tall
+// canvas (see ClientLogoTicker), so one height gives them all the same weight.
+const HERO_LOGOS = [
+    { name: "TokenWorks", logo: "tokenworks", w: 636 },
+    { name: "Arch Network", logo: "arch-network", w: 518 },
+    { name: "Jinba", logo: "jinba", w: 561 },
+    { name: "Perena", logo: "perena", w: 682 },
+    { name: "Logical", logo: "logical", w: 580 },
+];
+const HERO_LOGO_HEIGHT = 34;
+
+function HeroLogos() {
+    return (
+        <div
+            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-4 overflow-hidden lg:flex"
+            style={{ height: HERO_LOGO_HEIGHT }}
+        >
+            <span className="mr-1 whitespace-nowrap text-[13px] text-neutral-400">Trusted by</span>
+            {HERO_LOGOS.map((c) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                    key={c.logo}
+                    src={`/logos-match-height/${c.logo}.png`}
+                    alt={c.name}
+                    width={Math.round((HERO_LOGO_HEIGHT * c.w) / 264)}
+                    height={HERO_LOGO_HEIGHT}
+                    className="shrink-0 opacity-45 grayscale"
+                    style={{ height: HERO_LOGO_HEIGHT, width: "auto" }}
+                />
+            ))}
+        </div>
     );
 }
 
@@ -766,7 +803,7 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 createPortal(
                     <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
                         <motion.div
-                            className="relative ml-5 mt-6 aspect-video w-[240px] overflow-hidden rounded-xl bg-neutral-200 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
+                            className="relative ml-4 mt-5 aspect-video w-[176px] overflow-hidden rounded-[10px] bg-neutral-200 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
                             style={{ transformOrigin: "0% 0%" }}
                             initial={false}
                             animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
