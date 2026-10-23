@@ -8,6 +8,6 @@ export const apps: WorkPageConfig = {
   introIsDraft: true,
   metaTitle: "App Design Portfolio",
   metaDescription:
-    "Product and app design by Blueprint Studio for LivingIP, Huch and Bump: UX, product design and platform builds.",
-  order: ["huch", "livingip", "bump"],
+    "Product and app design by Blueprint Studio for LivingIP, Bump and Huch: UX, product design and platform builds.",
+  order: ["livingip", "bump", "huch"],
 };

@@ -9,5 +9,5 @@ export const branding: WorkPageConfig = {
   metaTitle: "Branding Portfolio",
   metaDescription:
     "Brand identities and logo systems by Blueprint Studio for Bump, Huch, UNI, Autara, HoneyB, Jinba, Breeze and Arch Network.",
-  order: ["bump", "huch", "uni", "honeyb", "autara", "jinba", "breeze", "arch-network"],
+  order: ["bump", "uni", "honeyb", "autara", "jinba", "breeze", "arch-network", "huch"],
 };
