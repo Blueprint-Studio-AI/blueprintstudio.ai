@@ -4,22 +4,35 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MotionConfig, motion, useAnimate, useMotionValue, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+    MotionConfig,
+    animate as animateValue,
+    motion,
+    useAnimate,
+    useMotionValue,
+    useReducedMotion,
+    useScroll,
+    useTransform,
+    type MotionValue,
+} from "framer-motion";
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import {
     ASSET_GENERATOR,
-    CRYPTO,
     CallButton,
     EASE_OUT,
     FOCUS,
-    SECTIONS,
+    INDUSTRIES,
+    INSIGHTS,
+    PRICING,
     SERVICES,
     SPRING,
     isNavHidden,
-    useActiveSection,
+    useCurrentItem,
     useGoToSection,
     useNavReveal,
+    type NavItem,
 } from "@/components/nav/shared";
+import { BrandLogo, logoWidths, useLogoLook } from "@/components/nav/logo";
 
 // The nav at the top of the page. From md up it's one nav with two shapes: a
 // bar across the top of the page, which stays put as the page scrolls, and,
@@ -32,27 +45,28 @@ import {
 const BAR_H = 64;
 const PILL_H = 48;
 const PILL_TOP = 12;
-const PILL_PAD = { left: 16, right: 6 };
+const PILL_PAD = { left: 14, right: 6 };
 const FRAME = 61; // the frame lines sit 60px in from each side, and are 1px wide
-const GAP = 20; // between the logo, the links and the call
-const REST_MS = 90; // still this long on Services, and its menu opens
+const REST_MS = 90; // still this long on a menu's name, and its menu opens
 const LINGER_MS = 500; // or on it this long, still moving
 
-const MENU = {
-    closed: { opacity: 0, scale: 0.92, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
-    open: {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        transition: { type: "spring", visualDuration: 0.34, bounce: 0.2, opacity: { duration: 0.14 }, staggerChildren: 0.025, delayChildren: 0.03 },
-    },
+type MenuId = "services" | "industries" | "products";
+const MENUS: MenuId[] = ["services", "industries", "products"];
+
+const PANEL = {
+    closed: { opacity: 0, scale: 0.94, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
+    open: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", visualDuration: 0.34, bounce: 0.2, opacity: { duration: 0.14 } } },
 } as const;
+const ROWS = { open: { transition: { staggerChildren: 0.025, delayChildren: 0.03 } }, closed: {} } as const;
 const ROW = {
     closed: { opacity: 0, y: -4, filter: "blur(3px)", transition: { duration: 0.1 } },
     open: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.3, ease: EASE_OUT } },
 } as const;
 
 const linkTone = (on: boolean) => (on ? "text-[rgba(28,28,30,0.96)]" : "text-[rgba(28,28,30,0.62)]");
+const ROW_FOCUS = "outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB]";
+const mix = (from: number, to: number, p: number) => from + (to - from) * p;
+const clamp01 = (p: number) => Math.min(1, Math.max(0, p));
 
 type Box = { x: number; y: number; w: number; h: number; on: boolean; glide: boolean };
 
@@ -87,9 +101,10 @@ function Glide({ box, className }: { box: Box; className: string }) {
 
 const MotionLink = motion.create(Link);
 
-function Logo() {
+function Logo({ fold, wide }: { fold?: MotionValue<number>; wide?: boolean }) {
     const home = usePathname() === "/";
     const goToSection = useGoToSection();
+    const look = useLogoLook();
     return (
         <MotionLink
             href="/"
@@ -103,7 +118,7 @@ function Logo() {
             aria-label="Blueprint Studio home"
             className={`flex w-fit shrink-0 items-center rounded-md transition-opacity duration-200 hover:opacity-70 ${FOCUS}`}
         >
-            <Image src="/blueprint-logo-dark.svg" alt="" width={120} height={16} priority className="h-[14px] w-auto md:h-4" />
+            <BrandLogo look={look} fold={fold} wide={wide} />
         </MotionLink>
     );
 }
@@ -190,35 +205,40 @@ function DesktopNav() {
     const revealed = useNavReveal();
     const reduce = useReducedMotion();
     const compact = useCompact();
-    const section = useActiveSection();
+    const current = useCurrentItem();
+    const look = useLogoLook();
     const panelId = useId();
 
-    // The viewport width (for the bar), and the pill's width from its parts.
+    // The viewport (for the bar), and the parts' widths (for the pill).
     const [vw, setVw] = useState(0);
+    const wide = vw === 0 || vw >= 1024; // between md and lg there's only room for the mark
+    const gap = vw >= 1024 ? 20 : 12;
+    const barPad = vw >= 1024 ? 23 : 19;
     const logoRef = useRef<HTMLDivElement>(null);
     const linksRef = useRef<HTMLUListElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
-    const [pillW, setPillW] = useState(600);
+    const [parts, setParts] = useState({ logoBar: 142, logoPill: 142, links: 440, cta: 104 });
     useLayoutEffect(() => {
         const measure = () => {
-            setVw(document.documentElement.clientWidth);
-            const logo = logoRef.current?.offsetWidth ?? 120;
-            const links = linksRef.current?.offsetWidth ?? 300;
-            const cta = ctaRef.current?.offsetWidth ?? 104;
-            setPillW(PILL_PAD.left + PILL_PAD.right + 2 * Math.max(logo, cta) + links + 2 * GAP);
+            const width = document.documentElement.clientWidth;
+            setVw(width);
+            const logo = logoWidths(look, width >= 1024, logoRef.current?.offsetWidth ?? 142);
+            setParts({ logoBar: logo.bar, logoPill: logo.pill, links: linksRef.current?.offsetWidth ?? 440, cta: ctaRef.current?.offsetWidth ?? 104 });
         };
         measure();
         document.fonts?.ready.then(measure);
         const observer = new ResizeObserver(measure);
-        for (const ref of [logoRef, linksRef, ctaRef]) if (ref.current) observer.observe(ref.current);
+        for (const ref of [linksRef, ctaRef]) if (ref.current) observer.observe(ref.current);
         window.addEventListener("resize", measure);
         return () => {
             observer.disconnect();
             window.removeEventListener("resize", measure);
         };
-    }, []);
+    }, [look]);
+    const barW = vw - 2 * FRAME;
+    const pillW = PILL_PAD.left + PILL_PAD.right + parts.logoPill + gap + parts.links + gap + parts.cta;
 
-    // The shape follows `compact` straight away, with a spring. With reduced
+    // The shape follows `compact` straight away, on a spring. With reduced
     // motion the nav fades out, changes shape and fades back in instead.
     const [shape, setShape] = useState<"bar" | "pill">("bar");
     const [scope, animate] = useAnimate<HTMLDivElement>();
@@ -244,22 +264,52 @@ function DesktopNav() {
         };
     }, [compact, reduce, instant, animate, scope]);
     const pill = shape === "pill";
-    const padX = vw >= 1024 ? 23 : 19;
-    const geometry = pill
-        ? { width: pillW, height: PILL_H, top: PILL_TOP, borderRadius: 24, paddingLeft: PILL_PAD.left, paddingRight: PILL_PAD.right }
-        : { width: vw ? vw - 2 * FRAME : "calc(100% - 122px)", height: BAR_H, top: 0, borderRadius: 0, paddingLeft: padX, paddingRight: padX };
+
+    // Everything about the shape runs off two values on the same spring: the
+    // width, and how far along the bar is to being the pill (0 to 1).
+    const width = useMotionValue<number | string>("calc(100% - 122px)");
+    const pillness = useMotionValue(0);
+    const lastPill = useRef<boolean | null>(null);
+    useLayoutEffect(() => {
+        if (!vw) return;
+        const target = pill ? pillW : barW;
+        // A change of shape springs; a resize or a remeasure just lands there.
+        const spring = lastPill.current !== null && lastPill.current !== pill && !reduce && !instant;
+        lastPill.current = pill;
+        if (!spring) {
+            width.jump(target);
+            pillness.jump(pill ? 1 : 0);
+            return;
+        }
+        const a = animateValue(width, target, SPRING.morph);
+        const b = animateValue(pillness, pill ? 1 : 0, SPRING.morph);
+        return () => {
+            a.stop();
+            b.stop();
+        };
+    }, [pill, pillW, barW, vw, reduce, instant, width, pillness]);
+    const height = useTransform(pillness, [0, 1], [BAR_H, PILL_H], { clamp: false });
+    const top = useTransform(pillness, [0, 1], [0, PILL_TOP]);
+    const radius = useTransform(pillness, [0, 1], [0, 24]);
+    const paddingLeft = useTransform(pillness, [0, 1], [barPad, PILL_PAD.left]);
+    const paddingRight = useTransform(pillness, [0, 1], [barPad, PILL_PAD.right]);
+    // The links sit in the middle of the bar (when there's room) and right after
+    // the logo in the pill; the space either side always adds up to the width.
+    const columns = useTransform(() => {
+        const w = width.get();
+        if (typeof w !== "number") return "minmax(0,1fr) auto minmax(0,1fr)";
+        const p = clamp01(pillness.get());
+        const free = Math.max(0, w - paddingLeft.get() - paddingRight.get() - parts.links - 2 * gap);
+        const centred = Math.min(Math.max(free / 2, parts.logoBar), Math.max(parts.logoBar, free - parts.cta));
+        const left = Math.max(0, mix(centred, parts.logoPill, p));
+        return `${left}px auto ${Math.max(0, free - left)}px`;
+    });
 
     // While it's a bar over the page, it frosts in as the page starts to move under it.
     const { scrollY } = useScroll();
     const frost = useTransform(scrollY, [0, 40], [0, 1]);
-    // How far along the bar is to being the pill (0 to 1), on the shape's own spring.
-    const pillness = useMotionValue(0);
-    useEffect(() => {
-        const controls = animate(pillness, pill ? 1 : 0, reduce || instant ? { duration: 0 } : SPRING.morph);
-        return () => controls.stop();
-    }, [pill, reduce, instant, pillness]);
     const surfaceOpacity = useTransform(() => {
-        const p = Math.min(1, Math.max(0, pillness.get()));
+        const p = clamp01(pillness.get());
         return p + (1 - p) * frost.get();
     });
     const surfaceColor = useTransform(pillness, [0, 1], ["rgba(246, 246, 246, 0.9)", "rgba(255, 255, 255, 0.76)"]);
@@ -277,59 +327,105 @@ function DesktopNav() {
         if (containerRef.current) containerRef.current.inert = !revealed;
     }, [revealed]);
 
-    // Services opens on hover (with a beat of intent either way), or on click, tap and keys.
-    const [open, setOpen] = useState(false);
+    // The menus. Resting on a menu's name opens it; once one is open, moving to
+    // another name swaps straight to it. Click, tap and the keys work too.
+    const [menu, setMenu] = useState<MenuId | null>(null);
     const [lingering, setLingering] = useState(false); // still animating closed
-    const servicesRef = useRef<HTMLLIElement | null>(null);
-    const triggerRef = useRef<HTMLButtonElement>(null);
+    const regionRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
+    const triggers = useRef<Record<string, HTMLButtonElement | null>>({}).current;
+    const contents = useRef<Record<string, HTMLDivElement | null>>({}).current;
     const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const openedAt = useRef(0);
     const pointerType = useRef("mouse");
     const pointerAt = useRef<{ x: number; y: number } | null>(null);
 
-    const show = () => {
+    const show = (id: MenuId) => {
         clearTimeout(closeTimer.current);
+        clearTimeout(openTimer.current);
         openedAt.current = performance.now();
         setLingering(true);
-        setOpen(true);
+        setMenu(id);
     };
     const hide = () => {
         clearTimeout(openTimer.current);
-        setOpen(false);
+        setMenu(null);
     };
-    // Closed on purpose (a click, Escape, a pick): hover leaves it closed until the pointer leaves and comes back.
+    const scheduleClose = (ms = 160) => {
+        clearTimeout(closeTimer.current);
+        closeTimer.current = setTimeout(hide, ms);
+    };
+    // Closed on purpose (a click, Escape, a pick): hover leaves it closed until the pointer leaves the nav.
     const dismissed = useRef(false);
     const dismiss = () => {
         dismissed.current = true;
         hide();
     };
-    // Hover opens once the pointer rests on Services (or lingers there), so
-    // gliding across the nav to another link doesn't flash the menu open.
     const enteredAt = useRef(0);
     const armedAt = useRef({ x: 0, y: 0 });
-    const armOpen = (e: React.PointerEvent) => {
+    const armOpen = (id: MenuId, e: React.PointerEvent) => {
         if (dismissed.current) return;
         // A hand resting on the mouse still twitches: that counts as resting.
         if (openTimer.current && Math.hypot(e.clientX - armedAt.current.x, e.clientY - armedAt.current.y) < 4) return;
         armedAt.current = { x: e.clientX, y: e.clientY };
         clearTimeout(openTimer.current);
         const wait = Math.min(REST_MS, Math.max(0, enteredAt.current + LINGER_MS - performance.now()));
-        openTimer.current = setTimeout(show, wait);
+        openTimer.current = setTimeout(() => show(id), wait);
     };
-    const firstRow = () => panelRef.current?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
+    const focusFirst = (id: MenuId) => contents[id]?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
 
-    // Which item is lit: the one under the pointer, else Services while its
-    // menu is open, else the section on screen. The highlight glides between them.
-    const [hovered, setHovered] = useState<string | null>(null);
-    const onPage = SECTIONS.some((s) => s.id === section) ? section : null;
-    const lit = hovered ?? (open ? "services" : onPage);
+    // Which item is lit: the one under the pointer, else the open menu, else where you are.
+    const [hovered, setHovered] = useState<NavItem | null>(null);
+    const lit = hovered ?? menu ?? current;
     const items = useRef<Record<string, HTMLElement | null>>({}).current;
     const box = useGlide(lit, items);
     const [row, setRow] = useState<string | null>(null);
     const rows = useRef<Record<string, HTMLElement | null>>({}).current;
-    const rowBox = useGlide(open ? row : null, rows);
+    const rowBox = useGlide(menu === "services" ? row : null, rows);
+
+    // The panel: the last open menu stays in it while it closes. It's as big as
+    // that menu, under its name, and springs to the next one's size and place.
+    const shown = useRef<MenuId>("services");
+    if (menu) shown.current = menu;
+    const [sizes, setSizes] = useState<Record<MenuId, { w: number; h: number }>>({
+        services: { w: 360, h: 300 },
+        industries: { w: 372, h: 140 },
+        products: { w: 372, h: 300 },
+    });
+    useLayoutEffect(() => {
+        const measure = () =>
+            setSizes((prev) => {
+                const next = { ...prev };
+                for (const id of MENUS) {
+                    const el = contents[id];
+                    if (el) next[id] = { w: el.offsetWidth, h: el.offsetHeight };
+                }
+                return next;
+            });
+        measure();
+        document.fonts?.ready.then(measure);
+    }, [contents]);
+    const [place, setPlace] = useState({ x: 0, origin: 0.5, glide: false });
+    const placedFor = useRef<MenuId | null>(null);
+    useLayoutEffect(() => {
+        if (!menu) {
+            placedFor.current = null;
+            return;
+        }
+        const trigger = triggers[menu];
+        const region = regionRef.current;
+        if (!trigger || !region) return;
+        const { w } = sizes[menu];
+        const centre = trigger.offsetLeft + trigger.offsetWidth / 2;
+        const left = region.getBoundingClientRect().left;
+        const x = Math.min(Math.max(centre - w / 2, 12 - left), document.documentElement.clientWidth - 12 - w - left);
+        // From one open menu to another it springs across; opening, it starts in place.
+        const switching = placedFor.current !== null && placedFor.current !== menu;
+        placedFor.current = menu;
+        setPlace({ x, origin: (centre - x) / w, glide: switching });
+        // Placed again when the nav changes shape under an open menu.
+    }, [menu, sizes, triggers, pill]);
 
     useEffect(() => {
         const note = (e: PointerEvent) => {
@@ -345,27 +441,27 @@ function DesktopNav() {
     }, []);
 
     useEffect(() => {
-        if (!open) {
+        if (!menu) {
             setRow(null);
             // Closed under a still pointer: light whatever is really under it now.
             const at = pointerAt.current;
             const under = at ? document.elementFromPoint(at.x, at.y) : null;
-            if (!under || !servicesRef.current?.contains(under)) setHovered((h) => (h === "services" ? null : h));
+            if (!under || !regionRef.current?.contains(under)) setHovered(null);
             return;
         }
         const onDown = (e: PointerEvent) => {
-            if (!servicesRef.current?.contains(e.target as Node)) hide();
+            if (!regionRef.current?.contains(e.target as Node)) hide();
         };
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 dismiss();
-                triggerRef.current?.focus();
+                triggers[menu]?.focus();
                 return;
             }
             if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-            const links = [...(panelRef.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])];
+            const links = [...(contents[menu]?.querySelectorAll<HTMLAnchorElement>("a") ?? [])];
             const at = links.indexOf(document.activeElement as HTMLAnchorElement);
-            if (at === -1 && document.activeElement !== triggerRef.current) return;
+            if (at === -1 && document.activeElement !== triggers[menu]) return;
             e.preventDefault();
             const step = e.key === "ArrowDown" ? 1 : -1;
             links[at === -1 ? (step === 1 ? 0 : links.length - 1) : (at + step + links.length) % links.length]?.focus();
@@ -376,7 +472,9 @@ function DesktopNav() {
             window.removeEventListener("pointerdown", onDown);
             window.removeEventListener("keydown", onKey);
         };
-    }, [open]);
+        // dismiss and the refs are stable for this purpose
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [menu]);
 
     useEffect(
         () => () => {
@@ -388,50 +486,131 @@ function DesktopNav() {
 
     if (isNavHidden(pathname)) return null;
 
-    const hoverable = (id: string) => ({
-        ref: (el: HTMLLIElement | null) => {
-            items[id] = el;
-        },
-        onPointerEnter: (e: React.PointerEvent) => e.pointerType === "mouse" && setHovered(id),
-    });
-
-    const sectionLink = (id: string, label: string) => (
-        <li key={id} {...hoverable(id)} className="relative">
-            <motion.a
-                href={`/#${id}`}
-                onClick={(e) => {
+    const plainLink = (id: NavItem, label: string, href: string, onGo?: () => void) => (
+        <li
+            key={id}
+            ref={(el) => {
+                items[id] = el;
+            }}
+            className="relative"
+            onPointerEnter={(e) => {
+                if (e.pointerType !== "mouse") return;
+                setHovered(id);
+                if (menu) scheduleClose(140);
+            }}
+        >
+            <MotionLink
+                href={href}
+                onClick={(e: React.MouseEvent) => {
+                    if (!onGo) return;
                     e.preventDefault();
-                    goToSection(id);
+                    onGo();
                 }}
                 whileTap={{ scale: 0.97 }}
                 transition={SPRING.press}
-                aria-current={onPage === id ? "location" : undefined}
-                className={`flex h-8 items-center whitespace-nowrap rounded-full px-3 text-sm font-medium transition-colors duration-200 ${linkTone(lit === id)} ${FOCUS}`}
+                aria-current={current === id ? "page" : undefined}
+                className={`flex h-8 items-center whitespace-nowrap rounded-full px-2.5 text-sm font-medium transition-colors duration-200 lg:px-3 ${linkTone(lit === id)} ${FOCUS}`}
             >
                 {label}
-            </motion.a>
+            </MotionLink>
         </li>
     );
 
-    const rowLink = (key: string) => ({
-        ref: (el: HTMLLIElement | null) => {
-            rows[key] = el;
-        },
-    });
+    const menuTrigger = (id: MenuId, label: string) => (
+        <li
+            key={id}
+            ref={(el) => {
+                items[id] = el;
+            }}
+            className="relative"
+            onPointerEnter={(e) => {
+                if (e.pointerType !== "mouse") return;
+                setHovered(id);
+                clearTimeout(closeTimer.current);
+                if (menu) {
+                    if (menu !== id && !dismissed.current) show(id);
+                    return;
+                }
+                enteredAt.current = performance.now();
+                openTimer.current = undefined;
+                armOpen(id, e);
+            }}
+            onPointerMove={(e) => {
+                if (e.pointerType === "mouse" && !menu) armOpen(id, e);
+            }}
+            onPointerLeave={() => clearTimeout(openTimer.current)}
+        >
+            <motion.button
+                ref={(el: HTMLButtonElement | null) => {
+                    triggers[id] = el;
+                }}
+                type="button"
+                aria-expanded={menu === id}
+                aria-controls={`${panelId}-${id}`}
+                onClick={(e) => {
+                    const keys = e.detail === 0;
+                    // Already opened by the hover that led to this click: the click confirms it.
+                    if (menu === id && !keys && pointerType.current === "mouse" && performance.now() - openedAt.current < 600) return;
+                    if (menu === id) return dismiss();
+                    dismissed.current = false;
+                    show(id);
+                    if (keys) requestAnimationFrame(() => focusFirst(id));
+                }}
+                onKeyDown={(e) => {
+                    if (e.key !== "ArrowDown" || menu === id) return;
+                    e.preventDefault();
+                    show(id);
+                    requestAnimationFrame(() => focusFirst(id));
+                }}
+                whileTap={{ scale: 0.97 }}
+                transition={SPRING.press}
+                className={`flex h-8 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full pl-2.5 pr-2 text-sm font-medium transition-colors duration-200 lg:pl-3 lg:pr-2.5 ${linkTone(lit === id)} ${FOCUS}`}
+            >
+                {label}
+                <motion.span className="inline-flex" animate={{ rotate: menu === id ? 180 : 0 }} transition={SPRING.glide}>
+                    <ChevronDown aria-hidden className="h-3.5 w-3.5 opacity-60" strokeWidth={2.25} />
+                </motion.span>
+            </motion.button>
+        </li>
+    );
 
+    const order = MENUS.indexOf(shown.current);
+    const content = (id: MenuId, children: React.ReactNode) => {
+        const active = shown.current === id;
+        const side = MENUS.indexOf(id) < order ? -1 : 1;
+        return (
+            <motion.div
+                key={id}
+                id={`${panelId}-${id}`}
+                ref={(el: HTMLDivElement | null) => {
+                    contents[id] = el;
+                    if (el) el.inert = !active;
+                }}
+                aria-hidden={!active || undefined}
+                className="absolute left-0 top-0 w-max"
+                initial={false}
+                animate={active ? { opacity: 1, x: 0, filter: "blur(0px)" } : { opacity: 0, x: side * 28, filter: "blur(4px)" }}
+                transition={{ ...SPRING.glide, opacity: { duration: 0.18, ease: EASE_OUT } }}
+                style={{ pointerEvents: active ? "auto" : "none" }}
+            >
+                <motion.div variants={ROWS} initial={false} animate={menu === id ? "open" : "closed"}>
+                    {children}
+                </motion.div>
+            </motion.div>
+        );
+    };
+
+    const size = sizes[shown.current];
     return (
         <MotionConfig reducedMotion="user">
             <motion.div
                 ref={containerRef}
                 aria-hidden={!revealed || undefined}
                 className="fixed inset-x-0 z-50 mx-auto hidden md:block"
+                style={{ width, height, top, borderRadius: radius, paddingLeft, paddingRight }}
                 initial={false}
-                animate={{ ...geometry, opacity: revealed ? 1 : 0, y: revealed ? 0 : -10 }}
-                transition={{
-                    ...(reduce || instant ? { duration: 0 } : SPRING.morph),
-                    opacity: revealed ? { duration: 0.7, ease: EASE_OUT } : { duration: 0 },
-                    y: revealed ? { duration: 0.7, ease: EASE_OUT } : { duration: 0 },
-                }}
+                animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : -10 }}
+                transition={revealed ? { duration: 0.7, ease: EASE_OUT } : { duration: 0 }}
             >
                 {/* Fills the container, padding and all; with reduced motion this is what fades. */}
                 <div ref={scope} className="absolute inset-0" style={{ borderRadius: "inherit", paddingLeft: "inherit", paddingRight: "inherit" }}>
@@ -442,171 +621,208 @@ function DesktopNav() {
                         style={{ borderRadius: "inherit", opacity: surfaceOpacity, backgroundColor: surfaceColor, boxShadow: surfaceShadow }}
                     />
 
-                    <div className="relative grid h-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center" style={{ columnGap: GAP }}>
+                    <motion.div className="relative grid h-full items-center" style={{ gridTemplateColumns: columns, columnGap: gap }}>
                         <div ref={logoRef} className="w-fit">
-                            <Logo />
+                            <Logo fold={pillness} wide={wide} />
                         </div>
 
                         <nav aria-label="Main">
-                            <ul ref={linksRef} className="relative flex items-center gap-0.5" onPointerLeave={() => setHovered(null)}>
-                                <Glide box={box} className="rounded-full bg-black/[0.05]" />
-                                {sectionLink("work", "Work")}
-                                <li
-                                    ref={(el) => {
-                                        items.services = el;
-                                        servicesRef.current = el;
-                                    }}
-                                    className="relative"
-                                    onPointerEnter={(e) => {
-                                        if (e.pointerType !== "mouse") return;
-                                        setHovered("services");
-                                        clearTimeout(closeTimer.current);
-                                        enteredAt.current = performance.now();
-                                        openTimer.current = undefined;
-                                        if (!open) armOpen(e);
-                                    }}
-                                    onPointerMove={(e) => {
-                                        if (e.pointerType === "mouse" && !open) armOpen(e);
-                                    }}
-                                    onPointerLeave={(e) => {
-                                        if (e.pointerType !== "mouse") return;
-                                        dismissed.current = false;
-                                        clearTimeout(openTimer.current);
-                                        closeTimer.current = setTimeout(hide, 160);
-                                    }}
-                                    onBlur={(e) => {
-                                        if (open && !e.currentTarget.contains(e.relatedTarget as Node)) hide();
-                                    }}
-                                >
-                                    <motion.button
-                                        ref={triggerRef}
-                                        type="button"
-                                        aria-expanded={open}
-                                        aria-controls={panelId}
-                                        onClick={(e) => {
-                                            const keys = e.detail === 0;
-                                            // Already opened by the hover that led to this click: the click confirms it.
-                                            if (open && !keys && pointerType.current === "mouse" && performance.now() - openedAt.current < 600) return;
-                                            if (open) return dismiss();
-                                            dismissed.current = false;
-                                            show();
-                                            if (keys) requestAnimationFrame(firstRow);
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key !== "ArrowDown" || open) return;
-                                            e.preventDefault();
-                                            show();
-                                            requestAnimationFrame(firstRow);
-                                        }}
-                                        whileTap={{ scale: 0.97 }}
-                                        transition={SPRING.press}
-                                        className={`flex h-8 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full pl-3 pr-2.5 text-sm font-medium transition-colors duration-200 ${linkTone(lit === "services")} ${FOCUS}`}
-                                    >
-                                        Services
-                                        <motion.span className="inline-flex" animate={{ rotate: open ? 180 : 0 }} transition={SPRING.glide}>
-                                            <ChevronDown aria-hidden className="h-3.5 w-3.5 opacity-60" strokeWidth={2.25} />
-                                        </motion.span>
-                                    </motion.button>
+                            <div
+                                ref={regionRef}
+                                className="relative"
+                                onPointerEnter={() => clearTimeout(closeTimer.current)}
+                                onPointerLeave={(e) => {
+                                    if (e.pointerType !== "mouse") return;
+                                    dismissed.current = false;
+                                    clearTimeout(openTimer.current);
+                                    setHovered(null);
+                                    if (menu) scheduleClose();
+                                }}
+                                onBlur={(e) => {
+                                    if (menu && !e.currentTarget.contains(e.relatedTarget as Node)) hide();
+                                }}
+                            >
+                                <ul ref={linksRef} className="relative flex items-center gap-0.5">
+                                    <Glide box={box} className="rounded-full bg-black/[0.05]" />
+                                    {plainLink("work", "Work", "/#work", () => goToSection("work"))}
+                                    {menuTrigger("services", "Services")}
+                                    {menuTrigger("industries", "Industries")}
+                                    {menuTrigger("products", "Products")}
+                                    {plainLink("insights", INSIGHTS.label, INSIGHTS.href)}
+                                </ul>
 
-                                    {/* Grows out of the trigger. The padding bridges the gap, so the pointer can cross it. */}
-                                    <div
-                                        id={panelId}
-                                        className="absolute left-1/2 top-full w-[360px] -translate-x-1/2 pt-3"
-                                        style={{ visibility: open || lingering ? "visible" : "hidden", pointerEvents: open ? "auto" : "none" }}
+                                {/* One panel for every menu. It grows out of the open menu's name, and moving to
+                                    another name springs it to that menu's size and place. The padding bridges the
+                                    gap, so the pointer can cross it. */}
+                                <motion.div
+                                    className="absolute left-0 top-full pt-3"
+                                    style={{ visibility: menu || lingering ? "visible" : "hidden", pointerEvents: menu ? "auto" : "none" }}
+                                    initial={false}
+                                    animate={{ x: place.x, width: size.w + 2 /* the border */ }}
+                                    transition={place.glide ? SPRING.glide : { duration: 0 }}
+                                    onPointerEnter={() => clearTimeout(closeTimer.current)}
+                                >
+                                    <motion.div
+                                        ref={panelRef}
+                                        initial={false}
+                                        animate={menu ? "open" : "closed"}
+                                        variants={PANEL}
+                                        onAnimationComplete={(label) => label === "closed" && setLingering(false)}
+                                        style={{ originX: place.origin, originY: 0 }}
+                                        className="rounded-[18px] border border-black/[0.06] bg-white/[0.8] shadow-[0_24px_48px_-16px_rgba(0,0,0,0.2),0_8px_20px_-10px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl backdrop-saturate-[1.8]"
                                     >
                                         <motion.div
-                                            ref={panelRef}
+                                            className="relative overflow-hidden rounded-[17px]"
                                             initial={false}
-                                            animate={open ? "open" : "closed"}
-                                            variants={MENU}
-                                            onAnimationComplete={(label) => label === "closed" && setLingering(false)}
-                                            style={{ originX: 0.5, originY: 0 }}
-                                            className="rounded-[18px] border border-black/[0.06] bg-white/[0.8] p-1.5 shadow-[0_24px_48px_-16px_rgba(0,0,0,0.2),0_8px_20px_-10px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl backdrop-saturate-[1.8]"
+                                            animate={{ height: size.h }}
+                                            transition={place.glide ? SPRING.glide : { duration: 0 }}
                                         >
-                                            <ul className="relative" onPointerLeave={() => setRow(null)}>
-                                                <Glide box={rowBox} className="rounded-xl bg-black/[0.045]" />
-                                                {SERVICES.map((service) => {
-                                                    const on = open && row === service.key;
-                                                    return (
-                                                        <motion.li key={service.key} variants={ROW} {...rowLink(service.key)} className="relative">
+                                            {content(
+                                                "services",
+                                                <div className="w-[360px] p-1.5">
+                                                    <ul className="relative" onPointerLeave={() => setRow(null)}>
+                                                        <Glide box={rowBox} className="rounded-xl bg-black/[0.045]" />
+                                                        {SERVICES.map((service) => {
+                                                            const on = menu === "services" && row === service.key;
+                                                            return (
+                                                                <motion.li
+                                                                    key={service.key}
+                                                                    variants={ROW}
+                                                                    ref={(el: HTMLLIElement | null) => {
+                                                                        rows[service.key] = el;
+                                                                    }}
+                                                                    className="relative"
+                                                                >
+                                                                    <Link
+                                                                        href={service.href}
+                                                                        onClick={dismiss}
+                                                                        onPointerEnter={() => setRow(service.key)}
+                                                                        onFocus={() => setRow(service.key)}
+                                                                        className={`flex items-center gap-3 rounded-xl p-1.5 pr-3 ${ROW_FOCUS}`}
+                                                                    >
+                                                                        <span className="relative h-10 w-[60px] shrink-0 overflow-hidden rounded-[9px] bg-neutral-200">
+                                                                            <Image
+                                                                                src={service.still}
+                                                                                alt=""
+                                                                                fill
+                                                                                sizes="60px"
+                                                                                loading="eager"
+                                                                                style={{ objectPosition: service.focus }}
+                                                                                className={`object-cover transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
+                                                                            />
+                                                                            <span className="absolute inset-0 rounded-[9px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
+                                                                        </span>
+                                                                        <span className="min-w-0 flex-1">
+                                                                            <span className="block text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>
+                                                                            <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{service.hint}</span>
+                                                                        </span>
+                                                                        <ArrowRight
+                                                                            aria-hidden
+                                                                            className={`h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)] transition-all duration-200 ${on ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0"}`}
+                                                                            strokeWidth={2.25}
+                                                                        />
+                                                                    </Link>
+                                                                </motion.li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                    <motion.div variants={ROW} aria-hidden className="mx-2.5 my-1.5 h-px bg-black/[0.07]" />
+                                                    <motion.div variants={ROW}>
+                                                        <Link
+                                                            href={`/#${PRICING.id}`}
+                                                            onClick={(e) => {
+                                                                dismiss();
+                                                                if (pathname !== "/") return;
+                                                                e.preventDefault();
+                                                                goToSection(PRICING.id);
+                                                            }}
+                                                            className={`group flex h-9 items-center justify-between rounded-xl px-3 text-[13px] font-medium text-[rgba(28,28,30,0.55)] transition-colors hover:text-[rgba(28,28,30,0.9)] ${ROW_FOCUS}`}
+                                                        >
+                                                            See pricing
+                                                            <ArrowRight aria-hidden className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.25} />
+                                                        </Link>
+                                                    </motion.div>
+                                                </div>,
+                                            )}
+                                            {content(
+                                                "industries",
+                                                <div className="w-[372px] p-1.5">
+                                                    {INDUSTRIES.map((industry) => (
+                                                        <motion.div key={industry.key} variants={ROW}>
                                                             <Link
-                                                                href={service.href}
+                                                                href={industry.href}
                                                                 onClick={dismiss}
-                                                                onPointerEnter={() => setRow(service.key)}
-                                                                onFocus={() => setRow(service.key)}
-                                                                className="flex items-center gap-3 rounded-xl p-1.5 pr-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB]"
+                                                                className={`group block rounded-xl p-3 transition-colors duration-200 hover:bg-black/[0.035] ${ROW_FOCUS}`}
                                                             >
-                                                                <span className="relative h-10 w-[60px] shrink-0 overflow-hidden rounded-[9px] bg-neutral-200">
-                                                                    <Image
-                                                                        src={service.still}
-                                                                        alt=""
-                                                                        fill
-                                                                        sizes="60px"
-                                                                        loading="eager"
-                                                                        style={{ objectPosition: service.focus }}
-                                                                        className={`object-cover transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
+                                                                <span className="flex items-center justify-between">
+                                                                    <span className="text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{industry.label}</span>
+                                                                    <ArrowRight
+                                                                        aria-hidden
+                                                                        className="h-3.5 w-3.5 -translate-x-1 text-[rgba(28,28,30,0.45)] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+                                                                        strokeWidth={2.25}
                                                                     />
-                                                                    <span className="absolute inset-0 rounded-[9px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
                                                                 </span>
-                                                                <span className="min-w-0 flex-1">
-                                                                    <span className="block text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>
-                                                                    <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{service.hint}</span>
+                                                                <span className="mt-0.5 block text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{industry.line}</span>
+                                                                {/* A few of the clients, in grey until the card is hovered */}
+                                                                <span className="mt-3.5 flex items-center gap-6">
+                                                                    {industry.logos.map((logo) => (
+                                                                        <Image
+                                                                            key={logo.name}
+                                                                            src={logo.src}
+                                                                            alt={logo.name}
+                                                                            width={Math.round((logo.width * 22) / 264)}
+                                                                            height={22}
+                                                                            loading="eager"
+                                                                            className="h-[22px] w-auto opacity-70 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                                                                        />
+                                                                    ))}
                                                                 </span>
-                                                                <ArrowRight
-                                                                    aria-hidden
-                                                                    className={`h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)] transition-all duration-200 ${on ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0"}`}
-                                                                    strokeWidth={2.25}
-                                                                />
                                                             </Link>
-                                                        </motion.li>
-                                                    );
-                                                })}
-                                                <motion.li aria-hidden variants={ROW} className="mx-2.5 my-1.5 h-px bg-black/[0.07]" />
-                                                <motion.li variants={ROW} {...rowLink("crypto")} className="relative">
-                                                    <Link
-                                                        href={CRYPTO.href}
-                                                        onClick={dismiss}
-                                                        onPointerEnter={() => setRow("crypto")}
-                                                        onFocus={() => setRow("crypto")}
-                                                        className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium text-[rgba(28,28,30,0.86)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB]"
-                                                    >
-                                                        <span className="flex-1">{CRYPTO.label}</span>
-                                                        <ArrowRight
-                                                            aria-hidden
-                                                            className={`h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)] transition-all duration-200 ${open && row === "crypto" ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0"}`}
-                                                            strokeWidth={2.25}
-                                                        />
-                                                    </Link>
-                                                </motion.li>
-                                                <motion.li variants={ROW} {...rowLink("asset-generator")} className="relative">
-                                                    <a
-                                                        href={ASSET_GENERATOR.href}
-                                                        target="_blank"
-                                                        rel="noopener"
-                                                        title={ASSET_GENERATOR.hint}
-                                                        onClick={dismiss}
-                                                        onPointerEnter={() => setRow("asset-generator")}
-                                                        onFocus={() => setRow("asset-generator")}
-                                                        className="flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium text-[rgba(28,28,30,0.86)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB]"
-                                                    >
-                                                        {ASSET_GENERATOR.label}
-                                                        <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
-                                                        <ArrowUpRight aria-hidden className="ml-auto h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
-                                                    </a>
-                                                </motion.li>
-                                            </ul>
+                                                        </motion.div>
+                                                    ))}
+                                                </div>,
+                                            )}
+                                            {content(
+                                                "products",
+                                                <div className="w-[372px] p-1.5">
+                                                    <motion.div variants={ROW}>
+                                                        <a
+                                                            href={ASSET_GENERATOR.href}
+                                                            target="_blank"
+                                                            rel="noopener"
+                                                            onClick={dismiss}
+                                                            className={`group block rounded-xl p-1.5 transition-colors duration-200 hover:bg-black/[0.035] ${ROW_FOCUS}`}
+                                                        >
+                                                            <span className="relative block aspect-[1248/600] overflow-hidden rounded-[10px] bg-neutral-100 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
+                                                                <Image
+                                                                    src={ASSET_GENERATOR.image}
+                                                                    alt=""
+                                                                    fill
+                                                                    sizes="360px"
+                                                                    loading="eager"
+                                                                    className="object-cover object-[50%_35%] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                                                                />
+                                                            </span>
+                                                            <span className="flex items-center gap-2 px-1.5 pt-2.5">
+                                                                <span className="text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{ASSET_GENERATOR.label}</span>
+                                                                <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
+                                                                <ArrowUpRight aria-hidden className="ml-auto h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
+                                                            </span>
+                                                            <span className="block px-1.5 pb-1 text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>
+                                                        </a>
+                                                    </motion.div>
+                                                </div>,
+                                            )}
                                         </motion.div>
-                                    </div>
-                                </li>
-                                {sectionLink("pricing", "Pricing")}
-                                {sectionLink("faq", "FAQ")}
-                            </ul>
+                                    </motion.div>
+                                </motion.div>
+                            </div>
                         </nav>
 
                         <div ref={ctaRef} className="w-fit justify-self-end">
                             <CallButton onGo={() => goToSection("contact")} />
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </motion.div>
         </MotionConfig>

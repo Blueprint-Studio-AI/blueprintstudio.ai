@@ -22,18 +22,31 @@ export const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 export const FOCUS = "outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]";
 
-// Landing pages with their own header hide both navs.
-const HIDDEN_NAV_ROUTES = ["/launch-videos", "/launch", "/brand", "/insights", "/brands"];
+// The paid landing pages (/brand, /launch, /launch-videos) and the client brand
+// kits (/brands/*) keep their own focused header, so both navs stay off them.
+const HIDDEN_NAV_ROUTES = ["/launch-videos", "/launch", "/brand", "/brands"];
 
 export const isNavHidden = (pathname: string) =>
     HIDDEN_NAV_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"));
 
-/** The home page's sections in the nav, in page order. Services sits after Work. */
-export const SECTIONS = [
-    { id: "work", label: "Work" },
-    { id: "pricing", label: "Pricing" },
-    { id: "faq", label: "FAQ" },
-];
+/** The nav's own items, in order. Services, Industries and Products open menus. */
+export type NavItem = "work" | "services" | "industries" | "products" | "insights";
+
+/** The item for where you are: the page you're on, or Work while it's on screen at home. */
+export function useCurrentItem(): NavItem | null {
+    const pathname = usePathname();
+    const section = useActiveSection();
+    if (pathname === "/") return section === "work" ? "work" : null;
+    if (pathname.startsWith("/work")) return "work";
+    if (pathname.startsWith("/services")) return "services";
+    if (pathname.startsWith("/industries")) return "industries";
+    if (pathname.startsWith("/insights")) return "insights";
+    return null;
+}
+
+/** Pricing and FAQ left the top level; the menus and the footer still link them. */
+export const PRICING = { label: "Pricing", id: "pricing" };
+export const FAQ = { label: "FAQ", id: "faq" };
 
 // What we make, each with its own page. The stills are the hero's, so the menu
 // and the headline show the same work.
@@ -49,12 +62,32 @@ export const SERVICES = (
     return { ...service, label: variant.label, still: variant.still };
 });
 
-export const CRYPTO = { label: "For crypto founders", href: "/industries/crypto" };
+// The industries we have a page for. Each is a card: a line on what we make
+// there, and a few of the clients (from lib/industries on its page's branch).
+export const INDUSTRIES = [
+    {
+        key: "crypto",
+        label: "Crypto",
+        href: "/industries/crypto",
+        line: "For stablecoins, Bitcoin finance, DeFi and on-chain AI.",
+        logos: [
+            { name: "Arch Network", src: "/logos-match-height/arch-network.png", width: 518 },
+            { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
+            { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
+            { name: "Autara", src: "/logos-match-height/autara.png", width: 525 },
+        ],
+    },
+];
+
+/** Our own product, on the tools subdomain. The picture is the home page's Asset Generator band's. */
 export const ASSET_GENERATOR = {
     label: "Asset Generator",
-    hint: "Your brand’s Styles and logos in your AI app",
+    line: "Your brand’s Styles and logos in your AI app.",
+    image: "/asset-generator/demo-1.webp",
     href: assetGeneratorUrl("/asset-generator/landing", "nav"),
 };
+
+export const INSIGHTS = { label: "Insights", href: "/insights" };
 
 /** Goes to a home page section with Locomotive's eased scroll, 80px clear of the top, or loads /#section from any other page. */
 export function useGoToSection() {
@@ -99,7 +132,7 @@ export function useActiveSection() {
     useEffect(() => {
         setActive(null);
         if (pathname !== "/") return;
-        const ids = [...SECTIONS.map((s) => s.id), "testimonials", "contact"];
+        const ids = ["work", "pricing", "testimonials", "faq", "contact"];
         const observer = new IntersectionObserver(
             (entries) => {
                 if (window.scrollY < 200) return setActive(null);

@@ -7,13 +7,16 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useSmoothScroll } from "./SmoothScroll";
+import { Mark, useLogoLook } from "@/components/nav/logo";
 import {
     ASSET_GENERATOR,
-    CRYPTO,
     CallButton,
     EASE_OUT,
+    FAQ,
     FOCUS,
-    SECTIONS,
+    INDUSTRIES,
+    INSIGHTS,
+    PRICING,
     SERVICES,
     SPRING,
     isNavHidden,
@@ -40,6 +43,7 @@ export const FloatingNavNew = () => {
     const goToSection = useGoToSection();
     const section = useActiveSection();
     const { scroll } = useSmoothScroll();
+    const look = useLogoLook();
     const [open, setOpen] = useState(false);
 
     // The closed pill is as wide as its row; the sheet as wide as the screen allows.
@@ -92,6 +96,28 @@ export const FloatingNavNew = () => {
     if (isNavHidden(pathname)) return null;
 
     const morph = reduce ? { duration: 0 } : SPRING.morph;
+    const heading = (label: string) => (
+        <motion.p variants={ROW} className="px-3 pb-1 pt-3 text-[13px] font-medium text-[rgba(28,28,30,0.5)]">
+            {label}
+        </motion.p>
+    );
+    const bigLink = (label: string, href: string, onGo: (() => void) | undefined, here: boolean) => (
+        <motion.div variants={ROW}>
+            <Link
+                href={href}
+                onClick={(e) => {
+                    if (!onGo) return setOpen(false);
+                    e.preventDefault();
+                    onGo();
+                }}
+                aria-current={here ? "page" : undefined}
+                className={`flex h-12 items-center justify-between rounded-2xl px-3 text-[17px] font-medium text-[rgba(28,28,30,0.96)] ${here ? "bg-black/[0.05]" : "active:bg-black/[0.04]"} ${FOCUS}`}
+            >
+                {label}
+                {here && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />}
+            </Link>
+        </motion.div>
+    );
     return (
         <MotionConfig reducedMotion="user">
             <div className="md:hidden">
@@ -134,28 +160,8 @@ export const FloatingNavNew = () => {
                         animate={open ? "open" : "closed"}
                         variants={{ open: { transition: { staggerChildren: 0.03, delayChildren: 0.06 } }, closed: {} }}
                     >
-                        <ul>
-                            {SECTIONS.map((s) => (
-                                <motion.li key={s.id} variants={ROW}>
-                                    <a
-                                        href={`/#${s.id}`}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            go(s.id);
-                                        }}
-                                        aria-current={home && section === s.id ? "location" : undefined}
-                                        className={`flex h-12 items-center justify-between rounded-2xl px-3 text-[17px] font-medium text-[rgba(28,28,30,0.96)] ${home && section === s.id ? "bg-black/[0.05]" : "active:bg-black/[0.04]"} ${FOCUS}`}
-                                    >
-                                        {s.label}
-                                        {home && section === s.id && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />}
-                                    </a>
-                                </motion.li>
-                            ))}
-                        </ul>
-                        <motion.div variants={ROW} aria-hidden className="mx-3 my-2 h-px bg-black/[0.07]" />
-                        <motion.p variants={ROW} className="px-3 pb-1 text-[13px] font-medium text-[rgba(28,28,30,0.5)]">
-                            Services
-                        </motion.p>
+                        {bigLink("Work", "/#work", () => go("work"), home && section === "work")}
+                        {heading("Services")}
                         <ul>
                             {SERVICES.map((service) => (
                                 <motion.li key={service.key} variants={ROW}>
@@ -164,9 +170,9 @@ export const FloatingNavNew = () => {
                                         onClick={() => setOpen(false)}
                                         className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
                                     >
-                                        <span className="relative h-10 w-[60px] shrink-0 overflow-hidden rounded-[9px] bg-neutral-200">
-                                            <Image src={service.still} alt="" fill sizes="60px" style={{ objectPosition: service.focus }} className="object-cover" />
-                                            <span className="absolute inset-0 rounded-[9px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
+                                        <span className="relative h-9 w-[54px] shrink-0 overflow-hidden rounded-[8px] bg-neutral-200">
+                                            <Image src={service.still} alt="" fill sizes="54px" style={{ objectPosition: service.focus }} className="object-cover" />
+                                            <span className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
                                         </span>
                                         <span className="min-w-0 flex-1">
                                             <span className="block text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>
@@ -176,31 +182,62 @@ export const FloatingNavNew = () => {
                                 </motion.li>
                             ))}
                         </ul>
-                        <motion.div variants={ROW} aria-hidden className="mx-3 my-2 h-px bg-black/[0.07]" />
-                        <ul>
-                            <motion.li variants={ROW}>
+                        {heading("Industries")}
+                        {INDUSTRIES.map((industry) => (
+                            <motion.div key={industry.key} variants={ROW}>
                                 <Link
-                                    href={CRYPTO.href}
+                                    href={industry.href}
                                     onClick={() => setOpen(false)}
-                                    className={`flex h-11 items-center rounded-2xl px-3 text-[15px] font-medium text-[rgba(28,28,30,0.86)] active:bg-black/[0.04] ${FOCUS}`}
+                                    className={`flex items-center gap-3 rounded-2xl px-3 py-2 active:bg-black/[0.04] ${FOCUS}`}
                                 >
-                                    {CRYPTO.label}
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">{industry.label}</span>
+                                        <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{industry.line}</span>
+                                    </span>
                                 </Link>
-                            </motion.li>
-                            <motion.li variants={ROW}>
+                            </motion.div>
+                        ))}
+                        {heading("Products")}
+                        <motion.div variants={ROW}>
+                            <a
+                                href={ASSET_GENERATOR.href}
+                                target="_blank"
+                                rel="noopener"
+                                onClick={() => setOpen(false)}
+                                className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
+                            >
+                                <span className="relative h-9 w-[54px] shrink-0 overflow-hidden rounded-[8px] bg-neutral-100">
+                                    <Image src={ASSET_GENERATOR.image} alt="" fill sizes="54px" className="object-cover object-[50%_35%]" />
+                                    <span className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="flex items-center gap-2 text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">
+                                        {ASSET_GENERATOR.label}
+                                        <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
+                                    </span>
+                                    <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>
+                                </span>
+                                <ArrowUpRight aria-hidden className="h-4 w-4 shrink-0 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
+                            </a>
+                        </motion.div>
+                        <motion.div variants={ROW} aria-hidden className="mx-3 my-2 h-px bg-black/[0.07]" />
+                        {bigLink(INSIGHTS.label, INSIGHTS.href, undefined, pathname.startsWith(INSIGHTS.href))}
+                        {/* Pricing and FAQ left the top level; they stay one tap away here */}
+                        <motion.div variants={ROW} className="flex items-center gap-1 px-1 pb-1 pt-2">
+                            {[PRICING, FAQ].map((link) => (
                                 <a
-                                    href={ASSET_GENERATOR.href}
-                                    target="_blank"
-                                    rel="noopener"
-                                    onClick={() => setOpen(false)}
-                                    className={`flex h-11 items-center gap-2 rounded-2xl px-3 text-[15px] font-medium text-[rgba(28,28,30,0.86)] active:bg-black/[0.04] ${FOCUS}`}
+                                    key={link.id}
+                                    href={`/#${link.id}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        go(link.id);
+                                    }}
+                                    className={`rounded-full px-2 py-1 text-[13px] font-medium text-[rgba(28,28,30,0.55)] active:bg-black/[0.04] ${FOCUS}`}
                                 >
-                                    {ASSET_GENERATOR.label}
-                                    <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
-                                    <ArrowUpRight aria-hidden className="ml-auto h-4 w-4 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
+                                    {link.label}
                                 </a>
-                            </motion.li>
-                        </ul>
+                            ))}
+                        </motion.div>
                     </motion.div>
 
                     {/* The pill's own row, which stays at the bottom edge as the shape grows */}
@@ -218,7 +255,7 @@ export const FloatingNavNew = () => {
                                 aria-label="Blueprint Studio home"
                                 className={`flex h-11 w-11 items-center justify-center rounded-full active:bg-black/[0.05] ${FOCUS}`}
                             >
-                                <Image src="/blueprint-logo.svg" alt="" width={24} height={24} className="h-6 w-6" />
+                                <Mark look={look} size={look === 2 ? 24 : 22} />
                             </motion.a>
                             <motion.button
                                 type="button"
