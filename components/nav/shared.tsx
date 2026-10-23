@@ -76,7 +76,7 @@ export const INDUSTRIES = [
             { name: "Arch Network", src: "/logos-match-height/arch-network.png", width: 518 },
             { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
             { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
-            { name: "Autara", src: "/logos-match-height/autara.png", width: 525 },
+            { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
         ],
     },
 ];
