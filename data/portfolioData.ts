@@ -565,7 +565,7 @@ export const clients: Client[] = [
             poster: `${KITS}/livingip-app/hero.jpg`,
             // The app on a laptop, then a phone. (Earlier stretches include “Poast”,
             // whose ownership is a question for Tyler, and pale blurred transitions.)
-            clip: [10.1, 13],
+            clip: [10.1, 12.7],
           },
           vertical: {
             src: `${PROJECTS}/living-ip/living-ip-vertical-compressed.mp4`,
