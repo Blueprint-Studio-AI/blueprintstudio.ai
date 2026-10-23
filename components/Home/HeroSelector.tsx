@@ -24,8 +24,8 @@ export type Variant = {
      * `phone` is a tall cut for the 4:5 frame on phones, where one exists.
      */
     video: { src: string; phone?: string; poster: string; start: number; end: number };
-    /** A small crop of the poster, for inline use in text. */
-    thumb: string;
+    /** A still of the work, floated by the cursor when the word is hovered. */
+    still: string;
 };
 
 export const VARIANTS: Variant[] = [
@@ -34,7 +34,7 @@ export const VARIANTS: Variant[] = [
         word: "apps",
         label: "Apps",
         sub: "For founders like LivingIP and Bump.",
-        thumb: "/media/hero-words/apps.jpg",
+        still: "/media/hero-words/apps.jpg",
         cta: { label: "See app work", href: "#work" },
         video: {
             src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
@@ -49,7 +49,7 @@ export const VARIANTS: Variant[] = [
         word: "websites",
         label: "Websites",
         sub: "For founders like Perena, Autara and Breeze.",
-        thumb: "/media/hero-words/websites.jpg",
+        still: "/media/hero-words/websites.jpg",
         cta: { label: "See website work", href: "#work" },
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
@@ -65,7 +65,7 @@ export const VARIANTS: Variant[] = [
         label: "Brands",
         sub: "For founders like Autara, Arch Network and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
-        thumb: "/media/hero-words/brands.jpg",
+        still: "/media/hero-words/brands.jpg",
         // Autara's identity: the triangle pattern into its homepage.
         video: {
             src: "/media/projects/autara/autara-horizontal-compressed.mp4",
@@ -80,7 +80,7 @@ export const VARIANTS: Variant[] = [
         word: "launch videos",
         label: "Launch videos",
         sub: "For founders like TokenWorks, Jinba and Pyra.",
-        thumb: "/media/hero-words/launch-videos.jpg",
+        still: "/media/hero-words/launch-videos.jpg",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
