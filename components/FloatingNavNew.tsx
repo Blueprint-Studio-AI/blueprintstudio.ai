@@ -4,10 +4,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useSmoothScroll } from "./SmoothScroll";
-import { Mark, useLogoLook } from "@/components/nav/logo";
+import { FoldingLogo, logoWidth, useLogoLook, type LogoGeometry } from "@/components/nav/logo";
 import {
     ASSET_GENERATOR,
     CallButton,
@@ -46,21 +46,30 @@ export const FloatingNavNew = () => {
     const look = useLogoLook();
     const [open, setOpen] = useState(false);
 
-    // The closed pill is as wide as its row; the sheet as wide as the screen allows.
+    // The logo stays folded here (BPSTU, or the fingerprint): the full name is in the bar
+    // at the top, and opened it wouldn't fit beside Close and Book a call.
+    const fold = useMotionValue(1);
+    const [geometry, setGeometry] = useState<LogoGeometry>({ kept: 52, runs: [0] });
+
+    // The closed pill is as wide as its row with the logo folded; the sheet as wide as the screen allows.
     const rowRef = useRef<HTMLDivElement>(null);
+    const logoRef = useRef<HTMLAnchorElement>(null);
     const sheetRef = useRef<HTMLDivElement>(null);
-    const [size, setSize] = useState({ pill: 280, sheetW: 360, sheetH: 520 });
+    const [size, setSize] = useState({ rest: 230, sheetW: 360, sheetH: 520 });
     useLayoutEffect(() => {
         const measure = () => {
             const row = rowRef.current;
             const sheet = sheetRef.current;
-            if (!row || !sheet) return;
+            const logo = logoRef.current;
+            if (!row || !sheet || !logo) return;
             const style = getComputedStyle(row);
             const parts = [...row.children].reduce((sum, el) => sum + (el as HTMLElement).offsetWidth, 0);
             const gaps = parseFloat(style.columnGap || "0") * (row.children.length - 1);
             const pad = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+            const logoPad = parseFloat(getComputedStyle(logo).paddingLeft) * 2;
             setSize({
-                pill: Math.ceil(parts + gaps + pad),
+                // Everything but the logo itself, which is added at its folded width.
+                rest: Math.ceil(parts + gaps + pad - logo.offsetWidth + logoPad),
                 sheetW: Math.min(window.innerWidth - 24, 420),
                 sheetH: sheet.offsetHeight + PILL_H,
             });
@@ -70,6 +79,7 @@ export const FloatingNavNew = () => {
         window.addEventListener("resize", measure);
         return () => window.removeEventListener("resize", measure);
     }, []);
+    const pillW = size.rest + logoWidth(geometry, 1);
 
     // While the sheet is open the page stays still, Escape closes it, and so does going somewhere else.
     useEffect(() => {
@@ -141,7 +151,7 @@ export const FloatingNavNew = () => {
                     style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
                     initial={false}
                     animate={{
-                        width: open ? size.sheetW : size.pill,
+                        width: open ? size.sheetW : pillW,
                         height: open ? size.sheetH : PILL_H,
                         borderRadius: open ? 24 : PILL_H / 2,
                         y: revealed ? 0 : 96,
@@ -192,7 +202,7 @@ export const FloatingNavNew = () => {
                                 >
                                     <span className="min-w-0 flex-1">
                                         <span className="block text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">{industry.label}</span>
-                                        <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{industry.line}</span>
+                                        <span className="block text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{industry.line}</span>
                                     </span>
                                 </Link>
                             </motion.div>
@@ -215,7 +225,7 @@ export const FloatingNavNew = () => {
                                         {ASSET_GENERATOR.label}
                                         <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
                                     </span>
-                                    <span className="block truncate text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>
+                                    <span className="block text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>
                                 </span>
                                 <ArrowUpRight aria-hidden className="h-4 w-4 shrink-0 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
                             </a>
@@ -252,10 +262,11 @@ export const FloatingNavNew = () => {
                                 }}
                                 whileTap={{ scale: 0.94 }}
                                 transition={SPRING.press}
-                                aria-label="Blueprint Studio home"
-                                className={`flex h-11 w-11 items-center justify-center rounded-full active:bg-black/[0.05] ${FOCUS}`}
+                                ref={logoRef}
+                                aria-label="Blueprint Studio"
+                                className={`flex h-11 items-center rounded-full px-3 active:bg-black/[0.05] ${FOCUS}`}
                             >
-                                <Mark look={look} size={look === 2 ? 24 : 22} />
+                                <FoldingLogo look={look} fold={fold} onGeometry={setGeometry} />
                             </motion.a>
                             <motion.button
                                 type="button"

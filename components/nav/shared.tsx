@@ -14,6 +14,8 @@ import { assetGeneratorUrl } from "@/lib/asset-generator";
 export const SPRING = {
     /** The bar becoming the pill, and the pill becoming the menu sheet. */
     morph: { type: "spring", visualDuration: 0.55, bounce: 0.14 } satisfies Transition,
+    /** The logo folding to BPSTU and opening again: a touch slower, so the runs can follow one another. */
+    fold: { type: "spring", visualDuration: 0.6, bounce: 0.1 } satisfies Transition,
     /** Highlights gliding from item to item, chevrons turning. */
     glide: { type: "spring", visualDuration: 0.3, bounce: 0.12 } satisfies Transition,
     press: { type: "spring", visualDuration: 0.15, bounce: 0.1 } satisfies Transition,

@@ -32,7 +32,7 @@ import {
     useNavReveal,
     type NavItem,
 } from "@/components/nav/shared";
-import { BrandLogo, logoWidths, useLogoLook } from "@/components/nav/logo";
+import { FoldingLogo, logoWidth, useLogoLook, type LogoGeometry } from "@/components/nav/logo";
 
 // The nav at the top of the page. From md up it's one nav with two shapes: a
 // bar across the top of the page, which stays put as the page scrolls, and,
@@ -101,7 +101,17 @@ function Glide({ box, className }: { box: Box; className: string }) {
 
 const MotionLink = motion.create(Link);
 
-function Logo({ fold, wide }: { fold?: MotionValue<number>; wide?: boolean }) {
+function Logo({
+    fold,
+    onGeometry,
+    onPointerEnter,
+    onPointerLeave,
+}: {
+    fold?: MotionValue<number>;
+    onGeometry?: (geometry: LogoGeometry) => void;
+    onPointerEnter?: (e: React.PointerEvent) => void;
+    onPointerLeave?: (e: React.PointerEvent) => void;
+}) {
     const home = usePathname() === "/";
     const goToSection = useGoToSection();
     const look = useLogoLook();
@@ -113,12 +123,14 @@ function Logo({ fold, wide }: { fold?: MotionValue<number>; wide?: boolean }) {
                 e.preventDefault();
                 goToSection("hero");
             }}
+            onPointerEnter={onPointerEnter}
+            onPointerLeave={onPointerLeave}
             whileTap={{ scale: 0.97 }}
             transition={SPRING.press}
-            aria-label="Blueprint Studio home"
-            className={`flex w-fit shrink-0 items-center rounded-md transition-opacity duration-200 hover:opacity-70 ${FOCUS}`}
+            aria-label="Blueprint Studio"
+            className={`flex w-fit shrink-0 items-center rounded-md ${FOCUS}`}
         >
-            <BrandLogo look={look} fold={fold} wide={wide} />
+            <FoldingLogo look={look} fold={fold} onGeometry={onGeometry} />
         </MotionLink>
     );
 }
@@ -206,24 +218,21 @@ function DesktopNav() {
     const reduce = useReducedMotion();
     const compact = useCompact();
     const current = useCurrentItem();
-    const look = useLogoLook();
     const panelId = useId();
 
     // The viewport (for the bar), and the parts' widths (for the pill).
     const [vw, setVw] = useState(0);
-    const wide = vw === 0 || vw >= 1024; // between md and lg there's only room for the mark
+    const wide = vw === 0 || vw >= 1024; // between md and lg the logo stays folded, to leave room for the links
     const gap = vw >= 1024 ? 20 : 12;
     const barPad = vw >= 1024 ? 23 : 19;
-    const logoRef = useRef<HTMLDivElement>(null);
     const linksRef = useRef<HTMLUListElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
-    const [parts, setParts] = useState({ logoBar: 142, logoPill: 142, links: 440, cta: 104 });
+    const [parts, setParts] = useState({ links: 440, cta: 104 });
+    const [geometry, setGeometry] = useState<LogoGeometry>({ kept: 52, runs: [0] });
     useLayoutEffect(() => {
         const measure = () => {
-            const width = document.documentElement.clientWidth;
-            setVw(width);
-            const logo = logoWidths(look, width >= 1024, logoRef.current?.offsetWidth ?? 142);
-            setParts({ logoBar: logo.bar, logoPill: logo.pill, links: linksRef.current?.offsetWidth ?? 440, cta: ctaRef.current?.offsetWidth ?? 104 });
+            setVw(document.documentElement.clientWidth);
+            setParts({ links: linksRef.current?.offsetWidth ?? 440, cta: ctaRef.current?.offsetWidth ?? 104 });
         };
         measure();
         document.fonts?.ready.then(measure);
@@ -234,9 +243,8 @@ function DesktopNav() {
             observer.disconnect();
             window.removeEventListener("resize", measure);
         };
-    }, [look]);
+    }, []);
     const barW = vw - 2 * FRAME;
-    const pillW = PILL_PAD.left + PILL_PAD.right + parts.logoPill + gap + parts.links + gap + parts.cta;
 
     // The shape follows `compact` straight away, on a spring. With reduced
     // motion the nav fades out, changes shape and fades back in instead.
@@ -257,7 +265,8 @@ function DesktopNav() {
         animate(scope.current, { opacity: 0 }, { duration: 0.12 }).then(() => {
             if (cancelled) return;
             setShape(next);
-            requestAnimationFrame(() => animate(scope.current, { opacity: 1 }, { duration: 0.18 }));
+            // Back in once the new shape has been laid out.
+            requestAnimationFrame(() => requestAnimationFrame(() => animate(scope.current, { opacity: 1 }, { duration: 0.18 })));
         });
         return () => {
             cancelled = true;
@@ -265,29 +274,50 @@ function DesktopNav() {
     }, [compact, reduce, instant, animate, scope]);
     const pill = shape === "pill";
 
-    // Everything about the shape runs off two values on the same spring: the
-    // width, and how far along the bar is to being the pill (0 to 1).
-    const width = useMotionValue<number | string>("calc(100% - 122px)");
+    // Everything about the shape comes from two springs: how far the bar is to
+    // being the pill (0 to 1), and how far the logo has folded (0 to 1). The
+    // width, the corners and the columns are worked out from them every frame,
+    // so the parts can never get out of step.
     const pillness = useMotionValue(0);
+    const morph = useRef<{ stop: () => void }>(undefined);
     const lastPill = useRef<boolean | null>(null);
     useLayoutEffect(() => {
-        if (!vw) return;
-        const target = pill ? pillW : barW;
-        // A change of shape springs; a resize or a remeasure just lands there.
-        const spring = lastPill.current !== null && lastPill.current !== pill && !reduce && !instant;
+        const first = lastPill.current === null;
         lastPill.current = pill;
-        if (!spring) {
-            width.jump(target);
-            pillness.jump(pill ? 1 : 0);
+        morph.current?.stop();
+        if (first || reduce || instant) pillness.jump(pill ? 1 : 0);
+        else morph.current = animateValue(pillness, pill ? 1 : 0, SPRING.morph);
+    }, [pill, reduce, instant, pillness]);
+
+    // The logo is open in the bar and folded in the pill, and opens while the pointer rests on it.
+    const fold = useMotionValue(wide ? 0 : 1);
+    const [logoHover, setLogoHover] = useState(false);
+    const folded = !wide || (pill && !logoHover);
+    const foldAnim = useRef<{ stop: () => void }>(undefined);
+    const logoScope = useRef<HTMLDivElement>(null);
+    useLayoutEffect(() => {
+        foldAnim.current?.stop();
+        const target = folded ? 1 : 0;
+        if (instant || fold.get() === target) return fold.jump(target);
+        if (reduce) {
+            // A crossfade between the two, not a fold.
+            fold.jump(target);
+            if (logoScope.current) foldAnim.current = animateValue(logoScope.current, { opacity: [0, 1] }, { duration: 0.2 });
             return;
         }
-        const a = animateValue(width, target, SPRING.morph);
-        const b = animateValue(pillness, pill ? 1 : 0, SPRING.morph);
-        return () => {
-            a.stop();
-            b.stop();
-        };
-    }, [pill, pillW, barW, vw, reduce, instant, width, pillness]);
+        foldAnim.current = animateValue(fold, target, SPRING.fold);
+    }, [folded, reduce, instant, fold]);
+
+    const widthAt = (p: number, f: number) => {
+        if (!vw) return 0;
+        const pillW = PILL_PAD.left + PILL_PAD.right + logoWidth(geometry, f) + gap + parts.links + gap + parts.cta;
+        return mix(barW, pillW, p);
+    };
+    const width = useTransform(() => {
+        const p = pillness.get();
+        const f = fold.get();
+        return vw ? widthAt(p, f) : "calc(100% - 122px)";
+    });
     const height = useTransform(pillness, [0, 1], [BAR_H, PILL_H], { clamp: false });
     const top = useTransform(pillness, [0, 1], [0, PILL_TOP]);
     const radius = useTransform(pillness, [0, 1], [0, 24]);
@@ -296,12 +326,14 @@ function DesktopNav() {
     // The links sit in the middle of the bar (when there's room) and right after
     // the logo in the pill; the space either side always adds up to the width.
     const columns = useTransform(() => {
-        const w = width.get();
-        if (typeof w !== "number") return "minmax(0,1fr) auto minmax(0,1fr)";
-        const p = clamp01(pillness.get());
-        const free = Math.max(0, w - paddingLeft.get() - paddingRight.get() - parts.links - 2 * gap);
-        const centred = Math.min(Math.max(free / 2, parts.logoBar), Math.max(parts.logoBar, free - parts.cta));
-        const left = Math.max(0, mix(centred, parts.logoPill, p));
+        const p = pillness.get();
+        const f = fold.get();
+        if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
+        const logo = logoWidth(geometry, f);
+        const q = clamp01(p);
+        const free = Math.max(0, widthAt(p, f) - mix(barPad, PILL_PAD.left, q) - mix(barPad, PILL_PAD.right, q) - parts.links - 2 * gap);
+        const centred = Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta));
+        const left = Math.max(0, mix(centred, logo, q));
         return `${left}px auto ${Math.max(0, free - left)}px`;
     });
 
@@ -373,6 +405,12 @@ function DesktopNav() {
         const wait = Math.min(REST_MS, Math.max(0, enteredAt.current + LINGER_MS - performance.now()));
         openTimer.current = setTimeout(() => show(id), wait);
     };
+    // Whether this event comes from the pointer moving, rather than the page moving
+    // under it. React handles it before the window's listener notes the new position.
+    const handMoved = (e: React.PointerEvent) => {
+        const at = pointerAt.current;
+        return !at || at.x !== e.clientX || at.y !== e.clientY;
+    };
     const focusFirst = (id: MenuId) => contents[id]?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
 
     // Which item is lit: the one under the pointer, else the open menu, else where you are.
@@ -406,6 +444,14 @@ function DesktopNav() {
         measure();
         document.fonts?.ready.then(measure);
     }, [contents]);
+    // Only the menu on show can take focus. (Motion keeps the first ref callback
+    // it's given, so this can't be done in the ref.)
+    useLayoutEffect(() => {
+        for (const id of MENUS) {
+            const el = contents[id];
+            if (el) el.inert = shown.current !== id;
+        }
+    }, [menu, contents]);
     const [place, setPlace] = useState({ x: 0, origin: 0.5, glide: false });
     const placedFor = useRef<MenuId | null>(null);
     useLayoutEffect(() => {
@@ -413,11 +459,11 @@ function DesktopNav() {
             placedFor.current = null;
             return;
         }
-        const trigger = triggers[menu];
+        const item = items[menu]; // the trigger's list item, measured within the list
         const region = regionRef.current;
-        if (!trigger || !region) return;
+        if (!item || !region) return;
         const { w } = sizes[menu];
-        const centre = trigger.offsetLeft + trigger.offsetWidth / 2;
+        const centre = item.offsetLeft + item.offsetWidth / 2;
         const left = region.getBoundingClientRect().left;
         const x = Math.min(Math.max(centre - w / 2, 12 - left), document.documentElement.clientWidth - 12 - w - left);
         // From one open menu to another it springs across; opening, it starts in place.
@@ -425,7 +471,7 @@ function DesktopNav() {
         placedFor.current = menu;
         setPlace({ x, origin: (centre - x) / w, glide: switching });
         // Placed again when the nav changes shape under an open menu.
-    }, [menu, sizes, triggers, pill]);
+    }, [menu, sizes, items, pill]);
 
     useEffect(() => {
         const note = (e: PointerEvent) => {
@@ -527,16 +573,19 @@ function DesktopNav() {
                 if (e.pointerType !== "mouse") return;
                 setHovered(id);
                 clearTimeout(closeTimer.current);
+                // The nav moving under a still pointer (scrolling, the bar
+                // becoming the pill) isn't a hand reaching for a menu.
+                const moved = handMoved(e);
                 if (menu) {
-                    if (menu !== id && !dismissed.current) show(id);
+                    if (menu !== id && !dismissed.current && moved) show(id);
                     return;
                 }
                 enteredAt.current = performance.now();
                 openTimer.current = undefined;
-                armOpen(id, e);
+                if (moved) armOpen(id, e);
             }}
             onPointerMove={(e) => {
-                if (e.pointerType === "mouse" && !menu) armOpen(id, e);
+                if (e.pointerType === "mouse" && !menu && handMoved(e)) armOpen(id, e);
             }}
             onPointerLeave={() => clearTimeout(openTimer.current)}
         >
@@ -584,13 +633,17 @@ function DesktopNav() {
                 id={`${panelId}-${id}`}
                 ref={(el: HTMLDivElement | null) => {
                     contents[id] = el;
-                    if (el) el.inert = !active;
                 }}
                 aria-hidden={!active || undefined}
                 className="absolute left-0 top-0 w-max"
                 initial={false}
-                animate={active ? { opacity: 1, x: 0, filter: "blur(0px)" } : { opacity: 0, x: side * 28, filter: "blur(4px)" }}
-                transition={{ ...SPRING.glide, opacity: { duration: 0.18, ease: EASE_OUT } }}
+                animate={active ? { opacity: 1, x: 0, filter: "blur(0px)" } : { opacity: 0, x: side * 16, filter: "blur(2px)" }}
+                // The menu leaving goes quicker than the one arriving, so the panel is never empty between them.
+                transition={{
+                    ...SPRING.glide,
+                    opacity: { duration: active ? 0.24 : 0.12, ease: EASE_OUT },
+                    filter: { duration: active ? 0.24 : 0.12, ease: EASE_OUT },
+                }}
                 style={{ pointerEvents: active ? "auto" : "none" }}
             >
                 <motion.div variants={ROWS} initial={false} animate={menu === id ? "open" : "closed"}>
@@ -622,15 +675,24 @@ function DesktopNav() {
                     />
 
                     <motion.div className="relative grid h-full items-center" style={{ gridTemplateColumns: columns, columnGap: gap }}>
-                        <div ref={logoRef} className="w-fit">
-                            <Logo fold={pillness} wide={wide} />
+                        <div ref={logoScope} className="w-fit">
+                            <Logo
+                                fold={fold}
+                                onGeometry={setGeometry}
+                                onPointerEnter={(e) => e.pointerType === "mouse" && handMoved(e) && setLogoHover(true)}
+                                onPointerLeave={() => setLogoHover(false)}
+                            />
                         </div>
 
                         <nav aria-label="Main">
                             <div
                                 ref={regionRef}
                                 className="relative"
-                                onPointerEnter={() => clearTimeout(closeTimer.current)}
+                                onPointerEnter={() => {
+                                    // Coming back into the nav starts afresh, however the last menu was closed.
+                                    dismissed.current = false;
+                                    clearTimeout(closeTimer.current);
+                                }}
                                 onPointerLeave={(e) => {
                                     if (e.pointerType !== "mouse") return;
                                     dismissed.current = false;
@@ -654,13 +716,16 @@ function DesktopNav() {
                                 {/* One panel for every menu. It grows out of the open menu's name, and moving to
                                     another name springs it to that menu's size and place. The padding bridges the
                                     gap, so the pointer can cross it. */}
-                                <motion.div
+                                {/* Shown and hidden by React straight away (not on the next animation frame), so keys can focus into it at once */}
+                                <div
                                     className="absolute left-0 top-full pt-3"
                                     style={{ visibility: menu || lingering ? "visible" : "hidden", pointerEvents: menu ? "auto" : "none" }}
+                                    onPointerEnter={() => clearTimeout(closeTimer.current)}
+                                >
+                                <motion.div
                                     initial={false}
                                     animate={{ x: place.x, width: size.w + 2 /* the border */ }}
                                     transition={place.glide ? SPRING.glide : { duration: 0 }}
-                                    onPointerEnter={() => clearTimeout(closeTimer.current)}
                                 >
                                     <motion.div
                                         ref={panelRef}
@@ -816,6 +881,7 @@ function DesktopNav() {
                                         </motion.div>
                                     </motion.div>
                                 </motion.div>
+                                </div>
                             </div>
                         </nav>
 
