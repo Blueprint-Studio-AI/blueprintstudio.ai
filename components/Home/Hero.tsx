@@ -651,37 +651,91 @@ export default function Hero() {
 }
 
 // A quiet row of clients beside the buttons, so there's proof on the first
-// screen without shrinking the reel. Logos that don't fit wrap onto a hidden
-// second line, so only whole logos ever show. Each file sits on a 264px-tall
-// canvas (see ClientLogoTicker), so one height gives them all the same weight.
-const HERO_LOGOS = [
-    { name: "TokenWorks", logo: "tokenworks", w: 636 },
-    { name: "Arch Network", logo: "arch-network", w: 518 },
-    { name: "Jinba", logo: "jinba", w: 561 },
-    { name: "Perena", logo: "perena", w: 682 },
-    { name: "Logical", logo: "logical", w: 580 },
+// screen without shrinking the reel. Each slot cycles through its own clients,
+// one slot after another, through a soft blur. Slots have a fixed width so the
+// row never shifts; one that doesn't fit wraps onto a hidden second line, so
+// only whole slots show. Logo files sit on a 264px-tall canvas (see
+// ClientLogoTicker), so one height gives them all the same weight.
+const HERO_LOGO_SLOTS: { name: string; logo: string; w: number; tone?: number }[][] = [
+    [
+        { name: "TokenWorks", logo: "tokenworks", w: 636 },
+        { name: "Logical", logo: "logical", w: 580 },
+        { name: "Bitfrost", logo: "bitfrost", w: 526 },
+    ],
+    [
+        { name: "Arch Network", logo: "arch-network", w: 518 },
+        { name: "Pyra", logo: "pyra", w: 476 },
+        { name: "Twelve", logo: "twelve", w: 568 },
+    ],
+    [
+        { name: "Jinba", logo: "jinba", w: 561 },
+        // HoneyB's orange turns pale in grey; darken it to match the others.
+        { name: "HoneyB", logo: "honeyb", w: 630, tone: 0.55 },
+        { name: "Reshift", logo: "reshift", w: 461 },
+    ],
+    [
+        { name: "Perena", logo: "perena", w: 682 },
+        { name: "LivingIP", logo: "livingip", w: 603 },
+        { name: "Bold", logo: "bold", w: 540 },
+    ],
 ];
 const HERO_LOGO_HEIGHT = 34;
+const HERO_LOGO_SLOT = 88; // the widest logo at this height
+const HERO_LOGO_EVERY_MS = 3200;
+const HERO_LOGO_STAGGER = 0.09;
 
 function HeroLogos() {
+    const reduceMotion = useReducedMotion();
+    const rowRef = useRef<HTMLDivElement>(null);
+    const [turn, setTurn] = useState(0);
+    const [paused, setPaused] = useState(false);
+    const [inView, setInView] = useState(true);
+    useEffect(() => {
+        const row = rowRef.current;
+        if (!row) return;
+        const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+        observer.observe(row);
+        return () => observer.disconnect();
+    }, []);
+    useEffect(() => {
+        if (reduceMotion || paused || !inView) return;
+        const timer = setInterval(() => {
+            if (!document.hidden) setTurn((t) => t + 1);
+        }, HERO_LOGO_EVERY_MS);
+        return () => clearInterval(timer);
+    }, [reduceMotion, paused, inView]);
+
     return (
         <div
-            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-4 overflow-hidden lg:flex"
+            ref={rowRef}
+            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-3 overflow-hidden lg:flex"
             style={{ height: HERO_LOGO_HEIGHT }}
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
         >
             <span className="mr-1 whitespace-nowrap text-[13px] text-neutral-400">Trusted by</span>
-            {HERO_LOGOS.map((c) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                    key={c.logo}
-                    src={`/logos-match-height/${c.logo}.png`}
-                    alt={c.name}
-                    width={Math.round((HERO_LOGO_HEIGHT * c.w) / 264)}
-                    height={HERO_LOGO_HEIGHT}
-                    className="shrink-0 opacity-45 grayscale"
-                    style={{ height: HERO_LOGO_HEIGHT, width: "auto" }}
-                />
-            ))}
+            {HERO_LOGO_SLOTS.map((slot, i) => {
+                const c = slot[turn % slot.length];
+                return (
+                    <div key={i} className="relative shrink-0" style={{ width: HERO_LOGO_SLOT, height: HERO_LOGO_HEIGHT }}>
+                        <AnimatePresence initial={false}>
+                            <motion.img
+                                key={c.logo}
+                                src={`/logos-match-height/${c.logo}.png`}
+                                alt={c.name}
+                                width={Math.round((HERO_LOGO_HEIGHT * c.w) / 264)}
+                                height={HERO_LOGO_HEIGHT}
+                                className="absolute inset-0 m-auto"
+                                style={{ height: HERO_LOGO_HEIGHT, width: "auto", maxWidth: "none" }}
+                                initial={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: 5 }}
+                                animate={{ opacity: 0.45, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(0px)`, y: 0 }}
+                                exit={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: -5 }}
+                                transition={{ duration: 0.7, ease: EASE_OUT, delay: i * HERO_LOGO_STAGGER }}
+                            />
+                        </AnimatePresence>
+                    </div>
+                );
+            })}
         </div>
     );
 }
