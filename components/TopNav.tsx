@@ -288,7 +288,10 @@ function DesktopNav() {
     // The logo is open in the bar and folded in the pill, and opens while the pointer rests on it.
     const fold = useMotionValue(wide ? 0 : 1);
     const [logoHover, setLogoHover] = useState(false);
-    const folded = !wide || (pill && !logoHover);
+    // The bar folds it below 1024, where there's no room beside the links; the
+    // pill opens it on hover wherever the opened pill still fits the window.
+    const openPillFits = vw > 0 && PILL_PAD.left + PILL_PAD.right + logoWidth(0) + 2 * gap + parts.links + parts.cta <= vw - 24;
+    const folded = pill ? !(logoHover && openPillFits) : !wide;
     const foldAnim = useRef<{ stop: () => void }>(undefined);
     const logoScope = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
