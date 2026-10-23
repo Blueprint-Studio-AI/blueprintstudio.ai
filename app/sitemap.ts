@@ -2,6 +2,8 @@
 import type { MetadataRoute } from 'next'
 import { getAllPosts } from '@/lib/blog'
 import { workPages } from '@/lib/work'
+import { industries, industryCombos } from '@/lib/industries'
+import { services } from '@/lib/services'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://blueprintstudio.ai'
@@ -24,6 +26,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/brand`,         lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${base}/launch`,        lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${base}/launch-videos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    ...services.map((service) => ({
+      url: `${base}/services/${service.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    // Industries, and industry x deliverable pages (only those with enough projects)
+    ...industries.map((industry) => ({
+      url: `${base}/industries/${industry.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...industryCombos().map(({ industry, deliverable }) => ({
+      url: `${base}/industries/${industry.slug}/${deliverable}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     // Portfolio, one page per deliverable (only those with enough projects)
     { url: `${base}/work`,          lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     ...workPages.map((page) => ({
