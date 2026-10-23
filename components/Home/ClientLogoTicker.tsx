@@ -7,55 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import { OuterLines } from "./GridLines";
-
-type Client = {
-  name: string;
-  logo: string;
-  /** Width of the logo's 264px-tall canvas, which reserves its space before it loads. */
-  w: number;
-  /** Logos drawn on a filled block read heavier than wordmarks, so they're drawn smaller. */
-  scale?: number;
-  /** What we did for them, in one line, from the services we list for them. */
-  did: string;
-  /** Their work on the site, where there is some: the card then shows a still and links to it. */
-  work?: { href: string; label: string };
-};
-
-const caseStudy = (slug: string) => ({ href: `/brands/${slug}`, label: "Case study" });
-const wall = (deliverable: string, id: string) => ({ href: `/work/${deliverable}#${id}`, label: "See the work" });
-
-// Every logo sits on a 264px-tall canvas with its own padding, so they share one height.
-const clients: Client[] = [
-  { name: "TokenWorks", logo: "tokenworks", w: 636, did: "Digital transformation, service design, development and product videos.", work: wall("launch-videos", "tokenworks") },
-  { name: "Arch Network", logo: "arch-network", w: 518, did: "Service design, branding, development and content creation.", work: caseStudy("arch") },
-  { name: "Perena", logo: "perena", w: 682, did: "Landing page, service design and development.", work: wall("websites", "perena") },
-  { name: "Jinba", logo: "jinba", w: 561, did: "Branding, landing page and launch video.", work: caseStudy("jinba") },
-  { name: "Bump", logo: "bump", scale: 0.62, w: 264, did: "Branding, product design and UX.", work: wall("branding", "bump") },
-  { name: "Logical", logo: "logical", w: 580, did: "Launch video." },
-  { name: "Pyra", logo: "pyra", w: 476, did: "Three launch videos and content creation." },
-  { name: "Hildene", logo: "hildene", scale: 0.82, w: 428, did: "Service design and content creation." },
-  { name: "HoneyB", logo: "honeyb", w: 630, did: "Product design, landing page, branding and development.", work: caseStudy("honeyb") },
-  { name: "Hashplay", logo: "hashplay", w: 749, did: "Landing page, branding and development." },
-  { name: "Bold", logo: "bold", w: 540, did: "Branding, platform UX and landing page." },
-  { name: "Cona", logo: "cona", w: 426, did: "Service design and content creation." },
-  { name: "DAG", logo: "dag", scale: 0.78, w: 503, did: "Branding and merch." },
-  { name: "Bitfrost", logo: "bitfrost", w: 526, did: "Branding and pitch deck." },
-  { name: "Autara", logo: "autara", w: 525, did: "Landing page and branding.", work: wall("branding", "autara") },
-  { name: "Pregame", logo: "pregame", w: 603, did: "Content creation." },
-  { name: "Twelve", logo: "twelve", w: 568, did: "AI automation, service design, development and UX design." },
-  { name: "Reshift", logo: "reshift", w: 461, did: "AI automation, development and service design." },
-  { name: "PavePower", logo: "pavepower", w: 609, did: "Landing page." },
-  { name: "BTC Summit Vegas", logo: "btc-summit-vegas", scale: 0.8, w: 370, did: "Content creation, immersive video and branding." },
-  { name: "Satoshi Bet", logo: "satoshibet", w: 656, did: "Landing page and development." },
-  { name: "Panta", logo: "panta", w: 459, did: "Launch video." },
-  { name: "Herth", logo: "herth", w: 481, did: "Product design and development." },
-  { name: "Customer Compass", logo: "customer-compass", scale: 0.82, w: 471, did: "Service design and customer research." },
-  { name: "Answers From Me", logo: "answers-from-me", w: 575, did: "Service design, AI automation and development." },
-  { name: "LivingIP", logo: "livingip", w: 603, did: "Product design and branding.", work: wall("apps", "livingip") },
-  { name: "Uni", logo: "uni", scale: 0.86, w: 356, did: "Branding and landing page.", work: wall("branding", "uni") },
-];
-
-const still = (client: Client) => `/logos-match-height/stills/${client.logo}.jpg`;
+import { CLIENT_LOGOS as clients, type ClientLogo as Client } from "./clientLogos";
 
 const CARD_W = 264;
 const EDGE = 8; // the card keeps this clear of the band's sides
@@ -70,14 +22,15 @@ const CARD = {
   open: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", visualDuration: 0.34, bounce: 0.2, opacity: { duration: 0.14 } } },
 } as const;
 
+// The still shows whenever there is one; the card links, and says so, only with an href.
 function CardBody({ client, describedBy }: { client: Client; describedBy: string }) {
   const body = (
     <>
-      {client.work && (
+      {client.still && (
         <span className="relative block aspect-[16/10] overflow-hidden rounded-[12px] bg-neutral-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={still(client)}
+            src={client.still}
             alt=""
             width={560}
             height={350}
@@ -90,9 +43,9 @@ function CardBody({ client, describedBy }: { client: Client; describedBy: string
       <span className="block px-2 pb-1.5 pt-2.5">
         <span className="flex items-baseline justify-between gap-3">
           <span className="text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{client.name}</span>
-          {client.work && (
+          {client.href && (
             <span className="flex shrink-0 items-center gap-0.5 text-[12px] leading-5 text-[rgba(28,28,30,0.5)] transition-colors group-hover/card:text-[rgba(28,28,30,0.85)]">
-              {client.work.label}
+              See the work
               <ArrowUpRight
                 aria-hidden
                 strokeWidth={2.25}
@@ -102,7 +55,7 @@ function CardBody({ client, describedBy }: { client: Client; describedBy: string
           )}
         </span>
         <span id={describedBy} className="mt-0.5 block text-[13px] leading-[18px] text-[rgba(28,28,30,0.6)]" style={{ textWrap: "pretty" }}>
-          {client.did}
+          {client.line}
         </span>
       </span>
     </>
@@ -114,9 +67,9 @@ function CardBody({ client, describedBy }: { client: Client; describedBy: string
       transition={{ duration: 0.25, ease: EASE_OUT }}
       className="p-1.5"
     >
-      {client.work ? (
+      {client.href ? (
         // The logo itself is the keyboard's way in, so the card stays out of the tab order.
-        <Link href={client.work.href} prefetch={false} tabIndex={-1} className="group/card block rounded-[12px]">
+        <Link href={client.href} prefetch={false} tabIndex={-1} className="group/card block rounded-[12px]">
           {body}
         </Link>
       ) : (
@@ -180,7 +133,7 @@ export default function ClientLogoTicker() {
   const preload = () => {
     if (preloaded.current) return;
     preloaded.current = true;
-    for (const client of clients) if (client.work) new window.Image().src = still(client);
+    for (const client of clients) if (client.still) new window.Image().src = client.still;
   };
 
   const springHeight = useRef(false);
@@ -339,8 +292,14 @@ export default function ClientLogoTicker() {
             height={264}
             decoding="async"
             draggable={false}
-            className={`w-auto select-none transition-[opacity,filter] duration-500 ease-out ${on ? "opacity-100 grayscale-0" : "opacity-50 grayscale [@media(hover:hover)]:group-hover/logo:opacity-70"}`}
-            style={{ height: `calc(var(--logo-h) * ${client.scale ?? 1})` }}
+            className={`w-auto select-none transition-[opacity,filter] duration-500 ease-out ${on ? "opacity-100" : "opacity-[var(--ink)] [@media(hover:hover)]:group-hover/logo:opacity-[calc(var(--ink)_+_0.2)]"}`}
+            style={
+              {
+                height: `calc(var(--logo-h) * ${client.scale ?? 1})`,
+                filter: on ? "grayscale(0) brightness(1)" : `grayscale(1) brightness(${client.tone ?? 1})`,
+                "--ink": client.ink ?? 0.5,
+              } as React.CSSProperties
+            }
           />
         );
         const props = {
@@ -348,7 +307,7 @@ export default function ClientLogoTicker() {
           "data-index": index,
           tabIndex: copy ? -1 : undefined,
           "aria-describedby": on && !copy ? describedBy : undefined,
-          className: `group/logo flex h-full items-center rounded-lg outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${ring ? "outline outline-2 outline-offset-4 outline-[#2563EB]" : ""} ${client.work ? "cursor-pointer" : "cursor-default"}`,
+          className: `group/logo flex h-full items-center rounded-lg outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${ring ? "outline outline-2 outline-offset-4 outline-[#2563EB]" : ""} ${client.href ? "cursor-pointer" : "cursor-default"}`,
           onPointerDown: (e: React.PointerEvent) => {
             pointerType.current = e.pointerType;
             preload();
@@ -389,7 +348,7 @@ export default function ClientLogoTicker() {
           onClick: (e: React.MouseEvent) => {
             // Enter or Space: a link goes, a plain logo toggles its card.
             if (e.detail === 0) {
-              if (!client.work) {
+              if (!client.href) {
                 if (active === index) close();
                 else open(index, e.currentTarget as HTMLElement);
               }
@@ -397,7 +356,7 @@ export default function ClientLogoTicker() {
             }
             // A tap shows the card first; a second tap on the same logo follows its link.
             if (pointerType.current === "mouse") {
-              if (active !== index && !client.work) open(index, e.currentTarget as HTMLElement);
+              if (active !== index && !client.href) open(index, e.currentTarget as HTMLElement);
               return;
             }
             if (active !== index) {
@@ -405,13 +364,13 @@ export default function ClientLogoTicker() {
               via.current = "touch";
               setRingCopy(false);
               open(index, e.currentTarget as HTMLElement);
-            } else if (!client.work) close();
+            } else if (!client.href) close();
           },
         };
         return (
           <li key={client.name} className="relative flex h-[var(--logo-h)] shrink-0 items-center">
-            {client.work ? (
-              <Link href={client.work.href} prefetch={false} {...props}>
+            {client.href ? (
+              <Link href={client.href} prefetch={false} {...props}>
                 {logo}
               </Link>
             ) : (
