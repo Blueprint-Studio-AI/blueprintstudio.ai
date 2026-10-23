@@ -22,7 +22,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { HEADLINES, LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, headlineFromUrl, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
+import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -51,12 +51,7 @@ type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
 
-// Every subline, stacked in one place and crossfaded so the copy keeps its
-// height whichever variant is showing; and the second button's links.
-const SUBLINES = [
-    { key: "all", text: "For founders, from first sketch to launch\u00A0video." },
-    ...VARIANTS.map((v) => ({ key: v.key, text: v.sub })),
-];
+// The second button's link for each variant.
 const LINKS = [{ key: "all", label: "See our work", href: "#work" }, ...VARIANTS.map((v) => ({ key: v.key, ...v.cta }))];
 
 /** False once the home page has mounted in this tab. */
@@ -127,26 +122,10 @@ export default function Hero() {
         return () => window.removeEventListener("resize", place);
     }, [place]);
 
-    // A link like /?for=websites opens on that variant; ?look= picks the headline look.
-    const [look, setLook] = useState<Look>("b");
-    const [headline, setHeadline] = useState(0);
+    // A link like /?for=websites opens on that variant.
     useEffect(() => {
         setVariantKey(variantFromUrl());
-        setLook(lookFromUrl());
-        setHeadline(headlineFromUrl());
     }, []);
-    const chooseHeadline = (index: number) => {
-        setHeadline(index);
-        const url = new URL(window.location.href);
-        url.searchParams.set("h", String(index + 1));
-        window.history.replaceState(window.history.state, "", url);
-    };
-    const chooseLook = (next: Look) => {
-        setLook(next);
-        const url = new URL(window.location.href);
-        url.searchParams.set("look", next);
-        window.history.replaceState(window.history.state, "", url);
-    };
 
     // Other sections (Featured Work) follow the picker, and can set it:
     // window "bp:variant" events carry { key, source }.
@@ -387,7 +366,6 @@ export default function Hero() {
                 )}
             </AnimatePresence>
 
-            <LookSwitcher look={look} onChange={chooseLook} headline={headline} onHeadline={chooseHeadline} />
             <Section
                 className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
@@ -437,70 +415,18 @@ export default function Hero() {
                         <div className="line-dash-y absolute bottom-0 left-0 top-0 hidden custom:block" />
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
 
-                        <div
-                            className={
-                                look === "e"
-                                    ? // As wide as the reel's slot below, so the statement and the frame share a left edge.
-                                      "flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
-                                    : "flex flex-col items-center text-center"
-                            }
-                        >
+                        {/* As wide as the reel's slot below, so the statement and the frame share a left edge. */}
+                        <div className="flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]">
                             <motion.h1
                                 {...rise(0.15)}
                                 className="cursor-default font-medium text-neutral-800"
-                                style={
-                                    look === "e"
-                                        ? { fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }
-                                        : { fontSize: "clamp(36px, 4.2vw, 56px)", lineHeight: 1.08, letterSpacing: "-0.035em", textWrap: "balance" }
-                                }
+                                style={{ fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }}
                             >
-                                {look === "e" ? (
-                                    <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
-                                ) : look === "d" ? (
-                                    HEADLINES[headline]
-                                ) : (
-                                    <>
-                                        {/* The chip gets its own line, so a longer word never rewraps the headline. */}
-                                        <span className="block">We design and build</span>
-                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
-                                    </>
-                                )}
+                                <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
                             </motion.h1>
-                            {look !== "e" && (
-                            <motion.p
-                                {...rise(0.25)}
-                                className="mt-4 grid max-w-[30ch] cursor-default text-neutral-600 sm:max-w-[680px]"
-                                style={{
-                                    fontSize: "clamp(16px, 1.4vw, 19px)",
-                                    lineHeight: 1.4,
-                                    letterSpacing: "-0.01em",
-                                    textWrap: "balance",
-                                }}
-                            >
-                                {SUBLINES.map((line) => {
-                                    const active = line.key === (variant?.key ?? "all");
-                                    return (
-                                        <motion.span
-                                            key={line.key}
-                                            aria-hidden={!active}
-                                            className="[grid-area:1/1]"
-                                            initial={false}
-                                            animate={active ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(4px)" }}
-                                            transition={{ duration: active ? 0.35 : 0.2, delay: active ? 0.08 : 0, ease: EASE_OUT }}
-                                        >
-                                            {line.text}
-                                        </motion.span>
-                                    );
-                                })}
-                            </motion.p>
-                            )}
                             <motion.div
                                 {...rise(0.35)}
-                                className={
-                                    look === "e"
-                                        ? "mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center"
-                                        : "mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
-                                }
+                                className="mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center"
                             >
                                 <motion.a
                                     href="#contact"
@@ -543,7 +469,7 @@ export default function Hero() {
                                         className="ml-1.5 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
                                     />
                                 </motion.a>
-                                {look === "e" && <HeroLogos />}
+                                <HeroLogos />
                             </motion.div>
                         </div>
 
@@ -589,17 +515,6 @@ export default function Hero() {
                                 {/* A hairline edge, so pale frames don't melt into the page. */}
                                 <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
-                                {/* Look d: the picker as a small frosted pill on the reel, like Pentagram's. */}
-                                {look === "d" && (
-                                    <div
-                                        className="absolute left-3 top-3 z-[3] flex items-center gap-0.5 rounded-full bg-white/80 py-1 pl-3 pr-1 text-[15px] font-medium text-neutral-500 shadow-[0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-md transition-opacity duration-500"
-                                        style={{ opacity: stage === "docked" ? 1 : 0, pointerEvents: stage === "docked" ? "auto" : "none" }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        Showing
-                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
-                                    </div>
-                                )}
                                 {stage === "docked" && (
                                     <button
                                         ref={maximizeRef}
@@ -740,7 +655,7 @@ function HeroLogos() {
     );
 }
 
-// Look e: one statement, the first sentence in ink and the rest in grey. What
+// The statement: the first sentence in ink and the rest in grey. What
 // we make doubles as the picker: each word switches the reel. On a desktop,
 // resting on a word floats a still of that work by the cursor. Words darken
 // into place once the reel has landed.
