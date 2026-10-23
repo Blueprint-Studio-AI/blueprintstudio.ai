@@ -1,53 +1,27 @@
 "use client";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Ref } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, MotionConfig, animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { ArrowRight, Pause, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
-import {
-  allWorkProjects,
-  featuredWork,
-  type Deliverable,
-  type MediaAsset,
-  type PortfolioProject,
-  type ResponsiveMedia,
-  type ShowcaseMedia,
-} from "@/data/portfolioData";
-import { hasWorkPage, mediaFor, projectsFor } from "@/lib/work";
+import Showcase from "@/components/work/Showcase";
+import type { Deliverable } from "@/data/portfolioData";
+import { clientShowcase, featuredClients, hasWorkPage, type ShowcaseData } from "@/lib/work";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import { SpringText, type VariantKey } from "./HeroSelector";
 
-// Featured Work follows the hero's picker, and can set it: both send and
-// listen for window "bp:variant" events carrying { key, source }.
-
-// Portfolio videos stay unloaded until the hero reel has landed (it sends
-// "bp:opening-landed"), so they don't compete with it. Then they load in page
-// order, two at a time. A card that comes near the screen loads straight away.
-type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
-const waiting: Waiter[] = [];
-const MAX_LOADING = 2;
-let released = false;
-let loading = 0;
-
-function pump() {
-  while (released && loading < MAX_LOADING) {
-    const next = waiting.find((w) => !w.started);
-    if (!next) return;
-    next.started = true;
-    if (next.start()) loading++;
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('bp:opening-landed', () => {
-    released = true;
-    pump();
-  }, { once: true });
-}
+// Featured Work: one card per client, from the same data and media kits as the
+// /work pages. It follows the hero's picker, and can set it: both send and
+// listen for window "bp:variant" events carrying { key, source }. A picked word
+// shows the clients with that kind of work, each leading with it.
+//
+// Clips load in stages (lib/work/videoQueue): nothing until the hero reel has
+// landed ("bp:opening-landed"), then in page order two at a time; a card that
+// comes near the screen loads straight away, and a card's other clips load
+// only when someone picks one of its stills.
 
 type Filter = VariantKey | null;
 
@@ -84,31 +58,10 @@ function filterFromUrl(): Filter {
   return FILTERS.find((f) => f.key !== null && f.key === key)?.key ?? null;
 }
 
-type Item = { project: PortfolioProject; media: ResponsiveMedia; href: string };
-
-const byId = (id: string) => allWorkProjects.find((p) => p.id === id);
-const isProject = (p: PortfolioProject | undefined): p is PortfolioProject => p !== undefined;
-
-/** What a filter shows, from featuredWork in the portfolio data. */
-function itemsFor(filter: Filter): Item[] {
-  let projects: PortfolioProject[];
-  if (filter === null) {
-    projects = featuredWork.all.map(byId).filter(isProject).filter((p) => !p.noLongerTrading);
-  } else {
-    const slug = DELIVERABLE[filter];
-    const lead = (featuredWork.lead[slug] ?? []).map(byId).filter(isProject).filter((p) => p.deliverables.includes(slug));
-    const rest = projectsFor(slug).filter((p) => !lead.includes(p));
-    // A stable sort: closed clients drop to the end, everything else keeps its place.
-    projects = [...lead, ...rest].sort((a, b) => Number(!!a.noLongerTrading) - Number(!!b.noLongerTrading));
-  }
-  return projects.slice(0, featuredWork.max).map((project) => {
-    // Under "All work" a project shows as its first kind of work (Perena: websites).
-    const as = filter ? DELIVERABLE[filter] : project.deliverables.find((d) => hasWorkPage(d)) ?? project.deliverables[0];
-    // The /brands pages are the case studies; they fit "All work" and Brands.
-    const caseStudy = project.brandPage && (filter === null || filter === "brands");
-    const href = caseStudy ? `/brands/${project.brandPage}` : hasWorkPage(as) ? `/work/${as}#${project.id}` : "/work";
-    return { project, media: mediaFor(project, as), href };
-  });
+/** What a filter shows: featured clients, each leading with the picked kind of work. */
+function itemsFor(filter: Filter): ShowcaseData[] {
+  const slug = filter ? DELIVERABLE[filter] : null;
+  return featuredClients(slug).flatMap((c) => clientShowcase(c, slug ?? undefined) ?? []);
 }
 
 function seeAllFor(filter: Filter) {
@@ -116,243 +69,15 @@ function seeAllFor(filter: Filter) {
   return { label: SEE_ALL[filter ?? "all"], href: slug && hasWorkPage(slug) ? `/work/${slug}` : "/work" };
 }
 
-interface MediaCardProps {
-  media: MediaAsset | ShowcaseMedia;
-  aspectRatio: string;
-  featured?: boolean;
-}
-
-function MediaCard({ media, aspectRatio, featured = false }: MediaCardProps) {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const slotRef = useRef(false); // holds one of the MAX_LOADING slots
-  const clip = "clip" in media ? media.clip : undefined;
-
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!card || media.type !== 'video') return;
-    const waiter: Waiter = {
-      started: false,
-      start: () => {
-        // The phone or desktop copy that's hidden at this width: leave it to the
-        // observer below, which loads it if a resize ever shows it.
-        if (card.getClientRects().length === 0) {
-          waiter.started = false;
-          waiting.splice(waiting.indexOf(waiter), 1);
-          return false;
-        }
-        slotRef.current = true;
-        setShouldLoad(true);
-        return true;
-      },
-    };
-    waiting.push(waiter);
-    pump();
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        if (waiter.started) return;
-        waiter.started = true; // jumps the queue without taking a slot
-        setShouldLoad(true);
-      },
-      { rootMargin: '100% 0px' }
-    );
-    observer.observe(card);
-    return () => {
-      observer.disconnect();
-      if (waiting.includes(waiter)) waiting.splice(waiting.indexOf(waiter), 1);
-      // A filter can remove a card mid-load: give its slot back.
-      if (slotRef.current) {
-        slotRef.current = false;
-        loading--;
-        pump();
-      }
-    };
-  }, [media.type]);
-
-  // Buffered enough (or gave up): hand the slot to the next video.
-  const freeSlot = () => {
-    if (!slotRef.current) return;
-    slotRef.current = false;
-    loading--;
-    pump();
-  };
-
-  const togglePlayPause = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  return (
-    <div ref={cardRef} className="relative">
-      <div className="relative">
-        <div
-          className="bg-neutral-200 absolute left-0 top-0 w-full rounded-md"
-          style={{ aspectRatio }}
-        />
-        <div className="relative mx-auto overflow-hidden transition-opacity duration-300 ease-out rounded-md">
-
-          <div className="relative w-full" style={{ aspectRatio }}>
-            {media.type === 'video' ? (
-              <div
-                className="absolute left-0 top-0 h-full w-full object-cover overflow-hidden"
-                style={{ aspectRatio }}
-              >
-                <video
-                  ref={videoRef}
-                  src={shouldLoad ? media.src : undefined}
-                  autoPlay
-                  loop
-                  playsInline
-                  muted
-                  preload="none"
-                  poster={shouldLoad ? media.poster : undefined}
-                  onLoadedMetadata={(e) => {
-                    if (clip) e.currentTarget.currentTime = clip[0];
-                  }}
-                  onTimeUpdate={(e) => {
-                    // Loop just the clip; this also catches the browser's own loop back to 0.
-                    const t = e.currentTarget.currentTime;
-                    if (clip && (t < clip[0] - 0.25 || t >= clip[1])) e.currentTarget.currentTime = clip[0];
-                  }}
-                  onCanPlayThrough={freeSlot}
-                  onSuspend={freeSlot}
-                  onError={freeSlot}
-                  className="pointer-events-none h-full w-full object-cover"
-                />
-                {featured && (
-                  <button
-                    type="button"
-                    onClick={togglePlayPause}
-                    className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition duration-200 hover:bg-black/60 cursor-pointer opacity-0 group-hover/project:opacity-100 focus-visible:opacity-100"
-                    aria-label={isPlaying ? "Pause video" : "Play video"}
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-3 w-3" />
-                    ) : (
-                      <Play className="h-3 w-3" />
-                    )}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="h-full w-full">
-                <div className="group relative h-full w-full overflow-hidden rounded-none bg-transparent transition-colors duration-300" style={{ aspectRatio }}>
-                  <Image
-                    alt={media.alt}
-                    fill
-                    sizes={featured ? "(max-width: 768px) 100vw, (max-width: 1024px) 75vw, 750px" : "(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 250px"}
-                    quality={90}
-                    className="object-cover object-center"
-                    src={media.src}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** A project's title and line. The title's link covers the featured media above it too. */
-function ProjectText({ project, href, textRef }: { project: PortfolioProject; href: string; textRef?: Ref<HTMLDivElement> }) {
-  return (
-    <div ref={textRef} className="text-black w-full pt-8">
-      <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2">
-        <Link
-          href={href}
-          className="outline-none after:absolute after:inset-0 after:rounded-md after:content-[''] focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-[#2563EB]"
-        >
-          {project.title}
-          <ArrowRight
-            aria-hidden
-            className="ml-2 inline-block h-[0.75em] w-[0.75em] -translate-y-[0.06em] text-neutral-400 transition-[color,transform] duration-300 ease-out group-hover/project:translate-x-1 group-hover/project:text-black"
-          />
-        </Link>
-      </h3>
-      <p className="text-neutral-600 text-base">{project.description}</p>
-    </div>
-  );
-}
-
-/** One project as the original bento: the featured reel, with its three squares beside it (below it on phones). */
-function ProjectSection({ item, first }: { item: Item; first: boolean }) {
-  const { project, media, href } = item;
-  const squares = project.showcaseMedia.slice(0, 3);
-  const textRef = useRef<HTMLDivElement>(null);
-  const [spacer, setSpacer] = useState(100);
-
-  // The squares' column ends level with the bottom of the featured media.
-  useEffect(() => {
-    const text = textRef.current;
-    if (!text) return;
-    const measure = () => setSpacer(text.offsetHeight === 0 ? 100 : Math.max(0, text.offsetHeight - 24));
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(text);
-    return () => observer.disconnect();
-  }, []);
-
-  // Phones use the media's own shape (the reels are cut 2:3); desktop is always 16:9.
-  const { width, height } = media.mobile;
-  const phoneRatio = width && height ? `${width}/${height}` : "2/3";
-
+/** One client in the section's frame: dashed lines, then its card. */
+function ClientSection({ data, first }: { data: ShowcaseData; first: boolean }) {
   return (
     <div className="w-full">
       {!first && <div className="w-full line-dash-x" />}
-
-      <InnerContainer className="py-10 sm:py-16 lg:py-20 px-2.5 sm:px-6 relative">
-        <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-        <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block" />
-
-        <div className={squares.length > 0 ? "lg:grid lg:grid-cols-4 lg:gap-6" : ""}>
-          <div className="lg:col-span-3">
-            <div className="lg:sticky lg:top-24">
-              <div className="block lg:hidden">
-                <div className="group/project relative">
-                  <MediaCard media={media.mobile} aspectRatio={phoneRatio} featured />
-                  <ProjectText project={project} href={href} />
-                </div>
-                {squares.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-8">
-                    {squares.map((square) => (
-                      <MediaCard key={square.id} media={square} aspectRatio="1/1" />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="group/project relative hidden lg:block">
-                <MediaCard media={media.desktop} aspectRatio="16/9" featured />
-                <ProjectText project={project} href={href} textRef={textRef} />
-              </div>
-            </div>
-          </div>
-
-          {squares.length > 0 && (
-            <div className="hidden lg:block lg:col-span-1">
-              <div className="space-y-6">
-                {squares.map((square) => (
-                  <MediaCard key={square.id} media={square} aspectRatio="1/1" />
-                ))}
-                <div style={{ height: spacer }} />
-              </div>
-            </div>
-          )}
-        </div>
+      <InnerContainer className="relative px-2.5 py-10 sm:px-6 sm:py-16 lg:py-20">
+        <div className="absolute bottom-0 left-0 top-0 hidden line-dash-y custom:block" />
+        <div className="absolute bottom-0 right-0 top-0 hidden line-dash-y custom:block" />
+        <Showcase data={data} staged />
       </InnerContainer>
     </div>
   );
@@ -516,7 +241,7 @@ function WorkList({ filter }: { filter: Filter }) {
         <AnimatePresence initial={false} mode="popLayout">
           {items.map((item, i) => (
             <motion.div
-              key={item.project.id}
+              key={item.id}
               layout="position"
               initial={enter}
               animate={shown}
@@ -524,7 +249,7 @@ function WorkList({ filter }: { filter: Filter }) {
               transition={{ layout: LAYOUT_SPRING, default: { duration: 0.45, ease: EASE_OUT, delay: 0.03 + Math.min(i, 3) * 0.05 } }}
               className="relative z-[1] w-full"
             >
-              <ProjectSection item={item} first={i === 0} />
+              <ClientSection data={item} first={i === 0} />
             </motion.div>
           ))}
         </AnimatePresence>

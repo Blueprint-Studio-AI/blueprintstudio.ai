@@ -14,8 +14,8 @@ export interface WorkPageConfig {
   metaTitle: string;
   metaDescription: string;
   /**
-   * Project ids in wall order. Projects with this deliverable that aren't
-   * listed follow in data order, so a new project shows up without an edit here.
+   * Work slugs in page order. Work of this kind that isn't listed follows in
+   * data order, so new work shows up without an edit here.
    */
   order: string[];
 }

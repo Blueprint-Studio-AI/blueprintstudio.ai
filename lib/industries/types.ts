@@ -9,7 +9,7 @@ export interface IndustryOffer {
   deliverable: Deliverable;
   /** One line on what we make of this kind for the industry. Client names are added from the data. */
   line: string;
-  /** Project id whose still leads the panel; the rest follow in the industry's order. */
+  /** Work slug whose picture leads the panel; the rest follow in the industry’s order. */
   lead?: string;
 }
 
@@ -37,7 +37,7 @@ export interface IndustryConfig {
   offersTitle: string;
   offers: IndustryOffer[];
   workTitle: string;
-  /** Wall order by project id. Projects in the industry that aren't listed follow in data order. */
+  /** Work slugs in page order (clients show in the order their first piece appears). Unlisted work follows in data order. */
   order: string[];
   /** /brands/<slug> case studies to point at, with a line each. */
   brandPages: { slug: string; line: string }[];

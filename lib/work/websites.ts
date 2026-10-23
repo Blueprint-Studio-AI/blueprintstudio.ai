@@ -8,7 +8,6 @@ export const websites: WorkPageConfig = {
   introIsDraft: true,
   metaTitle: "Website Design Portfolio",
   metaDescription:
-    "Landing pages and marketing sites designed and built by Blueprint Studio for Perena, HoneyB, Autara, Jinba and Breeze.",
-  // A reel first, then alternate stills and reels down the wall.
-  order: ["perena", "honeyb", "autara", "jinba", "breeze"],
+    "Landing pages and marketing sites designed and built by Blueprint Studio for Perena, HoneyB, Arch Network, Jinba and TokenWorks.",
+  order: ["perena-landing", "honeyb-website", "arch-chain", "jinba-website", "tokenworks-idvisor-page"],
 };
