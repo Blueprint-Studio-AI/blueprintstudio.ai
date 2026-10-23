@@ -1,85 +1,263 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import { OuterLines } from "./GridLines";
 
-// Every logo sits on a 264px-tall canvas with its own padding, so they share one
-// height and look the same weight. `w` is the canvas width, which reserves each
-// logo's space before it loads.
-const clients: { name: string; logo: string; w: number; scale?: number; services: string[] }[] = [
-  { name: "TokenWorks", logo: "tokenworks", w: 636, services: ["Digital Transformation", "Service Design", "Development", "Product Videos"] },
-  { name: "Arch Network", logo: "arch-network", w: 518, services: ["Service Design", "Branding", "Development", "Content Creation"] },
-  { name: "Perena", logo: "perena", w: 682, services: ["Landing Page", "Service Design", "Development"] },
-  { name: "Jinba", logo: "jinba", w: 561, services: ["Branding", "Landing Page", "Launch Video"] },
-  { name: "Bump", logo: "bump", scale: 0.62, w: 264, services: ["Branding", "Product Design", "UX"] },
-  { name: "Logical", logo: "logical", w: 580, services: ["Launch Video"] },
-  { name: "Pyra", logo: "pyra", w: 476, services: ["Launch Videos x3", "Content Creation"] },
-  { name: "Hildene", logo: "hildene", scale: 0.82, w: 428, services: ["Service Design", "Content Creation"] },
-  { name: "HoneyB", logo: "honeyb", w: 630, services: ["Product Design", "Landing Page", "Branding", "Development"] },
-  { name: "Hashplay", logo: "hashplay", w: 749, services: ["Landing Page", "Branding", "Development"] },
-  { name: "Bold", logo: "bold", w: 540, services: ["Branding", "Platform UX", "Landing Page"] },
-  { name: "Cona", logo: "cona", w: 426, services: ["Service Design", "Content Creation"] },
-  { name: "DAG", logo: "dag", scale: 0.78, w: 503, services: ["Branding", "Merch"] },
-  { name: "Bitfrost", logo: "bitfrost", w: 526, services: ["Branding", "Pitch Deck"] },
-  { name: "Autara", logo: "autara", w: 525, services: ["Landing Page", "Branding"] },
-  { name: "Pregame", logo: "pregame", w: 603, services: ["Content Creation"] },
-  { name: "Twelve", logo: "twelve", w: 568, services: ["AI Automation", "Service Design", "Development", "UX Design"] },
-  { name: "Reshift", logo: "reshift", w: 461, services: ["AI Automation", "Development", "Service Design"] },
-  { name: "PavePower", logo: "pavepower", w: 609, services: ["Landing Page"] },
-  { name: "BTC Summit Vegas", logo: "btc-summit-vegas", scale: 0.8, w: 370, services: ["Content Creation", "Immersive Video", "Branding"] },
-  { name: "Satoshi Bet", logo: "satoshibet", w: 656, services: ["Landing Page", "Development"] },
-  { name: "Panta", logo: "panta", w: 459, services: ["Launch Video"] },
-  { name: "Herth", logo: "herth", w: 481, services: ["Product Design", "Development"] },
-  { name: "Customer Compass", logo: "customer-compass", scale: 0.82, w: 471, services: ["Service Design", "Customer Research"] },
-  { name: "Answers From Me", logo: "answers-from-me", w: 575, services: ["Service Design", "AI Automation", "Development"] },
-  { name: "LivingIP", logo: "livingip", w: 603, services: ["Product Design", "Branding"] },
-  { name: "Uni", logo: "uni", scale: 0.86, w: 356, services: ["Branding", "Landing Page"] },
+type Client = {
+  name: string;
+  logo: string;
+  /** Width of the logo's 264px-tall canvas, which reserves its space before it loads. */
+  w: number;
+  /** Logos drawn on a filled block read heavier than wordmarks, so they're drawn smaller. */
+  scale?: number;
+  /** What we did for them, in one line, from the services we list for them. */
+  did: string;
+  /** Their work on the site, where there is some: the card then shows a still and links to it. */
+  work?: { href: string; label: string };
+};
+
+const caseStudy = (slug: string) => ({ href: `/brands/${slug}`, label: "Case study" });
+const wall = (deliverable: string, id: string) => ({ href: `/work/${deliverable}#${id}`, label: "See the work" });
+
+// Every logo sits on a 264px-tall canvas with its own padding, so they share one height.
+const clients: Client[] = [
+  { name: "TokenWorks", logo: "tokenworks", w: 636, did: "Digital transformation, service design, development and product videos.", work: wall("launch-videos", "tokenworks") },
+  { name: "Arch Network", logo: "arch-network", w: 518, did: "Service design, branding, development and content creation.", work: caseStudy("arch") },
+  { name: "Perena", logo: "perena", w: 682, did: "Landing page, service design and development.", work: wall("websites", "perena") },
+  { name: "Jinba", logo: "jinba", w: 561, did: "Branding, landing page and launch video.", work: caseStudy("jinba") },
+  { name: "Bump", logo: "bump", scale: 0.62, w: 264, did: "Branding, product design and UX.", work: wall("branding", "bump") },
+  { name: "Logical", logo: "logical", w: 580, did: "Launch video." },
+  { name: "Pyra", logo: "pyra", w: 476, did: "Three launch videos and content creation." },
+  { name: "Hildene", logo: "hildene", scale: 0.82, w: 428, did: "Service design and content creation." },
+  { name: "HoneyB", logo: "honeyb", w: 630, did: "Product design, landing page, branding and development.", work: caseStudy("honeyb") },
+  { name: "Hashplay", logo: "hashplay", w: 749, did: "Landing page, branding and development." },
+  { name: "Bold", logo: "bold", w: 540, did: "Branding, platform UX and landing page." },
+  { name: "Cona", logo: "cona", w: 426, did: "Service design and content creation." },
+  { name: "DAG", logo: "dag", scale: 0.78, w: 503, did: "Branding and merch." },
+  { name: "Bitfrost", logo: "bitfrost", w: 526, did: "Branding and pitch deck." },
+  { name: "Autara", logo: "autara", w: 525, did: "Landing page and branding.", work: wall("branding", "autara") },
+  { name: "Pregame", logo: "pregame", w: 603, did: "Content creation." },
+  { name: "Twelve", logo: "twelve", w: 568, did: "AI automation, service design, development and UX design." },
+  { name: "Reshift", logo: "reshift", w: 461, did: "AI automation, development and service design." },
+  { name: "PavePower", logo: "pavepower", w: 609, did: "Landing page." },
+  { name: "BTC Summit Vegas", logo: "btc-summit-vegas", scale: 0.8, w: 370, did: "Content creation, immersive video and branding." },
+  { name: "Satoshi Bet", logo: "satoshibet", w: 656, did: "Landing page and development." },
+  { name: "Panta", logo: "panta", w: 459, did: "Launch video." },
+  { name: "Herth", logo: "herth", w: 481, did: "Product design and development." },
+  { name: "Customer Compass", logo: "customer-compass", scale: 0.82, w: 471, did: "Service design and customer research." },
+  { name: "Answers From Me", logo: "answers-from-me", w: 575, did: "Service design, AI automation and development." },
+  { name: "LivingIP", logo: "livingip", w: 603, did: "Product design and branding.", work: wall("apps", "livingip") },
+  { name: "Uni", logo: "uni", scale: 0.86, w: 356, did: "Branding and landing page.", work: wall("branding", "uni") },
 ];
 
-// The second copy follows the first with the same gap, so -50% loops seamlessly.
-// --logo-h is the shared canvas height; logos drawn on a filled block are scaled
-// down so they don't outweigh the wordmarks.
-function LogoList({ copy }: { copy?: boolean }) {
-  return (
-    <ul
-      aria-hidden={copy || undefined}
-      className="flex shrink-0 items-center gap-x-12 pr-12 [--logo-h:44px] sm:gap-x-[72px] sm:pr-[72px] sm:[--logo-h:60px]"
-    >
-      {clients.map((client) => (
-        <li key={client.name} className="group relative flex h-[var(--logo-h)] shrink-0 items-center">
+const still = (client: Client) => `/logos-match-height/stills/${client.logo}.jpg`;
+
+const CARD_W = 264;
+const EDGE = 8; // the card keeps this clear of the band's sides
+const REST_MS = 90; // the pointer rests on a logo this long, and its card opens
+const LINGER_MS = 500; // or stays on it this long, still moving
+const CLOSE_MS = 160; // time to cross from a logo to its card
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+// The nav's Services menu, in miniature: grows out of the logo on a spring.
+const CARD = {
+  closed: { opacity: 0, scale: 0.92, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
+  open: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", visualDuration: 0.34, bounce: 0.2, opacity: { duration: 0.14 } } },
+} as const;
+
+function CardBody({ client, describedBy }: { client: Client; describedBy: string }) {
+  const body = (
+    <>
+      {client.work && (
+        <span className="relative block aspect-[16/10] overflow-hidden rounded-[12px] bg-neutral-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`/logos-match-height/${client.logo}.png`}
-            alt={copy ? "" : client.name}
-            width={client.w}
-            height={264}
-            decoding="async"
+            src={still(client)}
+            alt=""
+            width={560}
+            height={350}
             draggable={false}
-            className="w-auto select-none opacity-50 grayscale transition-[opacity,filter] duration-500 ease-out group-hover:opacity-100 group-hover:grayscale-0"
-            style={{ height: `calc(var(--logo-h) * ${client.scale ?? 1})` }}
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-[1.04]"
           />
-          {/* What we made for them, under the logo on hover */}
-          <p className="pointer-events-none absolute left-1/2 top-full hidden -translate-x-1/2 translate-y-1 whitespace-nowrap text-xs text-neutral-500 opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:block">
-            {client.services.join(" · ")}
-          </p>
-        </li>
-      ))}
-    </ul>
+          <span className="absolute inset-0 rounded-[12px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
+        </span>
+      )}
+      <span className="block px-2 pb-1.5 pt-2.5">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{client.name}</span>
+          {client.work && (
+            <span className="flex shrink-0 items-center gap-0.5 text-[12px] leading-5 text-[rgba(28,28,30,0.5)] transition-colors group-hover/card:text-[rgba(28,28,30,0.85)]">
+              {client.work.label}
+              <ArrowUpRight
+                aria-hidden
+                strokeWidth={2.25}
+                className="h-3 w-3 transition-transform duration-200 group-hover/card:-translate-y-px group-hover/card:translate-x-px"
+              />
+            </span>
+          )}
+        </span>
+        <span id={describedBy} className="mt-0.5 block text-[13px] leading-[18px] text-[rgba(28,28,30,0.6)]" style={{ textWrap: "pretty" }}>
+          {client.did}
+        </span>
+      </span>
+    </>
+  );
+  return (
+    <motion.div
+      initial={{ opacity: 0, filter: "blur(3px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      transition={{ duration: 0.25, ease: EASE_OUT }}
+      className="p-1.5"
+    >
+      {client.work ? (
+        // The logo itself is the keyboard's way in, so the card stays out of the tab order.
+        <Link href={client.work.href} prefetch={false} tabIndex={-1} className="group/card block rounded-[12px]">
+          {body}
+        </Link>
+      ) : (
+        <div>{body}</div>
+      )}
+    </motion.div>
   );
 }
 
 export default function ClientLogoTicker() {
-  const [hovered, setHovered] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const describedBy = useId();
+  const bandRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const hoverTimer = useRef<ReturnType<typeof setTimeout>>();
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Ease the marquee down to a third of its speed on hover, and back up after.
+  // The open card: which client, and the logo it hangs from (either copy in the loop).
+  const [active, setActive] = useState<number | null>(null);
+  const [shown, setShown] = useState<number | null>(null); // kept while the card closes
+  const [lingering, setLingering] = useState(false); // still animating closed
+  const [ringCopy, setRingCopy] = useState(false); // keyboard focus is drawn on the visible copy
+  const anchor = useRef<HTMLElement | null>(null);
+  const via = useRef<"hover" | "focus" | "touch">("hover");
+  const pointerType = useRef("mouse");
+  const [pointerIn, setPointerIn] = useState(false);
+
+  const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const enteredAt = useRef(0);
+  const armedAt = useRef({ x: 0, y: 0 });
+
+  // Where the card sits, in the band's coordinates. The spring glides it from logo to logo.
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const glide = { stiffness: 420, damping: 40, mass: 0.6 };
+  const sx = useSpring(x, glide);
+  const sy = useSpring(y, glide);
+  const [originX, setOriginX] = useState(0.5);
+
+  const place = (jump: boolean) => {
+    const band = bandRef.current;
+    const el = anchor.current;
+    if (!band || !el) return;
+    const b = band.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const centre = r.left + r.width / 2 - b.left;
+    const left = Math.min(Math.max(centre - CARD_W / 2, EDGE), b.width - CARD_W - EDGE);
+    const top = r.bottom - b.top + 6;
+    x.set(left);
+    y.set(top);
+    if (jump) {
+      sx.jump(left);
+      sy.jump(top);
+      setOriginX((centre - left) / CARD_W);
+    }
+  };
+
+  // Load the stills once someone reaches for the band, so a card never opens empty.
+  const preloaded = useRef(false);
+  const preload = () => {
+    if (preloaded.current) return;
+    preloaded.current = true;
+    for (const client of clients) if (client.work) new window.Image().src = still(client);
+  };
+
+  const springHeight = useRef(false);
+  const open = (index: number, el: HTMLElement) => {
+    clearTimeout(openTimer.current);
+    clearTimeout(closeTimer.current);
+    const wasOpen = active !== null;
+    springHeight.current = wasOpen;
+    anchor.current = el;
+    setActive(index);
+    setShown(index);
+    setLingering(true);
+    place(!wasOpen);
+  };
+  const close = () => {
+    clearTimeout(openTimer.current);
+    clearTimeout(closeTimer.current);
+    setActive(null);
+    setRingCopy(false);
+  };
+  const closeSoon = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(close, CLOSE_MS);
+  };
+
+  // Hover opens once the pointer rests on a logo (or lingers there), so gliding
+  // across the band doesn't flash cards. Once one is open, the next follows at once.
+  const arm = (e: React.PointerEvent, index: number) => {
+    if (openTimer.current && Math.hypot(e.clientX - armedAt.current.x, e.clientY - armedAt.current.y) < 4) return;
+    armedAt.current = { x: e.clientX, y: e.clientY };
+    clearTimeout(openTimer.current);
+    const el = e.currentTarget as HTMLElement;
+    const wait = Math.min(REST_MS, Math.max(0, enteredAt.current + LINGER_MS - performance.now()));
+    openTimer.current = setTimeout(() => {
+      via.current = "hover";
+      open(index, el);
+    }, wait);
+  };
+
+  // Keyboard focus walks the loop: the focused logo glides to the middle of the band.
+  const bringIntoView = (el: HTMLElement, index: number): HTMLElement => {
+    const track = trackRef.current;
+    const marquee = marqueeRef.current;
+    const anim = track?.getAnimations()[0];
+    if (!track || !marquee || !anim || reduceMotion) return el;
+    const half = track.scrollWidth / 2;
+    const duration = Number(anim.effect?.getTiming().duration) || 1;
+    const w = el.getBoundingClientRect().width;
+    let at = el.getBoundingClientRect().left - track.getBoundingClientRect().left;
+    let target = el;
+    // Logos at the start of the loop can't reach the middle; their copy can, and looks the same.
+    if (at + w / 2 < marquee.clientWidth / 2) {
+      const twin = track.querySelector<HTMLElement>(`[data-copy] [data-index="${index}"]`);
+      if (twin) {
+        target = twin;
+        at += half;
+      }
+    }
+    const shift = Math.min(Math.max(at + w / 2 - marquee.clientWidth / 2, 0), half);
+    const to = (shift / half) * duration;
+    const from = Number(anim.currentTime ?? 0) % duration;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / 450, 1);
+      anim.currentTime = from + (to - from) * (1 - Math.pow(1 - t, 3));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+    return target;
+  };
+
+  // The marquee eases to a stop under the pointer or while a card is open, and back up after.
+  const paused = pointerIn || active !== null;
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    const target = hovered ? 0.3 : 1;
+    const target = paused ? 0 : 1;
     let raf = 0;
     const step = () => {
       let done = true;
@@ -88,7 +266,7 @@ export default function ClientLogoTicker() {
         const diff = target - anim.playbackRate;
         if (Math.abs(diff) < 0.02) anim.playbackRate = target;
         else {
-          anim.playbackRate += diff * 0.1;
+          anim.playbackRate += diff * 0.14;
           done = false;
         }
       }
@@ -96,36 +274,188 @@ export default function ClientLogoTicker() {
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [hovered]);
+  }, [paused]);
 
-  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+  // While open, the card follows its logo as the marquee settles.
+  useEffect(() => {
+    if (active === null) return;
+    let raf = 0;
+    const tick = () => {
+      place(false);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // place reads refs only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  // A tap or click anywhere but a logo or the card closes it; so does Escape.
+  useEffect(() => {
+    if (active === null) return;
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest?.("[data-logo]") || t.closest?.("[data-logo-card]")) return;
+      close();
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [active]);
+
+  useEffect(
+    () => () => {
+      clearTimeout(openTimer.current);
+      clearTimeout(closeTimer.current);
+    },
+    [],
+  );
+
+  // The card's height springs between clients with and without a still (set when it opens fresh).
+  const [height, setHeight] = useState<number | "auto">("auto");
+  useLayoutEffect(() => {
+    if (contentRef.current) setHeight(contentRef.current.offsetHeight);
+  }, [shown]);
+  const heightTransition = !springHeight.current || reduceMotion ? { duration: 0 } : { type: "spring" as const, visualDuration: 0.32, bounce: 0.12 };
+
+  const renderList = (copy: boolean) => (
+    <ul
+      {...(copy ? { "aria-hidden": true, "data-copy": "" } : {})}
+      className="flex shrink-0 items-center gap-x-12 pr-12 [--logo-h:44px] sm:gap-x-[72px] sm:pr-[72px] sm:[--logo-h:60px]"
+    >
+      {clients.map((client, index) => {
+        const on = active === index;
+        const ring = on && ringCopy && copy;
+        const logo = (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/logos-match-height/${client.logo}.png`}
+            alt={copy ? "" : client.name}
+            width={client.w}
+            height={264}
+            decoding="async"
+            draggable={false}
+            className={`w-auto select-none transition-[opacity,filter] duration-500 ease-out ${on ? "opacity-100 grayscale-0" : "opacity-50 grayscale [@media(hover:hover)]:group-hover/logo:opacity-70"}`}
+            style={{ height: `calc(var(--logo-h) * ${client.scale ?? 1})` }}
+          />
+        );
+        const props = {
+          "data-logo": "",
+          "data-index": index,
+          tabIndex: copy ? -1 : undefined,
+          "aria-describedby": on && !copy ? describedBy : undefined,
+          className: `group/logo flex h-full items-center rounded-lg outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${ring ? "outline outline-2 outline-offset-4 outline-[#2563EB]" : ""} ${client.work ? "cursor-pointer" : "cursor-default"}`,
+          onPointerDown: (e: React.PointerEvent) => {
+            pointerType.current = e.pointerType;
+            preload();
+          },
+          onPointerEnter: (e: React.PointerEvent) => {
+            if (e.pointerType !== "mouse") return;
+            clearTimeout(closeTimer.current);
+            if (active !== null) {
+              via.current = "hover";
+              setRingCopy(false);
+              return open(index, e.currentTarget as HTMLElement);
+            }
+            enteredAt.current = performance.now();
+            arm(e, index);
+          },
+          onPointerMove: (e: React.PointerEvent) => {
+            if (e.pointerType === "mouse" && active === null) arm(e, index);
+          },
+          onPointerLeave: (e: React.PointerEvent) => {
+            if (e.pointerType !== "mouse") return;
+            clearTimeout(openTimer.current);
+            openTimer.current = undefined;
+            if (active !== null && via.current === "hover") closeSoon();
+          },
+          onFocus: (e: React.FocusEvent) => {
+            const el = e.currentTarget as HTMLElement;
+            if (!el.matches(":focus-visible")) return;
+            preload();
+            via.current = "focus";
+            const target = bringIntoView(el, index);
+            setRingCopy(target !== el);
+            open(index, target);
+          },
+          onBlur: (e: React.FocusEvent) => {
+            if (via.current !== "focus") return;
+            if (!(e.relatedTarget as HTMLElement | null)?.closest?.("[data-logo]")) close();
+          },
+          onClick: (e: React.MouseEvent) => {
+            // Enter or Space: a link goes, a plain logo toggles its card.
+            if (e.detail === 0) {
+              if (!client.work) {
+                if (active === index) close();
+                else open(index, e.currentTarget as HTMLElement);
+              }
+              return;
+            }
+            // A tap shows the card first; a second tap on the same logo follows its link.
+            if (pointerType.current === "mouse") {
+              if (active !== index && !client.work) open(index, e.currentTarget as HTMLElement);
+              return;
+            }
+            if (active !== index) {
+              e.preventDefault();
+              via.current = "touch";
+              setRingCopy(false);
+              open(index, e.currentTarget as HTMLElement);
+            } else if (!client.work) close();
+          },
+        };
+        return (
+          <li key={client.name} className="relative flex h-[var(--logo-h)] shrink-0 items-center">
+            {client.work ? (
+              <Link href={client.work.href} prefetch={false} {...props}>
+                {logo}
+              </Link>
+            ) : (
+              <button type="button" {...props}>
+                {logo}
+              </button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  const client = shown === null ? null : clients[shown];
 
   return (
-    <Section className="relative flex flex-col overflow-hidden bg-neutral-50">
+    // Above the next section, so an open card can hang over it.
+    <Section className="relative z-30 flex flex-col bg-neutral-50">
       <OuterLines />
       <div aria-hidden className="line-dash-x" />
 
       {/* The marquee spans the whole frame, not just the 1000px column */}
       <OuterContainer>
-        <div className="relative w-full pb-8 pt-12 sm:pb-10 sm:pt-16">
+        <div ref={bandRef} className="relative w-full pb-10 pt-12 sm:pb-14 sm:pt-16">
           <p className="cursor-default text-center text-xs font-medium uppercase tracking-[0.02em] text-neutral-500 sm:text-[13px]">
             Trusted by 30+ partners over 3 years
           </p>
 
           <div
-            className="mt-8 overflow-x-clip pb-8 sm:mt-10"
+            ref={marqueeRef}
+            className="mt-6 overflow-x-clip py-2 sm:mt-8"
             style={{
               maskImage: "linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)",
               WebkitMaskImage: "linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)",
             }}
-            onMouseEnter={() => {
-              clearTimeout(hoverTimer.current);
-              // A short delay, so a scroll that sweeps the cursor past doesn't trigger it.
-              hoverTimer.current = setTimeout(() => setHovered(true), 80);
+            onPointerEnter={(e) => {
+              if (e.pointerType !== "mouse") return;
+              preload();
+              setPointerIn(true);
             }}
-            onMouseLeave={() => {
-              clearTimeout(hoverTimer.current);
-              setHovered(false);
+            onPointerLeave={(e) => {
+              if (e.pointerType !== "mouse") return;
+              setPointerIn(false);
+              if (active !== null && via.current === "hover") closeSoon();
             }}
           >
             <div
@@ -133,10 +463,45 @@ export default function ClientLogoTicker() {
               className="flex w-max animate-logo-scroll motion-reduce:animate-none"
               style={{ willChange: "transform", backfaceVisibility: "hidden" }}
             >
-              <LogoList />
-              <LogoList copy />
+              {renderList(false)}
+              {renderList(true)}
             </div>
           </div>
+
+          {/* One card for the whole band, so it can sit outside the marquee's clip. */}
+          <motion.div
+            data-logo-card=""
+            className="absolute left-0 top-0 z-10"
+            style={{
+              x: sx,
+              y: sy,
+              width: CARD_W,
+              visibility: active !== null || lingering ? "visible" : "hidden",
+              pointerEvents: active !== null ? "auto" : "none",
+            }}
+            onPointerEnter={(e) => {
+              if (e.pointerType === "mouse") clearTimeout(closeTimer.current);
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType === "mouse" && via.current === "hover") closeSoon();
+            }}
+          >
+            <motion.div
+              initial={false}
+              animate={active !== null ? "open" : "closed"}
+              variants={CARD}
+              transition={reduceMotion ? { duration: 0 } : undefined}
+              onAnimationComplete={(label) => {
+                if (label === "closed") setLingering(false);
+              }}
+              style={{ originX, originY: 0 }}
+              className="overflow-hidden rounded-[18px] border border-black/[0.06] bg-white/[0.8] shadow-[0_24px_48px_-16px_rgba(0,0,0,0.2),0_8px_20px_-10px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl backdrop-saturate-[1.8]"
+            >
+              <motion.div initial={false} animate={{ height }} transition={heightTransition} className="overflow-hidden">
+                <div ref={contentRef}>{client && <CardBody key={client.logo} client={client} describedBy={describedBy} />}</div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
       </OuterContainer>
       <div aria-hidden className="line-dash-x" />
