@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
     AnimatePresence,
@@ -9,7 +10,9 @@ import {
     useMotionValue,
     useMotionValueEvent,
     useReducedMotion,
+    useSpring,
     useTransform,
+    useVelocity,
 } from "framer-motion";
 import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
@@ -19,7 +22,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { HEADLINES, LookSwitcher, SpringText, VARIANTS, VariantPicker, VariantVideo, headlineFromUrl, lookFromUrl, variantFromUrl, type Look, type VariantKey } from "./HeroSelector";
+import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -48,12 +51,7 @@ type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
 
-// Every subline, stacked in one place and crossfaded so the copy keeps its
-// height whichever variant is showing; and the second button's links.
-const SUBLINES = [
-    { key: "all", text: "For founders, from first sketch to launch\u00A0video." },
-    ...VARIANTS.map((v) => ({ key: v.key, text: v.sub })),
-];
+// The second button's link for each variant.
 const LINKS = [{ key: "all", label: "See our work", href: "#work" }, ...VARIANTS.map((v) => ({ key: v.key, ...v.cta }))];
 
 /** False once the home page has mounted in this tab. */
@@ -124,26 +122,10 @@ export default function Hero() {
         return () => window.removeEventListener("resize", place);
     }, [place]);
 
-    // A link like /?for=websites opens on that variant; ?look= picks the headline look.
-    const [look, setLook] = useState<Look>("b");
-    const [headline, setHeadline] = useState(0);
+    // A link like /?for=websites opens on that variant.
     useEffect(() => {
         setVariantKey(variantFromUrl());
-        setLook(lookFromUrl());
-        setHeadline(headlineFromUrl());
     }, []);
-    const chooseHeadline = (index: number) => {
-        setHeadline(index);
-        const url = new URL(window.location.href);
-        url.searchParams.set("h", String(index + 1));
-        window.history.replaceState(window.history.state, "", url);
-    };
-    const chooseLook = (next: Look) => {
-        setLook(next);
-        const url = new URL(window.location.href);
-        url.searchParams.set("look", next);
-        window.history.replaceState(window.history.state, "", url);
-    };
 
     // Other sections (Featured Work) follow the picker, and can set it:
     // window "bp:variant" events carry { key, source }.
@@ -384,7 +366,6 @@ export default function Hero() {
                 )}
             </AnimatePresence>
 
-            <LookSwitcher look={look} onChange={chooseLook} headline={headline} onHeadline={chooseHeadline} />
             <Section
                 className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
@@ -434,70 +415,18 @@ export default function Hero() {
                         <div className="line-dash-y absolute bottom-0 left-0 top-0 hidden custom:block" />
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
 
-                        <div
-                            className={
-                                look === "e"
-                                    ? // As wide as the reel's slot below, so the statement and the frame share a left edge.
-                                      "flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
-                                    : "flex flex-col items-center text-center"
-                            }
-                        >
+                        {/* As wide as the reel's slot below, so the statement and the frame share a left edge. */}
+                        <div className="flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]">
                             <motion.h1
                                 {...rise(0.15)}
                                 className="cursor-default font-medium text-neutral-800"
-                                style={
-                                    look === "e"
-                                        ? { fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }
-                                        : { fontSize: "clamp(36px, 4.2vw, 56px)", lineHeight: 1.08, letterSpacing: "-0.035em", textWrap: "balance" }
-                                }
+                                style={{ fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }}
                             >
-                                {look === "e" ? (
-                                    <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
-                                ) : look === "d" ? (
-                                    HEADLINES[headline]
-                                ) : (
-                                    <>
-                                        {/* The chip gets its own line, so a longer word never rewraps the headline. */}
-                                        <span className="block">We design and build</span>
-                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
-                                    </>
-                                )}
+                                <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
                             </motion.h1>
-                            {look !== "e" && (
-                            <motion.p
-                                {...rise(0.25)}
-                                className="mt-4 grid max-w-[30ch] cursor-default text-neutral-600 sm:max-w-[680px]"
-                                style={{
-                                    fontSize: "clamp(16px, 1.4vw, 19px)",
-                                    lineHeight: 1.4,
-                                    letterSpacing: "-0.01em",
-                                    textWrap: "balance",
-                                }}
-                            >
-                                {SUBLINES.map((line) => {
-                                    const active = line.key === (variant?.key ?? "all");
-                                    return (
-                                        <motion.span
-                                            key={line.key}
-                                            aria-hidden={!active}
-                                            className="[grid-area:1/1]"
-                                            initial={false}
-                                            animate={active ? { opacity: 1, filter: "blur(0px)" } : { opacity: 0, filter: "blur(4px)" }}
-                                            transition={{ duration: active ? 0.35 : 0.2, delay: active ? 0.08 : 0, ease: EASE_OUT }}
-                                        >
-                                            {line.text}
-                                        </motion.span>
-                                    );
-                                })}
-                            </motion.p>
-                            )}
                             <motion.div
                                 {...rise(0.35)}
-                                className={
-                                    look === "e"
-                                        ? "mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row"
-                                        : "mt-6 flex w-full max-w-[340px] flex-col gap-3 sm:grid sm:w-full sm:max-w-none sm:grid-cols-2"
-                                }
+                                className="mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center"
                             >
                                 <motion.a
                                     href="#contact"
@@ -506,7 +435,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
+                                    className="flex h-12 shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -531,7 +460,7 @@ export default function Hero() {
                                         scrollToId(link.href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="group flex h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
+                                    className="group flex h-12 shrink-0 whitespace-nowrap items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
                                 >
                                     {/* Springs to each label, growing away from "Book a call", which never moves. */}
                                     <SpringText text={link.label} />
@@ -540,6 +469,7 @@ export default function Hero() {
                                         className="ml-1.5 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
                                     />
                                 </motion.a>
+                                <HeroLogos />
                             </motion.div>
                         </div>
 
@@ -585,17 +515,6 @@ export default function Hero() {
                                 {/* A hairline edge, so pale frames don't melt into the page. */}
                                 <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
-                                {/* Look d: the picker as a small frosted pill on the reel, like Pentagram's. */}
-                                {look === "d" && (
-                                    <div
-                                        className="absolute left-3 top-3 z-[3] flex items-center gap-0.5 rounded-full bg-white/80 py-1 pl-3 pr-1 text-[15px] font-medium text-neutral-500 shadow-[0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-md transition-opacity duration-500"
-                                        style={{ opacity: stage === "docked" ? 1 : 0, pointerEvents: stage === "docked" ? "auto" : "none" }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        Showing
-                                        <VariantPicker key={look} value={variantKey} onChange={chooseVariant} rotate={revealed} look={look} />
-                                    </div>
-                                )}
                                 {stage === "docked" && (
                                     <button
                                         ref={maximizeRef}
@@ -646,11 +565,104 @@ export default function Hero() {
     );
 }
 
-// Look e: one statement, the first sentence in ink and the rest in grey. What
-// we make doubles as the picker: each word, with a small picture of that work,
-// switches the reel. Words darken into place once the reel has landed.
+// A quiet row of clients beside the buttons, so there's proof on the first
+// screen without shrinking the reel. Each slot cycles through its own clients,
+// one slot after another, through a soft blur. Slots have a fixed width so the
+// row never shifts; one that doesn't fit wraps onto a hidden second line, so
+// only whole slots show. Logo files sit on a 264px-tall canvas (see
+// ClientLogoTicker), so one height gives them all the same weight.
+const HERO_LOGO_SLOTS: { name: string; logo: string; w: number; tone?: number }[][] = [
+    [
+        { name: "TokenWorks", logo: "tokenworks", w: 636 },
+        { name: "Logical", logo: "logical", w: 580 },
+        { name: "Bitfrost", logo: "bitfrost", w: 526 },
+    ],
+    [
+        { name: "Arch Network", logo: "arch-network", w: 518 },
+        { name: "Pyra", logo: "pyra", w: 476 },
+        { name: "Twelve", logo: "twelve", w: 568 },
+    ],
+    [
+        { name: "Jinba", logo: "jinba", w: 561 },
+        // HoneyB's orange turns pale in grey; darken it to match the others.
+        { name: "HoneyB", logo: "honeyb", w: 630, tone: 0.55 },
+        { name: "Reshift", logo: "reshift", w: 461 },
+    ],
+    [
+        { name: "Perena", logo: "perena", w: 682 },
+        { name: "LivingIP", logo: "livingip", w: 603 },
+        { name: "Bold", logo: "bold", w: 540 },
+    ],
+];
+const HERO_LOGO_HEIGHT = 34;
+const HERO_LOGO_SLOT = 84; // Perena, the widest, overhangs by 2px a side, inside the gap
+const HERO_LOGO_EVERY_MS = 3200;
+const HERO_LOGO_STAGGER = 0.09;
+
+function HeroLogos() {
+    const reduceMotion = useReducedMotion();
+    const rowRef = useRef<HTMLDivElement>(null);
+    const [turn, setTurn] = useState(0);
+    const [paused, setPaused] = useState(false);
+    const [inView, setInView] = useState(true);
+    useEffect(() => {
+        const row = rowRef.current;
+        if (!row) return;
+        const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+        observer.observe(row);
+        return () => observer.disconnect();
+    }, []);
+    useEffect(() => {
+        if (reduceMotion || paused || !inView) return;
+        const timer = setInterval(() => {
+            if (!document.hidden) setTurn((t) => t + 1);
+        }, HERO_LOGO_EVERY_MS);
+        return () => clearInterval(timer);
+    }, [reduceMotion, paused, inView]);
+
+    return (
+        <div
+            ref={rowRef}
+            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-2.5 overflow-hidden lg:flex"
+            style={{ height: HERO_LOGO_HEIGHT }}
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
+        >
+            <span className="mr-1 whitespace-nowrap text-[13px] text-neutral-400">Trusted by</span>
+            {HERO_LOGO_SLOTS.map((slot, i) => {
+                const c = slot[turn % slot.length];
+                return (
+                    <div key={i} className="relative shrink-0" style={{ width: HERO_LOGO_SLOT, height: HERO_LOGO_HEIGHT }}>
+                        <AnimatePresence initial={false}>
+                            <motion.img
+                                key={c.logo}
+                                src={`/logos-match-height/${c.logo}.png`}
+                                alt={c.name}
+                                width={Math.round((HERO_LOGO_HEIGHT * c.w) / 264)}
+                                height={HERO_LOGO_HEIGHT}
+                                className="absolute inset-0 m-auto"
+                                style={{ height: HERO_LOGO_HEIGHT, width: "auto", maxWidth: "none" }}
+                                initial={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: 5 }}
+                                animate={{ opacity: 0.45, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(0px)`, y: 0 }}
+                                exit={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: -5 }}
+                                transition={{ duration: 0.7, ease: EASE_OUT, delay: i * HERO_LOGO_STAGGER }}
+                            />
+                        </AnimatePresence>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// The statement: the first sentence in ink and the rest in grey. What
+// we make doubles as the picker: each word switches the reel. On a desktop,
+// resting on a word floats a still of that work by the cursor. Words darken
+// into place once the reel has landed.
 const LEAD = "The design and build partner for founders.";
-const TAIL = ", from first sketch to launch.";
+const TAIL = "from first sketch to launch.";
+const PEEK_FOLLOW = { stiffness: 380, damping: 30, mass: 0.6 };
+const PEEK_HIDE_MS = 140; // long enough to cross the gap between two words
 
 function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
     const reduceMotion = useReducedMotion();
@@ -670,45 +682,117 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 </motion.span>
             );
         });
+
+    // The peek: only where there's a real hover, so phones just tap the words.
+    const [canHover, setCanHover] = useState(false);
+    useEffect(() => {
+        const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+        const update = () => setCanHover(query.matches);
+        update();
+        query.addEventListener("change", update);
+        return () => query.removeEventListener("change", update);
+    }, []);
+    const [peek, setPeek] = useState<VariantKey | null>(null);
+    const peekShown = useRef(false);
+    const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const pointerX = useMotionValue(0);
+    const pointerY = useMotionValue(0);
+    const x = useSpring(pointerX, PEEK_FOLLOW);
+    const y = useSpring(pointerY, PEEK_FOLLOW);
+    // It leans the way it's travelling and settles when the cursor stops.
+    const lean = useTransform(useVelocity(x), [-1400, 0, 1400], [-8, 0, 8], { clamp: true });
+    const follow = useCallback(
+        (e: PointerEvent | React.PointerEvent) => {
+            pointerX.set(e.clientX);
+            pointerY.set(e.clientY);
+            if (!peekShown.current || reduceMotion) {
+                x.jump(e.clientX);
+                y.jump(e.clientY);
+            }
+        },
+        [pointerX, pointerY, x, y, reduceMotion],
+    );
+    useEffect(() => {
+        peekShown.current = peek !== null;
+        if (!peek) return;
+        window.addEventListener("pointermove", follow, { passive: true });
+        return () => window.removeEventListener("pointermove", follow);
+    }, [peek, follow]);
+    useEffect(() => () => clearTimeout(hideTimer.current), []);
+    const showPeek = (key: VariantKey, e: React.PointerEvent) => {
+        if (!canHover || e.pointerType !== "mouse") return;
+        clearTimeout(hideTimer.current);
+        follow(e);
+        setPeek(key);
+    };
+    const hidePeek = () => {
+        clearTimeout(hideTimer.current);
+        hideTimer.current = setTimeout(() => setPeek(null), PEEK_HIDE_MS);
+    };
+
     return (
         <>
             {words(LEAD, true)} {words("We make", false)}{" "}
             {VARIANTS.map((v, i) => {
                 const active = value === v.key;
                 const delay = 0.2 + index++ * 0.025;
+                // Each word keeps its comma, so a comma never starts a line.
+                const comma = i !== VARIANTS.length - 2;
                 return (
                     <span key={v.key}>
-                        <button
-                            type="button"
-                            onClick={() => onPick(active ? null : v.key)}
-                            aria-pressed={active}
-                            className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-                        >
-                            <motion.span
-                                className="mr-[0.16em] inline-block h-[0.78em] w-[1.12em] overflow-hidden rounded-[0.16em] align-[-0.06em] shadow-[0_0_0_1px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover/word:-rotate-3 group-hover/word:scale-110"
-                                initial={{ opacity: 0, scale: 0.6 }}
-                                animate={revealed ? { opacity: 1, scale: 1 } : undefined}
-                                transition={reduceMotion ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.25, delay }}
+                        <span className="whitespace-nowrap">
+                            <button
+                                type="button"
+                                onClick={() => onPick(active ? null : v.key)}
+                                onPointerEnter={(e) => showPeek(v.key, e)}
+                                onPointerLeave={hidePeek}
+                                aria-pressed={active}
+                                className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
                             >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={v.thumb} alt="" className="h-full w-full object-cover" />
-                            </motion.span>
-                            <motion.span
-                                className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
-                                    active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
-                                }`}
-                                initial={{ color: "#D4D4D4" }}
-                                animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
-                                transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
-                            >
-                                {v.word}
-                            </motion.span>
-                        </button>
-                        {i < VARIANTS.length - 2 ? <>{words(",", false)} </> : i === VARIANTS.length - 2 ? <> {words("and", false)} </> : null}
+                                <motion.span
+                                    className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
+                                        active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
+                                    }`}
+                                    initial={{ color: "#D4D4D4" }}
+                                    animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
+                                    transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
+                                >
+                                    {v.word}
+                                </motion.span>
+                            </button>
+                            {comma && words(",", false)}
+                        </span>
+                        {comma ? " " : <> {words("and", false)} </>}
                     </span>
                 );
             })}
             {words(TAIL, false)}
+            {canHover &&
+                revealed &&
+                createPortal(
+                    <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
+                        <motion.div
+                            className="relative ml-4 mt-5 aspect-video w-[176px] overflow-hidden rounded-[10px] bg-neutral-200 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
+                            style={{ transformOrigin: "0% 0%" }}
+                            initial={false}
+                            animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+                            transition={reduceMotion ? { duration: 0.15 } : { type: "spring", visualDuration: 0.35, bounce: 0.25 }}
+                        >
+                            {VARIANTS.map((v) => (
+                                <motion.img
+                                    key={v.key}
+                                    src={v.still}
+                                    alt=""
+                                    className="absolute inset-0 h-full w-full object-cover"
+                                    initial={false}
+                                    animate={{ opacity: peek === v.key ? 1 : 0 }}
+                                    transition={{ duration: 0.2, ease: EASE_OUT }}
+                                />
+                            ))}
+                        </motion.div>
+                    </motion.div>,
+                    document.body,
+                )}
         </>
     );
 }
