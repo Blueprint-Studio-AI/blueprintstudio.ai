@@ -94,7 +94,7 @@ const more: Testimonial[][] = [
         "It was great working with you guys. You helped us focus our ideas and the final product came out really well. We'll be back for sure 🙂",
       author: "Ali Khalatpour",
       role: "Founder",
-      company: "Pirus Labs · YC W26",
+      company: "Piris Labs · YC W26",
       image: "/testimonials/ali-khalatpour.png",
     },
     {

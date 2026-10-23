@@ -26,6 +26,8 @@ const still = (key: string) => `/logos-match-height/stills/${key}.jpg`;
 export const CLIENT_LOGOS: ClientLogo[] = [
   { name: "TokenWorks", logo: "tokenworks", w: 636, line: "Digital transformation, service design, development and product videos.", still: still("tokenworks") },
   { name: "Arch Network", logo: "arch-network", w: 518, line: "Service design, branding, development and content creation.", still: still("arch-network"), href: "/brands/arch" },
+  // Brand only: its app, films and deck stay confidential until launch.
+  { name: "Arch Prime", logo: "arch-prime", w: 666, line: "Brand identity and design system.", still: still("arch-prime"), href: "/brands/arch-prime" },
   { name: "Perena", logo: "perena", w: 682, line: "Landing page, service design and development.", still: still("perena"), href: "/launch-videos" },
   { name: "Jinba", logo: "jinba", w: 561, line: "Branding, landing page and launch video.", still: still("jinba"), href: "/brands/jinba" },
   { name: "Bump", logo: "bump-wordmark", w: 350, line: "Branding, product design and UX.", still: still("bump") },
