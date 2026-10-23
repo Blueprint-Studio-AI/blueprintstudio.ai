@@ -8,10 +8,13 @@ import { motion, useMotionValue, useTransform, type MotionValue } from "framer-m
 // pill the wordmark folds away into the mark, which stays. `fold` runs from 0,
 // open, to 1, folded.
 
-// In the original 173 x 23 artwork the mark spans x 0.39 to 22.72, and the
-// wordmark's file starts at x 29.5 and is 142 wide, at the same height. At 16px
-// tall the wordmark's x-height (7.7px) sits with the nav's 14px links.
-const HEIGHT = 16;
+// In the original 173 x 23 artwork (public/blueprint-logo-dark.png) the mark
+// spans x 0.39 to 22.72, the full height from above the b to the foot of the p,
+// and the wordmark's file starts at x 29.5 and is 142 wide, at the same height;
+// so these proportions are the lockup's own. At 18px tall the mark holds its
+// own beside the links, and the wordmark's x-height (8.7px) is a touch above
+// theirs (7.6px).
+const HEIGHT = 18;
 const UNIT = HEIGHT / 23;
 const MARK = 22.3248 * UNIT;
 const GAP = (29.5 - 22.7193) * UNIT;

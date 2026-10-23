@@ -868,7 +868,6 @@ function DesktopNav() {
                                                             </span>
                                                             <span className="flex items-center gap-2 px-1.5 pt-2.5">
                                                                 <span className="text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{ASSET_GENERATOR.label}</span>
-                                                                <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
                                                                 <ArrowUpRight aria-hidden className="ml-auto h-3.5 w-3.5 shrink-0 text-[rgba(28,28,30,0.45)]" strokeWidth={2.25} />
                                                             </span>
                                                             <span className="block px-1.5 pb-1 text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>

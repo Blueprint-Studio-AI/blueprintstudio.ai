@@ -221,7 +221,6 @@ export const FloatingNavNew = () => {
                                 <span className="min-w-0 flex-1">
                                     <span className="flex items-center gap-2 text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">
                                         {ASSET_GENERATOR.label}
-                                        <span className="rounded-full bg-black/[0.05] px-1.5 py-px text-[11px] font-medium text-[rgba(28,28,30,0.55)]">Our app</span>
                                     </span>
                                     <span className="block text-[13px] leading-[18px] text-[rgba(28,28,30,0.5)]">{ASSET_GENERATOR.line}</span>
                                 </span>

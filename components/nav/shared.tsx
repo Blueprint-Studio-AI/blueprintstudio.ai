@@ -79,6 +79,18 @@ export const INDUSTRIES = [
             { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
         ],
     },
+    {
+        key: "ai",
+        label: "AI",
+        href: "/industries/ai",
+        line: "For AI assistants, agents and infrastructure.",
+        // Piris Labs belongs here too, once there's a logo file for it.
+        logos: [
+            { name: "Jinba", src: "/logos-match-height/jinba.png", width: 608 },
+            { name: "Logical", src: "/logos-match-height/logical.png", width: 580 },
+            { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
+        ],
+    },
 ];
 
 /** Our own product, on the tools subdomain. The picture is the home page's Asset Generator band's. */
