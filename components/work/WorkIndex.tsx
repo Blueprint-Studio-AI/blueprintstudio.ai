@@ -35,7 +35,7 @@ export default function WorkIndex() {
             id="all-work-title"
             eyebrow="Every client"
             title="All work"
-            aside="Everyone we’ve designed and built for since 2023. Names link where there’s more to see."
+            aside="Everyone we’ve designed and built for since 2024. Names link where there’s more to see."
           />
           <div className={TEXT_INSET}>
             <AllWorkList />

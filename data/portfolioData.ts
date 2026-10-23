@@ -20,10 +20,9 @@ import type { TestimonialId } from "./testimonials";
 
 // What we made. The first four have /work/<deliverable> pages once at least
 // two pieces of work carry them (lib/work).
-export type Deliverable = "websites" | "apps" | "branding" | "launch-videos";
+export type Deliverable = "websites" | "apps" | "branding" | "launch-videos" | "decks";
 export type WorkType =
   | Deliverable
-  | "pitch-decks"
   | "service-design"
   | "ai-automation"
   | "content"
@@ -44,6 +43,7 @@ export const deliverableLabels: Record<Deliverable, string> = {
   apps: "Apps",
   branding: "Branding",
   "launch-videos": "Launch videos",
+  decks: "Decks",
 };
 
 /** One of a kind, for meta lines and the All work list ("Website", "Launch videos" when there are several). */
@@ -52,7 +52,7 @@ export const workTypeLabels: Record<WorkType, { one: string; many: string }> = {
   apps: { one: "App", many: "Apps" },
   branding: { one: "Brand", many: "Brands" },
   "launch-videos": { one: "Launch video", many: "Launch videos" },
-  "pitch-decks": { one: "Pitch deck", many: "Pitch decks" },
+  decks: { one: "Pitch deck", many: "Pitch decks" },
   "service-design": { one: "Service design", many: "Service design" },
   "ai-automation": { one: "AI automation", many: "AI automation" },
   content: { one: "Content", many: "Content" },
@@ -114,6 +114,14 @@ export interface WorkItem {
   /** Slug of its /brands/<slug> case study. */
   brandPage?: string;
   kit?: MediaKit;
+  /**
+   * A deck's slides for /work/decks (16:9), after its cover (the kit's hero).
+   * Sensitive figures and names are blurred into the files themselves, never
+   * with CSS over the original; `blurred` puts a note on the slide.
+   */
+  deck?: { coverBlurred?: boolean; slides: { src: string; alt: string; blurred?: boolean }[] };
+  /** Show this piece on its deliverable page even though its client is archived. */
+  showWhenArchived?: boolean;
 }
 
 export interface Client {
@@ -123,8 +131,14 @@ export interface Client {
   /** "2023–2026", or one year. Empty when we don't know. */
   years: string;
   engagement: "Partnership" | "Project" | "Unknown";
-  /** False once the client has closed or its site has gone: listed, never featured. */
+  /** False once the client has closed or its site has gone. */
   trading: boolean;
+  /**
+   * Where the client shows (the registry's tier): Feature, on the home page's
+   * Featured Work and the top of /work (about eight at most); Show, on the
+   * /work pages; Archive, only in the All work list; Hide, nowhere.
+   */
+  tier: "Feature" | "Show" | "Archive" | "Hide";
   testimonial?: TestimonialId;
   /** The relationship, told plainly. */
   summary?: string;
@@ -166,12 +180,30 @@ function kit(
   };
 }
 
+
+/** A deck's files: /media/kits/<slug>/cover.jpg (also hero.jpg), slide-1..4.jpg, s1-3.jpg, hero-v.jpg. */
+function deck(slug: string, alts: { cover: string; slides: [string, string, string, string] }, blurred: number[], coverBlurred = false) {
+  const base = `${KITS}/${slug}`;
+  return {
+    kit: kit(slug, {
+      alt: alts.cover,
+      hero: { poster: `${base}/cover.jpg` },
+      stills: [alts.cover, alts.slides[0], alts.slides[2]],
+    }),
+    deck: {
+      coverBlurred,
+      slides: alts.slides.map((alt, i) => ({ src: `${base}/slide-${i + 1}.jpg`, alt, blurred: blurred.includes(i + 1) })),
+    },
+  };
+}
+
 const TW_REEL = `${PROJECTS}/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4`;
 
 export const clients: Client[] = [
   {
     slug: "tokenworks",
     name: "TokenWorks",
+    tier: "Feature",
     industry: [],
     // The registry has April 2024 to October 2026 (Tyler calls it three years).
     years: "2024–2026",
@@ -274,6 +306,7 @@ export const clients: Client[] = [
   {
     slug: "perena",
     name: "Perena",
+    tier: "Feature",
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -331,12 +364,13 @@ export const clients: Client[] = [
   {
     slug: "arch-network",
     name: "Arch Network",
+    tier: "Feature",
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
     trading: true,
     summary:
-      "Arch Network’s design partner since 2025: the BTC All-In Summit in Las Vegas, the Arch Prime identity, and the pages that launch the chain.",
+      "Arch Network’s design partner since 2025: the BTC All-In Summit in Las Vegas, the Arch and Arch Prime identities, and the pages that launch the chain.",
     work: [
       {
         slug: "arch-btc-summit",
@@ -385,10 +419,14 @@ export const clients: Client[] = [
         type: "branding",
         year: "2026",
         status: "live",
-        // Ownership unclear: /brands/arch was assembled from arch.network's existing
-        // imagery. The kit stays in /media/kits/arch-brand for when Tyler confirms.
-        visibility: "needs-ok",
-        source: "/brands/arch",
+        visibility: "public",
+        source: "/brands/arch; our versions, not arch.network's current homepage",
+        summary: "Arch Network’s identity and design system: the mark, the serif, the orange, and the diagrams.",
+        brandPage: "arch",
+        kit: kit("arch-brand", {
+          alt: "Arch Network: Real Bitcoin. Finally programmable.",
+          stills: ["The Arch Network lockup on orange", "An Arch diagram: the finance district", "The Arch glyph"],
+        }),
       },
       {
         slug: "arch-prime-brand",
@@ -440,13 +478,13 @@ export const clients: Client[] = [
     ],
     flags: [
       "arch.network's homepage (Arch Prime) is not our build: never use captures of it",
-      "Was the Arch Network identity ours? Not shown until confirmed",
       "Arch Prime's app, films and decks stay confidential until it launches",
     ],
   },
   {
     slug: "jinba",
     name: "Jinba",
+    tier: "Feature",
     industry: ["ai"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -501,6 +539,7 @@ export const clients: Client[] = [
   {
     slug: "livingip",
     name: "LivingIP",
+    tier: "Feature",
     industry: ["crypto", "ai"],
     // The designs are dated 2025 (the site said 2024).
     years: "2025",
@@ -524,13 +563,16 @@ export const clients: Client[] = [
           hero: {
             src: `${PROJECTS}/living-ip/living-ip-horizontal-compressed.mp4`,
             poster: `${KITS}/livingip-app/hero.jpg`,
-            // Analytics, then the app on a laptop and a phone; the rest is pale on white.
-            clip: [8.4, 12.3],
+            // The app on a laptop, then a phone. (Earlier stretches include “Poast”,
+            // whose ownership is a question for Tyler, and pale blurred transitions.)
+            clip: [10.1, 13],
           },
           vertical: {
             src: `${PROJECTS}/living-ip/living-ip-vertical-compressed.mp4`,
             poster: `${KITS}/livingip-app/hero-v.jpg`,
-            clip: [8, 12.8],
+            // The phone, as in the apps peek.
+            clip: [11.9, 13.3],
+            posterTime: 12.4,
           },
           stills: ["A contributor profile in the LivingIP app", "Voting on knowledge", "Achievement badges"],
         }),
@@ -540,6 +582,7 @@ export const clients: Client[] = [
   {
     slug: "honeyb",
     name: "HoneyB",
+    tier: "Feature",
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -581,6 +624,26 @@ export const clients: Client[] = [
         }),
       },
       {
+        slug: "honeyb-deck",
+        title: "Pitch deck",
+        label: "Pitch deck",
+        type: "decks",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // The slides /launch already shows (Tyler's fine keeping them); the raise and its lead are blurred.
+        source: "public/launch-assets/slide-deck_assets/honeyb_deck-assets",
+        summary: "The deck that took HoneyB from a blank slate to its raise: the yield gap, the market and the field.",
+        ...deck(
+          "honeyb-deck",
+          {
+            cover: "HoneyB deck: The Yield Layer for Bitcoin",
+            slides: ["Meet HoneyB", "Market size", "Competitive landscape", "Raising, with the amount and lead blurred"],
+          },
+          [4]
+        ),
+      },
+      {
         slug: "honeyb-app",
         title: "Web app",
         label: "App",
@@ -606,6 +669,7 @@ export const clients: Client[] = [
   {
     slug: "bump",
     name: "Bump.fun",
+    tier: "Show",
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -655,6 +719,7 @@ export const clients: Client[] = [
   {
     slug: "uni",
     name: "UNI",
+    tier: "Archive",
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -683,6 +748,7 @@ export const clients: Client[] = [
   {
     slug: "breeze",
     name: "Breeze",
+    tier: "Archive",
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -710,10 +776,11 @@ export const clients: Client[] = [
   {
     slug: "autara",
     name: "Autara",
+    tier: "Show",
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
-    // autara.xyz is a parked domain now: listed, not featured.
+    // Acquired by Arch; autara.xyz is parked. Its work shows on /work, never featured.
     trading: false,
     work: [
       {
@@ -741,11 +808,12 @@ export const clients: Client[] = [
       },
       { slug: "autara-landing", title: "Framer landing page", label: "Landing page", type: "websites", year: "2025", status: "archived", visibility: "public" },
     ],
-    flags: ["autara.xyz is parked"],
+    flags: ["autara.xyz is parked; Autara was acquired by Arch"],
   },
   {
     slug: "huch",
     name: "HUCH",
+    tier: "Archive",
     industry: ["gaming"],
     years: "2025–2026",
     engagement: "Project",
@@ -754,7 +822,28 @@ export const clients: Client[] = [
     work: [
       { slug: "huch-brand", title: "Rebrand", label: "Rebrand", type: "branding", year: "2025", status: "archived", visibility: "public" },
       { slug: "huch-platform", title: "Platform design and build", label: "Platform", type: "apps", year: "2025", status: "archived", visibility: "public" },
-      { slug: "huch-deck", title: "Pitch deck", label: "Pitch deck", type: "pitch-decks", year: "2025", status: "shipped", visibility: "needs-ok", source: "Cover states revenue" },
+      {
+        slug: "huch-deck",
+        title: "Pitch deck",
+        label: "Pitch deck",
+        type: "decks",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // The slides /launch already shows; revenue and raise figures blurred, cover line included.
+        source: "public/launch-assets/slide-deck_assets/huch_deck-assets",
+        summary: "A pitch deck for HUCH, the tokenization platform for gaming assets.",
+        showWhenArchived: true,
+        ...deck(
+          "huch-deck",
+          {
+            cover: "HUCH deck cover, with the revenue line blurred",
+            slides: ["Tokenization is no longer hype", "HUCH unlocks gaming assets", "Competitive landscape", "Traction, with the figures blurred"],
+          },
+          [4],
+          true
+        ),
+      },
     ],
   },
   // Listed in All work, from the client registry (review-2026-10-23/client-registry):
@@ -768,7 +857,7 @@ export const clients: Client[] = [
   listed("hashplay", "Hashplay", "2025–2026", ["branding", "websites", "content"], { engagement: "Project", trading: true }),
   listed("bold", "BOLD", "2025", ["websites", "apps"], { engagement: "Project", trading: true }),
   listed("panta", "Panta", "2026", ["launch-videos"], { engagement: "Project", trading: true }),
-  listed("hildene", "Hildene", "", ["video", "service-design"], { engagement: "Unknown", trading: true }),
+  listed("hildene", "Hildene", "", ["video", "service-design"], { engagement: "Unknown", trading: true, tier: "Hide" }),
   listed("pregame", "Pre.Game", "2025", ["content", "motion"], { engagement: "Project", trading: true }),
   listed("dag", "DAG.GG", "2025", ["merch", "branding"], { engagement: "Project", trading: true }),
   listed("twelve", "Twelve", "2025", ["apps"], { engagement: "Unknown", trading: true }),
@@ -790,7 +879,7 @@ function listed(
   name: string,
   years: string,
   types: WorkType[],
-  { engagement, trading }: Pick<Client, "engagement" | "trading">
+  { engagement, trading, tier = "Archive" }: Pick<Client, "engagement" | "trading"> & { tier?: Client["tier"] }
 ): Client {
   return {
     slug,
@@ -799,6 +888,7 @@ function listed(
     years,
     engagement,
     trading,
+    tier,
     work: types.map((type, i) => ({
       slug: `${slug}-${i + 1}`,
       title: workTypeLabels[type].one,
@@ -811,10 +901,10 @@ function listed(
   };
 }
 
-// The home page's Featured Work and /work's featured clients. "All work" is
-// the hand-picked `all`. A word picked in the hero shows every client with
-// public, kitted work of that kind: `lead` first, then the rest in the order
-// above, each leading with its work of that kind. At most `max`.
+// The home page's Featured Work and /work's featured clients: the Feature
+// tier, in `all`'s order. A word picked in the hero shows the Feature clients
+// with work of that kind (`lead` first), each leading with it; when fewer than
+// two have any, Show clients with it fill in. At most `max`.
 export const featuredWork: {
   max: number;
   all: string[];

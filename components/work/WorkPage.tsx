@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
-import { collectionShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
+import { collectionShowcase, deckShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
 import CtaBand from "./CtaBand";
+import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
 import ProjectFull from "./ProjectFull";
 import Reveal from "./Reveal";
@@ -19,7 +20,8 @@ export type WorkLayout = "a" | "b";
 //    three's stills beside it; below, each piece as large as the screen allows.
 export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig; layout?: WorkLayout }) {
   const works = workFor(page.slug);
-  const hero = layout === "b" ? collectionShowcase(works, "") : null;
+  // Decks have their own layout (cover and slides) in both A and B.
+  const hero = layout === "b" && page.slug !== "decks" ? collectionShowcase(works, "") : null;
 
   return (
     <div>
@@ -44,7 +46,11 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
               </Reveal>
             )}
             {works.map((work, i) =>
-              layout === "b" ? (
+              page.slug === "decks" ? (
+                <Reveal key={work.slug}>
+                  <DeckShowcase data={deckShowcase(work)} eager={i === 0} />
+                </Reveal>
+              ) : layout === "b" ? (
                 <Reveal key={work.slug}>
                   <ProjectFull data={workShowcase(work)} />
                 </Reveal>

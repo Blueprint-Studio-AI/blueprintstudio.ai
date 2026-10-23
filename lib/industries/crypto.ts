@@ -28,14 +28,15 @@ export const crypto: IndustryConfig = {
   offersTitle: "What we make for crypto founders",
   offers: [
     { deliverable: "websites", line: "Landing pages and marketing sites, designed and built.", lead: "honeyb-website" },
-    { deliverable: "branding", line: "Identities, logo systems and the kits that carry them.", lead: "arch-prime-brand" },
+    { deliverable: "branding", line: "Identities, logo systems and the kits that carry them.", lead: "arch-brand" },
     { deliverable: "apps", line: "Product design and UX for on-chain products.", lead: "livingip-app" },
     { deliverable: "launch-videos", line: "Motion and launch media for a product going live." },
   ],
   workTitle: "Crypto work",
   // A reel, then alternate stills and reels down the wall.
-  order: ["perena-landing", "perena-film", "arch-btc-summit", "arch-chain", "arch-prime-brand", "honeyb-website", "honeyb-brand", "livingip-app", "bump-brand", "bump-app", "uni-brand", "breeze-brand"],
+  order: ["perena-landing", "perena-film", "arch-btc-summit", "arch-chain", "arch-brand", "arch-prime-brand", "honeyb-website", "honeyb-brand", "livingip-app", "bump-brand", "bump-app", "uni-brand", "breeze-brand"],
   brandPages: [
+    { slug: "arch", line: "Bitcoin-native financial market infrastructure." },
     { slug: "arch-prime", line: "Arch Network’s product brand, with its own palette and a place system for the app." },
     { slug: "honeyb", line: "A Bitcoin yield platform. Brand, website and pitch deck." },
   ],

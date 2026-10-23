@@ -3,8 +3,9 @@ import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
 import { workTypeLabels, type Client } from "@/data/portfolioData";
 import { testimonials } from "@/data/testimonials";
-import { madeFor, shownWorkOf, workShowcase } from "@/lib/work";
+import { deckShowcase, madeFor, shownWorkOf, workShowcase } from "@/lib/work";
 import CtaBand from "./CtaBand";
+import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
 import Quote from "./Quote";
 import Reveal from "./Reveal";
@@ -93,7 +94,15 @@ export default function ClientPage({ client }: { client: Client }) {
           <div className={`${TEXT_INSET} ${STACK}`}>
             {works.map((work, i) => (
               <Reveal key={work.slug}>
-                <Showcase data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [{ key: work.slug, label: `${workTypeLabels[work.type].one} · ${work.year}` }] }} eager={i === 0} titleAs="h2" />
+                {work.type === "decks" ? (
+                  <DeckShowcase data={{ ...deckShowcase(work), title: work.title, items: [{ key: work.slug, label: `${workTypeLabels[work.type].one} · ${work.year}` }] }} />
+                ) : (
+                  <Showcase
+                    data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [{ key: work.slug, label: `${workTypeLabels[work.type].one} · ${work.year}` }] }}
+                    eager={i === 0}
+                    titleAs="h2"
+                  />
+                )}
               </Reveal>
             ))}
           </div>

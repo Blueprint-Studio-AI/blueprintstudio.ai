@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { clients, type Client } from "@/data/portfolioData";
-import { clientPath, hasClientPage, madeFor, shownWorkOf, workHref } from "@/lib/work";
+import { clientPath, hasClientPage, madeFor, shownWork, workHref } from "@/lib/work";
 
 /** Where a client's row links: its page, its brand case study, or its work on a wall. */
 function rowHref(client: Client): string | undefined {
   if (hasClientPage(client)) return clientPath(client);
   const brand = client.work.find((w) => w.visibility === "public" && w.brandPage)?.brandPage;
   if (brand) return `/brands/${brand}`;
-  const shown = shownWorkOf(client)[0];
+  // Archived clients can still have a piece on a deliverable page (a deck).
+  const shown = shownWork.find((w) => w.client.slug === client.slug);
   return shown ? workHref(shown) : undefined;
 }
 
@@ -16,7 +17,7 @@ function rowHref(client: Client): string | undefined {
 // made, and the years where we know them. Names link where there's a page.
 export default function AllWorkList() {
   const rows = [...clients]
-    .filter((c) => c.work.some((w) => w.visibility !== "needs-ok"))
+    .filter((c) => c.tier !== "Hide" && c.work.some((w) => w.visibility !== "needs-ok"))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (

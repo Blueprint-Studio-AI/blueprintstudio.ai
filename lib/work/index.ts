@@ -15,6 +15,7 @@ import { websites } from "./websites";
 import { apps } from "./apps";
 import { branding } from "./branding";
 import { launchVideos } from "./launch-videos";
+import { decks } from "./decks";
 
 export type { WorkPageConfig } from "./types";
 
@@ -23,26 +24,31 @@ export const MIN_PROJECTS = 2;
 // A client gets its own page once it has this many pieces of work to show.
 export const MIN_CLIENT_PAGE = 3;
 
-const allPages: WorkPageConfig[] = [websites, apps, branding, launchVideos];
-const DELIVERABLES: Deliverable[] = ["websites", "apps", "branding", "launch-videos"];
+const allPages: WorkPageConfig[] = [websites, apps, branding, launchVideos, decks];
+const DELIVERABLES: Deliverable[] = ["websites", "apps", "branding", "launch-videos", "decks"];
 
 export const isDeliverable = (t: WorkType): t is Deliverable => (DELIVERABLES as WorkType[]).includes(t);
 
-/** A piece of work we show: public, with a kit, from a client that's still trading. */
+/** A piece of work we show: public, with a kit, from a client in the Feature or Show tier. */
 export type ShownWork = WorkItem & { type: Deliverable; kit: MediaKit; client: Client };
 
+export const isShown = (client: Client) => client.tier === "Feature" || client.tier === "Show";
+
 const shown = (client: Client): ShownWork[] =>
-  client.trading
-    ? client.work.flatMap((w) =>
-        w.visibility === "public" && w.kit && isDeliverable(w.type) ? [{ ...w, type: w.type, kit: w.kit, client }] : []
-      )
-    : [];
+  client.tier === "Hide"
+    ? []
+    : client.work.flatMap((w) =>
+        (isShown(client) || w.showWhenArchived) && w.visibility === "public" && w.kit && isDeliverable(w.type)
+          ? [{ ...w, type: w.type, kit: w.kit, client }]
+          : []
+      );
 
 /** Every piece of work we show, in client order. */
 export const shownWork: ShownWork[] = clients.flatMap(shown);
 
+/** A client's shown work. Archived clients have none here, even with a deck shown on /work/decks. */
 export function shownWorkOf(client: Client): ShownWork[] {
-  return shownWork.filter((w) => w.client.slug === client.slug);
+  return isShown(client) ? shownWork.filter((w) => w.client.slug === client.slug) : [];
 }
 
 export function clientBySlug(slug: string): Client | undefined {
@@ -206,6 +212,27 @@ export function workShowcase(work: ShownWork, opts: { clientLink?: boolean } = {
   };
 }
 
+export interface DeckSlide {
+  src: string;
+  alt: string;
+  blurred?: boolean;
+}
+
+/** A deck as a showcase: the cover plays in the big frame, the slides sit under it and take its place when picked. */
+export function deckShowcase(work: ShownWork): ShowcaseData & { slides: (DeckSlide & { frame: string })[]; coverBlurred: boolean } {
+  const base = workShowcase(work);
+  const slides = (work.deck?.slides ?? []).map((slide, i) => ({ ...slide, frame: `${work.slug}-${i + 1}` }));
+  return {
+    ...base,
+    frames: [
+      { key: work.slug, label: "Cover", hero: { ...work.kit.hero, vertical: undefined } },
+      ...slides.map((slide) => ({ key: slide.frame, label: slide.alt, hero: { poster: slide.src, alt: slide.alt } })),
+    ],
+    slides,
+    coverBlurred: !!work.deck?.coverBlurred,
+  };
+}
+
 /**
  * Several pieces of work as one showcase, for a page's hero: the first plays,
  * the next three's first stills sit beside it and play when picked.
@@ -233,16 +260,24 @@ export function collectionShowcase(works: ShownWork[], title: string, lead = "")
 }
 
 /**
- * Featured clients for the home page and /work: the hand-picked set, or for
- * one kind of work, every trading client with that kind (the picked ones first).
+ * Featured clients for the home page and /work: the Feature tier, in
+ * featuredWork's order. For one kind of work, the Feature clients with that
+ * kind (featuredWork.lead first); when fewer than two have any, Show clients
+ * with it fill in, so a filter never shows a lone card.
  */
 export function featuredClients(filter: Deliverable | null): Client[] {
   const has = (c: Client) => shownWorkOf(c).some((w) => !filter || w.type === filter);
-  const bySlugs = (slugs: string[]) => slugs.flatMap((s) => clientBySlug(s) ?? []).filter(has);
-  if (!filter) return bySlugs(featuredWork.all).slice(0, featuredWork.max);
-  const lead = bySlugs(featuredWork.lead[filter] ?? []);
-  const rest = clients.filter((c) => has(c) && !lead.includes(c));
-  return [...lead, ...rest].slice(0, featuredWork.max);
+  const rank = (slugs: string[]) => (c: Client) => {
+    const i = slugs.indexOf(c.slug);
+    return i === -1 ? slugs.length : i;
+  };
+  const byOrder = (list: Client[], slugs: string[]) =>
+    list.map((c, i) => ({ c, i })).sort((a, b) => rank(slugs)(a.c) - rank(slugs)(b.c) || a.i - b.i).map(({ c }) => c);
+  const feature = byOrder(clients.filter((c) => c.tier === "Feature" && has(c)), featuredWork.all);
+  if (!filter) return feature.slice(0, featuredWork.max);
+  const picked = byOrder(feature, featuredWork.lead[filter] ?? []);
+  const fill = picked.length < 2 ? clients.filter((c) => c.tier === "Show" && has(c)) : [];
+  return [...picked, ...fill].slice(0, featuredWork.max);
 }
 
 /** Industry tags for a piece of work, minus the page's own industry. */

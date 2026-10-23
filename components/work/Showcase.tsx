@@ -257,9 +257,7 @@ function Stills({
             {interactive && (
               <span
                 aria-hidden="true"
-                className={`pointer-events-none absolute bottom-2 left-2 hidden rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-medium text-neutral-800 shadow-[0_1px_6px_rgba(0,0,0,0.08)] backdrop-blur-md transition-[opacity,transform] duration-300 ease-out sm:block lg:bottom-3 lg:left-3 ${
-                  on ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0 group-hover/still:translate-y-0 group-hover/still:opacity-100"
-                }`}
+                className="pointer-events-none absolute bottom-2 left-2 hidden translate-y-1 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-medium text-neutral-800 opacity-0 shadow-[0_1px_6px_rgba(0,0,0,0.08)] backdrop-blur-md transition-[opacity,transform] duration-300 ease-out group-hover/still:translate-y-0 group-hover/still:opacity-100 sm:block lg:bottom-3 lg:left-3"
               >
                 {label(still.frame)}
               </span>
