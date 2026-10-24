@@ -148,7 +148,8 @@ export const honeyb: BrandConfig = {
   },
   typeDefaults: { display: "Poly Regular", text: "Inter Light" },
 
-  // No mockups: the set that used to lead this section was AI-generated, so it's gone.
+  // No mockups here: the scenes in /mockups have AI-drawn screens, so they stay unlinked
+  // until real captures of our work are composited into them (see CLAUDE.md).
   // Names describe what each file actually shows. "Mockup 4" tells a visitor
   // nothing and makes the download ambiguous once it's on their desktop; the
   // filename still carries the index for anyone matching against the source kit.
