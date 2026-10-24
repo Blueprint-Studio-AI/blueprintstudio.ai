@@ -3,10 +3,11 @@ import { hasWorkPage, shownWork, type ShownWork } from "@/lib/work";
 import type { IndustryCombo, IndustryConfig } from "./types";
 import { crypto } from "./crypto";
 import { ai } from "./ai";
+import { finance } from "./finance";
 
 export type { IndustryCombo, IndustryConfig } from "./types";
 
-const allIndustries: IndustryConfig[] = [crypto, ai];
+const allIndustries: IndustryConfig[] = [crypto, finance, ai];
 
 // An industry page needs a real body of work behind it, and a combo page
 // (industry x deliverable) needs enough to stand on its own.
@@ -20,7 +21,7 @@ export function industryProjects(industry: IndustryConfig, deliverable?: Deliver
     return i === -1 ? industry.order.length : i;
   };
   return shownWork
-    .filter((w) => w.client.industry.includes(industry.slug) && (!deliverable || w.type === deliverable))
+    .filter((w) => (w.industry ?? w.client.industry).includes(industry.slug) && (!deliverable || w.type === deliverable))
     .map((w, i) => ({ w, i }))
     .sort((a, b) => rank(a.w.slug) - rank(b.w.slug) || a.i - b.i)
     .map(({ w }) => w);

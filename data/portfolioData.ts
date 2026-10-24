@@ -39,7 +39,7 @@ export type WorkType =
   | "workshops";
 
 // The client's field, as their own copy and media describe it.
-export type Industry = "crypto" | "ai" | "gaming";
+export type Industry = "crypto" | "ai" | "gaming" | "finance";
 
 export const deliverableLabels: Record<Deliverable, string> = {
   websites: "Websites",
@@ -73,6 +73,7 @@ export const industryLabels: Record<Industry, string> = {
   crypto: "Crypto",
   ai: "AI",
   gaming: "Gaming",
+  finance: "Finance",
 };
 
 /** A clip (or a still) with its poster. `clip` is the stretch to loop, [start, end] in seconds. */
@@ -123,6 +124,8 @@ export interface WorkItem {
    * with CSS over the original; `blurred` puts a note on the slide.
    */
   deck?: { coverBlurred?: boolean; slides: { src: string; alt: string; blurred?: boolean }[] };
+  /** The piece's own fields, when they differ from its client's (Arch Prime's brand is finance; the rest of Arch isn't). */
+  industry?: Industry[];
   /** Show this piece on its deliverable page even though its client is archived. */
   showWhenArchived?: boolean;
 }
@@ -134,7 +137,7 @@ export interface Client {
   /** "2023–2026", or one year. Empty when we don't know. */
   years: string;
   engagement: "Partnership" | "Project" | "Unknown";
-  /** False once the client has closed or its site has gone. */
+  /** False once the client has closed or its site has gone: never link its site. Where work shows is the tier's call. */
   trading: boolean;
   /**
    * Where the client shows (the registry's tier): Feature, on the home page's
@@ -330,7 +333,7 @@ export const clients: Client[] = [
     slug: "perena",
     name: "Perena",
     tier: tierOf("perena"),
-    industry: ["crypto"],
+    industry: ["crypto", "finance"],
     years: "2025–2026",
     engagement: "Partnership",
     trading: true,
@@ -471,6 +474,7 @@ export const clients: Client[] = [
       },
       {
         slug: "arch-prime-brand",
+        industry: ["crypto", "finance"],
         title: "Arch Prime identity",
         label: "Arch Prime",
         type: "branding",
@@ -571,7 +575,7 @@ export const clients: Client[] = [
     slug: "livingip",
     name: "LivingIP",
     tier: tierOf("livingip"),
-    industry: ["crypto", "ai"],
+    industry: ["crypto"],
     // The designs are dated 2025 (the site said 2024).
     years: "2025",
     engagement: "Unknown",
@@ -614,7 +618,7 @@ export const clients: Client[] = [
     slug: "honeyb",
     name: "HoneyB",
     tier: tierOf("honeyb"),
-    industry: ["crypto"],
+    industry: ["crypto", "finance"],
     years: "2025–2026",
     engagement: "Partnership",
     trading: true,
@@ -783,7 +787,7 @@ export const clients: Client[] = [
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
-    // The client retired the Breeze name: archive work, listed, not featured.
+    // The client retired the Breeze name; its tier decides where the work shows.
     trading: false,
     work: [
       {
@@ -811,7 +815,7 @@ export const clients: Client[] = [
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
-    // Acquired by Arch; autara.xyz is parked. Its work shows on /work, never featured.
+    // Acquired by Arch; autara.xyz is parked, so no link. Its tier decides where it shows.
     trading: false,
     summary: "Brand identity and a Framer website for Bitcoin lending on Arch. Acquired by Arch.",
     work: [
@@ -850,7 +854,7 @@ export const clients: Client[] = [
     industry: ["gaming"],
     years: "2025–2026",
     engagement: "Project",
-    // No longer trading: listed, not featured.
+    // No longer trading; its tier still decides where its work shows. No link to a dead site.
     trading: false,
     work: [
       {
@@ -907,7 +911,7 @@ export const clients: Client[] = [
     slug: "herth",
     name: "Herth",
     tier: tierOf("herth"),
-    industry: ["ai"],
+    industry: [],
     years: "2025–2026",
     engagement: "Partnership",
     trading: true,
@@ -934,7 +938,7 @@ export const clients: Client[] = [
     slug: "pyra",
     name: "Pyra",
     tier: tierOf("pyra"),
-    industry: ["crypto"],
+    industry: ["crypto", "finance"],
     years: "2025",
     engagement: "Project",
     trading: false,
@@ -1096,12 +1100,12 @@ export const featuredWork: {
   all: string[];
   lead: Partial<Record<Deliverable, string[]>>;
 } = {
-  max: 8,
-  all: ["tokenworks", "arch-network", "perena", "jinba", "honeyb", "livingip", "bump", "autara"],
+  max: 9,
+  all: ["tokenworks", "arch-network", "perena", "honeyb", "jinba", "huch", "bump", "uni", "autara"],
   lead: {
-    apps: ["livingip", "tokenworks", "bump"],
+    apps: ["tokenworks", "huch", "bump"],
     websites: ["perena", "arch-network", "honeyb", "jinba"],
-    branding: ["jinba", "arch-network", "honeyb", "bump", "autara"],
+    branding: ["jinba", "arch-network", "honeyb", "huch", "uni", "bump", "autara"],
     "launch-videos": ["tokenworks", "perena"],
   },
 };

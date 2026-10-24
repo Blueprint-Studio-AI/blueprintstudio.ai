@@ -163,8 +163,9 @@ const frameOf = (w: ShownWork): ShowcaseFrame => ({ key: w.slug, label: w.label,
  * plays in the big frame; the three stills come from three different pieces
  * of work where it has them (the first still of each), so the breadth shows.
  */
-export function clientShowcase(client: Client, lead?: Deliverable): ShowcaseData | null {
-  const all = shownWorkOf(client);
+export function clientShowcase(client: Client, lead?: Deliverable, pool?: ShownWork[]): ShowcaseData | null {
+  // `pool` narrows it to some of the client's work (an industry page's).
+  const all = pool ?? shownWorkOf(client);
   if (all.length === 0) return null;
   const first = (lead && all.find((w) => w.type === lead)) || all[0];
   const ordered = [first, ...all.filter((w) => w !== first)];

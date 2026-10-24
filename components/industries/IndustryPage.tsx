@@ -25,7 +25,8 @@ import OfferGrid from "./OfferGrid";
 export default function IndustryPage({ industry }: { industry: IndustryConfig }) {
   const work = industryProjects(industry);
   const clients = work.reduce<Client[]>((list, w) => (list.includes(w.client) ? list : [...list, w.client]), []);
-  const showcases = clients.flatMap((c) => clientShowcase(c) ?? []);
+  // Each client with only its work in this industry (Arch Prime's brand on Finance, not the rest of Arch).
+  const showcases = clients.flatMap((c) => clientShowcase(c, undefined, work.filter((w) => w.client === c)) ?? []);
   const testimonial = industry.testimonial ? testimonials[industry.testimonial] : undefined;
   const label = industry.label.toLowerCase();
 

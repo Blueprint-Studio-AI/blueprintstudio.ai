@@ -267,6 +267,51 @@
    ]
   },
   {
+   "slug": "huch",
+   "name": "HUCH",
+   "tier": "Feature",
+   "years": "2025–2026",
+   "engagement": "Unknown",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "research",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "deck",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
    "slug": "perena",
    "name": "Perena",
    "tier": "Feature",
@@ -337,22 +382,32 @@
    ]
   },
   {
-   "slug": "livingip",
-   "name": "LivingIP",
+   "slug": "uni",
+   "name": "UNI",
    "tier": "Feature",
-   "years": "2025 (likely)",
+   "years": "2025",
    "engagement": "Project",
-   "trading": true,
+   "trading": false,
    "work": [
     {
-     "type": "product design",
+     "type": "brand",
      "year": "2025",
      "visibility": "public"
     },
     {
-     "type": "product design",
+     "type": "website",
      "year": "2025",
      "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "private"
     }
    ]
   },
@@ -416,6 +471,56 @@
     },
     {
      "type": "motion",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "breeze",
+   "name": "Breeze",
+   "tier": "Show",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "landing page",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "livingip",
+   "name": "LivingIP",
+   "tier": "Show",
+   "years": "2025 (likely)",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product design",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "product design",
      "year": "2025",
      "visibility": "public"
     }
@@ -572,6 +677,21 @@
    ]
   },
   {
+   "slug": "bitfrost",
+   "name": "Bitfrost",
+   "tier": "Show",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
    "slug": "friday-table",
    "name": "The Friday Table",
    "tier": "Show",
@@ -612,121 +732,81 @@
    ]
   },
   {
-   "slug": "huch",
-   "name": "HUCH",
-   "tier": "Archive",
-   "years": "2025–2026",
-   "engagement": "Unknown",
-   "trading": false,
-   "work": [
-    {
-     "type": "brand",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "app",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "social",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "motion",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "event",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "research",
-     "year": "2025",
-     "visibility": "private"
-    },
-    {
-     "type": "deck",
-     "year": "2025",
-     "visibility": "private"
-    }
-   ]
-  },
-  {
-   "slug": "uni",
-   "name": "UNI",
-   "tier": "Archive",
+   "slug": "pregame",
+   "name": "Pre.Game",
+   "tier": "Show",
    "years": "2025",
-   "engagement": "Project",
-   "trading": false,
-   "work": [
-    {
-     "type": "brand",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "social",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "brand",
-     "year": "2025",
-     "visibility": "private"
-    }
-   ]
-  },
-  {
-   "slug": "breeze",
-   "name": "Breeze",
-   "tier": "Archive",
-   "years": "2025",
-   "engagement": "Project",
-   "trading": false,
-   "work": [
-    {
-     "type": "brand",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "landing page",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "social",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "2025",
-     "visibility": "private"
-    }
-   ]
-  },
-  {
-   "slug": "bitfrost",
-   "name": "Bitfrost",
-   "tier": "Archive",
-   "years": "2026",
    "engagement": "Project",
    "trading": true,
    "work": [
     {
-     "type": "brand",
-     "year": "2026",
+     "type": "content",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "sdn",
+   "name": "Service Design Network (SDN)",
+   "tier": "Show",
+   "years": "2024–2025",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2024–2025",
+     "visibility": "public"
+    },
+    {
+     "type": "service design",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "manchester-energy",
+   "name": "Manchester (VT) Energy Committee",
+   "tier": "Show",
+   "years": "2024",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "manchester-tourism",
+   "name": "Manchester Tourism (Vermont)",
+   "tier": "Show",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "~2023",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "~2020",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "unknown",
      "visibility": "private"
     }
    ]
@@ -768,26 +848,6 @@
      "type": "product video",
      "year": "by 2026-01",
      "visibility": "public"
-    }
-   ]
-  },
-  {
-   "slug": "pregame",
-   "name": "Pre.Game",
-   "tier": "Archive",
-   "years": "2025",
-   "engagement": "Project",
-   "trading": true,
-   "work": [
-    {
-     "type": "content",
-     "year": "2025",
-     "visibility": "private"
-    },
-    {
-     "type": "motion",
-     "year": "2025",
-     "visibility": "private"
     }
    ]
   },
@@ -843,66 +903,6 @@
      "type": "print",
      "year": "2023 (likely)",
      "visibility": "public"
-    }
-   ]
-  },
-  {
-   "slug": "sdn",
-   "name": "Service Design Network (SDN)",
-   "tier": "Archive",
-   "years": "2024–2025",
-   "engagement": "Unknown",
-   "trading": true,
-   "work": [
-    {
-     "type": "website",
-     "year": "2024–2025",
-     "visibility": "public"
-    },
-    {
-     "type": "service design",
-     "year": "unknown",
-     "visibility": "private"
-    }
-   ]
-  },
-  {
-   "slug": "manchester-energy",
-   "name": "Manchester (VT) Energy Committee",
-   "tier": "Archive",
-   "years": "2024",
-   "engagement": "Project",
-   "trading": true,
-   "work": [
-    {
-     "type": "website",
-     "year": "2024",
-     "visibility": "public"
-    }
-   ]
-  },
-  {
-   "slug": "manchester-tourism",
-   "name": "Manchester Tourism (Vermont)",
-   "tier": "Archive",
-   "years": "",
-   "engagement": "Project",
-   "trading": true,
-   "work": [
-    {
-     "type": "product video",
-     "year": "~2023",
-     "visibility": "public"
-    },
-    {
-     "type": "product video",
-     "year": "~2020",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "unknown",
-     "visibility": "private"
     }
    ]
   },
