@@ -341,7 +341,7 @@ export default function Hero() {
                                     alt="Blueprint Studio"
                                     width={30}
                                     height={30}
-                                    className="loader-fade mb-6 h-4 w-auto sm:mb-8 sm:h-5"
+                                    className="loader-fade mb-6 h-6 w-auto sm:mb-8 sm:h-7"
                                     style={{ animationDuration: "700ms", animationDelay: "150ms" }}
                                     priority
                                 />
