@@ -1,0 +1,14 @@
+import type { WorkPageConfig } from "./types";
+
+export const websites: WorkPageConfig = {
+  slug: "websites",
+  label: "Websites",
+  // Placeholder: factual, but Tyler to write the real line.
+  intro: "Landing pages and marketing sites we've designed and built for founders, most of them in crypto.",
+  introIsDraft: true,
+  metaTitle: "Website Design Portfolio",
+  metaDescription:
+    "Landing pages and marketing sites designed and built by Blueprint Studio for Perena, HoneyB, Autara, Jinba and Breeze.",
+  // A reel first, then alternate stills and reels down the wall.
+  order: ["perena", "honeyb", "autara", "jinba", "breeze"],
+};
