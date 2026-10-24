@@ -47,7 +47,8 @@ export default function CaseStack({
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-2 sm:gap-3 lg:mt-12 lg:gap-4">
+      {/* Two up with the phone cut, three up without it, so no gap is left. */}
+      <div className={`mt-8 grid gap-2 sm:gap-3 lg:mt-12 lg:gap-4 ${images.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
         {images.map((image) => (
           <div key={image.src} className="relative aspect-square overflow-hidden rounded-[12px] bg-[#EDEDEC] lg:rounded-[18px]">
             <Image
