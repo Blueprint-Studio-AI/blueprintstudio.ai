@@ -148,24 +148,11 @@ export const honeyb: BrandConfig = {
   },
   typeDefaults: { display: "Poly Regular", text: "Inter Light" },
 
-  // Mockups lead — they're the most legible proof of the brand in use, so they
-  // open the section rather than sitting behind a tab.
+  // No mockups: the set that used to lead this section was AI-generated, so it's gone.
   // Names describe what each file actually shows. "Mockup 4" tells a visitor
   // nothing and makes the download ambiguous once it's on their desktop; the
   // filename still carries the index for anyone matching against the source kit.
   assetCategories: [
-    {
-      id: "mockups",
-      label: "Mockups",
-      dir: `${B}/mockups`,
-      items: [
-        ["Homepage on Display", "honeyb-mockup-1.png", "5504×3072"],
-        ["Vault Dashboard on iMac", "honeyb-mockup-2.png", "5504×3072"],
-        ["Mobile Web Pair", "honeyb-mockup-3.png", "1920×1080"],
-        ["Homepage on Laptop", "honeyb-mockup-4.png", "2048×2048"],
-        ["Product Page in Hand", "honeyb-mockup-5.png", "4096×4096"],
-      ],
-    },
     {
       id: "assets",
       label: "Assets",
@@ -213,10 +200,9 @@ export const honeyb: BrandConfig = {
       // the better opening argument than another screen with the logo on it.
       { src: `${B}/social/HoneyB-LinkedIn-banners.png`, alt: "Social banner artwork, two treatments", caption: "The glyph as an avatar tile" },
       { src: `${B}/social/HoneyB-LinkedIn-banner-mockup.png`, alt: "HoneyB LinkedIn company page", caption: "The banner in place on LinkedIn" },
-      { src: `${B}/mockups/honeyb-mockup-1.png`, alt: "Homepage on a desktop display", caption: "The lockup in context" },
-      { src: `${B}/mockups/honeyb-mockup-2.png`, alt: "Vault dashboard on an iMac", caption: "The mark inside the product" },
-      { src: `${B}/mockups/honeyb-mockup-4.png`, alt: "Homepage on a laptop", caption: "The lockup at reading distance" },
-      { src: `${B}/mockups/honeyb-mockup-5.png`, alt: "Product page on a phone in hand", caption: "Gold against neutral ground" },
+      // Real work only: our capture of honeybtc.com and a slide from the brand deck.
+      { src: "/media/kits/honeyb-website/hero.jpg", alt: "The honeybtc.com homepage we designed and built", caption: "The lockup on the live site" },
+      { src: "/media/kits/honeyb-brand/hero.jpg", alt: "The Yield Layer for Bitcoin, from the brand deck", caption: "The serif and the gold at full size" },
     ],
     type: [
       { src: `${B}/ui/honeyb-ui-2.png`, alt: "Epoch onboarding modal", caption: "Poly and Inter carrying product UI" },

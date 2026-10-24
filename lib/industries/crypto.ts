@@ -22,7 +22,7 @@ export const crypto: IndustryConfig = {
     { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
     { name: "Autara", src: "/logos-match-height/autara.png", width: 525 },
     { name: "UNI", src: "/logos-match-height/uni.png", width: 356 },
-    { name: "Bump", src: "/logos-match-height/bump.png", width: 264 },
+    { name: "Bump", src: "/logos-match-height/bump-wordmark.png", width: 445 },
     { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
   ],
   offersTitle: "What we make for crypto founders",

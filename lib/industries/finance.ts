@@ -16,7 +16,7 @@ export const finance: IndustryConfig = {
   logos: [
     { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
     { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
-    { name: "Arch Network", src: "/logos-match-height/arch-network.png", width: 518 },
+    { name: "Arch Prime", src: "/logos-match-height/arch-prime.png", width: 573 },
     { name: "Pyra", src: "/logos-match-height/pyra.png", width: 476 },
   ],
   offersTitle: "What we make for finance founders",
