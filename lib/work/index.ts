@@ -193,6 +193,17 @@ export function clientShowcase(client: Client, lead?: Deliverable, pool?: ShownW
   };
 }
 
+/**
+ * A case's phone tile: the vertical cut's poster, only where it's a real phone
+ * screen (a site's or app's mobile version). A film's vertical cut is a crop of
+ * the film, so beside its stills it would only repeat one of them.
+ */
+export function casePhone(work: ShownWork): { src: string; alt: string } | undefined {
+  const v = work.kit.hero.vertical;
+  if (!v?.src || (work.type !== "websites" && work.type !== "apps")) return undefined;
+  return { src: v.poster, alt: work.kit.hero.alt };
+}
+
 /** One piece of work as a showcase: its hero and its own three stills. */
 export function workShowcase(work: ShownWork, opts: { clientLink?: boolean } = {}): ShowcaseData {
   const { client } = work;

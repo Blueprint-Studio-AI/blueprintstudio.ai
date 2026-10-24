@@ -2,7 +2,7 @@ import Link from "next/link";
 import { workTypeLabels } from "@/data/portfolioData";
 import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
-import { collectionShowcase, deckShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
+import { casePhone, collectionShowcase, deckShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
 import CtaBand from "./CtaBand";
 import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
@@ -59,7 +59,7 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
                     data={workShowcase(work)}
                     tag={workTypeLabels[work.type].one}
                     story={work.story}
-                    phone={work.kit.hero.vertical?.src ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
+                    phone={casePhone(work)}
                   />
                 </Reveal>
               ) : (

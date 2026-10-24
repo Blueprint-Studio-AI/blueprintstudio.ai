@@ -3,7 +3,7 @@ import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
 import { workTypeLabels, type Client } from "@/data/portfolioData";
 import { testimonials } from "@/data/testimonials";
-import { deckShowcase, madeFor, shownWorkOf, workShowcase } from "@/lib/work";
+import { casePhone, deckShowcase, madeFor, shownWorkOf, workShowcase } from "@/lib/work";
 import CtaBand from "./CtaBand";
 import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
@@ -101,7 +101,7 @@ export default function ClientPage({ client }: { client: Client }) {
                     data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [] }}
                     tag={[workTypeLabels[work.type].one, work.year].filter(Boolean).join(" · ")}
                     story={work.story}
-                    phone={work.kit.hero.vertical?.src ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
+                    phone={casePhone(work)}
                     eager={i === 0}
                   />
                 )}
