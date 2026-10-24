@@ -24,24 +24,25 @@ type Testimonial = {
 // Quotes, names and titles as the site already has them: the ticker on /brand,
 // /launch and /launch-videos (with photos), then the home page's own. People
 // with photos come first.
+// The lead is about the work as a whole, not one deliverable.
 const featured: Testimonial = {
-  quote: "Anyone who sees the video buys the product. Working with you guys is like eating chocolate. We can't go back.",
-  lead: "Anyone who sees the video buys the product.",
-  author: "Daniel Greene",
-  role: "COO",
-  company: "TokenWorks",
-  image: "/testimonials/daniel-greene.jpg",
+  quote:
+    "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
+  lead: "What sets Blueprint apart is the quality of their end-to-end design and engineering work.",
+  author: "Shina Foo",
+  role: "Head of Growth",
+  company: "Perena",
+  image: "/testimonials/shina-foo-perena.jpg",
 };
 
 const shown: Testimonial[][] = [
   [
     {
-      quote:
-        "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
-      author: "Shina Foo",
-      role: "Head of Growth",
-      company: "Perena",
-      image: "/testimonials/shina-foo-perena.jpg",
+      quote: "Anyone who sees the video buys the product. Working with you guys is like eating chocolate. We can't go back.",
+      author: "Daniel Greene",
+      role: "COO",
+      company: "TokenWorks",
+      image: "/testimonials/daniel-greene.jpg",
     },
     {
       quote: "I actually fucking love this version, I got goosebumps",

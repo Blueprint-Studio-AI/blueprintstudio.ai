@@ -89,7 +89,7 @@ export default function HeroSection() {
 
             <motion.div {...intro(0.42)}>
               <SocialProof showDivider>
-                <span className="font-medium text-neutral-900">25+</span> startups launched
+                <span className="font-medium text-neutral-900">30+</span> startups launched
               </SocialProof>
             </motion.div>
 

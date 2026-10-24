@@ -74,7 +74,7 @@ export default function PricingSection() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                25+ tech founders
+                30+ founders
               </strong>{" "}
               across AI, Web3, and YC.
             </SocialProof>

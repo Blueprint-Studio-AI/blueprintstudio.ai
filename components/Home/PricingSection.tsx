@@ -74,7 +74,7 @@ export default function PricingSection() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                25+ tech founders
+                30+ founders
               </strong>
               {' '}who shipped<br className="sm:hidden" /> with Blueprint Studio.
             </p>
