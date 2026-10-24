@@ -126,6 +126,8 @@ export interface WorkItem {
   deck?: { coverBlurred?: boolean; slides: { src: string; alt: string; blurred?: boolean }[] };
   /** The piece's own fields, when they differ from its client's (Arch Prime's brand is finance; the rest of Arch isn't). */
   industry?: Industry[];
+  /** A short case story (Problem, Process, Solution) for the case pages; shown only where written. */
+  story?: { problem?: string; process?: string[]; solution?: string };
   /** Show this piece on its deliverable page even though its client is archived. */
   showWhenArchived?: boolean;
 }

@@ -10,7 +10,7 @@ import FrameLines from "./FrameLines";
 import Quote from "./Quote";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
-import Showcase from "./Showcase";
+import CaseStack from "./CaseStack";
 import WorkHeader, { EYEBROW, PAGE_END, SECTION, STACK, TEXT_INSET, WIDE } from "./WorkHeader";
 
 // /work/clients/<slug>, for a client with three or more pieces of work to show:
@@ -97,10 +97,12 @@ export default function ClientPage({ client }: { client: Client }) {
                 {work.type === "decks" ? (
                   <DeckShowcase data={{ ...deckShowcase(work), title: work.title, items: [{ key: work.slug, label: `${workTypeLabels[work.type].one} · ${work.year}` }] }} />
                 ) : (
-                  <Showcase
-                    data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [{ key: work.slug, label: `${workTypeLabels[work.type].one} · ${work.year}` }] }}
+                  <CaseStack
+                    data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [] }}
+                    tag={[workTypeLabels[work.type].one, work.year].filter(Boolean).join(" · ")}
+                    story={work.story}
+                    phone={work.kit.hero.vertical ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
                     eager={i === 0}
-                    titleAs="h2"
                   />
                 )}
               </Reveal>

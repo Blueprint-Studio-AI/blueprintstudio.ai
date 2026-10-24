@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { workTypeLabels } from "@/data/portfolioData";
 import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
 import { collectionShowcase, deckShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
 import CtaBand from "./CtaBand";
 import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
-import ProjectFull from "./ProjectFull";
+import CaseStack from "./CaseStack";
 import Reveal from "./Reveal";
 import Showcase from "./Showcase";
 import WorkHeader, { PAGE_END, STACK, TEXT_INSET, WIDE } from "./WorkHeader";
@@ -17,7 +18,9 @@ export type WorkLayout = "a" | "b";
 // A: each piece of work as the home page's Featured Work shows a client, its
 //    big frame with its three stills beside it.
 // B: the page opens in that format, the first piece playing with the next
-//    three's stills beside it; below, each piece as large as the screen allows.
+//    three's stills beside it; below, each piece as a case: its name, then big
+//    images one after another, then its story where we have one (after the
+//    original Blueprint site's case pages).
 export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig; layout?: WorkLayout }) {
   const works = workFor(page.slug);
   // Decks have their own layout (cover and slides) in both A and B.
@@ -52,7 +55,12 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
                 </Reveal>
               ) : layout === "b" ? (
                 <Reveal key={work.slug}>
-                  <ProjectFull data={workShowcase(work)} />
+                  <CaseStack
+                    data={workShowcase(work)}
+                    tag={workTypeLabels[work.type].one}
+                    story={work.story}
+                    phone={work.kit.hero.vertical ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
+                  />
                 </Reveal>
               ) : (
                 <Reveal key={work.slug}>

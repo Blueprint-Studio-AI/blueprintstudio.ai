@@ -312,6 +312,7 @@ export function Caption({ data, active, as: Tag = "h3", className = "" }: { data
           )}
         </Tag>
       )}
+      {(data.lead || data.items.length > 0) && (
       <p className={`text-[15px] leading-[1.45] text-neutral-500 lg:text-base ${data.title ? "mt-2" : ""}`}>
         {data.lead && (
           <>
@@ -332,6 +333,7 @@ export function Caption({ data, active, as: Tag = "h3", className = "" }: { data
           </span>
         ))}
       </p>
+      )}
       {data.summary && <p className="mt-3 max-w-[60ch] text-pretty text-sm leading-[1.5] text-neutral-500">{data.summary}</p>}
       {data.links.length > 0 && (
         <div className="relative z-20 mt-5 flex flex-wrap gap-2">
