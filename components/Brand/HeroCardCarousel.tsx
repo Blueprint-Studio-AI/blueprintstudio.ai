@@ -7,7 +7,7 @@ import Image from "next/image";
 // thumbnails), so we just render it inside a rounded, shadowed frame.
 const cards = [
   { src: "/media/hero/uni_brands-we-built.png", alt: "UNI brand identity" },
-  { src: "/media/hero/honeyb_brands-we-built.png", alt: "HoneyB brand identity" },
+  { src: "/media/hero/honeyb_brands-we-built.webp", alt: "HoneyB brand identity" },
   { src: "/media/hero/breeze_brands-we-built.png", alt: "Breeze brand identity" },
   { src: "/media/hero/autara_brands-we-built.png", alt: "Autara brand identity" },
   { src: "/media/hero/huch_brands-we-built.png", alt: "Huch brand identity" },

@@ -52,7 +52,8 @@ const featuredProject = {
     { num: "02", label: "Website" },
     { num: "03", label: "Deck" },
   ],
-  image: "/launch-assets/honeyb-spotlight/spotlight-background.png",
+  // The live honeybtc.com homepage in a plain browser window (real capture).
+  image: "/launch-assets/honeyb-spotlight/honeyb-site-featured.webp",
   href: "/work",
 };
 

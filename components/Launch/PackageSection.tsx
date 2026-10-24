@@ -62,8 +62,10 @@ const websiteBrands = [
     id: "honeyb",
     name: "HoneyB",
     logo: "/launch-assets/brand-picker-icons/honeyb.png",
-    desktop: "/launch-assets/web-design_assets/desktop-honeyb.png",
-    mobile: "/launch-assets/web-design_assets/mobile-honeyb.png",
+    // Real captures of the live honeybtc.com: a plain browser window and a bare
+    // phone screen, at the same aspect as the device PNGs beside them.
+    desktop: "/launch-assets/web-design_assets/honeyb-site-desktop.webp",
+    mobile: "/launch-assets/web-design_assets/honeyb-site-mobile.webp",
   },
   {
     id: "perena",
