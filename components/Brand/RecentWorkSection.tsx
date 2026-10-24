@@ -25,10 +25,8 @@ const projects: (CaseStudy & { id: number; color: string })[] = [
       { num: "02", label: "Website" },
       { num: "03", label: "Deck" },
     ],
-    // The live honeybtc.com homepage in a plain browser window on HoneyB's comb
-    // field (a real capture, not a generated mockup).
-    image: "/media/recent-work/honeyb-site-desktop.webp",
-    imageMobile: "/media/recent-work/honeyb-site-mobile.webp",
+    image: "/media/recent-work/honeyb-desktop.webp",
+    imageMobile: "/media/recent-work/honeyb-mobile.webp",
     href: "/brands/honeyb",
   },
   {

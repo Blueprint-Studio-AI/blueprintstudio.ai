@@ -113,20 +113,17 @@ export default function ProjectSpotlightModal({
                   ))}
                 </div>
 
-                {/* Real captures of the live honeybtc.com (homepage and Yield page),
-                    in a plain browser window or as bare phone screens on the comb
-                    field. Each is composed to survive its slot's cover crop. */}
                 <div className="flex flex-col gap-3 mt-8">
                   <div className="flex flex-col sm:flex-row gap-3 sm:h-80">
                     <div className="relative aspect-[3/2] sm:aspect-auto sm:w-[60%] rounded-xl bg-neutral-100 border border-neutral-200 overflow-hidden">
-                      <Image src="/launch-assets/honeyb-spotlight/honeyb-site-home.webp" alt="" fill sizes="(max-width: 640px) 100vw, 520px" className="object-cover" />
+                      <Image src="/launch-assets/honeyb-spotlight/honeyb-image1.png" alt="" fill className="object-cover" />
                     </div>
                     <div className="relative aspect-[3/2] sm:aspect-auto sm:w-[40%] rounded-xl bg-neutral-100 border border-neutral-200 overflow-hidden">
-                      <Image src="/launch-assets/honeyb-spotlight/honeyb-site-phones.webp" alt="" fill sizes="(max-width: 640px) 100vw, 350px" className="object-cover" />
+                      <Image src="/launch-assets/honeyb-spotlight/honeyb-image2.png" alt="" fill className="object-cover" />
                     </div>
                   </div>
                   <div className="relative aspect-[21/9] rounded-xl bg-neutral-100 border border-neutral-200 overflow-hidden">
-                    <Image src="/launch-assets/honeyb-spotlight/honeyb-site-yield.webp" alt="" fill sizes="(max-width: 896px) 100vw, 820px" className="object-cover" />
+                    <Image src="/launch-assets/honeyb-spotlight/honeyb-image3.jpg" alt="" fill className="object-cover" />
                   </div>
                 </div>
               </div>
@@ -211,8 +208,8 @@ export default function ProjectSpotlightModal({
                       heading: "Responsive Design",
                       description: "The site adapts seamlessly from desktop to mobile without compromising the bold visual identity. Users get the same premium experience whether browsing on a 27\u2033 monitor or checking rates on their phone.",
                       galleryImages: [
-                        { src: "/launch-assets/web-design_assets/honeyb-site-desktop.webp", aspect: "16/10" },
-                        { src: "/launch-assets/web-design_assets/honeyb-site-mobile.webp", aspect: "9/16" },
+                        { src: "/launch-assets/honeyb-spotlight/desktop-honeyb.png", aspect: "16/10" },
+                        { src: "/launch-assets/honeyb-spotlight/mobile-honeyb.png", aspect: "9/16" },
                       ],
                       galleryLayout: "side-by-side",
                     },
@@ -220,9 +217,7 @@ export default function ProjectSpotlightModal({
                       heading: "UI Components",
                       description: "We built a comprehensive component library that maintains consistency while allowing for flexibility. Subtle gradients, clean typography, and generous spacing create a premium feel that builds trust in the DeFi space.",
                       galleryImages: [
-                        // Live components, each shot on its own box: the products card,
-                        // a Yield criteria card and the "Institutional by Design" row.
-                        { src: "/launch-assets/honeyb-spotlight/honeyb-site-components.webp", aspect: "auto" },
+                        { src: "/launch-assets/honeyb-spotlight/honeyb-components.png", aspect: "auto" },
                       ],
                     },
                   ],

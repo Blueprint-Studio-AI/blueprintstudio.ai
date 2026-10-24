@@ -70,8 +70,7 @@ const addons: {
     price: "$15,000",
     description: "A complete visual system that is fully built to scale. Includes:",
     features: ["Custom Design", "Development", "Email Capture & SEO"],
-    // The live honeybtc.com homepage in a plain browser window (real capture).
-    image: "/media/whats-included/website-example-honeyb.webp",
+    image: "/media/whats-included/website-example.webp",
   },
   {
     id: "pitchDeck",
