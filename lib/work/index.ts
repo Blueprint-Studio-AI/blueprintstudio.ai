@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import {
   allWorkProjects,
+  deliverableLabels,
+  industryLabels,
   type Deliverable,
+  type Industry,
   type PortfolioProject,
   type ResponsiveMedia,
 } from "@/data/portfolioData";
+import type { PanelProject, PanelTag } from "@/components/work/ProjectPanel";
 import type { WorkPageConfig } from "./types";
 import { websites } from "./websites";
 import { apps } from "./apps";
@@ -50,6 +54,41 @@ export function hasWorkPage(slug: Deliverable): boolean {
   return workPages.some((p) => p.slug === slug);
 }
 
+/**
+ * A panel's tags: the client's field, what we made (`lead` first), then the
+ * year. Deliverables other than `lead` link to their wall. On a page that's
+ * already about one industry, that industry's tag is left off.
+ */
+export function tagsFor(project: PortfolioProject, lead?: Deliverable, industry?: Industry): PanelTag[] {
+  const deliverables = lead ? [lead, ...project.deliverables.filter((d) => d !== lead)] : project.deliverables;
+  return [
+    ...project.industries.filter((i) => i !== industry).map((i) => ({ label: industryLabels[i] })),
+    ...deliverables.map((d) => ({
+      label: deliverableLabels[d],
+      href: d !== lead && hasWorkPage(d) ? `/work/${d}` : undefined,
+    })),
+    ...(project.metadata?.year ? [{ label: project.metadata.year.replace("-", "–") }] : []),
+  ];
+}
+
+/** One project as a wall panel, leading with its `lead` deliverable's media when given. */
+export function panelFor(project: PortfolioProject, lead?: Deliverable, industry?: Industry): PanelProject {
+  return {
+    id: project.id,
+    title: project.title,
+    description: project.description,
+    media: lead ? mediaFor(project, lead) : project.featuredMedia,
+    tags: tagsFor(project, lead, industry),
+    liveUrl: project.liveUrl,
+    brandPage: project.brandPage,
+  };
+}
+
+/** Projects by id, in the order given; unknown ids are skipped. */
+export function projectsById(ids: string[]): PortfolioProject[] {
+  return ids.flatMap((id) => allWorkProjects.find((p) => p.id === id) ?? []);
+}
+
 // Copy for /work and for the call-to-action band at the foot of every work page.
 // Placeholders: factual, but Tyler to write the real lines.
 export const workIndex = {
@@ -66,7 +105,18 @@ export const workCta = {
   isDraft: true,
 };
 
-export function workMetadata({ path, title, description }: { path: string; title: string; description: string }): Metadata {
+export function workMetadata({
+  path,
+  title,
+  description,
+  image,
+}: {
+  path: string;
+  title: string;
+  description: string;
+  /** A 2400x1260 share image; the site-wide one when omitted. */
+  image?: string;
+}): Metadata {
   // The root layout's template appends "| Blueprint Studio" to `title`; OG and
   // Twitter titles don't go through the template, so they get it here.
   const full = `${title} | Blueprint Studio`;
@@ -79,8 +129,12 @@ export function workMetadata({ path, title, description }: { path: string; title
       url: `https://blueprintstudio.ai${path}`,
       title: full,
       description,
-      images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Blueprint Studio" }],
+      images: [
+        image
+          ? { url: image, width: 2400, height: 1260, alt: full }
+          : { url: "/og-image.jpg", width: 1200, height: 630, alt: "Blueprint Studio" },
+      ],
     },
-    twitter: { card: "summary_large_image", title: full, description, images: ["/og-image.jpg"] },
+    twitter: { card: "summary_large_image", title: full, description, images: [image ?? "/og-image.jpg"] },
   };
 }
