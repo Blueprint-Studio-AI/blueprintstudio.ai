@@ -15,27 +15,27 @@
      "visibility": "public"
     },
     {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
      "type": "content",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "docs",
-     "year": "2025",
-     "visibility": "public"
-    },
-    {
-     "type": "event",
-     "year": "2025",
-     "visibility": "private"
-    },
-    {
-     "type": "event",
-     "year": "2025",
-     "visibility": "private"
-    },
-    {
-     "type": "event",
      "year": "2025",
      "visibility": "public"
     },
@@ -50,43 +50,13 @@
      "visibility": "private"
     },
     {
-     "type": "website",
+     "type": "docs",
      "year": "2025",
      "visibility": "public"
     },
     {
-     "type": "website",
-     "year": "2026",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "2026",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "2026",
-     "visibility": "public"
-    },
-    {
-     "type": "website",
-     "year": "2026",
-     "visibility": "public"
-    },
-    {
-     "type": "content",
-     "year": "2026",
-     "visibility": "private"
-    },
-    {
-     "type": "brand",
-     "year": "2026",
-     "visibility": "public"
-    },
-    {
-     "type": "social",
-     "year": "2026",
+     "type": "event",
+     "year": "2025",
      "visibility": "private"
     },
     {
@@ -117,7 +87,7 @@
     {
      "type": "brand",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "design system",
@@ -130,6 +100,11 @@
      "visibility": "public"
     },
     {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
      "type": "docs",
      "year": "2026",
      "visibility": "public"
@@ -137,12 +112,27 @@
     {
      "type": "app",
      "year": "2025–2026",
-     "visibility": "private"
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "pitch deck",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "deck",
+     "year": "2025",
+     "visibility": "public"
     },
     {
      "type": "content",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "launch video",
@@ -152,7 +142,7 @@
     {
      "type": "product video",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "social",
@@ -162,17 +152,32 @@
     {
      "type": "print",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "print",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "brand",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "service design",
+     "year": "2026",
+     "visibility": "public"
     },
     {
      "type": "brand",
@@ -182,12 +187,17 @@
     {
      "type": "website",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "product video",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2026",
+     "visibility": "public"
     }
    ]
   },
@@ -195,7 +205,7 @@
    "slug": "tokenworks",
    "name": "TokenWorks",
    "tier": "Feature",
-   "years": "2024–2026",
+   "years": "2023–2026",
    "engagement": "Partnership",
    "trading": true,
    "work": [
@@ -237,32 +247,62 @@
     {
      "type": "product design",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "app",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "brand",
      "year": "2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "content",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "app",
      "year": "2025–2026",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "app",
      "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "research",
+     "year": "2026",
      "visibility": "private"
+    },
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    },
+    {
+     "type": "docs",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "product design",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025–2026",
+     "visibility": "public"
     }
    ]
   },
@@ -290,6 +330,11 @@
      "visibility": "public"
     },
     {
+     "type": "pitch deck",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
      "type": "motion",
      "year": "2025",
      "visibility": "public"
@@ -302,12 +347,17 @@
     {
      "type": "research",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "deck",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "public"
     }
    ]
   },
@@ -327,6 +377,16 @@
     {
      "type": "launch video",
      "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "service design",
+     "year": "2026",
      "visibility": "public"
     }
    ]
@@ -537,12 +597,12 @@
     {
      "type": "research",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "product design",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
     },
     {
      "type": "app",
@@ -550,9 +610,19 @@
      "visibility": "public"
     },
     {
+     "type": "product design",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
      "type": "brand",
      "year": "2025",
-     "visibility": "private"
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "public"
     }
    ]
   },
@@ -594,21 +664,6 @@
   {
    "slug": "piris-labs",
    "name": "Piris Labs",
-   "tier": "Show",
-   "years": "2026",
-   "engagement": "Project",
-   "trading": true,
-   "work": [
-    {
-     "type": "launch video",
-     "year": "2026",
-     "visibility": "public"
-    }
-   ]
-  },
-  {
-   "slug": "panta",
-   "name": "Panta",
    "tier": "Show",
    "years": "2026",
    "engagement": "Project",
@@ -812,6 +867,40 @@
    ]
   },
   {
+   "slug": "cona",
+   "name": "Cona Cash",
+   "tier": "Archive",
+   "years": "2023–2024 (likely)",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2023–2024 (likely)",
+     "visibility": "public"
+    },
+    {
+     "type": "service design",
+     "year": "2023–2024 (likely)",
+     "visibility": "public"
+    },
+    {
+     "type": "content",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "panta",
+   "name": "Panta",
+   "tier": "Archive",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": []
+  },
+  {
    "slug": "bold",
    "name": "BOLD",
    "tier": "Archive",
@@ -863,6 +952,11 @@
      "type": "app",
      "year": "2025",
      "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2023–2025",
+     "visibility": "private"
     }
    ]
   },
@@ -888,6 +982,11 @@
      "type": "print",
      "year": "2024",
      "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
     }
    ]
   },
@@ -903,6 +1002,16 @@
      "type": "print",
      "year": "2023 (likely)",
      "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2023",
+     "visibility": "private"
     }
    ]
   },
@@ -914,6 +1023,11 @@
    "engagement": "Project",
    "trading": true,
    "work": [
+    {
+     "type": "app",
+     "year": "2024",
+     "visibility": "public"
+    },
     {
      "type": "app",
      "year": "2024",
@@ -1073,20 +1187,10 @@
      "type": "AI automation",
      "year": "unknown",
      "visibility": "private"
-    }
-   ]
-  },
-  {
-   "slug": "cona",
-   "name": "Cona",
-   "tier": "Hide",
-   "years": "",
-   "engagement": "Unknown",
-   "trading": true,
-   "work": [
+    },
     {
-     "type": "service design",
-     "year": "unknown",
+     "type": "AI automation",
+     "year": "2023",
      "visibility": "private"
     }
    ]
