@@ -1057,7 +1057,8 @@ function listedFromRegistry(c: RegistryClient): Client[] {
   const types = [...new Set(c.work.flatMap((w) => REGISTRY_TYPES[w.type] ?? []))];
   if (types.length === 0) return [];
   return [
-    listed(c.slug, c.name, c.years, types, {
+    // The registry marks its best guesses "(likely)"; the list shows the year alone.
+    listed(c.slug, c.name, c.years.replace(/\s*\(likely\)/gi, ""), types, {
       engagement: c.engagement as Client["engagement"],
       trading: c.trading,
       tier: (c.tier as Client["tier"]) ?? "Archive",
