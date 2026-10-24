@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "galley": {
+      "command": "./node_modules/.bin/galley",
+      "args": ["mcp"]
+    }
+  }
+}
