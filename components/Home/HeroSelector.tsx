@@ -14,7 +14,6 @@ export type Variant = {
     word: string;
     label: string;
     /** Leads with the client whose work is on screen. */
-    sub: string;
     cta: { label: string; href: string };
     /**
      * Plays in the hero frame over the reel, looping from `start` to `end`, which
@@ -31,7 +30,6 @@ export const VARIANTS: Variant[] = [
         key: "apps",
         word: "apps",
         label: "Apps",
-        sub: "For founders like LivingIP and Bump.",
         still: "/media/hero-words/apps.jpg",
         cta: { label: "See app work", href: "#work" },
         video: {
@@ -46,7 +44,6 @@ export const VARIANTS: Variant[] = [
         key: "websites",
         word: "websites",
         label: "Websites",
-        sub: "For founders like Perena, Autara and Breeze.",
         still: "/media/hero-words/websites.jpg",
         cta: { label: "See website work", href: "#work" },
         video: {
@@ -61,7 +58,6 @@ export const VARIANTS: Variant[] = [
         key: "brands",
         word: "brands",
         label: "Brands",
-        sub: "For founders like Autara, Arch Network and HoneyB.",
         cta: { label: "See brand work", href: "/brand" },
         still: "/media/hero-words/brands.jpg",
         // Autara's identity: the triangle pattern into its homepage.
@@ -77,7 +73,6 @@ export const VARIANTS: Variant[] = [
         key: "launch-videos",
         word: "launch videos",
         label: "Launch videos",
-        sub: "For founders like TokenWorks, Jinba and Pyra.",
         still: "/media/hero-words/launch-videos.jpg",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.

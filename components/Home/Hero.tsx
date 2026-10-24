@@ -298,6 +298,9 @@ export default function Hero() {
     const revealed = stage !== "loading" && stage !== "reel";
     const link = LINKS.find((l) => l.key === (variant?.key ?? "all"))!;
     const fullscreen = stage === "expanded" || stage === "closing";
+    // Above the top nav while the reel is a full-screen card, so the bar never cuts
+    // across its rounded top; the nav arrives as it lands.
+    const raised = fullscreen || stage === "reel" || stage === "landing";
 
     const scrollToId = (id: string) => {
         const element = document.getElementById(id);
@@ -340,7 +343,7 @@ export default function Hero() {
                                     alt="Blueprint Studio"
                                     width={30}
                                     height={30}
-                                    className="loader-fade mb-6 h-4 w-auto sm:mb-8 sm:h-5"
+                                    className="loader-fade mb-6 h-6 w-auto sm:mb-8 sm:h-7"
                                     style={{ animationDuration: "700ms", animationDelay: "150ms" }}
                                     priority
                                 />
@@ -366,7 +369,7 @@ export default function Hero() {
             </AnimatePresence>
 
             <Section
-                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[calc(100svh-48px)] justify-between overflow-hidden bg-neutral-50 md:min-h-[calc(100svh-64px)]`}
+                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[calc(100svh-48px)] justify-between overflow-hidden bg-neutral-50 md:min-h-[calc(100svh-64px)]`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
