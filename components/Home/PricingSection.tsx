@@ -3,9 +3,18 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "../ui/SectionHeader";
-import { ArrowUpRight, Package, MessageCircle, CheckCircle, Palette, Rocket } from "lucide-react";
+import { ArrowUpRight, Package, MessageCircle, CheckCircle, Rocket } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useSmoothScroll } from "@/components/SmoothScroll";
+
+// Where a project can start from. Prices live on each page; the home page only
+// gives the "from" number.
+const projectLinks = [
+  { name: "Brand Identity", href: "/brand" },
+  { name: "Full Launch", href: "/launch" },
+  { name: "Launch Videos", href: "/launch-videos" },
+];
 
 const GreenCheckIcon = () => (
   <svg className="shrink-0" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,6 +23,7 @@ const GreenCheckIcon = () => (
 );
 
 export default function PricingSection() {
+  const { scroll } = useSmoothScroll();
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
@@ -64,7 +74,7 @@ export default function PricingSection() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                25+ tech founders
+                30+ founders
               </strong>
               {' '}who shipped<br className="sm:hidden" /> with Blueprint Studio.
             </p>
@@ -74,31 +84,31 @@ export default function PricingSection() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
             {/* Left Column - Three Cards */}
             <div className="flex flex-col justify-center items-start gap-1 p-1 rounded-[20px] border border-neutral-300 bg-neutral-200">
-              {/* Card 1 - Subscribe */}
-              <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
-                <div className="flex justify-between items-center w-full mb-3">
-                  <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
-                    <CheckCircle className="w-4 h-4 text-neutral-600" />
-                  </div>
-                  <span className="text-sm font-medium text-neutral-400">[1]</span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Subscribe</h4>
-                  <p className="text-neutral-500 text-xs cursor-default">Pick a plan that fits your goals</p>
-                </div>
-              </div>
-
-              {/* Card 2 - Request */}
+              {/* Card 1 - Book a call */}
               <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
                 <div className="flex justify-between items-center w-full mb-3">
                   <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
                     <MessageCircle className="w-4 h-4 text-neutral-600" />
                   </div>
+                  <span className="text-sm font-medium text-neutral-400">[1]</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Book a call</h4>
+                  <p className="text-neutral-500 text-xs cursor-default">Tell us what you&apos;re building</p>
+                </div>
+              </div>
+
+              {/* Card 2 - Pick a path */}
+              <div className="flex flex-col justify-between items-start flex-1 self-stretch p-4 rounded-2xl border border-neutral-300 bg-neutral-100">
+                <div className="flex justify-between items-center w-full mb-3">
+                  <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center border border-neutral-300">
+                    <CheckCircle className="w-4 h-4 text-neutral-600" />
+                  </div>
                   <span className="text-sm font-medium text-neutral-400">[2]</span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Request</h4>
-                  <p className="text-neutral-500 text-xs cursor-default">Submit tasks</p>
+                  <h4 className="font-medium text-base mb-1 text-black cursor-default">Pick a path</h4>
+                  <p className="text-neutral-500 text-xs cursor-default">A monthly partnership, or a single project</p>
                 </div>
               </div>
 
@@ -117,20 +127,20 @@ export default function PricingSection() {
               </div>
             </div>
 
-            {/* Middle Column - Design & Build Subscription */}
+            {/* Middle Column - Partnership, the design & build subscription */}
             <div className="flex flex-col items-start gap-6 p-5 rounded-[20px] border border-neutral-300 bg-white">
               {/* Icon */}
               <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-300 bg-neutral-100">
                 <Package className="w-4 h-4 text-neutral-600" />
               </div>
-              
+
               {/* Title & Description */}
               <div>
                 <h3 className="font-medium text-lg text-black cursor-default">
-                  Design & Build Subscription
+                  Partnership
                 </h3>
                 <p className="text-neutral-500 text-sm cursor-default mt-1">
-                  Keep&nbsp;shipping.
+                  Design & build subscription. Keep&nbsp;shipping.
                 </p>
               </div>
 
@@ -163,6 +173,15 @@ export default function PricingSection() {
                   <p className="font-medium text-black text-sm cursor-default">Pause or cancel anytime</p>
                 </li>
               </ul>
+
+              {/* Proof: a partnership that ran for years */}
+              <a
+                href="/work/clients/tokenworks"
+                className="group -mt-2 inline-flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+              >
+                See three years with TokenWorks
+                <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+              </a>
 
               {/* Button */}
               <motion.button
@@ -238,7 +257,7 @@ export default function PricingSection() {
               </motion.button>
             </div>
 
-            {/* Third Column - Launch Packages */}
+            {/* Third Column - Projects: open-ended, scoped on a call */}
             <div className="flex flex-col items-start gap-6 p-5 rounded-[20px] border border-neutral-300 bg-neutral-100">
               {/* Icon */}
               <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-300 bg-neutral-200">
@@ -246,53 +265,32 @@ export default function PricingSection() {
               </div>
 
               <div>
-                <h3 className="font-medium text-lg text-black cursor-default">Launch Packages</h3>
-                <p className="text-neutral-500 text-sm cursor-default mt-1">Get to&nbsp;market.</p>
+                <h3 className="font-medium text-lg text-black cursor-default">Projects</h3>
+                <p className="text-neutral-500 text-sm cursor-default mt-1">
+                  Apps, websites, brands and launch videos, scoped with you on a&nbsp;call.
+                </p>
               </div>
 
-              {/* Package Rows */}
+              {/* Price: one "from" number, the rest is scoped on the call */}
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm text-neutral-500 italic cursor-default">from</span>
+                <span className="text-2xl font-bold text-black cursor-default">$8k</span>
+                <span className="text-sm text-neutral-500 italic cursor-default">per project</span>
+              </div>
+
+              {/* Packages to start from, without prices */}
               <div className="w-full space-y-2">
-                <Link
-                  href="/launch-videos"
-                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium text-sm text-black">Launch Video</span>
-                    <span className="text-xs text-neutral-500">1-2 weeks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$8K – $15K</span>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
-                  </div>
-                </Link>
-
-                <Link
-                  href="/brand"
-                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium text-sm text-black">Brand Identity</span>
-                    <span className="text-xs text-neutral-500">3-4 weeks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$18K – $23K</span>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
-                  </div>
-                </Link>
-
-                <Link
-                  href="/launch"
-                  className="flex items-center justify-between p-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium text-sm text-black">Full Launch</span>
-                    <span className="text-xs text-neutral-500">6-12 weeks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-black">$50K – $120K</span>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
-                  </div>
-                </Link>
+                <p className="text-xs text-neutral-500 cursor-default">Or start from a package</p>
+                {projectLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
+                  >
+                    <span className="font-medium text-sm text-black">{item.name}</span>
+                    <ArrowUpRight className="w-4 h-4 shrink-0 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
+                  </Link>
+                ))}
               </div>
 
               {/* Button with holographic border */}
@@ -354,18 +352,25 @@ export default function PricingSection() {
                   }}
                 />
 
-                {/* Inner button */}
-                <Link
-                  href="/launch"
+                {/* Inner button: glides to the booking calendar */}
+                <a
+                  href="#contact"
+                  onClick={(e) => {
+                    const target = document.getElementById("contact");
+                    if (!target) return;
+                    e.preventDefault();
+                    if (scroll) scroll.scrollTo(target, { offset: -80, duration: 1.2 });
+                    else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+                  }}
                   className="relative w-full py-[10px] px-6 font-medium flex items-center justify-center text-neutral-700 rounded-[10px] text-sm"
                   style={{
                     background: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(8px)',
                   }}
                 >
-                  <span>View Packages</span>
+                  <span>Scope a project</span>
                   <ArrowUpRight className="w-4 h-4 ml-2" />
-                </Link>
+                </a>
               </motion.div>
             </div>
           </div>
