@@ -285,27 +285,28 @@ function DesktopNav() {
         else morph.current = animateValue(pillness, pill ? 1 : 0, SPRING.morph);
     }, [pill, reduce, instant, pillness]);
 
-    // The logo is open in the bar and folded in the pill, and opens while the pointer rests on it.
-    const fold = useMotionValue(wide ? 0 : 1);
+    // The logo is open in the bar and folded in the pill, and opens while the
+    // pointer rests on the pill's mark. The fold isn't a spring of its own: in
+    // a change of shape it is the shape's spring, so the wordmark's box and the
+    // nav land on the same frame; resting on the mark adds one more spring.
     const [logoHover, setLogoHover] = useState(false);
-    // The bar folds it below 1024, where there's no room beside the links; the
-    // pill opens it on hover wherever the opened pill still fits the window.
+    // The bar keeps it folded below 1024, where there's no room beside the links;
+    // the pill opens it on hover wherever the opened pill still fits the window.
     const openPillFits = vw > 0 && PILL_PAD.left + PILL_PAD.right + logoWidth(0) + 2 * gap + parts.links + parts.cta <= vw - 24;
-    const folded = pill ? !(logoHover && openPillFits) : !wide;
-    const foldAnim = useRef<{ stop: () => void }>(undefined);
-    const logoScope = useRef<HTMLDivElement>(null);
+    const hoverOpen = useMotionValue(0);
+    const hoverTarget = pill && logoHover && openPillFits ? 1 : 0;
     useLayoutEffect(() => {
-        foldAnim.current?.stop();
-        const target = folded ? 1 : 0;
-        if (instant || fold.get() === target) return fold.jump(target);
-        if (reduce) {
-            // A crossfade between the two, not a fold.
-            fold.jump(target);
-            if (logoScope.current) foldAnim.current = animateValue(logoScope.current, { opacity: [0, 1] }, { duration: 0.2 });
+        if (reduce || instant) {
+            hoverOpen.jump(hoverTarget);
             return;
         }
-        foldAnim.current = animateValue(fold, target, SPRING.fold);
-    }, [folded, reduce, instant, fold]);
+        const controls = animateValue(hoverOpen, hoverTarget, SPRING.morph);
+        return () => controls.stop();
+    }, [hoverTarget, reduce, instant, hoverOpen]);
+    const fold = useTransform(() => {
+        const h = clamp01(hoverOpen.get());
+        return wide ? clamp01(pillness.get()) * (1 - h) : 1 - h;
+    });
 
     const widthAt = (p: number, f: number) => {
         if (!vw) return 0;
@@ -674,7 +675,7 @@ function DesktopNav() {
                     />
 
                     <motion.div className="relative grid h-full items-center" style={{ gridTemplateColumns: columns, columnGap: gap }}>
-                        <div ref={logoScope} className="w-fit">
+                        <div className="w-fit">
                             <Logo
                                 fold={fold}
                                 onPointerEnter={(e) => e.pointerType === "mouse" && handMoved(e) && setLogoHover(true)}

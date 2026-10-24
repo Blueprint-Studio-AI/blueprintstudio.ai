@@ -14,8 +14,6 @@ import { assetGeneratorUrl } from "@/lib/asset-generator";
 export const SPRING = {
     /** The bar becoming the pill, and the pill becoming the menu sheet. */
     morph: { type: "spring", visualDuration: 0.55, bounce: 0.14 } satisfies Transition,
-    /** The logo folding to BPSTU and opening again: a touch slower, so the runs can follow one another. */
-    fold: { type: "spring", visualDuration: 0.6, bounce: 0.1 } satisfies Transition,
     /** Highlights gliding from item to item, chevrons turning. */
     glide: { type: "spring", visualDuration: 0.3, bounce: 0.12 } satisfies Transition,
     press: { type: "spring", visualDuration: 0.15, bounce: 0.1 } satisfies Transition,
@@ -80,15 +78,27 @@ export const INDUSTRIES = [
         ],
     },
     {
+        key: "finance",
+        label: "Finance",
+        href: "/industries/finance",
+        line: "For yield, stablecoins and credit.",
+        logos: [
+            { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
+            { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
+            { name: "Arch Prime", src: "/logos-match-height/arch-prime.png", width: 666 },
+            { name: "Pyra", src: "/logos-match-height/pyra.png", width: 476 },
+        ],
+    },
+    {
         key: "ai",
         label: "AI",
         href: "/industries/ai",
         line: "For AI assistants, agents and infrastructure.",
-        // Piris Labs belongs here too, once there's a logo file for it.
         logos: [
-            { name: "Jinba", src: "/logos-match-height/jinba.png", width: 608 },
+            { name: "Jinba", src: "/logos-match-height/jinba.png", width: 561 },
             { name: "Logical", src: "/logos-match-height/logical.png", width: 580 },
-            { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
+            // From the wordmark on pirislabs.io, set on the same canvas as the others.
+            { name: "Piris Labs", src: "/logos-match-height/piris-labs.png", width: 796 },
         ],
     },
 ];
