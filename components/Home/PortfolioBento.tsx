@@ -12,6 +12,31 @@ const portfolioSections = [
   ...portfolioProjects
 ];
 
+// Portfolio videos stay unloaded until the hero reel has landed (it sends
+// "bp:opening-landed"), so they don't compete with it. Then they load in page
+// order, two at a time. A card that comes near the screen loads straight away.
+type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
+const waiting: Waiter[] = [];
+const MAX_LOADING = 2;
+let released = false;
+let loading = 0;
+
+function pump() {
+  while (released && loading < MAX_LOADING) {
+    const next = waiting.find((w) => !w.started);
+    if (!next) return;
+    next.started = true;
+    if (next.start()) loading++;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('bp:opening-landed', () => {
+    released = true;
+    pump();
+  }, { once: true });
+}
+
 interface MediaCardProps {
   media: MediaAsset | ShowcaseMedia;
   title?: string;
@@ -26,6 +51,54 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const slotRef = useRef(false); // holds one of the MAX_LOADING slots
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || media.type !== 'video') return;
+    const waiter: Waiter = {
+      started: false,
+      start: () => {
+        // The phone or desktop copy that's hidden at this width: leave it to the
+        // observer below, which loads it if a resize ever shows it.
+        if (card.getClientRects().length === 0) {
+          waiter.started = false;
+          waiting.splice(waiting.indexOf(waiter), 1);
+          return false;
+        }
+        slotRef.current = true;
+        setShouldLoad(true);
+        return true;
+      },
+    };
+    waiting.push(waiter);
+    pump();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        if (waiter.started) return;
+        waiter.started = true; // jumps the queue without taking a slot
+        setShouldLoad(true);
+      },
+      { rootMargin: '100% 0px' }
+    );
+    observer.observe(card);
+    return () => {
+      observer.disconnect();
+      if (waiting.includes(waiter)) waiting.splice(waiting.indexOf(waiter), 1);
+    };
+  }, [media.type]);
+
+  // Buffered enough (or gave up): hand the slot to the next video.
+  const freeSlot = () => {
+    if (!slotRef.current) return;
+    slotRef.current = false;
+    loading--;
+    pump();
+  };
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +117,7 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   const scaleClass = ''; // Hover effect disabled
 
   return (
-    <div className="relative cursor-default">
+    <div ref={cardRef} className="relative cursor-default">
       <div className="group relative">
         <div
           className="bg-neutral-200 absolute left-0 top-0 w-full rounded-md"
@@ -60,18 +133,20 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
               >
                 <video
                   ref={videoRef}
+                  src={shouldLoad ? media.src : undefined}
                   autoPlay
                   loop
                   playsInline
                   muted
-                  poster={media.poster}
+                  preload="none"
+                  poster={shouldLoad ? media.poster : undefined}
+                  onCanPlayThrough={freeSlot}
+                  onSuspend={freeSlot}
+                  onError={freeSlot}
                   className={`pointer-events-none h-full w-full object-cover transition-transform duration-300 ${scaleClass}`}
                   onMouseEnter={() => setShowControls(true)}
                   onMouseLeave={() => setShowControls(false)}
-                >
-                  <source src={media.src} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                />
                 {featured && (
                   <button
                     type="button"
