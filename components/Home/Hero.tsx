@@ -299,6 +299,9 @@ export default function Hero() {
     const revealed = stage !== "loading" && stage !== "reel";
     const link = LINKS.find((l) => l.key === (variant?.key ?? "all"))!;
     const fullscreen = stage === "expanded" || stage === "closing";
+    // Above the top nav while the reel is a full-screen card, so the bar never cuts
+    // across its rounded top; the nav arrives as it lands.
+    const raised = fullscreen || stage === "reel" || stage === "landing";
 
     const scrollToId = (id: string) => {
         const element = document.getElementById(id);
@@ -367,7 +370,7 @@ export default function Hero() {
             </AnimatePresence>
 
             <Section
-                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
+                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
@@ -595,7 +598,7 @@ const HERO_LOGO_SLOTS: { name: string; logo: string; w: number; tone?: number }[
     ],
 ];
 const HERO_LOGO_HEIGHT = 34;
-const HERO_LOGO_SLOT = 84; // Perena, the widest, overhangs by 2px a side, inside the gap
+const HERO_LOGO_SLOT = 84; // Perena, the widest, overhangs by 2px a side: the gap, and the row's own padding at the end, keep it whole
 const HERO_LOGO_EVERY_MS = 3200;
 const HERO_LOGO_STAGGER = 0.09;
 
@@ -623,7 +626,7 @@ function HeroLogos() {
     return (
         <div
             ref={rowRef}
-            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-2.5 overflow-hidden lg:flex"
+            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-2.5 overflow-hidden px-1 lg:flex"
             style={{ height: HERO_LOGO_HEIGHT }}
             onPointerEnter={() => setPaused(true)}
             onPointerLeave={() => setPaused(false)}
