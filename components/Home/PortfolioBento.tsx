@@ -8,7 +8,7 @@ import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Showcase from "@/components/work/Showcase";
-import type { Deliverable } from "@/data/portfolioData";
+import { featuredWork, type Deliverable } from "@/data/portfolioData";
 import { clientShowcase, featuredClients, hasWorkPage, type ShowcaseData } from "@/lib/work";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import { SpringText, type VariantKey } from "./HeroSelector";
@@ -61,7 +61,8 @@ function filterFromUrl(): Filter {
 /** What a filter shows: featured clients, each leading with the picked kind of work. */
 function itemsFor(filter: Filter): ShowcaseData[] {
   const slug = filter ? DELIVERABLE[filter] : null;
-  return featuredClients(slug).flatMap((c) => clientShowcase(c, slug ?? undefined) ?? []);
+  // Six at most on the home page; "See all work" carries the rest to /work.
+  return featuredClients(slug, featuredWork.home).flatMap((c) => clientShowcase(c, slug ?? undefined) ?? []);
 }
 
 function seeAllFor(filter: Filter) {

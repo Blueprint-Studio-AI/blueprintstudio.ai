@@ -10,16 +10,17 @@ import registry from "./registry.json";
 // Two levels:
 // - A client is the relationship: years, engagement, a line on it, a quote.
 // - A piece of work (`work[]`) is one deliverable for that client, in a year.
-//   Work we show carries a kit: one hero (the 16:9 clip and its poster, plus a
-//   vertical cut) and exactly three square stills, all in one treatment (work
-//   on a light-grey field, top-anchored, running off the bottom edge). Work
+//   Work we show carries a kit: one hero (the 16:9 clip and its poster; a
+//   phone screen too for sites and apps that have one) and exactly three
+//   square stills, all full bleed: the work edge to edge, each crop around a
+//   whole subject (a whole headline, a whole device, a whole mark). Work
 //   without a kit is listed, not shown.
 //
 // The field names follow the client registry (review-2026-10-23/client-registry/
 // registry.json: slug, name, industry, years, engagement, trading, testimonial,
 // work[{ title, type, year, status, visibility, source }], images, flags), so
 // it can be filled from there. Kit files live in /public/media/kits/<work slug>/
-// and are made by the kit composer, not by hand.
+// and are cropped from our own captures, reels and Figma exports.
 
 // What we made. The first four have /work/<deliverable> pages once at least
 // two pieces of work carry them (lib/work).
@@ -92,7 +93,7 @@ export interface KitStill {
 }
 
 export interface MediaKit {
-  /** 16:9 for desktop; `vertical` is the 2:3 (or 4:5) cut for phones. */
+  /** The 16:9 frame, at every width; `vertical` is the site's or app's own mobile screen, where we have one. */
   hero: KitMedia & { alt: string; vertical?: KitMedia };
   /** Exactly three, square, in the kit treatment. The first leads wherever one still stands for the work. */
   stills: [KitStill, KitStill, KitStill];
@@ -176,7 +177,8 @@ function kit(
     alt: string;
     stills: [string, string, string];
     hero?: Partial<KitMedia>;
-    vertical?: Partial<KitMedia> | false;
+    /** The kit has hero-v.jpg, a real mobile screen (sites and apps only). */
+    vertical?: boolean;
     /** A composed hero has its own mp4 (hero.mp4, hero-v.mp4); a still hero has none. */
     clip?: boolean;
   }
@@ -189,9 +191,7 @@ function kit(
       poster: `${base}/hero.jpg`,
       ...(own ? { src: `${base}/hero.mp4` } : {}),
       ...opts.hero,
-      ...(opts.vertical === false
-        ? {}
-        : { vertical: { poster: `${base}/hero-v.jpg`, ...(own ? { src: `${base}/hero-v.mp4` } : {}), ...opts.vertical } }),
+      ...(opts.vertical ? { vertical: { poster: `${base}/hero-v.jpg` } } : {}),
     },
     stills: opts.stills.map((alt, i) => ({ src: `${base}/s${i + 1}.jpg`, alt })) as MediaKit["stills"],
   };
@@ -199,13 +199,18 @@ function kit(
 
 
 /** A deck's files: /media/kits/<slug>/cover.jpg (also hero.jpg), slide-1..4.jpg, s1-3.jpg, hero-v.jpg. */
-function deck(slug: string, alts: { cover: string; slides: [string, string, string, string] }, blurred: number[], coverBlurred = false) {
+function deck(
+  slug: string,
+  alts: { cover: string; slides: [string, string, string, string]; stills?: [string, string, string] },
+  blurred: number[],
+  coverBlurred = false
+) {
   const base = `${KITS}/${slug}`;
   return {
     kit: kit(slug, {
       alt: alts.cover,
       hero: { poster: `${base}/cover.jpg` },
-      stills: [alts.cover, alts.slides[0], alts.slides[2]],
+      stills: alts.stills ?? [alts.cover, alts.slides[0], alts.slides[2]],
     }),
     deck: {
       coverBlurred,
@@ -239,13 +244,12 @@ export const clients: Client[] = [
     name: "TokenWorks",
     tier: tierOf("tokenworks"),
     industry: [],
-    // The registry has April 2024 to October 2026 (Tyler calls it three years).
-    years: "2024–2026",
+    years: "2023–2026",
     engagement: "Partnership",
     trading: true,
     testimonial: "daniel-greene",
     summary:
-      "Since 2024, the design and build team behind TokenWorks’ ID scanners: launch and product films, a mobile scanner app and the customer portal, and the product pages of the earlier idscanner.com.",
+      "Since 2023, the design and build team behind TokenWorks’ ID scanners: launch and product films, the IDVisor Go app and the customer portal, and the product pages of the earlier idscanner.com.",
     work: [
       {
         slug: "tokenworks-agevisor-3",
@@ -260,24 +264,24 @@ export const clients: Client[] = [
         kit: kit("tokenworks-agevisor-3", {
           alt: "AgeVisor 3 launch film",
           hero: { src: TW_REEL, clip: [8.3, 12.3], posterTime: 8.6 },
-          vertical: { src: `${KITS}/tokenworks-agevisor-3/hero-v.mp4` },
-          stills: ["AgeVisor 3 on a counter", "The AgeVisor 3 screen, close", "AgeVisor 3 under water, from the film"],
+          stills: ["AgeVisor 3", "The AgeVisor 3 screen, close", "AgeVisor 3 under water, from the film"],
         }),
       },
       {
         slug: "tokenworks-app",
-        title: "Scanner app and customer portal",
+        title: "IDVisor Go app and customer portal",
         label: "Scanner app",
         type: "apps",
         year: "2026",
         status: "shipped",
         // Cleared to show in the registry's second pass: the App Store set and the portal screens.
         visibility: "public",
-        source: "Registry media: App Store screenshot set, IDScanner portal add-ons, AgeVisor 3 device UI",
-        summary: "A mobile ID scanner app with DMV checks, the IDScanner customer portal, and the AgeVisor 3 device screens.",
+        source: "Figma: Portal Design (the UMS customer portal), TokenWorks App (the IDVisor Go App Store set), Device UI; exported 2026-10-23",
+        summary: "IDVisor Go, a phone app that scans IDs and checks them against DMV records, and the IDScanner customer portal for devices, add-ons and billing.",
         kit: kit("tokenworks-app", {
-          alt: "The IDScanner customer portal",
-          stills: ["The scanner app: Catch fake IDs", "The portal's add-ons store", "The AgeVisor 3 scan screen"],
+          alt: "The IDScanner customer portal’s add-ons store",
+          vertical: true,
+          stills: ["IDVisor Go on the App Store: scan IDs, catch fake IDs", "The AgeVisor 3 device screen", "An invoice in the customer portal"],
         }),
       },
       {
@@ -293,7 +297,7 @@ export const clients: Client[] = [
         kit: kit("tokenworks-idvisor-page", {
           alt: "The idVisor product page, scrolling",
           clip: true,
-          stills: ["The idVisor page’s opening", "idVisor’s features, one card each", "Configuring an idVisor to buy"],
+          stills: ["idVisor’s security features", "Free updates for life", "Owners love it"],
         }),
       },
       {
@@ -309,10 +313,9 @@ export const clients: Client[] = [
         source: "Registry: 'IDVisor product videos, IDVisor 3 Amazon video'; cut from tokenworks-videos-horizontal",
         summary: "Product films for idVisor, the handheld scanner: the reveal, and a scan at the door.",
         kit: kit("tokenworks-idvisor", {
-          alt: "idVisor product film",
-          hero: { src: TW_REEL, clip: [1.6, 6.2], posterTime: 4.3 },
-          vertical: { src: `${KITS}/tokenworks-idvisor/hero-v.mp4` },
-          stills: ["idVisor, front and side", "idVisor in the dark, from the film", "Scanning an ID with idVisor"],
+          alt: "idVisor product film: an ID scanned OK",
+          hero: { src: TW_REEL, clip: [1.6, 6.4], posterTime: 6.2 },
+          stills: ["idVisor, front and side", "A scan coming back OK", "Scanning an ID with idVisor"],
         }),
       },
       {
@@ -341,7 +344,7 @@ export const clients: Client[] = [
     trading: true,
     testimonial: "shina-foo",
     summary: "We designed, built and filmed the launch of USD*, Perena’s yield-bearing stablecoin.",
-    flags: ["perena.org has been redesigned since: don't link it as our work", "Perena Purple is NDA-gated"],
+    flags: ["perena.org has been redesigned since: don't link it as our work"],
     work: [
       {
         slug: "perena-landing",
@@ -354,20 +357,9 @@ export const clients: Client[] = [
         source: "perena reel; perena.org has since been redesigned by Perena",
         summary: "Landing page design and development for the launch of USD*.",
         kit: kit("perena-landing", {
-          alt: "The USD* landing page on a laptop",
-          hero: {
-            src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`,
-            poster: `${PROJECTS}/perena/perena-desktop-poster.jpg`,
-            clip: [1, 3.6],
-            posterTime: 1,
-          },
-          vertical: {
-            src: `${PROJECTS}/perena/perena-vertical-compressed.mp4`,
-            poster: `${PROJECTS}/perena/perena-mobile-poster.jpg`,
-            clip: [0.5, 3.6],
-            posterTime: 1,
-          },
-          stills: ["The landing page’s dark hero", "Buying USD* on the landing page", "The landing page on two phones"],
+          alt: "The USD* landing page: Build Wealth on Autopilot",
+          hero: { src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`, clip: [2.2, 3.9], posterTime: 2.4 },
+          stills: ["The landing page’s dark hero", "The landing page on two phones", "Buying USD*"],
         }),
       },
       {
@@ -381,11 +373,22 @@ export const clients: Client[] = [
         source: "https://youtu.be/DwqvawhROwE; https://x.com/perena/status/2002083042308104204",
         summary: "A short film walking through USD*: how it grows, how it’s secured, and how it has performed.",
         kit: kit("perena-film", {
-          alt: "USD* launch film",
-          hero: { src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`, clip: [6, 12.2], posterTime: 8.6 },
-          vertical: { src: `${PROJECTS}/perena/perena-vertical-compressed.mp4`, clip: [6, 12.2], posterTime: 8.6 },
-          stills: ["USD* APY over a field of flowers", "“Fully audited, running publicly on Solana”", "USD*’s performance against the market"],
+          alt: "USD* launch film: fully audited, running publicly on Solana",
+          hero: { src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`, clip: [6, 12.2], posterTime: 7 },
+          stills: ["USD* APY over a field of flowers", "USD* against the market, from the film", "USD*’s stats and performance"],
         }),
+      },
+      {
+        slug: "perena-purple",
+        title: "Perena Purple membership app",
+        label: "Perena Purple",
+        type: "apps",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        // Public in the registry's latest pass; listed, not shown, until there are frames to fill a kit.
+        source: "BPSTU-429, 568, 608, 759; Figma Perena 534:590, 778:3443",
+        summary: "Onboarding with NDA and wallet verification, the member dashboard and quarterly reports for Perena’s invitation-only membership.",
       },
     ],
   },
@@ -401,24 +404,6 @@ export const clients: Client[] = [
       "Arch Network’s design partner since 2025: the BTC All-In Summit in Las Vegas, the Arch and Arch Prime identities, and the pages that launch the chain.",
     work: [
       {
-        slug: "arch-site",
-        title: "arch.network site",
-        label: "Website",
-        type: "websites",
-        year: "2026",
-        // Our build of the homepage, /chain and /ecosystem. Today's homepage (Arch Prime) isn't ours, so no link.
-        status: "archived",
-        visibility: "public",
-        source: "Registry media: arch.network homepage hero (our build), chain page, blog redesign preview",
-        summary: "The arch.network site we built: the homepage, the chain pages and /ecosystem, and a blog redesign.",
-        kit: kit("arch-site", {
-          alt: "The arch.network homepage we built: Real Bitcoin. Finally programmable.",
-          clip: true,
-          vertical: { src: undefined },
-          stills: ["Real Bitcoin.", "The financial chain for native Bitcoin", "The Arch blog redesign"],
-        }),
-      },
-      {
         slug: "arch-btc-summit",
         title: "BTC All-In Summit, Las Vegas",
         label: "BTC Summit",
@@ -429,16 +414,9 @@ export const clients: Client[] = [
         source: "arch-vegas reel",
         summary: "Event identity, screens and motion for Arch Network’s BTC All-In Summit in Las Vegas.",
         kit: kit("arch-btc-summit", {
-          alt: "BTC All-In Summit reel",
-          hero: {
-            src: `${PROJECTS}/arch-vegas/arch-vegas-horizontal-compressed.mp4`,
-            poster: `${PROJECTS}/arch-vegas/arch-vegas-desktop-poster.jpg`,
-          },
-          vertical: {
-            src: `${PROJECTS}/arch-vegas/arch-vegas-vertical-compressed.mp4`,
-            poster: `${PROJECTS}/arch-vegas/arch-vegas-mobile-poster.jpg`,
-          },
-          stills: ["The summit’s screens at the venue", "The sponsor wall", "The BTC All-In Summit wordmark"],
+          alt: "The BTC All-In Summit’s door projection, Las Vegas",
+          hero: { src: `${PROJECTS}/arch-vegas/arch-vegas-horizontal-compressed.mp4`, clip: [1, 13], posterTime: 4.4 },
+          stills: ["The sponsor wall", "The summit’s sponsor screens at the venue", "The BTC All-In Summit wordmark"],
         }),
       },
       {
@@ -453,8 +431,8 @@ export const clients: Client[] = [
         summary: "Arch Network’s identity and design system: the mark, the serif, the orange, and the diagrams.",
         brandPage: "arch",
         kit: kit("arch-brand", {
-          alt: "Arch Network: Real Bitcoin. Finally programmable.",
-          stills: ["The Arch Network lockup on orange", "An Arch diagram: the finance district", "The Arch glyph"],
+          alt: "The Arch Network brand page: the lockup over the city at night",
+          stills: ["Arch’s isometric system: the native-tech stack", "The Arch Network lockup on Arch orange", "An Arch diagram: the finance district"],
         }),
       },
       {
@@ -465,13 +443,33 @@ export const clients: Client[] = [
         year: "2026",
         status: "live",
         visibility: "public",
-        source: "Clients/Arch/arch-site/src/app/chain; live page captured 2026-10-23",
+        // Captured from our build (Arch-Network/arch-site, preview arch-site-drab.vercel.app/chain), not the live site's Arch Prime chrome.
+        source: "Clients/Arch/arch-site/src/app/chain; our build captured 2026-10-23",
         summary: "The page that introduces Arch’s chain, purpose-built for credit at scale. Designed and built.",
         liveUrl: "https://www.arch.network/chain",
         kit: kit("arch-chain", {
-          alt: "The Arch chain page, scrolling",
+          alt: "The Arch chain page we built, scrolling",
           clip: true,
-          stills: ["The chain page’s opening", "“Credit needs its own chain”", "The chain page on a phone"],
+          vertical: true,
+          stills: ["Built for clearing", "What clearing makes possible", "Credit needs its own chain"],
+        }),
+      },
+      {
+        slug: "arch-site",
+        title: "arch.network site",
+        label: "Website",
+        type: "websites",
+        year: "2026",
+        // Our build of the homepage, /chain and /ecosystem. Today's homepage (Arch Prime) isn't ours, so no link.
+        status: "archived",
+        visibility: "public",
+        // The homepage shows only as a still while Tyler confirms it's ours; the frame is /ecosystem.
+        source: "Our build of arch.network (Arch-Network/arch-site, preview arch-site-drab.vercel.app) and the blog preview, captured 2026-10-23",
+        summary: "The arch.network site we built: the homepage, the chain pages and /ecosystem, and a blog redesign.",
+        kit: kit("arch-site", {
+          alt: "The arch.network Ecosystem page we built",
+          vertical: true,
+          stills: ["The arch.network homepage we built", "The Arch blog redesign", "“Bitcoin should do more. Now it can.”"],
         }),
       },
       {
@@ -487,8 +485,8 @@ export const clients: Client[] = [
         summary: "The product brand that descends from Arch Network, with its own palette and a place system for the app.",
         brandPage: "arch-prime",
         kit: kit("arch-prime-brand", {
-          alt: "Arch Prime’s key visual and lockup",
-          stills: ["Arch Prime’s key visual", "An Arch Prime building, for Earn", "The Arch Prime lockup"],
+          alt: "The Arch Prime brand page: the Prime arch over the city",
+          stills: ["An Arch Prime building, for Earn products", "An Arch Prime building, for Earn pools", "An Arch Prime building, for Earn strategies"],
         }),
       },
       {
@@ -542,7 +540,8 @@ export const clients: Client[] = [
         kit: kit("jinba-website", {
           alt: "jinba.io, scrolling",
           clip: true,
-          stills: ["jinba.io’s opening", "Jinba’s security and customers section", "jinba.io on a phone"],
+          vertical: true,
+          stills: ["SOC 2, HIPAA and GDPR", "Trusted by enterprises", "A Jinba use case: loan screening"],
         }),
       },
       {
@@ -557,8 +556,8 @@ export const clients: Client[] = [
         summary: "Logo system, brand narrative, materials and a design system for a platform serving regulated industries.",
         brandPage: "jinba",
         kit: kit("jinba-brand", {
-          alt: "The Jinba lockup on its brass texture",
-          stills: ["The Jinba logo on its texture", "Jinba on LinkedIn", "Jinba’s chocolate brass material"],
+          alt: "The Jinba brand page: the mark on its brush texture",
+          stills: ["Jinba on LinkedIn", "The Jinba brand guidelines", "Jinba’s chocolate brass material"],
         }),
       },
       {
@@ -596,22 +595,15 @@ export const clients: Client[] = [
         source: "living-ip reel",
         summary: "Product design for on-chain AI agents: knowledge voting, analytics and contributor profiles.",
         kit: kit("livingip-app", {
-          alt: "LivingIP app reel",
+          alt: "A LivingIP contributor profile on a phone",
           hero: {
             src: `${PROJECTS}/living-ip/living-ip-horizontal-compressed.mp4`,
-            poster: `${KITS}/livingip-app/hero.jpg`,
             // The app on a laptop, then a phone. (Earlier stretches include “Poast”,
             // whose ownership is a question for Tyler, and pale blurred transitions.)
             clip: [10.1, 12.7],
+            posterTime: 12,
           },
-          vertical: {
-            src: `${PROJECTS}/living-ip/living-ip-vertical-compressed.mp4`,
-            poster: `${KITS}/livingip-app/hero-v.jpg`,
-            // The phone, as in the apps peek.
-            clip: [11.9, 13.3],
-            posterTime: 12.4,
-          },
-          stills: ["A contributor profile in the LivingIP app", "Voting on knowledge", "Achievement badges"],
+          stills: ["Achievement badges", "Analytics", "Top contributors and incoming knowledge"],
         }),
       },
     ],
@@ -641,7 +633,8 @@ export const clients: Client[] = [
         kit: kit("honeyb-website", {
           alt: "honeybtc.com, scrolling",
           clip: true,
-          stills: ["honeybtc.com’s opening", "HoneyB’s products, and “Institutional by Design”", "honeybtc.com on a phone"],
+          vertical: true,
+          stills: ["Earn more with your Bitcoin, however you hold it", "Same yield, your custodian", "The Yield page on a phone"],
         }),
       },
       {
@@ -656,7 +649,7 @@ export const clients: Client[] = [
         summary: "The HoneyB identity: the mark, the honeycomb, and the 3D coins and objects that carry it.",
         brandPage: "honeyb",
         kit: kit("honeyb-brand", {
-          alt: "The HoneyB lockup over its honeycomb",
+          alt: "HoneyB: The Yield Layer for Bitcoin",
           stills: ["The HoneyB glyph as a coin", "A HoneyB wallet", "HoneyB coins"],
         }),
       },
@@ -724,15 +717,8 @@ export const clients: Client[] = [
         source: "bump reel",
         summary: "“The orange pill for memecoins”: the Bump identity and its launch reel.",
         kit: kit("bump-brand", {
-          alt: "Bump brand reel",
-          hero: {
-            src: `${PROJECTS}/bump/bump-brand-overview-horizontal-compressed.mp4`,
-            poster: `${PROJECTS}/bump/bump-desktop-poster.jpg`,
-          },
-          vertical: {
-            src: `${PROJECTS}/bump/bump-brand-overview-vertical-compressed.mp4`,
-            poster: `${PROJECTS}/bump/bump-mobile-poster.jpg`,
-          },
+          alt: "The orange pill for memecoins",
+          hero: { src: `${PROJECTS}/bump/bump-brand-overview-horizontal-compressed.mp4`, posterTime: 1.6 },
           stills: ["BUMP on an orange pill", "The blue and orange pills", "“They print money from nothing.”"],
         }),
       },
@@ -744,11 +730,11 @@ export const clients: Client[] = [
         year: "2025",
         status: "shipped",
         visibility: "public",
-        source: "bump-asset-3",
-        summary: "Product design for Bump’s platform: trending coins, the watchlist and explore.",
+        source: "Registry media: the Bump platform (leaderboard, explore, a coin page)",
+        summary: "Product design for Bump’s platform: trending coins, explore, and each coin’s page with its chart and trading.",
         kit: kit("bump-app", {
-          alt: "The Bump platform on a laptop",
-          stills: ["Bump’s trending coins", "Bump’s coin grid", "The Bump platform on a laptop"],
+          alt: "The Bump platform: trending and explore",
+          stills: ["A coin’s page and price chart", "Trending and explore", "Buying a coin"],
         }),
       },
     ],
@@ -761,6 +747,7 @@ export const clients: Client[] = [
     years: "2025",
     engagement: "Project",
     trading: true,
+    summary: "A character-led identity for UNI, a Bitcoin stablecoin on Arch: the mark, the type and colour, and the posters and screens that launched it.",
     flags: ["Trading status unknown (registry)"],
     work: [
       {
@@ -776,7 +763,7 @@ export const clients: Client[] = [
         summary: "Brand identity for a Bitcoin-denominated stablecoin: logo system, type, palette and visual language.",
         kit: kit("uni-brand", {
           alt: "UNI brand overview",
-          stills: ["The UNI badge", "UNI’s “Get started” poster", "The UNI wordmark"],
+          stills: ["The UNI badge", "UNI’s “Get started” poster", "UNI on two phones"],
         }),
       },
       { slug: "uni-landing", title: "Landing page", label: "Landing page", type: "websites", year: "2025", status: "archived", visibility: "public" },
@@ -791,6 +778,7 @@ export const clients: Client[] = [
     engagement: "Project",
     // The client retired the Breeze name; its tier decides where the work shows.
     trading: false,
+    summary: "“Easy. Breezy. Bitcoin.” A light, sky-blue identity for a Bitcoin payments app: the logo system, type and colour, and its social kit.",
     work: [
       {
         slug: "breeze-brand",
@@ -804,8 +792,7 @@ export const clients: Client[] = [
         summary: "“Easy. Breezy. Bitcoin.” Logo system, type and palette, social kit and brand deck.",
         kit: kit("breeze-brand", {
           alt: "Easy. Breezy. Bitcoin.",
-          vertical: { poster: `${PROJECTS}/breeze/hero-breeze-mobile.jpg` },
-          stills: ["The Breeze B, made of sky", "The Breeze wordmark on a hill", "Breeze’s flying piggy bank"],
+          stills: ["The Breeze B, made of sky", "The Breeze app in hand", "Spend anywhere"],
         }),
       },
     ],
@@ -832,17 +819,9 @@ export const clients: Client[] = [
         summary: "Brand identity for Autara, Bitcoin-collateralised lending on Arch: the names, the triangle pattern and the deck. Autara has since been acquired by Arch.",
         source: "autara reel (the hero’s “brands” word still plays it)",
         kit: kit("autara-brand", {
-          alt: "Autara brand reel",
-          hero: {
-            src: `${PROJECTS}/autara/autara-horizontal-compressed.mp4`,
-            poster: `${PROJECTS}/autara/autara-hero-poster.jpg`,
-            clip: [3.8, 7.8],
-          },
-          vertical: {
-            src: `${PROJECTS}/autara/autara-vertical-compressed.mp4`,
-            poster: `${PROJECTS}/autara/autara-mobile-poster.jpg`,
-          },
-          stills: ["Autara’s triangle pattern", "The Autara wordmark", "Autara’s homepage"],
+          alt: "Autara: The premier Bitcoin money market",
+          hero: { src: `${PROJECTS}/autara/autara-horizontal-compressed.mp4`, clip: [4.6, 7.3], posterTime: 7 },
+          stills: ["Autara’s triangle pattern", "Autara’s site on a laptop", "Autara’s allocation chart"],
         }),
       },
       { slug: "autara-landing", title: "Framer landing page", label: "Landing page", type: "websites", year: "2025", status: "archived", visibility: "public" },
@@ -858,6 +837,7 @@ export const clients: Client[] = [
     engagement: "Project",
     // No longer trading; its tier still decides where its work shows. No link to a dead site.
     trading: false,
+    summary: "A full rebrand for HUCH, the tokenization platform for gaming assets: the mark, the brand reel, the platform’s look and the pitch deck.",
     work: [
       {
         slug: "huch-brand",
@@ -871,16 +851,7 @@ export const clients: Client[] = [
         summary: "A full rebrand for HUCH, the tokenization platform for gaming assets.",
         kit: kit("huch-brand", {
           alt: "HUCH brand reel",
-          hero: {
-            src: `${PROJECTS}/huch/huch-brand-overview-horizontal-compressed.mp4`,
-            poster: `${PROJECTS}/huch/huch-desktop-poster.jpg`,
-            posterTime: 1.6,
-          },
-          vertical: {
-            src: `${PROJECTS}/huch/huch-brand-overview-vertical-compressed.mp4`,
-            poster: `${PROJECTS}/huch/huch-mobile-poster.jpg`,
-            posterTime: 1.6,
-          },
+          hero: { src: `${PROJECTS}/huch/huch-brand-overview-horizontal-compressed.mp4`, posterTime: 1.6 },
           stills: ["The HUCH mark", "HUCH's skin analytics", "A HUCH skin card"],
         }),
       },
@@ -902,6 +873,7 @@ export const clients: Client[] = [
           {
             cover: "HUCH deck cover, with the revenue line blurred",
             slides: ["Tokenization is no longer hype", "HUCH unlocks gaming assets", "Competitive landscape", "Traction, with the figures blurred"],
+            stills: ["HUCH deck cover, with the revenue line blurred", "The HUCH platform, from the deck", "HUCH’s moat, from the deck"],
           },
           [4],
           true
@@ -927,11 +899,12 @@ export const clients: Client[] = [
         year: "2025",
         status: "live",
         visibility: "public",
-        source: "Registry media: Herth buyer site, mobile map search, property page",
+        source: "Figma: Herth buyer site, mobile map search, property page (exported 2026-10-23); registry: buyer account hub",
         summary: "Find a home by how it looks: natural-language search, map search and property pages, on web and mobile.",
         kit: kit("herth-app", {
           alt: "Herth: What does your perfect home look like?",
-          stills: ["Herth's mobile map search", "A Herth property page", "Herth's homepage search"],
+          vertical: true,
+          stills: ["A Herth property page", "Property details and street view", "A buyer’s saved homes"],
         }),
       },
     ],
@@ -954,13 +927,13 @@ export const clients: Client[] = [
         year: "2025",
         status: "shipped",
         visibility: "public",
-        source: "https://youtu.be/A1hq1u_M7L8; registry media excerpt",
+        source: "https://youtu.be/A1hq1u_M7L8; cut at 1080p from our highlight reel",
         summary: "A launch film for Pyra’s credit app, made in two days.",
         kit: kit("pyra-film", {
           alt: "Pyra credit launch film",
           clip: true,
-          vertical: { src: undefined },
-          stills: ["Easily manage your credit", "Pyra's manage-assets screen", "Watch your portfolio grow"],
+          hero: { posterTime: 5.2 },
+          stills: ["An enhanced design", "Track loans", "Watch your portfolio grow"],
         }),
       },
     ],
@@ -983,11 +956,11 @@ export const clients: Client[] = [
         year: "2026",
         status: "shipped",
         visibility: "public",
-        source: "https://youtu.be/PeaWXlRNjPE; registry media frames",
+        source: "https://youtu.be/PeaWXlRNjPE; frames exported from the Piris Labs Figma file",
         summary: "“We’re building the data movement platform for AI”: the YC W26 launch film, made in Figma and Jitter.",
         kit: kit("piris-film", {
           alt: "Piris Labs launch film: rack-to-rack data movement",
-          stills: ["We're building the data movement platform for AI", "Piris Labs benchmarks", "Rack-to-rack data movement"],
+          stills: ["Piris Labs benchmarks", "The Piris Labs end card", "A rack, close"],
         }),
       },
     ],
@@ -1015,7 +988,8 @@ export const clients: Client[] = [
         liveUrl: "https://pavepower.com",
         kit: kit("pavepower-website", {
           alt: "pavepower.com",
-          stills: ["pavepower.com's opening", "Pave Power's services", "pavepower.com on a phone"],
+          vertical: true,
+          stills: ["Pave Project: an EV truck depot", "Fleet electrification done right", "Site selection, design and development"],
         }),
       },
     ],
@@ -1042,7 +1016,8 @@ export const clients: Client[] = [
         summary: "Steam for Bitcoin. Play, own, trade: the Hashplay site and its games.",
         kit: kit("hashplay-website", {
           alt: "Hashplay: Steam for Bitcoin",
-          stills: ["Hashplay's opening over the game grid", "Hashplay game cards", "Deal or No Deal on Hashplay"],
+          vertical: true,
+          stills: ["Crazy Wheel", "Scratchpad", "HashBots"],
         }),
       },
       { slug: "hashplay-brand", title: "Brand", label: "Brand", type: "branding", year: "2025", status: "shipped", visibility: "public" },
@@ -1100,10 +1075,13 @@ function listed(
 // two have any, Show clients with it fill in. At most `max`.
 export const featuredWork: {
   max: number;
+  /** The home page shows this many; "See all work" carries the rest. */
+  home: number;
   all: string[];
   lead: Partial<Record<Deliverable, string[]>>;
 } = {
   max: 9,
+  home: 6,
   all: ["tokenworks", "arch-network", "perena", "honeyb", "jinba", "huch", "bump", "uni", "autara"],
   lead: {
     apps: ["tokenworks", "huch", "bump"],

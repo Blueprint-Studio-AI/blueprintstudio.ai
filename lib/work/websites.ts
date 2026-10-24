@@ -9,5 +9,5 @@ export const websites: WorkPageConfig = {
   metaTitle: "Website Design Portfolio",
   metaDescription:
     "Landing pages and marketing sites designed and built by Blueprint Studio for Perena, HoneyB, Arch Network, Jinba and TokenWorks.",
-  order: ["perena-landing", "arch-site", "honeyb-website", "jinba-website", "arch-chain", "tokenworks-idvisor-page", "pavepower-website", "hashplay-website"],
+  order: ["perena-landing", "honeyb-website", "arch-chain", "jinba-website", "arch-site", "tokenworks-idvisor-page", "pavepower-website", "hashplay-website"],
 };

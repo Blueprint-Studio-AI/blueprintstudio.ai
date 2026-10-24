@@ -181,10 +181,9 @@ export function clientShowcase(client: Client, lead?: Deliverable, pool?: ShownW
     id: client.slug,
     title: client.name,
     href: clientHref(client, first),
-    lead: single ? "" : client.years,
-    items: single
-      ? [{ key: first.slug, label: `${workTypeLabels[first.type].one} · ${first.year}` }]
-      : used.map((w) => ({ key: w.slug, label: w.label })),
+    // One line for every card: the years, then what we made.
+    lead: client.years || first.year,
+    items: single ? [{ key: first.slug, label: workTypeLabels[first.type].one }] : used.map((w) => ({ key: w.slug, label: w.label })),
     summary: client.summary,
     frames: used.map(frameOf),
     stills,
@@ -194,14 +193,13 @@ export function clientShowcase(client: Client, lead?: Deliverable, pool?: ShownW
 }
 
 /**
- * A case's phone tile: the vertical cut's poster, only where it's a real phone
- * screen (a site's or app's mobile version). A film's vertical cut is a crop of
- * the film, so beside its stills it would only repeat one of them.
+ * A case's phone tile: the site's or app's own mobile screen, where we have one.
+ * Kits carry a phone cut only when it's a real mobile screen, never a crop.
  */
 export function casePhone(work: ShownWork): { src: string; alt: string } | undefined {
   const v = work.kit.hero.vertical;
-  if (!v?.src || (work.type !== "websites" && work.type !== "apps")) return undefined;
-  return { src: v.poster, alt: work.kit.hero.alt };
+  if (!v || (work.type !== "websites" && work.type !== "apps")) return undefined;
+  return { src: v.poster, alt: `${work.kit.hero.alt}, on a phone` };
 }
 
 /** One piece of work as a showcase: its hero and its own three stills. */
@@ -214,8 +212,9 @@ export function workShowcase(work: ShownWork, opts: { clientLink?: boolean } = {
   return {
     id: work.slug,
     title: client.name,
-    lead: "",
-    items: [{ key: work.slug, label: `${work.title} · ${work.year}` }],
+    // The same line as a client card: the year, then what it is.
+    lead: work.year,
+    items: [{ key: work.slug, label: work.title }],
     summary: work.summary,
     frames: [frameOf(work)],
     stills: work.kit.stills.map((s) => ({ ...s, frame: work.slug })),
@@ -277,7 +276,7 @@ export function collectionShowcase(works: ShownWork[], title: string, lead = "")
  * kind (featuredWork.lead first); when fewer than two have any, Show clients
  * with it fill in, so a filter never shows a lone card.
  */
-export function featuredClients(filter: Deliverable | null): Client[] {
+export function featuredClients(filter: Deliverable | null, max = featuredWork.max): Client[] {
   const has = (c: Client) => shownWorkOf(c).some((w) => !filter || w.type === filter);
   const rank = (slugs: string[]) => (c: Client) => {
     const i = slugs.indexOf(c.slug);
@@ -286,10 +285,10 @@ export function featuredClients(filter: Deliverable | null): Client[] {
   const byOrder = (list: Client[], slugs: string[]) =>
     list.map((c, i) => ({ c, i })).sort((a, b) => rank(slugs)(a.c) - rank(slugs)(b.c) || a.i - b.i).map(({ c }) => c);
   const feature = byOrder(clients.filter((c) => c.tier === "Feature" && has(c)), featuredWork.all);
-  if (!filter) return feature.slice(0, featuredWork.max);
+  if (!filter) return feature.slice(0, max);
   const picked = byOrder(feature, featuredWork.lead[filter] ?? []);
   const fill = picked.length < 2 ? clients.filter((c) => c.tier === "Show" && has(c)) : [];
-  return [...picked, ...fill].slice(0, featuredWork.max);
+  return [...picked, ...fill].slice(0, max);
 }
 
 /** Industry tags for a piece of work, minus the page's own industry. */
