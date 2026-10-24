@@ -101,7 +101,7 @@ export default function ClientPage({ client }: { client: Client }) {
                     data={{ ...workShowcase(work, { clientLink: false }), title: work.title, items: [] }}
                     tag={[workTypeLabels[work.type].one, work.year].filter(Boolean).join(" · ")}
                     story={work.story}
-                    phone={work.kit.hero.vertical ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
+                    phone={work.kit.hero.vertical?.src ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
                     eager={i === 0}
                   />
                 )}

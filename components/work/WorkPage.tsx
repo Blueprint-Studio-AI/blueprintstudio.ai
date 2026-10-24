@@ -59,7 +59,7 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
                     data={workShowcase(work)}
                     tag={workTypeLabels[work.type].one}
                     story={work.story}
-                    phone={work.kit.hero.vertical ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
+                    phone={work.kit.hero.vertical?.src ? { src: work.kit.hero.vertical.poster, alt: work.kit.hero.alt } : undefined}
                   />
                 </Reveal>
               ) : (
