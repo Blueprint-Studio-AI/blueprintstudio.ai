@@ -178,9 +178,8 @@ export const FloatingNavNew = () => {
                                         onClick={() => setOpen(false)}
                                         className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
                                     >
-                                        <span className="relative h-9 w-[54px] shrink-0 overflow-hidden rounded-[8px] bg-neutral-200">
-                                            <Image src={service.still} alt="" fill sizes="54px" style={{ objectPosition: service.focus }} className="object-cover" />
-                                            <span className="absolute inset-0 rounded-[8px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
+                                        <span className="relative h-9 w-[54px] shrink-0">
+                                            <Image src={service.still} alt="" fill sizes="108px" className="object-contain mix-blend-multiply" />
                                         </span>
                                         <span className="min-w-0 flex-1">
                                             <span className="block text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>
