@@ -288,7 +288,7 @@ export const clients: Client[] = [
         year: "2024",
         status: "archived",
         visibility: "public",
-        source: "Our screen recording of the page, September 2024 (idVisor product page.mp4)",
+        source: "Our screen recording of the page, September 2024 (idVisor product page.mp4), the mouse cursor painted out frame by frame",
         summary: "A product page for idVisor on the IDScanner.com store: the scanner, what it catches, and a configurator to buy it.",
         kit: kit("tokenworks-idvisor-page", {
           alt: "The idVisor product page, scrolling",
