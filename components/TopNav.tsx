@@ -290,20 +290,15 @@ function DesktopNav() {
     // pointer rests on the pill's mark. The fold isn't a spring of its own: in
     // a change of shape it is the shape's spring, so the wordmark's box and the
     // nav land on the same frame; resting on the mark adds one more spring.
-    const [logoHover, setLogoHover] = useState(false);
+    // Opened by the pointer arriving on the mark, it stays open while the pointer
+    // is anywhere on the nav (its menus included), so the links never slide under
+    // a pointer that's on them. See the effect after the menus' state.
+    const [logoHeld, setLogoHeld] = useState(false);
+    const [pointerInside, setPointerInside] = useState(false);
     // The bar keeps it folded below 1024, where there's no room beside the links;
     // the pill opens it on hover wherever the opened pill still fits the window.
     const openPillFits = vw > 0 && PILL_PAD.left + PILL_PAD.right + logoWidth(0) + 2 * gap + parts.links + parts.cta <= vw - 24;
     const hoverOpen = useMotionValue(0);
-    const hoverTarget = pill && logoHover && openPillFits ? 1 : 0;
-    useLayoutEffect(() => {
-        if (reduce || instant) {
-            hoverOpen.jump(hoverTarget);
-            return;
-        }
-        const controls = animateValue(hoverOpen, hoverTarget, SPRING.morph);
-        return () => controls.stop();
-    }, [hoverTarget, reduce, instant, hoverOpen]);
     const fold = useTransform(() => {
         const h = clamp01(hoverOpen.get());
         return wide ? clamp01(pillness.get()) * (1 - h) : 1 - h;
@@ -414,9 +409,30 @@ function DesktopNav() {
     };
     const focusFirst = (id: MenuId) => contents[id]?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
 
-    // Which item is lit: the one under the pointer, else the open menu, else where you are.
+    // The logo's hover-open. While a menu is open or closing, it holds whatever
+    // it is, so its menu's name never moves under the panel; otherwise it opens
+    // while held and folds once the pointer has left the nav.
+    const menuBusy = menu !== null || lingering;
+    const logoTarget = useRef(0);
+    if (!pill || !openPillFits) logoTarget.current = 0;
+    else if (!menuBusy) logoTarget.current = logoHeld ? 1 : 0;
+    const hoverTarget = logoTarget.current;
+    useLayoutEffect(() => {
+        if (reduce || instant) {
+            hoverOpen.jump(hoverTarget);
+            return;
+        }
+        const controls = animateValue(hoverOpen, hoverTarget, SPRING.morph);
+        return () => controls.stop();
+    }, [hoverTarget, reduce, instant, hoverOpen]);
+    useEffect(() => {
+        if (logoHeld && !pointerInside && !menuBusy) setLogoHeld(false);
+    }, [logoHeld, pointerInside, menuBusy]);
+
+    // Which item is lit: the open menu's name while a menu is open, so the two
+    // always agree; else the one under the pointer; else where you are.
     const [hovered, setHovered] = useState<NavItem | null>(null);
-    const lit = hovered ?? menu ?? current;
+    const lit = menu ?? hovered ?? current;
     const items = useRef<Record<string, HTMLElement | null>>({}).current;
     const box = useGlide(lit, items);
     const [row, setRow] = useState<string | null>(null);
@@ -660,6 +676,8 @@ function DesktopNav() {
             <motion.div
                 ref={containerRef}
                 aria-hidden={!revealed || undefined}
+                onPointerEnter={(e) => e.pointerType === "mouse" && setPointerInside(true)}
+                onPointerLeave={(e) => e.pointerType === "mouse" && setPointerInside(false)}
                 className="fixed inset-x-0 z-50 mx-auto hidden md:block"
                 style={{ width, height, top, borderRadius: radius, paddingLeft, paddingRight }}
                 initial={false}
@@ -679,8 +697,7 @@ function DesktopNav() {
                         <div className="w-fit">
                             <Logo
                                 fold={fold}
-                                onPointerEnter={(e) => e.pointerType === "mouse" && handMoved(e) && setLogoHover(true)}
-                                onPointerLeave={() => setLogoHover(false)}
+                                onPointerEnter={(e) => e.pointerType === "mouse" && handMoved(e) && setLogoHeld(true)}
                             />
                         </div>
 
