@@ -179,7 +179,7 @@ export const FloatingNavNew = () => {
                                         className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
                                     >
                                         <span className="relative h-9 w-[54px] shrink-0">
-                                            <Image src={service.still} alt="" fill sizes="108px" className="object-contain mix-blend-multiply" />
+                                            <Image src={service.menuStill} alt="" fill sizes="162px" className="object-contain" />
                                         </span>
                                         <span className="min-w-0 flex-1">
                                             <span className="block text-[15px] font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>

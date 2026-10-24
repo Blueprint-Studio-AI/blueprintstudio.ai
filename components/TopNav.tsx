@@ -782,16 +782,15 @@ function DesktopNav() {
                                                                         onFocus={() => setRow(service.key)}
                                                                         className={`flex items-center gap-3 rounded-xl p-1.5 pr-3 ${ROW_FOCUS}`}
                                                                     >
-                                                                        {/* The device sits straight on the glass: no tile or outline, and its white
-                                                                            ground multiplies away into the panel. */}
+                                                                        {/* The menu's own 3:2 picture, its rounded tile baked in, straight on the glass. */}
                                                                         <span className="relative h-10 w-[60px] shrink-0">
                                                                             <Image
-                                                                                src={service.still}
+                                                                                src={service.menuStill}
                                                                                 alt=""
                                                                                 fill
-                                                                                sizes="120px"
+                                                                                sizes="180px"
                                                                                 loading="eager"
-                                                                                className={`object-contain mix-blend-multiply transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
+                                                                                className={`object-contain transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
                                                                             />
                                                                         </span>
                                                                         <span className="min-w-0 flex-1">
