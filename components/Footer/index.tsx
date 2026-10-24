@@ -24,6 +24,9 @@ const footerLinks: Record<string, FooterSection> = {
     links: [
       { name: 'Tyler Stupart', href: 'https://www.linkedin.com/in/tylerstupart/', external: true },
       { name: 'Insights', href: '/insights' },
+      // Out of the top nav, so linked here
+      { name: 'Pricing', href: '/#pricing' },
+      { name: 'FAQ', href: '/#faq' },
       { name: 'Contact', href: 'mailto:blueprint.dao@gmail.com' },
       // { name: 'Careers', href: '/careers' },
     ]
