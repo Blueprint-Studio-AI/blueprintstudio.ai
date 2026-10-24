@@ -52,8 +52,8 @@ export const FAQ = { label: "FAQ", id: "faq" };
 // and the headline show the same work.
 export const SERVICES = (
     [
-        { key: "apps", href: "/work/apps", hint: "From first sketch to launch", focus: "26% 30%" },
-        { key: "websites", href: "/services/websites", hint: "Marketing sites, designed and built", focus: "50% 40%" },
+        { key: "apps", href: "/?for=apps#work", hint: "From first sketch to launch", focus: "26% 30%" },
+        { key: "websites", href: "/?for=websites#work", hint: "Marketing sites, designed and built", focus: "50% 40%" },
         { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%" },
         { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%" },
     ] satisfies { key: VariantKey; href: string; hint: string; focus: string }[]
@@ -64,44 +64,9 @@ export const SERVICES = (
 
 // The industries we have a page for. Each is a card: a line on what we make
 // there, and a few of the clients (from lib/industries on its page's branch).
-export const INDUSTRIES = [
-    {
-        key: "crypto",
-        label: "Crypto",
-        href: "/industries/crypto",
-        line: "For stablecoins, Bitcoin finance, DeFi and on-chain AI.",
-        logos: [
-            { name: "Arch Network", src: "/logos-match-height/arch-network.png", width: 518 },
-            { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
-            { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
-            { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
-        ],
-    },
-    {
-        key: "finance",
-        label: "Finance",
-        href: "/industries/finance",
-        line: "For yield, stablecoins and credit.",
-        logos: [
-            { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
-            { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
-            { name: "Arch Prime", src: "/logos-match-height/arch-prime.png", width: 666 },
-            { name: "Pyra", src: "/logos-match-height/pyra.png", width: 476 },
-        ],
-    },
-    {
-        key: "ai",
-        label: "AI",
-        href: "/industries/ai",
-        line: "For AI assistants, agents and infrastructure.",
-        logos: [
-            { name: "Jinba", src: "/logos-match-height/jinba.png", width: 561 },
-            { name: "Logical", src: "/logos-match-height/logical.png", width: 580 },
-            // From the wordmark on pirislabs.io, set on the same canvas as the others.
-            { name: "Piris Labs", src: "/logos-match-height/piris-labs.png", width: 796 },
-        ],
-    },
-];
+// The checkpoint ships before any industry page exists, so the menu is empty
+// and the nav hides it. The cards come back with their pages.
+export const INDUSTRIES: { key: string; label: string; href: string; line: string; logos: { name: string; src: string; width: number }[] }[] = [];
 
 /** Our own product, on the tools subdomain. The picture is the home page's Asset Generator band's. */
 export const ASSET_GENERATOR = {
