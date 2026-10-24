@@ -104,6 +104,7 @@ const more: Testimonial[][] = [
       author: "Andrew Jenkins",
       role: "Former VP of Engineering, Credit Karma",
       company: "Currently Startup Co-Founder",
+      image: "/testimonials/andrew-jenkins.png",
     },
   ],
   [
@@ -113,6 +114,7 @@ const more: Testimonial[][] = [
       author: "Alex Escudero",
       role: "Co-Founder",
       company: "Project Metavision",
+      image: "/testimonials/alex-escudero.png",
     },
     {
       quote:
@@ -120,6 +122,7 @@ const more: Testimonial[][] = [
       author: "Scott Zimmer",
       role: "Former EVP of Innovation, Truist Bank",
       company: "Currently Startup Co-Founder",
+      image: "/testimonials/scott-zimmer.png",
     },
   ],
   [
@@ -129,6 +132,7 @@ const more: Testimonial[][] = [
       author: "Mauricio Manhaes",
       role: "President",
       company: "SDN Academic Task Force",
+      image: "/testimonials/mauricio-manhaes.png",
     },
     {
       quote:
@@ -136,6 +140,7 @@ const more: Testimonial[][] = [
       author: "Steven Luis Howell",
       role: "CEO & Co-Founder",
       company: "Project Metavision",
+      image: "/testimonials/steven-luis-howell.png",
     },
   ],
 ];
