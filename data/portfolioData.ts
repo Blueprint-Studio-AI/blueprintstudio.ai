@@ -209,6 +209,23 @@ function deck(slug: string, alts: { cover: string; slides: [string, string, stri
   };
 }
 
+// Clients written out above; the registry fills in everyone else.
+const CURATED = new Set([
+  "tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb", "bump", "uni", "breeze", "autara", "huch",
+  "herth", "pyra", "piris-labs", "pavepower", "hashplay",
+]);
+
+const REGISTRY_TYPES: Record<string, WorkType> = {
+  brand: "branding", logo: "branding", "design system": "branding",
+  website: "websites", "landing page": "websites",
+  app: "apps", "product design": "apps",
+  "launch video": "launch-videos", "product video": "video",
+  content: "content", social: "content", docs: "content", motion: "motion",
+  event: "events", merch: "merch", print: "print", workshop: "workshops",
+  "pitch deck": "decks", deck: "decks",
+  research: "research", "service design": "service-design", "AI automation": "ai-automation",
+};
+
 const TW_REEL = `${PROJECTS}/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4`;
 
 export const clients: Client[] = [
@@ -1028,23 +1045,6 @@ export const clients: Client[] = [
   // Everyone else in the registry, listed in All work (Hide tier left out).
   ...registry.clients.filter((c) => !CURATED.has(c.slug) && c.tier !== "Hide").flatMap(listedFromRegistry),
 ];
-
-// Clients written out above; the registry fills in everyone else.
-const CURATED = new Set([
-  "tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb", "bump", "uni", "breeze", "autara", "huch",
-  "herth", "pyra", "piris-labs", "pavepower", "hashplay",
-]);
-
-const REGISTRY_TYPES: Record<string, WorkType> = {
-  brand: "branding", logo: "branding", "design system": "branding",
-  website: "websites", "landing page": "websites",
-  app: "apps", "product design": "apps",
-  "launch video": "launch-videos", "product video": "video",
-  content: "content", social: "content", docs: "content", motion: "motion",
-  event: "events", merch: "merch", print: "print", workshop: "workshops",
-  "pitch deck": "decks", deck: "decks",
-  research: "research", "service design": "service-design", "AI automation": "ai-automation",
-};
 
 /** A registry client we list but don't show yet: its name, years, tier and kinds of work. */
 function listedFromRegistry(c: RegistryClient): Client[] {
