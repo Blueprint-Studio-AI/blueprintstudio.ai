@@ -298,8 +298,8 @@ export const clients: Client[] = [
       },
       {
         slug: "tokenworks-idvisor",
-        title: "IDVisor product films",
-        label: "IDVisor films",
+        title: "idVisor product films",
+        label: "idVisor films",
         type: "launch-videos",
         year: "2025",
         status: "shipped",
@@ -307,12 +307,12 @@ export const clients: Client[] = [
         // The registry confirms the IDVisor product videos (2025–2026) as ours; which
         // YouTube uploads exactly (Smart Plus, V2) is still a question for Tyler.
         source: "Registry: 'IDVisor product videos, IDVisor 3 Amazon video'; cut from tokenworks-videos-horizontal",
-        summary: "Product films for IDVisor, the handheld scanner: the reveal, and a scan at the door.",
+        summary: "Product films for idVisor, the handheld scanner: the reveal, and a scan at the door.",
         kit: kit("tokenworks-idvisor", {
-          alt: "IDVisor product film",
+          alt: "idVisor product film",
           hero: { src: TW_REEL, clip: [1.6, 6.2], posterTime: 4.3 },
           vertical: { src: `${KITS}/tokenworks-idvisor/hero-v.mp4` },
-          stills: ["IDVisor, front and side", "IDVisor in the dark, from the film", "Scanning an ID with IDVisor"],
+          stills: ["idVisor, front and side", "idVisor in the dark, from the film", "Scanning an ID with idVisor"],
         }),
       },
       {
