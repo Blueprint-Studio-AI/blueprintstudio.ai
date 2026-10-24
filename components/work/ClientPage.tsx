@@ -80,7 +80,10 @@ export default function ClientPage({ client }: { client: Client }) {
                         <a href={`#${w.slug}`} className="text-[17px] font-medium tracking-[-0.015em] text-neutral-900 underline-offset-4 hover:underline lg:text-lg">
                           {w.title}
                         </a>
-                        <span className="text-[15px] text-neutral-500">{workTypeLabels[w.type].one}</span>
+                        {/* "Website · Website" says nothing: the type shows only when the title doesn't already. */}
+                        {!w.title.toLowerCase().includes(workTypeLabels[w.type].one.toLowerCase()) && (
+                          <span className="text-[15px] text-neutral-500">{workTypeLabels[w.type].one}</span>
+                        )}
                       </li>
                     ))}
                 </ul>

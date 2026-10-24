@@ -11,7 +11,7 @@ import { useClipLoad } from "@/lib/work/videoQueue";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 
 // One client or one piece of work, the way the home page's Featured Work shows
-// it: a big frame (16:9 on desktop, the vertical cut on phones) with three
+// it: a big 16:9 frame (at every width, so nothing is ever cropped) with three
 // square stills beside it, and the name, one quiet line and a description
 // under the frame. When the stills come from different pieces of work,
 // resting on one (or tapping it) plays that work in the big frame, crossfading
@@ -35,24 +35,19 @@ function useIsDesktop() {
   return desktop;
 }
 
-/** The poster for both widths, as one <picture>: the vertical cut's below lg. */
+/** The 16:9 poster, filling the frame edge to edge. */
 function Poster({ hero, sizes, eager }: { hero: ShowcaseFrame["hero"]; sizes: string; eager: boolean }) {
-  const common = { alt: hero.alt, sizes, quality: 80, loading: eager ? ("eager" as const) : ("lazy" as const) };
-  const d = getImageProps({ ...common, src: hero.poster, width: 1920, height: 1080 }).props;
-  const phone = hero.vertical?.poster;
-  const m = phone ? getImageProps({ ...common, src: phone, width: 720, height: 1080 }).props : null;
-  if (!m) {
-    // No phone cut: the 16:9 poster sits whole inside the grey frame on phones.
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...d} className="absolute inset-0 h-full w-full object-contain lg:object-cover" />;
-  }
-  return (
-    <picture>
-      <source media={DESKTOP} srcSet={d.srcSet} sizes={d.sizes} />
-      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-      <img {...m} className="absolute inset-0 h-full w-full object-cover" />
-    </picture>
-  );
+  const d = getImageProps({
+    alt: hero.alt,
+    sizes,
+    quality: 80,
+    loading: eager ? "eager" : "lazy",
+    src: hero.poster,
+    width: 2560,
+    height: 1440,
+  }).props;
+  // eslint-disable-next-line jsx-a11y/alt-text
+  return <img {...d} className="absolute inset-0 h-full w-full object-cover" />;
 }
 
 /** One frame's poster and clip. Its clip loads only when it's allowed to (see useClipLoad). */
@@ -80,8 +75,8 @@ function FrameLayer({
   eager: boolean;
 }) {
   const { hero } = frame;
-  const media: KitMedia | null =
-    desktop === null ? null : desktop ? hero : hero.vertical ? hero.vertical : hero;
+  // Wait for the first layout pass, so the clip never starts loading during hydration.
+  const media: KitMedia | null = desktop === null ? null : hero;
   const src = media?.src;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shown, setShown] = useState(false);
@@ -134,9 +129,7 @@ function FrameLayer({
           onCanPlayThrough={done}
           onSuspend={done}
           onError={done}
-          className={`absolute inset-0 h-full w-full transition-opacity duration-500 ease-out ${
-            hero.vertical || desktop ? "object-cover" : "object-contain"
-          } ${shown ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${shown ? "opacity-100" : "opacity-0"}`}
         />
       )}
     </motion.div>
@@ -149,9 +142,9 @@ export function Stage({
   picked,
   staged = false,
   eager = false,
-  sizes = "(min-width: 1480px) 1100px, (min-width: 1024px) 74vw, 94vw",
+  sizes = "(min-width: 1024px) 700px, 94vw",
   className = "",
-  frameClassName = "aspect-[2/3] lg:aspect-video",
+  frameClassName = "aspect-video",
 }: {
   data: ShowcaseData;
   active: string;
@@ -170,7 +163,7 @@ export function Stage({
   // The visitor's own play/pause wins over scrolling in and out of view.
   const [choice, setChoice] = useState<"auto" | "play" | "pause">("auto");
   const frame = data.frames.find((f) => f.key === active) ?? data.frames[0];
-  const hasClip = !!(frame.hero.src || frame.hero.vertical?.src);
+  const hasClip = !!frame.hero.src;
 
   useEffect(() => {
     const el = stageRef.current;
@@ -251,7 +244,7 @@ function Stills({
               alt={still.alt}
               fill
               quality={85}
-              sizes="(min-width: 1480px) 360px, (min-width: 1024px) 24vw, 31vw"
+              sizes="(min-width: 1024px) 230px, 31vw"
               className="object-cover transition-transform [transition-duration:700ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover/still:scale-[1.03] motion-reduce:transform-none"
             />
             {interactive && (

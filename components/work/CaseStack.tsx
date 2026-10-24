@@ -37,13 +37,13 @@ export default function CaseStack({
     <article id={data.id} aria-label={data.title} className="scroll-mt-24">
       <div className="group/project relative">
         {tag && (
-          <span className="inline-flex h-7 items-center rounded-full bg-black/[0.05] px-3 font-mono text-[11px] uppercase tracking-wide text-neutral-600">
+          <span className="inline-flex h-7 items-center rounded-full bg-black/[0.05] px-3 text-[13px] text-neutral-600">
             {tag}
           </span>
         )}
         <Caption data={data} active={active} as="h2" className={`pb-6 lg:pb-8 ${tag ? "pt-4" : ""}`} />
         <div className="group/stage relative">
-          <Stage data={data} active={active} picked={picked} eager={eager} sizes="(min-width: 1480px) 1420px, 96vw" />
+          <Stage data={data} active={active} picked={picked} eager={eager} sizes="(min-width: 1000px) 952px, 96vw" />
         </div>
       </div>
 
@@ -56,7 +56,7 @@ export default function CaseStack({
               alt={image.alt}
               fill
               quality={85}
-              sizes="(min-width: 1480px) 710px, 48vw"
+              sizes="(min-width: 1000px) 476px, 48vw"
               className={image.phone ? "object-cover object-top" : "object-cover"}
             />
           </div>
@@ -67,13 +67,13 @@ export default function CaseStack({
         <dl className="mt-10 grid gap-8 border-t border-black/10 pt-8 lg:mt-14 lg:grid-cols-3 lg:gap-12 lg:pt-10">
           {story.problem && (
             <div>
-              <dt className="font-mono text-[11px] uppercase tracking-wide text-neutral-500">Problem</dt>
+              <dt className="text-sm text-neutral-500">Problem</dt>
               <dd className="mt-3 text-pretty text-[17px] leading-[1.5] text-neutral-700">{story.problem}</dd>
             </div>
           )}
           {story.process && story.process.length > 0 && (
             <div>
-              <dt className="font-mono text-[11px] uppercase tracking-wide text-neutral-500">Process</dt>
+              <dt className="text-sm text-neutral-500">Process</dt>
               <dd className="mt-3">
                 <ul className="flex flex-col gap-2 text-[17px] leading-[1.5] text-neutral-700">
                   {story.process.map((step) => (
@@ -88,7 +88,7 @@ export default function CaseStack({
           )}
           {story.solution && (
             <div>
-              <dt className="font-mono text-[11px] uppercase tracking-wide text-neutral-500">Solution</dt>
+              <dt className="text-sm text-neutral-500">Solution</dt>
               <dd className="mt-3 text-pretty text-[17px] leading-[1.5] text-neutral-700">{story.solution}</dd>
             </div>
           )}

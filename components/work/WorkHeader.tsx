@@ -7,18 +7,22 @@ import Draft from "./Draft";
 // One system for /work, /services and /industries: the same column, the same
 // left edge, the same type scale and the same spacing on every page.
 
-/** The wide column every work, service and industry page sits in. */
-export const WIDE = "mx-auto w-full max-w-[1480px] px-1.5 sm:px-3 custom:px-4";
-/** The inset inside it, so text and media share one left edge. */
-export const TEXT_INSET = "px-[18px] sm:px-6 lg:px-8";
+/**
+ * The one column every page that shows work sits in: the home page's
+ * (InnerContainer, 1000px with the same padding), so a showcase is the same
+ * width on the home page, /work, the services and the industries.
+ */
+export const WIDE = "mx-auto w-full max-w-[1000px]";
+/** The padding inside it, shared by text and media so they keep one left edge. */
+export const TEXT_INSET = "px-2.5 sm:px-6";
 /** Space above a section. */
 export const SECTION = "pt-24 sm:pt-32 lg:pt-40";
 /** Space between showcases. */
 export const STACK = "flex flex-col gap-20 sm:gap-24 lg:gap-28";
 /** Space after a page's last section, before the call-to-action band. */
 export const PAGE_END = "pb-24 sm:pb-32 lg:pb-40";
-/** Mono eyebrow over headings. */
-export const EYEBROW = "font-mono text-[11px] uppercase tracking-wide text-neutral-500";
+/** A small label over a heading or a fact: sentence case, never tracked capitals. */
+export const EYEBROW = "text-sm text-neutral-500";
 /** The one H1 size: a word ("Websites") or a sentence. */
 export const H1 = "max-w-[17ch] text-balance text-[clamp(40px,6vw,84px)] font-medium leading-[0.98] tracking-[-0.045em] text-black";
 

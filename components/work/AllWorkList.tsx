@@ -22,7 +22,7 @@ export default function AllWorkList() {
 
   return (
     <div>
-      <div className="hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)_120px] gap-6 border-b border-black/10 pb-3 font-mono text-[11px] uppercase tracking-wide text-neutral-500 sm:grid">
+      <div className="hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)_120px] gap-6 border-b border-black/10 pb-3 text-sm text-neutral-500 sm:grid">
         <span>Client</span>
         <span>What we made</span>
         <span className="text-right">Year</span>
@@ -50,7 +50,7 @@ export default function AllWorkList() {
                   )}
                 </div>
                 <span className="order-3 col-span-2 text-[15px] leading-[1.45] text-neutral-500 sm:order-none sm:col-span-1">{madeFor(client)}</span>
-                <span className="text-right font-mono text-[13px] tabular-nums text-neutral-500">{client.years || "—"}</span>
+                <span className="text-right font-mono text-[13px] tabular-nums text-neutral-500">{client.years}</span>
               </div>
             </li>
           );
