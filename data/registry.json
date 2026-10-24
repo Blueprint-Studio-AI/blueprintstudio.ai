@@ -1,0 +1,1104 @@
+{
+ "generated": "2026-10-23",
+ "clients": [
+  {
+   "slug": "arch-network",
+   "name": "Arch Network",
+   "tier": "Feature",
+   "years": "2025–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "content",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "docs",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "content",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "AI automation",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "honeyb",
+   "name": "HoneyB",
+   "tier": "Feature",
+   "years": "2025–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "design system",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "docs",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025–2026",
+     "visibility": "private"
+    },
+    {
+     "type": "content",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "launch video",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "social",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "print",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "print",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "brand",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "product video",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "tokenworks",
+   "name": "TokenWorks",
+   "tier": "Feature",
+   "years": "2024–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    },
+    {
+     "type": "launch video",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "content",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "docs",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "product design",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "content",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2025–2026",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "perena",
+   "name": "Perena",
+   "tier": "Feature",
+   "years": "2025–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "landing page",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "launch video",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "jinba",
+   "name": "Jinba",
+   "tier": "Feature",
+   "years": "2025–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "launch video",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "print",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2026",
+     "visibility": "public"
+    },
+    {
+     "type": "deck",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "livingip",
+   "name": "LivingIP",
+   "tier": "Feature",
+   "years": "2025 (likely)",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product design",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "product design",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "bump",
+   "name": "Bump.fun",
+   "tier": "Feature",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "autara",
+   "name": "Autara",
+   "tier": "Feature",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "herth",
+   "name": "Herth",
+   "tier": "Show",
+   "years": "2025–2026",
+   "engagement": "Partnership",
+   "trading": true,
+   "work": [
+    {
+     "type": "research",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "product design",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2025–2026",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "logical",
+   "name": "Logical",
+   "tier": "Show",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "launch video",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "pyra",
+   "name": "Pyra",
+   "tier": "Show",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "launch video",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "launch video",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "piris-labs",
+   "name": "Piris Labs",
+   "tier": "Show",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "launch video",
+     "year": "2026",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "panta",
+   "name": "Panta",
+   "tier": "Show",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "launch video",
+     "year": "2026",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "pavepower",
+   "name": "Pave Power",
+   "tier": "Show",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "unknown",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "hashplay",
+   "name": "Hashplay",
+   "tier": "Show",
+   "years": "2025–2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "docs",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "website",
+     "year": "2026",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "friday-table",
+   "name": "The Friday Table",
+   "tier": "Show",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    },
+    {
+     "type": "workshop",
+     "year": "2026",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "dag",
+   "name": "DAG.GG",
+   "tier": "Show",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "merch",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "huch",
+   "name": "HUCH",
+   "tier": "Archive",
+   "years": "2025–2026",
+   "engagement": "Unknown",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "event",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "research",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "deck",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "uni",
+   "name": "UNI",
+   "tier": "Archive",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "breeze",
+   "name": "Breeze",
+   "tier": "Archive",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "landing page",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "social",
+     "year": "2025",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "bitfrost",
+   "name": "Bitfrost",
+   "tier": "Archive",
+   "years": "2026",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "brand",
+     "year": "2026",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "bold",
+   "name": "BOLD",
+   "tier": "Archive",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "landing page",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "hildene",
+   "name": "Hildene, The Lincoln Family Home",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "by 2026-01",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "pregame",
+   "name": "Pre.Game",
+   "tier": "Archive",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "content",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "motion",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "twelve",
+   "name": "Twelve",
+   "tier": "Archive",
+   "years": "2025",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "app",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "project-metavision",
+   "name": "Project Metavision",
+   "tier": "Archive",
+   "years": "2024",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "content",
+     "year": "2024",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "2024",
+     "visibility": "private"
+    },
+    {
+     "type": "print",
+     "year": "2024",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "living-persona",
+   "name": "Living Persona",
+   "tier": "Archive",
+   "years": "2023 (likely)",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "print",
+     "year": "2023 (likely)",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "sdn",
+   "name": "Service Design Network (SDN)",
+   "tier": "Archive",
+   "years": "2024–2025",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2024–2025",
+     "visibility": "public"
+    },
+    {
+     "type": "service design",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "manchester-energy",
+   "name": "Manchester (VT) Energy Committee",
+   "tier": "Archive",
+   "years": "2024",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2024",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "manchester-tourism",
+   "name": "Manchester Tourism (Vermont)",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "~2023",
+     "visibility": "public"
+    },
+    {
+     "type": "product video",
+     "year": "~2020",
+     "visibility": "public"
+    },
+    {
+     "type": "website",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "juris-genius",
+   "name": "Juris Genius",
+   "tier": "Archive",
+   "years": "2024",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "app",
+     "year": "2024",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "amanda-scotese",
+   "name": "Amanda Scotese",
+   "tier": "Archive",
+   "years": "2024–2025",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "website",
+     "year": "2025",
+     "visibility": "public"
+    }
+   ]
+  },
+  {
+   "slug": "answers-from-me",
+   "name": "Answers From Me",
+   "tier": "Archive",
+   "years": "2024 (likely)",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "service design",
+     "year": "2024 (likely)",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "customer-compass",
+   "name": "Customer Compass",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "service design",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "dorset-tourism",
+   "name": "Dorset Tourism (Farm)",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "climbing-giants",
+   "name": "Climbing Giants",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "catalyst-film-fest",
+   "name": "Catalyst Film Fest",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "hailey-van-der-kar",
+   "name": "Hailey Van Der Kar",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "celia-kelly",
+   "name": "Celia Kelly",
+   "tier": "Archive",
+   "years": "",
+   "engagement": "Project",
+   "trading": true,
+   "work": [
+    {
+     "type": "product video",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "satoshi-bet",
+   "name": "Satoshi Bet",
+   "tier": "Hide",
+   "years": "2025",
+   "engagement": "Project",
+   "trading": false,
+   "work": [
+    {
+     "type": "landing page",
+     "year": "2025",
+     "visibility": "private"
+    },
+    {
+     "type": "logo",
+     "year": "2025",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "reshift",
+   "name": "Reshift",
+   "tier": "Hide",
+   "years": "",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "AI automation",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "cona",
+   "name": "Cona",
+   "tier": "Hide",
+   "years": "",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": [
+    {
+     "type": "service design",
+     "year": "unknown",
+     "visibility": "private"
+    }
+   ]
+  },
+  {
+   "slug": "truist",
+   "name": "Truist (2022 workshop)",
+   "tier": "Hide",
+   "years": "2022",
+   "engagement": "Unknown",
+   "trading": true,
+   "work": []
+  }
+ ]
+}

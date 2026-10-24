@@ -1,4 +1,7 @@
 import type { TestimonialId } from "./testimonials";
+// The registry's public fields (tier, years, engagement, work types), synced by
+// scripts/sync-registry.mjs. Re-run it when the registry changes.
+import registry from "./registry.json";
 
 // Every client we've worked with, and the work we did for each. One file, so
 // the home page's Featured Work, /work, the service and industry pages and the
@@ -149,6 +152,15 @@ export interface Client {
   flags?: string[];
 }
 
+type RegistryClient = (typeof registry.clients)[number];
+const fromRegistry = (slug: string): RegistryClient | undefined => registry.clients.find((c) => c.slug === slug);
+
+/** A client's tier, from the registry; Archive if the registry doesn't know it. */
+function tierOf(slug: string): Client["tier"] {
+  const tier = fromRegistry(slug)?.tier;
+  return tier === "Feature" || tier === "Show" || tier === "Hide" ? tier : "Archive";
+}
+
 const KITS = "/media/kits";
 const PROJECTS = "/media/projects";
 
@@ -203,7 +215,7 @@ export const clients: Client[] = [
   {
     slug: "tokenworks",
     name: "TokenWorks",
-    tier: "Feature",
+    tier: tierOf("tokenworks"),
     industry: [],
     // The registry has April 2024 to October 2026 (Tyler calls it three years).
     years: "2024–2026",
@@ -211,7 +223,7 @@ export const clients: Client[] = [
     trading: true,
     testimonial: "daniel-greene",
     summary:
-      "Since 2024, the design and build team behind TokenWorks’ ID scanners: launch and product films, the idscanner.com store and its product pages, and the customer portal.",
+      "Since 2024, the design and build team behind TokenWorks’ ID scanners: launch and product films, a mobile scanner app and the customer portal, and the product pages of the earlier idscanner.com.",
     work: [
       {
         slug: "tokenworks-agevisor-3",
@@ -228,6 +240,38 @@ export const clients: Client[] = [
           hero: { src: TW_REEL, clip: [8.3, 12.3], posterTime: 8.6 },
           vertical: { src: `${KITS}/tokenworks-agevisor-3/hero-v.mp4` },
           stills: ["AgeVisor 3 on a counter", "The AgeVisor 3 screen, close", "AgeVisor 3 under water, from the film"],
+        }),
+      },
+      {
+        slug: "tokenworks-app",
+        title: "Scanner app and customer portal",
+        label: "Scanner app",
+        type: "apps",
+        year: "2026",
+        status: "shipped",
+        // Cleared to show in the registry's second pass: the App Store set and the portal screens.
+        visibility: "public",
+        source: "Registry media: App Store screenshot set, IDScanner portal add-ons, AgeVisor 3 device UI",
+        summary: "A mobile ID scanner app with DMV checks, the IDScanner customer portal, and the AgeVisor 3 device screens.",
+        kit: kit("tokenworks-app", {
+          alt: "The IDScanner customer portal",
+          stills: ["The scanner app: Catch fake IDs", "The portal's add-ons store", "The AgeVisor 3 scan screen"],
+        }),
+      },
+      {
+        slug: "tokenworks-idvisor-page",
+        title: "idVisor product page",
+        label: "idVisor page",
+        type: "websites",
+        year: "2024",
+        status: "archived",
+        visibility: "public",
+        source: "Our screen recording of the page, September 2024 (idVisor product page.mp4)",
+        summary: "A product page for idVisor on the IDScanner.com store: the scanner, what it catches, and a configurator to buy it.",
+        kit: kit("tokenworks-idvisor-page", {
+          alt: "The idVisor product page, scrolling",
+          clip: true,
+          stills: ["The idVisor page’s opening", "idVisor’s features, one card each", "Configuring an idVisor to buy"],
         }),
       },
       {
@@ -250,22 +294,6 @@ export const clients: Client[] = [
         }),
       },
       {
-        slug: "tokenworks-idvisor-page",
-        title: "idVisor product page",
-        label: "idVisor page",
-        type: "websites",
-        year: "2024",
-        status: "archived",
-        visibility: "public",
-        source: "Our screen recording of the page, September 2024 (idVisor product page.mp4)",
-        summary: "A product page for idVisor on the IDScanner.com store: the scanner, what it catches, and a configurator to buy it.",
-        kit: kit("tokenworks-idvisor-page", {
-          alt: "The idVisor product page, scrolling",
-          clip: true,
-          stills: ["The idVisor page’s opening", "idVisor’s features, one card each", "Configuring an idVisor to buy"],
-        }),
-      },
-      {
         slug: "tokenworks-fake-id",
         title: "Fake ID Detection film",
         label: "Fake ID film",
@@ -275,38 +303,16 @@ export const clients: Client[] = [
         visibility: "public",
         source: "https://youtu.be/XdmW5bcyiJU (no local file for a kit yet)",
       },
-      {
-        slug: "tokenworks-portal",
-        title: "IDScanner customer portal",
-        label: "Portal",
-        type: "apps",
-        year: "2025",
-        status: "shipped",
-        visibility: "private",
-        source: "Registry: customer-facing portal behind a login",
-      },
-      {
-        slug: "tokenworks-idvisor-go",
-        title: "Mobile scanner app",
-        label: "Scanner app",
-        type: "apps",
-        year: "2026",
-        status: "shipped",
-        visibility: "needs-ok",
-        source: "Clients/Tokenworks/Tokenworks App (TestFlight only)",
-        summary: "A Kotlin Multiplatform ID and mDL scanner app, with an App Store screenshot set. Unreleased.",
-      },
     ],
     flags: [
       "Is today's idscanner.com homepage still our design? (not shown until confirmed)",
       "Which YouTube uploads beyond AgeVisor 3 and Fake ID Detection are ours?",
-      "The app's App Store screenshots wait for its launch",
     ],
   },
   {
     slug: "perena",
     name: "Perena",
-    tier: "Feature",
+    tier: tierOf("perena"),
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -364,7 +370,7 @@ export const clients: Client[] = [
   {
     slug: "arch-network",
     name: "Arch Network",
-    tier: "Feature",
+    tier: tierOf("arch-network"),
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -372,6 +378,24 @@ export const clients: Client[] = [
     summary:
       "Arch Network’s design partner since 2025: the BTC All-In Summit in Las Vegas, the Arch and Arch Prime identities, and the pages that launch the chain.",
     work: [
+      {
+        slug: "arch-site",
+        title: "arch.network site",
+        label: "Website",
+        type: "websites",
+        year: "2026",
+        // Our build of the homepage, /chain and /ecosystem. Today's homepage (Arch Prime) isn't ours, so no link.
+        status: "archived",
+        visibility: "public",
+        source: "Registry media: arch.network homepage hero (our build), chain page, blog redesign preview",
+        summary: "The arch.network site we built: the homepage, the chain pages and /ecosystem, and a blog redesign.",
+        kit: kit("arch-site", {
+          alt: "The arch.network homepage we built: Real Bitcoin. Finally programmable.",
+          clip: true,
+          vertical: { src: undefined },
+          stills: ["Real Bitcoin.", "The financial chain for native Bitcoin", "The Arch blog redesign"],
+        }),
+      },
       {
         slug: "arch-btc-summit",
         title: "BTC All-In Summit, Las Vegas",
@@ -396,6 +420,22 @@ export const clients: Client[] = [
         }),
       },
       {
+        slug: "arch-brand",
+        title: "Arch Network identity",
+        label: "Identity",
+        type: "branding",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        source: "/brands/arch; our versions, not arch.network's current homepage",
+        summary: "Arch Network’s identity and design system: the mark, the serif, the orange, and the diagrams.",
+        brandPage: "arch",
+        kit: kit("arch-brand", {
+          alt: "Arch Network: Real Bitcoin. Finally programmable.",
+          stills: ["The Arch Network lockup on orange", "An Arch diagram: the finance district", "The Arch glyph"],
+        }),
+      },
+      {
         slug: "arch-chain",
         title: "Chain page",
         label: "Chain page",
@@ -413,22 +453,6 @@ export const clients: Client[] = [
         }),
       },
       {
-        slug: "arch-brand",
-        title: "Arch Network identity",
-        label: "Identity",
-        type: "branding",
-        year: "2026",
-        status: "live",
-        visibility: "public",
-        source: "/brands/arch; our versions, not arch.network's current homepage",
-        summary: "Arch Network’s identity and design system: the mark, the serif, the orange, and the diagrams.",
-        brandPage: "arch",
-        kit: kit("arch-brand", {
-          alt: "Arch Network: Real Bitcoin. Finally programmable.",
-          stills: ["The Arch Network lockup on orange", "An Arch diagram: the finance district", "The Arch glyph"],
-        }),
-      },
-      {
         slug: "arch-prime-brand",
         title: "Arch Prime identity",
         label: "Arch Prime",
@@ -443,16 +467,6 @@ export const clients: Client[] = [
           alt: "Arch Prime’s key visual and lockup",
           stills: ["Arch Prime’s key visual", "An Arch Prime building, for Earn", "The Arch Prime lockup"],
         }),
-      },
-      {
-        slug: "arch-site",
-        title: "arch.network pages: /ecosystem and share images",
-        label: "Site pages",
-        type: "websites",
-        year: "2026",
-        status: "live",
-        visibility: "public",
-        source: "Registry; the current homepage (Arch Prime) is not ours",
       },
       {
         slug: "arch-podcast",
@@ -484,7 +498,7 @@ export const clients: Client[] = [
   {
     slug: "jinba",
     name: "Jinba",
-    tier: "Feature",
+    tier: tierOf("jinba"),
     industry: ["ai"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -539,7 +553,7 @@ export const clients: Client[] = [
   {
     slug: "livingip",
     name: "LivingIP",
-    tier: "Feature",
+    tier: tierOf("livingip"),
     industry: ["crypto", "ai"],
     // The designs are dated 2025 (the site said 2024).
     years: "2025",
@@ -582,7 +596,7 @@ export const clients: Client[] = [
   {
     slug: "honeyb",
     name: "HoneyB",
-    tier: "Feature",
+    tier: tierOf("honeyb"),
     industry: ["crypto"],
     years: "2025–2026",
     engagement: "Partnership",
@@ -669,7 +683,7 @@ export const clients: Client[] = [
   {
     slug: "bump",
     name: "Bump.fun",
-    tier: "Show",
+    tier: tierOf("bump"),
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -719,7 +733,7 @@ export const clients: Client[] = [
   {
     slug: "uni",
     name: "UNI",
-    tier: "Archive",
+    tier: tierOf("uni"),
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -748,7 +762,7 @@ export const clients: Client[] = [
   {
     slug: "breeze",
     name: "Breeze",
-    tier: "Archive",
+    tier: tierOf("breeze"),
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
@@ -776,12 +790,13 @@ export const clients: Client[] = [
   {
     slug: "autara",
     name: "Autara",
-    tier: "Show",
+    tier: tierOf("autara"),
     industry: ["crypto"],
     years: "2025",
     engagement: "Project",
     // Acquired by Arch; autara.xyz is parked. Its work shows on /work, never featured.
     trading: false,
+    summary: "Brand identity and a Framer website for Bitcoin lending on Arch. Acquired by Arch.",
     work: [
       {
         slug: "autara-brand",
@@ -791,6 +806,7 @@ export const clients: Client[] = [
         year: "2025",
         status: "archived",
         visibility: "public",
+        summary: "Brand identity for Autara, Bitcoin-collateralised lending on Arch: the names, the triangle pattern and the deck. Autara has since been acquired by Arch.",
         source: "autara reel (the hero’s “brands” word still plays it)",
         kit: kit("autara-brand", {
           alt: "Autara brand reel",
@@ -813,14 +829,38 @@ export const clients: Client[] = [
   {
     slug: "huch",
     name: "HUCH",
-    tier: "Archive",
+    tier: tierOf("huch"),
     industry: ["gaming"],
     years: "2025–2026",
     engagement: "Project",
     // No longer trading: listed, not featured.
     trading: false,
     work: [
-      { slug: "huch-brand", title: "Rebrand", label: "Rebrand", type: "branding", year: "2025", status: "archived", visibility: "public" },
+      {
+        slug: "huch-brand",
+        title: "Rebrand",
+        label: "Rebrand",
+        type: "branding",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        source: "huch reel and brand assets",
+        summary: "A full rebrand for HUCH, the tokenization platform for gaming assets.",
+        kit: kit("huch-brand", {
+          alt: "HUCH brand reel",
+          hero: {
+            src: `${PROJECTS}/huch/huch-brand-overview-horizontal-compressed.mp4`,
+            poster: `${PROJECTS}/huch/huch-desktop-poster.jpg`,
+            posterTime: 1.6,
+          },
+          vertical: {
+            src: `${PROJECTS}/huch/huch-brand-overview-vertical-compressed.mp4`,
+            poster: `${PROJECTS}/huch/huch-mobile-poster.jpg`,
+            posterTime: 1.6,
+          },
+          stills: ["The HUCH mark", "HUCH's skin analytics", "A HUCH skin card"],
+        }),
+      },
       { slug: "huch-platform", title: "Platform design and build", label: "Platform", type: "apps", year: "2025", status: "archived", visibility: "public" },
       {
         slug: "huch-deck",
@@ -846,32 +886,178 @@ export const clients: Client[] = [
       },
     ],
   },
-  // Listed in All work, from the client registry (review-2026-10-23/client-registry):
-  // each client's work types, leaving out confidential work. Left out of the
-  // list until Tyler confirms them: Satoshi Bet, Bitfrost, The Friday Table,
-  // Truist, and the name-only video clients from /launch-videos.
-  listed("herth", "Herth", "2025–2026", ["research", "apps", "branding"], { engagement: "Partnership", trading: true }),
-  listed("logical", "Logical", "2025", ["launch-videos"], { engagement: "Project", trading: true }),
-  listed("pyra", "Pyra", "2025", ["launch-videos"], { engagement: "Project", trading: false }),
-  listed("piris-labs", "Piris Labs", "2026", ["launch-videos"], { engagement: "Project", trading: true }),
-  listed("hashplay", "Hashplay", "2025–2026", ["branding", "websites", "content"], { engagement: "Project", trading: true }),
-  listed("bold", "BOLD", "2025", ["websites", "apps"], { engagement: "Project", trading: true }),
-  listed("panta", "Panta", "2026", ["launch-videos"], { engagement: "Project", trading: true }),
-  listed("hildene", "Hildene", "", ["video", "service-design"], { engagement: "Unknown", trading: true, tier: "Hide" }),
-  listed("pregame", "Pre.Game", "2025", ["content", "motion"], { engagement: "Project", trading: true }),
-  listed("dag", "DAG.GG", "2025", ["merch", "branding"], { engagement: "Project", trading: true }),
-  listed("twelve", "Twelve", "2025", ["apps"], { engagement: "Unknown", trading: true }),
-  listed("project-metavision", "Project Metavision", "2024", ["content", "video", "print"], { engagement: "Unknown", trading: true }),
-  listed("sdn", "Service Design Network (SDN)", "2024–2025", ["websites", "service-design"], { engagement: "Unknown", trading: true }),
-  listed("manchester-energy", "Manchester (VT) Energy Committee", "2024", ["websites"], { engagement: "Project", trading: true }),
-  listed("juris-genius", "Juris Genius", "2024", ["apps"], { engagement: "Project", trading: true }),
-  listed("amanda-scotese", "Amanda Scotese", "2024–2025", ["websites"], { engagement: "Project", trading: true }),
-  listed("reshift", "Reshift", "", ["ai-automation"], { engagement: "Unknown", trading: true }),
-  listed("cona", "Cona", "", ["service-design"], { engagement: "Unknown", trading: true }),
-  listed("pavepower", "Pave Power", "", ["websites"], { engagement: "Project", trading: true }),
-  listed("customer-compass", "Customer Compass", "", ["service-design"], { engagement: "Unknown", trading: true }),
-  listed("answers-from-me", "Answers From Me", "", ["ai-automation"], { engagement: "Unknown", trading: true }),
+  {
+    slug: "herth",
+    name: "Herth",
+    tier: tierOf("herth"),
+    industry: ["ai"],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    summary: "The buyer side of Herth’s home search (natural-language search, saved searches, messaging), designed and built on its existing frontend.",
+    work: [
+      {
+        slug: "herth-app",
+        title: "Home search product",
+        label: "Home search",
+        type: "apps",
+        year: "2025",
+        status: "live",
+        visibility: "public",
+        source: "Registry media: Herth buyer site, mobile map search, property page",
+        summary: "Find a home by how it looks: natural-language search, map search and property pages, on web and mobile.",
+        kit: kit("herth-app", {
+          alt: "Herth: What does your perfect home look like?",
+          stills: ["Herth's mobile map search", "A Herth property page", "Herth's homepage search"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "pyra",
+    name: "Pyra",
+    tier: tierOf("pyra"),
+    industry: ["crypto"],
+    years: "2025",
+    engagement: "Project",
+    trading: false,
+    summary: "A launch film for Pyra’s credit app, made in two days.",
+    work: [
+      {
+        slug: "pyra-film",
+        title: "Credit launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/A1hq1u_M7L8; registry media excerpt",
+        summary: "A launch film for Pyra’s credit app, made in two days.",
+        kit: kit("pyra-film", {
+          alt: "Pyra credit launch film",
+          clip: true,
+          vertical: { src: undefined },
+          stills: ["Easily manage your credit", "Pyra's manage-assets screen", "Watch your portfolio grow"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "piris-labs",
+    name: "Piris Labs",
+    tier: tierOf("piris-labs"),
+    industry: ["ai"],
+    years: "2026",
+    engagement: "Project",
+    trading: true,
+    summary: "The YC W26 launch film for Piris Labs, which builds optical data movement for AI infrastructure.",
+    work: [
+      {
+        slug: "piris-film",
+        title: "YC W26 launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/PeaWXlRNjPE; registry media frames",
+        summary: "“We’re building the data movement platform for AI”: the YC W26 launch film, made in Figma and Jitter.",
+        kit: kit("piris-film", {
+          alt: "Piris Labs launch film: rack-to-rack data movement",
+          stills: ["We're building the data movement platform for AI", "Piris Labs benchmarks", "Rack-to-rack data movement"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "pavepower",
+    name: "Pave Power",
+    tier: tierOf("pavepower"),
+    industry: [],
+    years: "",
+    engagement: "Project",
+    trading: true,
+    summary: "The website for Pave Power, which electrifies commercial fleets.",
+    work: [
+      {
+        slug: "pavepower-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "",
+        status: "live",
+        visibility: "public",
+        source: "Registry: the live pavepower.com is ours (Tyler)",
+        summary: "Enabling commercial fleets to harness the power of electric: the Pave Power website.",
+        liveUrl: "https://pavepower.com",
+        kit: kit("pavepower-website", {
+          alt: "pavepower.com",
+          stills: ["pavepower.com's opening", "Pave Power's services", "pavepower.com on a phone"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "hashplay",
+    name: "Hashplay",
+    tier: tierOf("hashplay"),
+    industry: ["crypto"],
+    years: "2025–2026",
+    engagement: "Project",
+    trading: true,
+    summary: "“Steam for Bitcoin”: Hashplay’s website and brand, relaunched for Arch in 2026.",
+    work: [
+      {
+        slug: "hashplay-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        source: "Registry media: hashplay-site (hashplay.xyz is parked)",
+        summary: "Steam for Bitcoin. Play, own, trade: the Hashplay site and its games.",
+        kit: kit("hashplay-website", {
+          alt: "Hashplay: Steam for Bitcoin",
+          stills: ["Hashplay's opening over the game grid", "Hashplay game cards", "Deal or No Deal on Hashplay"],
+        }),
+      },
+      { slug: "hashplay-brand", title: "Brand", label: "Brand", type: "branding", year: "2025", status: "shipped", visibility: "public" },
+    ],
+  },
+  // Everyone else in the registry, listed in All work (Hide tier left out).
+  ...registry.clients.filter((c) => !CURATED.has(c.slug) && c.tier !== "Hide").flatMap(listedFromRegistry),
 ];
+
+// Clients written out above; the registry fills in everyone else.
+const CURATED = new Set([
+  "tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb", "bump", "uni", "breeze", "autara", "huch",
+  "herth", "pyra", "piris-labs", "pavepower", "hashplay",
+]);
+
+const REGISTRY_TYPES: Record<string, WorkType> = {
+  brand: "branding", logo: "branding", "design system": "branding",
+  website: "websites", "landing page": "websites",
+  app: "apps", "product design": "apps",
+  "launch video": "launch-videos", "product video": "video",
+  content: "content", social: "content", docs: "content", motion: "motion",
+  event: "events", merch: "merch", print: "print", workshop: "workshops",
+  "pitch deck": "decks", deck: "decks",
+  research: "research", "service design": "service-design", "AI automation": "ai-automation",
+};
+
+/** A registry client we list but don't show yet: its name, years, tier and kinds of work. */
+function listedFromRegistry(c: RegistryClient): Client[] {
+  const types = [...new Set(c.work.flatMap((w) => REGISTRY_TYPES[w.type] ?? []))];
+  if (types.length === 0) return [];
+  return [
+    listed(c.slug, c.name, c.years, types, {
+      engagement: c.engagement as Client["engagement"],
+      trading: c.trading,
+      tier: (c.tier as Client["tier"]) ?? "Archive",
+    }),
+  ];
+}
 
 /** A client we list but don't show yet: a name, its years, and what we made. */
 function listed(
@@ -910,12 +1096,12 @@ export const featuredWork: {
   all: string[];
   lead: Partial<Record<Deliverable, string[]>>;
 } = {
-  max: 6,
-  all: ["tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb"],
+  max: 8,
+  all: ["tokenworks", "arch-network", "perena", "jinba", "honeyb", "livingip", "bump", "autara"],
   lead: {
-    apps: ["livingip", "bump"],
-    websites: ["perena", "honeyb", "arch-network", "jinba"],
-    branding: ["jinba", "arch-network", "honeyb"],
+    apps: ["livingip", "tokenworks", "bump"],
+    websites: ["perena", "arch-network", "honeyb", "jinba"],
+    branding: ["jinba", "arch-network", "honeyb", "bump", "autara"],
     "launch-videos": ["tokenworks", "perena"],
   },
 };

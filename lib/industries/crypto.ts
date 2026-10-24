@@ -34,7 +34,7 @@ export const crypto: IndustryConfig = {
   ],
   workTitle: "Crypto work",
   // A reel, then alternate stills and reels down the wall.
-  order: ["perena-landing", "perena-film", "arch-btc-summit", "arch-chain", "arch-brand", "arch-prime-brand", "honeyb-website", "honeyb-brand", "livingip-app", "bump-brand", "bump-app", "uni-brand", "breeze-brand"],
+  order: ["perena-landing", "perena-film", "arch-site", "arch-btc-summit", "arch-chain", "arch-brand", "arch-prime-brand", "honeyb-website", "honeyb-brand", "livingip-app", "bump-brand", "bump-app", "uni-brand", "breeze-brand"],
   brandPages: [
     { slug: "arch", line: "Bitcoin-native financial market infrastructure." },
     { slug: "arch-prime", line: "Arch Network’s product brand, with its own palette and a place system for the app." },

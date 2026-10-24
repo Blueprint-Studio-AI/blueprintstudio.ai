@@ -22,7 +22,7 @@ export default function OfferGrid({ industry }: { industry: IndustryConfig }) {
     .filter(({ projects }) => projects.length > 0);
 
   return (
-    <div className="grid gap-3 sm:gap-5 lg:grid-cols-2 lg:gap-6">
+    <div className={`grid gap-3 sm:gap-5 lg:gap-6 ${offers.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
       {offers.map(({ offer, projects }, i) => {
         const href = deliverableHref(industry, offer.deliverable);
         const label = deliverableLabels[offer.deliverable];

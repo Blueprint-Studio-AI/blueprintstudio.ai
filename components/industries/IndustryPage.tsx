@@ -65,8 +65,8 @@ export default function IndustryPage({ industry }: { industry: IndustryConfig })
             eyebrow="Client by client"
             title={industry.workTitle}
             aside={
-              <Link href="/work" className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-black">
-                All work, every industry
+              <Link href={industry.workAside?.href ?? "/work"} className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-black">
+                {industry.workAside?.label ?? "All work, every industry"}
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
               </Link>
             }

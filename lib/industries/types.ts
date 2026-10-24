@@ -37,6 +37,8 @@ export interface IndustryConfig {
   offersTitle: string;
   offers: IndustryOffer[];
   workTitle: string;
+  /** The link beside the work section's title; "All work, every industry" by default. */
+  workAside?: { label: string; href: string };
   /** Work slugs in page order (clients show in the order their first piece appears). Unlisted work follows in data order. */
   order: string[];
   /** /brands/<slug> case studies to point at, with a line each. */

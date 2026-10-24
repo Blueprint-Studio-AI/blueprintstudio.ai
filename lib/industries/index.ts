@@ -2,14 +2,15 @@ import type { Deliverable } from "@/data/portfolioData";
 import { hasWorkPage, shownWork, type ShownWork } from "@/lib/work";
 import type { IndustryCombo, IndustryConfig } from "./types";
 import { crypto } from "./crypto";
+import { ai } from "./ai";
 
 export type { IndustryCombo, IndustryConfig } from "./types";
 
-const allIndustries: IndustryConfig[] = [crypto];
+const allIndustries: IndustryConfig[] = [crypto, ai];
 
 // An industry page needs a real body of work behind it, and a combo page
 // (industry x deliverable) needs enough to stand on its own.
-export const MIN_INDUSTRY_PROJECTS = 4;
+export const MIN_INDUSTRY_PROJECTS = 3;
 export const MIN_COMBO_PROJECTS = 3;
 
 /** The industry's work in its page order, optionally only one deliverable's. */
