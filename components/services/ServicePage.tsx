@@ -5,12 +5,14 @@ import ProcessSection from "@/components/Brand/ProcessSection";
 import FAQSection from "@/components/Brand/FAQSection";
 import { testimonials } from "@/data/testimonials";
 import type { ServiceConfig } from "@/lib/services";
-import { panelFor, projectsById, projectsFor } from "@/lib/work";
+import { workBySlugs, workFor, workShowcase } from "@/lib/work";
 import CtaBand from "@/components/work/CtaBand";
 import FrameLines from "@/components/work/FrameLines";
 import Quote from "@/components/work/Quote";
-import Wall from "@/components/work/Wall";
-import WorkHeader, { TEXT_INSET, WIDE } from "@/components/work/WorkHeader";
+import Reveal from "@/components/work/Reveal";
+import SectionTitle from "@/components/work/SectionTitle";
+import Showcase from "@/components/work/Showcase";
+import WorkHeader, { PAGE_END, STACK, TEXT_INSET, WIDE } from "@/components/work/WorkHeader";
 import IncludedSection from "./IncludedSection";
 import PricingOptions from "./PricingOptions";
 import Rich from "./Rich";
@@ -20,9 +22,8 @@ import Rich from "./Rich";
 // FAQ and a call. Process, the included list and the FAQ are /brand's own
 // components with this service's content.
 export default function ServicePage({ service }: { service: ServiceConfig }) {
-  const featured = projectsById(service.featured);
-  const all = projectsFor(service.deliverable);
-  const panels = featured.map((p) => panelFor(p, service.deliverable));
+  const featured = workBySlugs(service.featured);
+  const all = workFor(service.deliverable);
   const testimonial = service.testimonial ? testimonials[service.testimonial] : undefined;
   const tag = service.label.toLowerCase();
   const { lead, faint, rest } = service.process.heading;
@@ -34,7 +35,6 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
         <WorkHeader
           section="Services"
           tag={tag}
-          statement
           title={service.headline}
           eyebrow={
             <>
@@ -45,20 +45,23 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
           intro={service.intro}
           introIsDraft={service.introIsDraft}
           actions={<CallToActions secondary={{ href: "#pricing", label: "See pricing" }} />}
+          links={false}
         />
-        <div className={`${WIDE} pb-16 sm:pb-24 lg:pb-32`}>
-          <p className={`${TEXT_INSET} pb-4 font-mono text-[11px] uppercase tracking-wide text-neutral-500 lg:pb-6`}>
-            {service.workTitle}
-          </p>
-          <Wall projects={panels} />
+        <section aria-labelledby="recent-title" className={`${WIDE} ${PAGE_END}`}>
+          <SectionTitle id="recent-title" eyebrow="Recent work" title={service.workTitle} />
+          <div className={`${TEXT_INSET} ${STACK}`}>
+            {featured.map((work, i) => (
+              <Reveal key={work.slug}>
+                <Showcase data={workShowcase(work)} eager={i === 0} />
+              </Reveal>
+            ))}
+          </div>
           {all.length > featured.length && (
-            <div className="flex justify-center pt-8 lg:pt-12">
-              <SecondaryButton href={`/work/${service.deliverable}`}>
-                All {all.length} {tag}
-              </SecondaryButton>
+            <div className="flex justify-center pt-16 lg:pt-24">
+              <SecondaryButton href={`/work/${service.deliverable}`}>All {tag}</SecondaryButton>
             </div>
           )}
-        </div>
+        </section>
       </Section>
 
       <ProcessSection

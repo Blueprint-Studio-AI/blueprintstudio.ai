@@ -6,12 +6,13 @@ import { deliverableLabels, type Deliverable } from "@/data/portfolioData";
 import { testimonials } from "@/data/testimonials";
 import { industryProjects, type IndustryCombo, type IndustryConfig } from "@/lib/industries";
 import { services } from "@/lib/services";
-import { panelFor } from "@/lib/work";
+import { workShowcase } from "@/lib/work";
 import CtaBand from "@/components/work/CtaBand";
 import FrameLines from "@/components/work/FrameLines";
 import Quote from "@/components/work/Quote";
-import Wall from "@/components/work/Wall";
-import WorkHeader, { WIDE } from "@/components/work/WorkHeader";
+import Reveal from "@/components/work/Reveal";
+import Showcase from "@/components/work/Showcase";
+import WorkHeader, { PAGE_END, SECTION, STACK, TEXT_INSET, WIDE } from "@/components/work/WorkHeader";
 
 // /industries/<slug>/<deliverable>: the industry's hero, narrowed to one kind
 // of work, over that filtered wall. The industry's quote shows only when it's
@@ -26,10 +27,9 @@ export default function ComboPage({
   combo: IndustryCombo;
 }) {
   const projects = industryProjects(industry, deliverable);
-  const panels = projects.map((p) => panelFor(p, deliverable, industry.slug));
   const service = services.find((s) => s.deliverable === deliverable);
   const quote = industry.testimonial ? testimonials[industry.testimonial] : undefined;
-  const testimonial = quote && projects.some((p) => p.metadata?.client === quote.company) ? quote : undefined;
+  const testimonial = quote && projects.some((p) => p.client.name === quote.company) ? quote : undefined;
   const label = deliverableLabels[deliverable];
 
   return (
@@ -47,12 +47,11 @@ export default function ComboPage({
               </Link>
               <span className="mx-2 text-neutral-300">/</span>
               {label}
-              <span className="mx-2 text-neutral-300">/</span>
-              {projects.length} projects
             </>
           }
           intro={combo.intro}
           introIsDraft={combo.introIsDraft}
+          links={false}
           actions={
             <CallToActions
               secondary={
@@ -63,11 +62,17 @@ export default function ComboPage({
             />
           }
         />
-        <div className={`${WIDE} pb-16 sm:pb-24 lg:pb-32`}>
-          <Wall projects={panels} />
+        <div className={`${WIDE} ${testimonial ? "" : PAGE_END}`}>
+          <div className={`${TEXT_INSET} ${STACK}`}>
+            {projects.map((work, i) => (
+              <Reveal key={work.slug}>
+                <Showcase data={workShowcase(work)} eager={i === 0} titleAs="h2" />
+              </Reveal>
+            ))}
+          </div>
         </div>
         {testimonial && (
-          <div className="w-full pb-24 pt-8 sm:pb-32 lg:pb-44 lg:pt-12">
+          <div className={`w-full ${SECTION} ${PAGE_END}`}>
             <Quote testimonial={testimonial} />
           </div>
         )}

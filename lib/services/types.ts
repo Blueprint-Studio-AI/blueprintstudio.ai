@@ -47,7 +47,7 @@ export interface ServiceConfig {
   /** True until Tyler has written the copy; outside production it renders with a "Draft" tag. */
   introIsDraft?: boolean;
   workTitle: string;
-  /** Project ids for the recent-work wall, in order. The rest of the deliverable's wall is a link away. */
+  /** Work slugs (data/portfolioData.ts) for the recent work, in order. The rest of the deliverable's page is a link away. */
   featured: string[];
   process: {
     /** Renders as "{lead} <faint>{faint}</faint> {rest}", the way /brand sets "Four steps, starting at three weeks". */

@@ -12,10 +12,10 @@ export const websites: ServiceConfig = {
   label: "Websites",
   headline: "We design and build websites for founders.",
   intro:
-    "Landing pages and marketing sites for teams like Perena, HoneyB, Autara and Jinba. Custom design, built in Framer, Next.js or Astro, with SEO and analytics in place.",
+    "Landing pages and marketing sites for teams like Perena, HoneyB, Arch Network and Jinba. Custom design, built in Framer, Next.js or Astro, with SEO and analytics in place.",
   introIsDraft: true,
   workTitle: "Recent websites",
-  featured: ["perena", "honeyb", "autara", "breeze"],
+  featured: ["perena-landing", "honeyb-website", "arch-chain", "jinba-website"],
   process: {
     heading: { lead: "Four steps,", faint: "from first call", rest: "to launch" },
     steps: [
@@ -59,19 +59,20 @@ export const websites: ServiceConfig = {
       {
         title: "Development",
         description: "Built in Framer, Next.js or Astro, whichever fits the site.",
-        image: "/media/projects/autara/recent-work-card.webp",
-        caption: "Framer landing page for Autara",
+        image: "/media/kits/arch-chain/hero.jpg",
+        caption: "Chain page for Arch Network",
       },
       {
         title: "CMS & SEO",
         description: "Content management, SEO foundations and analytics.",
-        image: "/media/recent-work/jinba-desktop.webp",
+        image: "/media/kits/jinba-website/hero.jpg",
         caption: "Website for Jinba",
       },
       {
         title: "Email Capture",
         description: "Collect sign-ups and leads from launch day.",
-        image: "/launch-assets/web-design_assets/desktop-honeyb.png",
+        // The current site (captured 2026-10-23), not the earlier orange-Bitcoin version.
+        image: "/media/kits/honeyb-website/hero.jpg",
         caption: "Website for HoneyB",
       },
     ],
@@ -162,7 +163,7 @@ export const websites: ServiceConfig = {
   },
   metaTitle: "Website Design & Development",
   metaDescription:
-    "Websites designed and built by Blueprint Studio for founders like Perena, HoneyB, Autara and Jinba. Custom design in Framer, Next.js or Astro, with SEO and analytics.",
+    "Websites designed and built by Blueprint Studio for founders like Perena, HoneyB, Arch Network and Jinba. Custom design in Framer, Next.js or Astro, with SEO and analytics.",
   ogImage: "/og-services-websites.png",
   serviceType: "Website design and development",
 };

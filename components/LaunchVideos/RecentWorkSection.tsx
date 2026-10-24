@@ -51,7 +51,7 @@ const featuredProjects: FeaturedProject[] = [
     postUrl: "https://x.com/perena/status/2002083042308104204",
   },
   {
-    name: "Pirus Labs",
+    name: "Piris Labs",
     type: "Launch Video",
     batch: "YC W26",
     timeline: "",

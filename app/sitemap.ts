@@ -1,7 +1,7 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next'
 import { getAllPosts } from '@/lib/blog'
-import { workPages } from '@/lib/work'
+import { clientPages, workPages } from '@/lib/work'
 import { industries, industryCombos } from '@/lib/industries'
 import { services } from '@/lib/services'
 
@@ -49,6 +49,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/work`,          lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     ...workPages.map((page) => ({
       url: `${base}/work/${page.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+    // Clients with three or more pieces of work to show
+    ...clientPages.map((client) => ({
+      url: `${base}/work/clients/${client.slug}`,
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.7,

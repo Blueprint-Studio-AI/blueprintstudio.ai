@@ -18,7 +18,7 @@ export default function BrandCallouts({ brands }: { brands: { slug: string; line
   });
 
   return (
-    <div className="grid gap-3 sm:gap-5 md:grid-cols-3 lg:gap-6">
+    <div className={`grid gap-3 sm:gap-5 lg:gap-6 ${items.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
       {items.map(({ brand, line }, i) => {
         const { hero } = brand;
         const lockupWidth = hero.lockupWidth ? (parseFloat(hero.lockupWidth) / WIDEST_LOCKUP) * 72 : 50;

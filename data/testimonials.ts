@@ -21,6 +21,24 @@ export const testimonials = {
     company: "Perena",
     image: "/testimonials/shina-foo-perena.jpg",
   },
+  // components/LaunchVideos/TestimonialTicker.tsx
+  "daniel-greene": {
+    quote:
+      "Anyone who sees the video buys the product. Working with you guys is like eating chocolate. We can't go back.",
+    name: "Daniel Greene",
+    role: "COO",
+    company: "TokenWorks",
+    image: "/testimonials/daniel-greene.jpg",
+  },
+  // components/LaunchVideos/TestimonialTicker.tsx
+  "sam-karu": {
+    quote:
+      "You guys are getting great reviews. Even though we haven't started publicizing on social media. You guys did a great job!",
+    name: "Sam Karu",
+    role: "CEO",
+    company: "Logical",
+    image: "/testimonials/sam-karu.jpg",
+  },
 } satisfies Record<string, Testimonial>;
 
 export type TestimonialId = keyof typeof testimonials;
