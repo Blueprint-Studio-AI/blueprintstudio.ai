@@ -69,12 +69,13 @@ export const INDUSTRIES = [
         key: "crypto",
         label: "Crypto",
         href: "/industries/crypto",
-        line: "For stablecoins, Bitcoin finance, DeFi and on-chain AI.",
+        line: "For Bitcoin infrastructure, launchpads, on-chain AI and games.",
+        // Each client shows in one card only (the pages can repeat them).
         logos: [
             { name: "Arch Network", src: "/logos-match-height/arch-network.png", width: 518 },
-            { name: "Perena", src: "/logos-match-height/perena.png", width: 682 },
-            { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
+            { name: "Bump", src: "/logos-match-height/bump-wordmark.png", width: 350 },
             { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
+            { name: "Hashplay", src: "/logos-match-height/hashplay.png", width: 749 },
         ],
     },
     {
