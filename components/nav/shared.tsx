@@ -48,18 +48,21 @@ export function useCurrentItem(): NavItem | null {
 export const PRICING = { label: "Pricing", id: "pricing" };
 export const FAQ = { label: "FAQ", id: "faq" };
 
-// What we make, each with its own page. The stills are the hero's, so the menu
-// and the headline show the same work.
+// What we make, each with its own page. Each row's picture is its menuStill, a
+// 3:2 scene made for the menu's small tile (the hero's own still when it has none):
+// the LivingIP phone, HoneyB's site on a Studio Display, our Jinba brand slides on
+// a table, and Logical's launch film on a keynote stage.
+const MENU = "/media/nav-services";
 export const SERVICES = (
     [
-        { key: "apps", href: "/work/apps", hint: "From first sketch to launch", focus: "26% 30%" },
-        { key: "websites", href: "/services/websites", hint: "Marketing sites, designed and built", focus: "50% 40%" },
-        { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%" },
-        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%" },
-    ] satisfies { key: VariantKey; href: string; hint: string; focus: string }[]
+        { key: "apps", href: "/work/apps", hint: "From first sketch to launch", focus: "26% 30%", menuStill: `${MENU}/apps-tile.webp` },
+        { key: "websites", href: "/services/websites", hint: "Marketing sites, designed and built", focus: "50% 40%", menuStill: `${MENU}/websites-display-tile.webp` },
+        { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%", menuStill: `${MENU}/brands-table-tile.webp` },
+        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%", menuStill: `${MENU}/launch-videos-stage-tile.webp` },
+    ] satisfies { key: VariantKey; href: string; hint: string; focus: string; menuStill?: string }[]
 ).map((service) => {
     const variant = VARIANTS.find((v) => v.key === service.key)!;
-    return { ...service, label: variant.label, still: variant.still };
+    return { ...service, label: variant.label, still: variant.still, menuStill: service.menuStill ?? variant.still };
 });
 
 // The industries we have a page for. Each is a card: a line on what we make
