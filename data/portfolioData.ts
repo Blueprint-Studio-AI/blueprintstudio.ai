@@ -219,6 +219,9 @@ function deck(
   };
 }
 
+// Private individuals stay out of the All work list until Tyler decides.
+export const UNLISTED = new Set(["amanda-scotese", "celia-kelly", "hailey-van-der-kar"]);
+
 // Clients written out above; the registry fills in everyone else.
 const CURATED = new Set([
   "tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb", "bump", "uni", "breeze", "autara", "huch",

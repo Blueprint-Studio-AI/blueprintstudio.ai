@@ -17,12 +17,10 @@ import WorkHeader, { EYEBROW, PAGE_END, SECTION, STACK, TEXT_INSET, WIDE } from 
 // the relationship told plainly, the work by year, each piece in the Featured
 // Work format, the client's words, and a call.
 export default function ClientPage({ client }: { client: Client }) {
-  // Newest first; within a year, in the data's order of strength.
-  const works = shownWorkOf(client)
-    .map((w, i) => ({ w, i }))
-    .sort((a, b) => Number(b.w.year) - Number(a.w.year) || a.i - b.i)
-    .map(({ w }) => w);
-  const years = [...new Set(works.map((w) => w.year))];
+  // The cases run in the data's order of strength, as the client's card does
+  // (Arch leads with the summit); the timeline lists them by year, newest first.
+  const works = shownWorkOf(client);
+  const years = [...new Set(works.map((w) => w.year))].sort((a, b) => Number(b) - Number(a));
   const testimonial = client.testimonial ? testimonials[client.testimonial] : undefined;
 
   const facts = [
