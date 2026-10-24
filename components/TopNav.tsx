@@ -51,7 +51,8 @@ const REST_MS = 90; // still this long on a menu's name, and its menu opens
 const LINGER_MS = 500; // or on it this long, still moving
 
 type MenuId = "services" | "industries" | "products";
-const MENUS: MenuId[] = ["services", "industries", "products"];
+// Industries only shows once there are industry pages to link to.
+const MENUS: MenuId[] = INDUSTRIES.length ? ["services", "industries", "products"] : ["services", "products"];
 
 const PANEL = {
     closed: { opacity: 0, scale: 0.94, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
@@ -707,7 +708,7 @@ function DesktopNav() {
                                     <Glide box={box} className="rounded-full bg-black/[0.05]" />
                                     {plainLink("work", "Work", "/#work", () => goToSection("work"))}
                                     {menuTrigger("services", "Services")}
-                                    {menuTrigger("industries", "Industries")}
+                                    {INDUSTRIES.length > 0 && menuTrigger("industries", "Industries")}
                                     {menuTrigger("products", "Products")}
                                     {plainLink("insights", INSIGHTS.label, INSIGHTS.href)}
                                 </ul>

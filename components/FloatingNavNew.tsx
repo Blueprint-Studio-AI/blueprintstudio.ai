@@ -190,7 +190,7 @@ export const FloatingNavNew = () => {
                                 </motion.li>
                             ))}
                         </ul>
-                        {heading("Industries")}
+                        {INDUSTRIES.length > 0 && heading("Industries")}
                         {INDUSTRIES.map((industry) => (
                             <motion.div key={industry.key} variants={ROW}>
                                 <Link
