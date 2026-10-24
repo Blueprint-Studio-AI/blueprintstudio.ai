@@ -782,17 +782,17 @@ function DesktopNav() {
                                                                         onFocus={() => setRow(service.key)}
                                                                         className={`flex items-center gap-3 rounded-xl p-1.5 pr-3 ${ROW_FOCUS}`}
                                                                     >
-                                                                        <span className="relative h-10 w-[60px] shrink-0 overflow-hidden rounded-[9px] bg-neutral-200">
+                                                                        {/* The device sits straight on the glass: no tile or outline, and its white
+                                                                            ground multiplies away into the panel. */}
+                                                                        <span className="relative h-10 w-[60px] shrink-0">
                                                                             <Image
                                                                                 src={service.still}
                                                                                 alt=""
                                                                                 fill
-                                                                                sizes="60px"
+                                                                                sizes="120px"
                                                                                 loading="eager"
-                                                                                style={{ objectPosition: service.focus }}
-                                                                                className={`object-cover transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
+                                                                                className={`object-contain mix-blend-multiply transition-transform duration-500 ease-out ${on ? "scale-[1.08]" : "scale-100"}`}
                                                                             />
-                                                                            <span className="absolute inset-0 rounded-[9px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" />
                                                                         </span>
                                                                         <span className="min-w-0 flex-1">
                                                                             <span className="block text-sm font-medium leading-5 text-[rgba(28,28,30,0.96)]">{service.label}</span>
