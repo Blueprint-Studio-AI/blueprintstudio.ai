@@ -299,6 +299,9 @@ export default function Hero() {
     const revealed = stage !== "loading" && stage !== "reel";
     const link = LINKS.find((l) => l.key === (variant?.key ?? "all"))!;
     const fullscreen = stage === "expanded" || stage === "closing";
+    // Above the top nav while the reel is a full-screen card, so the bar never cuts
+    // across its rounded top; the nav arrives as it lands.
+    const raised = fullscreen || stage === "reel" || stage === "landing";
 
     const scrollToId = (id: string) => {
         const element = document.getElementById(id);
@@ -367,7 +370,7 @@ export default function Hero() {
             </AnimatePresence>
 
             <Section
-                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
+                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
