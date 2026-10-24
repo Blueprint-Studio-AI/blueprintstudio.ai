@@ -148,22 +148,26 @@ export const honeyb: BrandConfig = {
   },
   typeDefaults: { display: "Poly Regular", text: "Inter Light" },
 
-  // Mockups lead — they're the most legible proof of the brand in use, so they
-  // open the section rather than sitting behind a tab.
-  // Names describe what each file actually shows. "Mockup 4" tells a visitor
-  // nothing and makes the download ambiguous once it's on their desktop; the
-  // filename still carries the index for anyone matching against the source kit.
+  // The live website leads — honeybtc.com, which we designed and built, is the
+  // most legible proof of the brand in use, so it opens the section rather than
+  // sitting behind a tab. Real captures only: settled viewport shots of the live
+  // homepage and Yield page (Oct 2026), desktop 1440×900 @2x and phone 390×844
+  // @3x, set in a plain browser window or as bare phone screens on the brand's
+  // comb field. Never AI-generated "mockups" — the old set had garbled screen text.
+  // Names describe what each file actually shows, so a download still makes
+  // sense once it's on someone's desktop.
   assetCategories: [
     {
-      id: "mockups",
-      label: "Mockups",
-      dir: `${B}/mockups`,
+      id: "website",
+      label: "Website",
+      dir: `${B}/website`,
       items: [
-        ["Homepage on Display", "honeyb-mockup-1.png", "5504×3072"],
-        ["Vault Dashboard on iMac", "honeyb-mockup-2.png", "5504×3072"],
-        ["Mobile Web Pair", "honeyb-mockup-3.png", "1920×1080"],
-        ["Homepage on Laptop", "honeyb-mockup-4.png", "2048×2048"],
-        ["Product Page in Hand", "honeyb-mockup-5.png", "4096×4096"],
+        ["Homepage", "honeyb-home.png", "2880×1800"],
+        ["Products Section", "honeyb-home-products.png", "2880×1800"],
+        ["Yield Page", "honeyb-yield.png", "2880×1800"],
+        ["Yield Criteria", "honeyb-yield-criteria.png", "2880×1800"],
+        ["Homepage on Mobile", "honeyb-mobile-home.png", "2880×1800"],
+        ["Yield Page on Mobile", "honeyb-mobile-yield.png", "2880×1800"],
       ],
     },
     {
@@ -213,10 +217,13 @@ export const honeyb: BrandConfig = {
       // the better opening argument than another screen with the logo on it.
       { src: `${B}/social/HoneyB-LinkedIn-banners.png`, alt: "Social banner artwork, two treatments", caption: "The glyph as an avatar tile" },
       { src: `${B}/social/HoneyB-LinkedIn-banner-mockup.png`, alt: "HoneyB LinkedIn company page", caption: "The banner in place on LinkedIn" },
-      { src: `${B}/mockups/honeyb-mockup-1.png`, alt: "Homepage on a desktop display", caption: "The lockup in context" },
-      { src: `${B}/mockups/honeyb-mockup-2.png`, alt: "Vault dashboard on an iMac", caption: "The mark inside the product" },
-      { src: `${B}/mockups/honeyb-mockup-4.png`, alt: "Homepage on a laptop", caption: "The lockup at reading distance" },
-      { src: `${B}/mockups/honeyb-mockup-5.png`, alt: "Product page on a phone in hand", caption: "Gold against neutral ground" },
+      // Then the live site, in a plain browser window on the brand's own comb
+      // field. Each window sits inside the middle 75% so the phone rail's ~4:3
+      // crop never cuts through it.
+      { src: `${B}/in-context/honeyb-site-home.webp`, alt: "honeybtc.com homepage", caption: "The lockup on the live site" },
+      { src: `${B}/in-context/honeyb-site-yield.webp`, alt: "honeybtc.com Yield page", caption: "The lockup set inline in a headline" },
+      { src: `${B}/in-context/honeyb-site-yield-criteria.webp`, alt: "Yield page section marked with the glyph", caption: "The glyph as a section marker" },
+      { src: `${B}/in-context/honeyb-site-mobile.webp`, alt: "honeybtc.com homepage and Yield page on a phone", caption: "The lockup at phone size" },
     ],
     type: [
       { src: `${B}/ui/honeyb-ui-2.png`, alt: "Epoch onboarding modal", caption: "Poly and Inter carrying product UI" },
