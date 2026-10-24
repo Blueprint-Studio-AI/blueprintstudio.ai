@@ -1,5 +1,3 @@
-import Image from "next/image";
-import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
 import type { Deliverable } from "@/data/portfolioData";
 import DeliverableLinks from "./DeliverableLinks";
@@ -25,15 +23,8 @@ export default function WorkHeader({
 }) {
   return (
     <>
-      <SectionHeader
-        leftText="Work"
-        centerContent={
-          <Link href="/" className="transition-opacity hover:opacity-70">
-            <Image src="/blueprint-logo-dark.svg" alt="Blueprint Studio" width={80} height={20} className="h-3 w-auto sm:h-4" />
-          </Link>
-        }
-        rightText={`// ${current ? title.toLowerCase() : "all work"}`}
-      />
+      {/* The site's nav carries the logo, so the strip keeps only its labels. */}
+      <SectionHeader leftText="Work" rightText={`// ${current ? title.toLowerCase() : "all work"}`} />
       <div className={WIDE}>
         <header className={`${TEXT_INSET} pb-8 pt-14 sm:pt-20 lg:pb-12 lg:pt-28`}>
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:items-end lg:gap-16">
