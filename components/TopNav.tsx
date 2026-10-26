@@ -782,7 +782,7 @@ function DesktopNav() {
                                                                         onFocus={() => setRow(service.key)}
                                                                         className={`flex items-center gap-3 rounded-xl p-1.5 pr-3 ${ROW_FOCUS}`}
                                                                     >
-                                                                        {/* The menu's own 3:2 picture, its rounded tile baked in, straight on the glass. */}
+                                                                        {/* The service's 3:2 cutout, straight on the glass (transparent around the device). */}
                                                                         <span className="relative h-10 w-[60px] shrink-0">
                                                                             <Image
                                                                                 src={service.menuStill}
