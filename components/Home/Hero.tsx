@@ -775,7 +775,7 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 createPortal(
                     <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
                         <motion.div
-                            className="relative ml-4 mt-5 aspect-video w-[176px] overflow-hidden rounded-[10px] bg-[#FAFAFA] shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
+                            className="relative ml-4 mt-5 aspect-[3/2] w-[176px] overflow-hidden rounded-[10px] bg-[#FAFAFA] shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
                             style={{ transformOrigin: "0% 0%" }}
                             initial={false}
                             animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
