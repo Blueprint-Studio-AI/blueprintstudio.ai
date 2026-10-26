@@ -48,18 +48,23 @@ export function useCurrentItem(): NavItem | null {
 export const PRICING = { label: "Pricing", id: "pricing" };
 export const FAQ = { label: "FAQ", id: "faq" };
 
-// What we make, each with its own page. The stills are the hero's, so the menu
-// and the headline show the same work.
+// What we make, each with its own page. The menu and the hero's word previews
+// show one picture per service: the LivingIP phone, HoneyB on a Studio Display,
+// our Jinba brand slides, and Logical's launch film on a keynote stage.
+// menuStill names those cutouts directly (they're the same files the hero's
+// VARIANTS use on feat/hero-words-3), so this branch shows them on its own;
+// once both are in, menuStill can go and the menu falls back to the variant's still.
+const CUTS = "/media/hero-words";
 export const SERVICES = (
     [
-        { key: "apps", href: "/work/apps", hint: "From first sketch to launch", focus: "26% 30%" },
-        { key: "websites", href: "/services/websites", hint: "Marketing sites, designed and built", focus: "50% 40%" },
-        { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%" },
-        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%" },
-    ] satisfies { key: VariantKey; href: string; hint: string; focus: string }[]
+        { key: "apps", href: "/work/apps", hint: "From first sketch to launch", focus: "26% 30%", menuStill: `${CUTS}/apps-cut.webp` },
+        { key: "websites", href: "/services/websites", hint: "Marketing sites, designed and built", focus: "50% 40%", menuStill: `${CUTS}/websites-cut.webp` },
+        { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%", menuStill: `${CUTS}/brands-cut.webp` },
+        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%", menuStill: `${CUTS}/launch-videos-cut.webp` },
+    ] satisfies { key: VariantKey; href: string; hint: string; focus: string; menuStill?: string }[]
 ).map((service) => {
     const variant = VARIANTS.find((v) => v.key === service.key)!;
-    return { ...service, label: variant.label, still: variant.still };
+    return { ...service, label: variant.label, still: variant.still, menuStill: service.menuStill ?? variant.still };
 });
 
 // The industries we have a page for. Each is a card: a line on what we make
