@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 
@@ -159,21 +158,8 @@ export default function BlogPost({ post }: { post: BlogPostType }) {
           </div>
         </div>
 
-        <SectionHeader
-          leftText="INSIGHTS"
-          centerContent={
-            <Link href="/" className="hover:opacity-70 transition-opacity">
-              <Image
-                src="/blueprint-logo-dark.svg"
-                alt="Blueprint Studio"
-                width={80}
-                height={20}
-                className="h-3 sm:h-4 w-auto"
-              />
-            </Link>
-          }
-          rightText={`// ${post.author.toLowerCase()}`}
-        />
+        {/* The top nav above carries the logo now */}
+        <SectionHeader leftText="INSIGHTS" rightText={`// ${post.author.toLowerCase()}`} />
 
         <OuterContainer>
           <InnerContainer className="pt-12 sm:pt-20 lg:pt-24 pb-16 sm:pb-24 lg:pb-32 px-2.5 sm:px-6 relative">
