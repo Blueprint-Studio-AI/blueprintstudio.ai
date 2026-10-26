@@ -21,8 +21,10 @@ export type Variant = {
      * `phone` is a tall cut for the 4:5 frame on phones, where one exists.
      */
     video: { src: string; phone?: string; poster: string; start: number; end: number };
-    /** A still of the work, floated by the cursor when the word is hovered. */
+    /** The work as a 3:2 cutout: the nav's Services menu shows it. */
     still: string;
+    /** The same picture re-framed at 16:9, floated by the cursor when the word is hovered. */
+    peek: string;
 };
 
 export const VARIANTS: Variant[] = [
@@ -30,7 +32,8 @@ export const VARIANTS: Variant[] = [
         key: "apps",
         word: "apps",
         label: "Apps",
-        still: "/media/hero-words/apps-device-2.webp",
+        still: "/media/hero-words/apps-cut.webp",
+        peek: "/media/hero-words/apps-cut-16x9.webp",
         cta: { label: "See app work", href: "#work" },
         video: {
             src: "/media/projects/living-ip/living-ip-horizontal-compressed.mp4",
@@ -44,7 +47,8 @@ export const VARIANTS: Variant[] = [
         key: "websites",
         word: "websites",
         label: "Websites",
-        still: "/media/hero-words/websites-device-2.webp",
+        still: "/media/hero-words/websites-cut.webp",
+        peek: "/media/hero-words/websites-cut-16x9.webp",
         cta: { label: "See website work", href: "#work" },
         video: {
             src: "/media/projects/perena/perena-horizontal-compressed.mp4",
@@ -59,7 +63,8 @@ export const VARIANTS: Variant[] = [
         word: "brands",
         label: "Brands",
         cta: { label: "See brand work", href: "/brand" },
-        still: "/media/hero-words/brands-device-2.webp",
+        still: "/media/hero-words/brands-cut.webp",
+        peek: "/media/hero-words/brands-cut-16x9.webp",
         // Autara's identity: the triangle pattern into its homepage.
         video: {
             src: "/media/projects/autara/autara-horizontal-compressed.mp4",
@@ -73,7 +78,8 @@ export const VARIANTS: Variant[] = [
         key: "launch-videos",
         word: "launch videos",
         label: "Launch videos",
-        still: "/media/hero-words/launch-videos-device-2.webp",
+        still: "/media/hero-words/launch-videos-cut.webp",
+        peek: "/media/hero-words/launch-videos-cut-16x9.webp",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
