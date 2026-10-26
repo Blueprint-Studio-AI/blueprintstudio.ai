@@ -1,838 +1,1095 @@
-export interface MediaAsset {
-  type: 'image' | 'video';
-  src: string;
-  poster?: string;
-  /** Seconds into the reel the poster was taken; the /work pages start playback there, so poster and reel line up. */
-  posterTime?: number;
-  /** The strong stretch of a reel, [start, end] in seconds; the home page loops just this, skipping dark or empty parts. */
-  clip?: [number, number];
-  alt: string;
-  /** Size as displayed. The /work pages size each frame from it, so nothing jumps when it loads. */
-  width?: number;
-  height?: number;
-}
+import type { TestimonialId } from "./testimonials";
+// The registry's public fields (tier, years, engagement, work types), synced by
+// scripts/sync-registry.mjs. Re-run it when the registry changes.
+import registry from "./registry.json";
 
-export interface ResponsiveMedia {
-  desktop: MediaAsset;
-  mobile: MediaAsset;
-}
+// Every client we've worked with, and the work we did for each. One file, so
+// the home page's Featured Work, /work, the service and industry pages and the
+// client pages all show the same work and the same images.
+//
+// Two levels:
+// - A client is the relationship: years, engagement, a line on it, a quote.
+// - A piece of work (`work[]`) is one deliverable for that client, in a year.
+//   Work we show carries a kit: one hero (the 16:9 clip and its poster; a
+//   phone screen too for sites and apps that have one) and exactly three
+//   square stills, all full bleed: the work edge to edge, each crop around a
+//   whole subject (a whole headline, a whole device, a whole mark). Work
+//   without a kit is listed, not shown.
+//
+// The field names follow the client registry (review-2026-10-23/client-registry/
+// registry.json: slug, name, industry, years, engagement, trading, testimonial,
+// work[{ title, type, year, status, visibility, source }], images, flags), so
+// it can be filled from there. Kit files live in /public/media/kits/<work slug>/
+// and are cropped from our own captures, reels and Figma exports.
 
-export interface ShowcaseMedia {
-  id: string;
-  type: 'image' | 'video';
-  src: string;
-  poster?: string;
-  alt: string;
-  caption?: string;
-}
+// What we made. The first four have /work/<deliverable> pages once at least
+// two pieces of work carry them (lib/work).
+export type Deliverable = "websites" | "apps" | "branding" | "launch-videos" | "decks";
+export type WorkType =
+  | Deliverable
+  | "service-design"
+  | "ai-automation"
+  | "content"
+  | "development"
+  | "research"
+  | "merch"
+  | "video"
+  | "motion"
+  | "events"
+  | "print"
+  | "workshops";
 
-// What we made for the client. Each value has a /work/<deliverable> page once
-// at least two projects carry it (lib/work).
-export type Deliverable = 'websites' | 'apps' | 'branding' | 'launch-videos';
-
-// The client's field, as the project's own copy and media describe it.
-export type Industry = 'crypto' | 'ai' | 'gaming';
+// The client's field, as their own copy and media describe it.
+export type Industry = "crypto" | "ai" | "gaming" | "finance";
 
 export const deliverableLabels: Record<Deliverable, string> = {
-  websites: 'Websites',
-  apps: 'Apps',
-  branding: 'Branding',
-  'launch-videos': 'Launch videos',
+  websites: "Websites",
+  apps: "Apps",
+  branding: "Branding",
+  "launch-videos": "Launch videos",
+  decks: "Decks",
+};
+
+/** One of a kind, for meta lines and the All work list ("Website", "Launch videos" when there are several). */
+export const workTypeLabels: Record<WorkType, { one: string; many: string }> = {
+  websites: { one: "Website", many: "Websites" },
+  apps: { one: "App", many: "Apps" },
+  branding: { one: "Brand", many: "Brands" },
+  "launch-videos": { one: "Launch video", many: "Launch videos" },
+  decks: { one: "Pitch deck", many: "Pitch decks" },
+  "service-design": { one: "Service design", many: "Service design" },
+  "ai-automation": { one: "AI automation", many: "AI automation" },
+  content: { one: "Content", many: "Content" },
+  development: { one: "Development", many: "Development" },
+  research: { one: "Research", many: "Research" },
+  merch: { one: "Merch", many: "Merch" },
+  video: { one: "Video", many: "Videos" },
+  motion: { one: "Motion", many: "Motion" },
+  events: { one: "Event design", many: "Event design" },
+  print: { one: "Print", many: "Print" },
+  workshops: { one: "Workshop", many: "Workshops" },
 };
 
 export const industryLabels: Record<Industry, string> = {
-  crypto: 'Crypto',
-  ai: 'AI',
-  gaming: 'Gaming',
+  crypto: "Crypto",
+  ai: "AI",
+  gaming: "Gaming",
+  finance: "Finance",
 };
 
-export interface PortfolioProject {
-  id: string;
+/** A clip (or a still) with its poster. `clip` is the stretch to loop, [start, end] in seconds. */
+export interface KitMedia {
+  /** mp4; leave out for a still hero. */
+  src?: string;
+  poster: string;
+  clip?: [number, number];
+  /** Where the poster was taken, inside `clip`: playback starts there so poster and clip line up. */
+  posterTime?: number;
+}
+
+export interface KitStill {
+  src: string;
+  alt: string;
+}
+
+export interface MediaKit {
+  /** The 16:9 frame, at every width; `vertical` is the site's or app's own mobile screen, where we have one. */
+  hero: KitMedia & { alt: string; vertical?: KitMedia };
+  /** Exactly three, square, in the kit treatment. The first leads wherever one still stands for the work. */
+  stills: [KitStill, KitStill, KitStill];
+}
+
+export interface WorkItem {
+  slug: string;
+  /** Full name, e.g. "AgeVisor 3 launch film". */
   title: string;
-  description: string;
-  category: string;
-  link?: string;
-  featuredMedia: ResponsiveMedia;
-  showcaseMedia: ShowcaseMedia[];
-  deliverables: Deliverable[];
-  industries: Industry[];
-  /** The client's live site, where we know the address. */
+  /** Short name for a client's meta line, e.g. "AgeVisor 3 film". */
+  label: string;
+  type: WorkType;
+  year: string;
+  /** live: it's up and can be visited; shipped: it went out (a film, an event); archived: no longer up. */
+  status: "live" | "shipped" | "archived";
+  /** Only public work is shown; private work is listed (e.g. a portal behind a login); needs-ok waits on Tyler. */
+  visibility: "public" | "private" | "needs-ok";
+  /** Where the work and its media come from. */
+  source?: string;
+  /** One line on what it is. */
+  summary?: string;
   liveUrl?: string;
-  /** Slug of the project's /brands/<slug> page, if it has one. */
+  /** Slug of its /brands/<slug> case study. */
   brandPage?: string;
-  /** The client has closed: never in the home page's "All work", and last wherever else it shows. */
-  noLongerTrading?: boolean;
-  /** Media to lead with on one deliverable's wall instead of featuredMedia (e.g. the site, not the brand reel). */
-  deliverableMedia?: Partial<Record<Deliverable, ResponsiveMedia>>;
-  metadata?: {
-    client?: string;
-    year?: string;
-    services?: string[];
-    testimonial?: string;
+  kit?: MediaKit;
+  /**
+   * A deck's slides for /work/decks (16:9), after its cover (the kit's hero).
+   * Sensitive figures and names are blurred into the files themselves, never
+   * with CSS over the original; `blurred` puts a note on the slide.
+   */
+  deck?: { coverBlurred?: boolean; slides: { src: string; alt: string; blurred?: boolean }[] };
+  /** The piece's own fields, when they differ from its client's (Arch Prime's brand is finance; the rest of Arch isn't). */
+  industry?: Industry[];
+  /** A short case story (Problem, Process, Solution) for the case pages; shown only where written. */
+  story?: { problem?: string; process?: string[]; solution?: string };
+  /** Show this piece on its deliverable page even though its client is archived. */
+  showWhenArchived?: boolean;
+}
+
+export interface Client {
+  slug: string;
+  name: string;
+  industry: Industry[];
+  /** "2023–2026", or one year. Empty when we don't know. */
+  years: string;
+  engagement: "Partnership" | "Project" | "Unknown";
+  /** False once the client has closed or its site has gone: never link its site. Where work shows is the tier's call. */
+  trading: boolean;
+  /**
+   * Where the client shows (the registry's tier): Feature, on the home page's
+   * Featured Work and the top of /work (about eight at most); Show, on the
+   * /work pages; Archive, only in the All work list; Hide, nowhere.
+   */
+  tier: "Feature" | "Show" | "Archive" | "Hide";
+  testimonial?: TestimonialId;
+  /** The relationship, told plainly. */
+  summary?: string;
+  /** In order of strength: the first shown piece leads wherever the client is shown. */
+  work: WorkItem[];
+  /** The registry's picks, for clients whose work has no kit yet. */
+  images?: { hero?: string; stills?: string[]; alternates?: string[] };
+  flags?: string[];
+}
+
+type RegistryClient = (typeof registry.clients)[number];
+const fromRegistry = (slug: string): RegistryClient | undefined => registry.clients.find((c) => c.slug === slug);
+
+/** A client's tier, from the registry; Archive if the registry doesn't know it. */
+function tierOf(slug: string): Client["tier"] {
+  const tier = fromRegistry(slug)?.tier;
+  return tier === "Feature" || tier === "Show" || tier === "Hide" ? tier : "Archive";
+}
+
+const KITS = "/media/kits";
+const PROJECTS = "/media/projects";
+
+/** A kit's standard files, /media/kits/<slug>/s1-3.jpg and hero(.mp4|.jpg) with -v for the phone cut. */
+function kit(
+  slug: string,
+  opts: {
+    alt: string;
+    stills: [string, string, string];
+    hero?: Partial<KitMedia>;
+    /** The kit has hero-v.jpg, a real mobile screen (sites and apps only). */
+    vertical?: boolean;
+    /** A composed hero has its own mp4 (hero.mp4, hero-v.mp4); a still hero has none. */
+    clip?: boolean;
+  }
+): MediaKit {
+  const base = `${KITS}/${slug}`;
+  const own = opts.clip ?? false;
+  return {
+    hero: {
+      alt: opts.alt,
+      poster: `${base}/hero.jpg`,
+      ...(own ? { src: `${base}/hero.mp4` } : {}),
+      ...opts.hero,
+      ...(opts.vertical ? { vertical: { poster: `${base}/hero-v.jpg` } } : {}),
+    },
+    stills: opts.stills.map((alt, i) => ({ src: `${base}/s${i + 1}.jpg`, alt })) as MediaKit["stills"],
   };
 }
 
-export const portfolioProjects: PortfolioProject[] = [
-  {
-    id: 'livingip',
-    title: 'LivingIP — On-Chain AI Agents',
-    description: 'UI/UX and product design for on-chain AI agents. Clarified vision. Simplified flows.',
-    category: 'Product Design',
-    link: '/portfolio/livingip',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/living-ip/living-ip-horizontal-compressed.mp4',
-        poster: '/media/projects/living-ip/living-ip-desktop-poster.jpg',
-        // Analytics, then the app on a laptop and a phone; the rest is pale on white.
-        clip: [8.4, 12.3],
-        alt: 'LivingIP Project Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/living-ip/living-ip-vertical-compressed.mp4',
-        poster: '/media/projects/living-ip/living-ip-mobile-poster.jpg',
-        // Analytics, then the app on a laptop and a phone; the rest is pale on white.
-        clip: [8, 12.8],
-        alt: 'LivingIP Project Reel',
-        width: 720,
-        height: 1080
-      }
+
+/** A deck's files: /media/kits/<slug>/cover.jpg (also hero.jpg), slide-1..4.jpg, s1-3.jpg, hero-v.jpg. */
+function deck(
+  slug: string,
+  alts: { cover: string; slides: [string, string, string, string]; stills?: [string, string, string] },
+  blurred: number[],
+  coverBlurred = false
+) {
+  const base = `${KITS}/${slug}`;
+  return {
+    kit: kit(slug, {
+      alt: alts.cover,
+      hero: { poster: `${base}/cover.jpg` },
+      stills: alts.stills ?? [alts.cover, alts.slides[0], alts.slides[2]],
+    }),
+    deck: {
+      coverBlurred,
+      slides: alts.slides.map((alt, i) => ({ src: `${base}/slide-${i + 1}.jpg`, alt, blurred: blurred.includes(i + 1) })),
     },
-    deliverables: ['apps'],
-    industries: ['crypto', 'ai'],
-    showcaseMedia: [
+  };
+}
+
+// Private individuals stay out of the All work list until Tyler decides.
+export const UNLISTED = new Set(["amanda-scotese", "celia-kelly", "hailey-van-der-kar"]);
+
+// Clients written out above; the registry fills in everyone else.
+const CURATED = new Set([
+  "tokenworks", "perena", "arch-network", "jinba", "livingip", "honeyb", "bump", "uni", "breeze", "autara", "huch",
+  "herth", "pyra", "piris-labs", "pavepower", "hashplay",
+]);
+
+const REGISTRY_TYPES: Record<string, WorkType> = {
+  brand: "branding", logo: "branding", "design system": "branding",
+  website: "websites", "landing page": "websites",
+  app: "apps", "product design": "apps",
+  "launch video": "launch-videos", "product video": "video",
+  content: "content", social: "content", docs: "content", motion: "motion",
+  event: "events", merch: "merch", print: "print", workshop: "workshops",
+  "pitch deck": "decks", deck: "decks",
+  research: "research", "service design": "service-design", "AI automation": "ai-automation",
+};
+
+const TW_REEL = `${PROJECTS}/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4`;
+
+export const clients: Client[] = [
+  {
+    slug: "tokenworks",
+    name: "TokenWorks",
+    tier: tierOf("tokenworks"),
+    industry: [],
+    years: "2023–2026",
+    engagement: "Partnership",
+    trading: true,
+    testimonial: "daniel-greene",
+    summary:
+      "Since 2023, the design and build team behind TokenWorks’ ID scanners: launch and product films, the IDVisor Go app and the customer portal, and the product pages of the earlier idscanner.com.",
+    work: [
       {
-        id: 'livingip-votes',
-        type: 'image',
-        src: '/media/projects/living-ip/square-votes.png',
-        alt: 'LivingIP voting interface',
-        caption: 'Governance voting UI'
+        slug: "tokenworks-agevisor-3",
+        title: "AgeVisor 3 launch film",
+        label: "AgeVisor 3 film",
+        type: "launch-videos",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/PBJbbMQ17eo; cut from tokenworks-videos-horizontal",
+        summary: "The launch film for AgeVisor 3, TokenWorks’ countertop ID scanner, made in seven days.",
+        kit: kit("tokenworks-agevisor-3", {
+          alt: "AgeVisor 3 launch film",
+          hero: { src: TW_REEL, clip: [8.3, 12.3], posterTime: 8.6 },
+          stills: ["AgeVisor 3", "The AgeVisor 3 screen, close", "AgeVisor 3 under water, from the film"],
+        }),
       },
       {
-        id: 'livingip-analytics',
-        type: 'image',
-        src: '/media/projects/living-ip/square-analytics.png',
-        alt: 'LivingIP analytics dashboard',
-        caption: 'Real-time analytics'
+        slug: "tokenworks-app",
+        title: "IDVisor Go app and customer portal",
+        label: "Scanner app",
+        type: "apps",
+        year: "2026",
+        status: "shipped",
+        // Cleared to show in the registry's second pass: the App Store set and the portal screens.
+        visibility: "public",
+        source: "Figma: Portal Design (the UMS customer portal), TokenWorks App (the IDVisor Go App Store set), Device UI; exported 2026-10-23",
+        summary: "IDVisor Go, a phone app that scans IDs and checks them against DMV records, and the IDScanner customer portal for devices, add-ons and billing.",
+        kit: kit("tokenworks-app", {
+          alt: "The IDScanner customer portal’s add-ons store",
+          vertical: true,
+          stills: ["IDVisor Go on the App Store: scan IDs, catch fake IDs", "The AgeVisor 3 device screen", "An invoice in the customer portal"],
+        }),
       },
       {
-        id: 'livingip-badges',
-        type: 'image',
-        src: '/media/projects/living-ip/square-badges.png',
-        alt: 'LivingIP achievement badges',
-        caption: 'Gamification elements'
-      }
+        slug: "tokenworks-idvisor-page",
+        title: "idVisor product page",
+        label: "idVisor page",
+        type: "websites",
+        year: "2024",
+        status: "archived",
+        visibility: "public",
+        source: "Our screen recording of the page, September 2024 (idVisor product page.mp4), the mouse cursor painted out frame by frame",
+        summary: "A product page for idVisor on the IDScanner.com store: the scanner, what it catches, and a configurator to buy it.",
+        kit: kit("tokenworks-idvisor-page", {
+          alt: "The idVisor product page, scrolling",
+          clip: true,
+          stills: ["idVisor’s security features", "Free updates for life", "Owners love it"],
+        }),
+      },
+      {
+        slug: "tokenworks-idvisor",
+        title: "idVisor product films",
+        label: "idVisor films",
+        type: "launch-videos",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // The registry confirms the IDVisor product videos (2025–2026) as ours; which
+        // YouTube uploads exactly (Smart Plus, V2) is still a question for Tyler.
+        source: "Registry: 'IDVisor product videos, IDVisor 3 Amazon video'; cut from tokenworks-videos-horizontal",
+        summary: "Product films for idVisor, the handheld scanner: the reveal, and a scan at the door.",
+        kit: kit("tokenworks-idvisor", {
+          alt: "idVisor product film: an ID scanned OK",
+          hero: { src: TW_REEL, clip: [1.6, 6.4], posterTime: 6.2 },
+          stills: ["idVisor, front and side", "A scan coming back OK", "Scanning an ID with idVisor"],
+        }),
+      },
+      {
+        slug: "tokenworks-fake-id",
+        title: "Fake ID Detection film",
+        label: "Fake ID film",
+        type: "launch-videos",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/XdmW5bcyiJU (no local file for a kit yet)",
+      },
     ],
-    metadata: {
-      client: 'LivingIP',
-      year: '2024',
-      services: ['UI/UX Design', 'Product Strategy', 'Prototyping']
-    }
+    flags: [
+      "Is today's idscanner.com homepage still our design? (not shown until confirmed)",
+      "Which YouTube uploads beyond AgeVisor 3 and Fake ID Detection are ours?",
+    ],
   },
   {
-    id: 'huch',
-    title: 'Huch — Rebrand, Redesign & Platform Build',
-    description: 'Full rebrand, product redesign, and end-to-end platform build.',
-    category: 'Platform Design, Development, Branding, Research',
-    link: '/portfolio/huch',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/huch/huch-brand-overview-horizontal-compressed.mp4',
-        poster: '/media/projects/huch/huch-desktop-poster.jpg',
-        posterTime: 1.6,
-        alt: 'Huch Platform Redesign & Rebrand Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/huch/huch-brand-overview-vertical-compressed.mp4',
-        poster: '/media/projects/huch/huch-mobile-poster.jpg',
-        posterTime: 1.6,
-        alt: 'Huch Platform Redesign & Rebrand Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    // The platform is a web app, so it sits under Apps; /launch's website
-    // picker also shows it as a site. Not tagged crypto: nothing in its copy says so.
-    deliverables: ['apps', 'branding'],
-    industries: ['gaming'],
-    noLongerTrading: true,
-    showcaseMedia: [
+    slug: "perena",
+    name: "Perena",
+    tier: tierOf("perena"),
+    industry: ["crypto", "finance"],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    testimonial: "shina-foo",
+    summary: "We designed, built and filmed the launch of USD*, Perena’s yield-bearing stablecoin.",
+    flags: ["perena.org has been redesigned since: don't link it as our work"],
+    work: [
       {
-        id: 'huch-asset-1',
-        type: 'image',
-        src: '/media/projects/huch/huch-asset-1.png',
-        alt: 'Huch platform redesign',
-        caption: 'Platform redesign'
+        slug: "perena-landing",
+        title: "USD* landing page",
+        label: "Landing page",
+        type: "websites",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        source: "perena reel; perena.org has since been redesigned by Perena",
+        summary: "Landing page design and development for the launch of USD*.",
+        kit: kit("perena-landing", {
+          alt: "The USD* landing page: Build Wealth on Autopilot",
+          hero: { src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`, clip: [2.2, 3.9], posterTime: 2.4 },
+          stills: ["The landing page’s dark hero", "The landing page on two phones", "Buying USD*"],
+        }),
       },
       {
-        id: 'huch-asset-2',
-        type: 'image',
-        src: '/media/projects/huch/huch-asset-2.png',
-        alt: 'Huch rebrand',
-        caption: 'Brand identity'
+        slug: "perena-film",
+        title: "USD* launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/DwqvawhROwE; https://x.com/perena/status/2002083042308104204",
+        summary: "A short film walking through USD*: how it grows, how it’s secured, and how it has performed.",
+        kit: kit("perena-film", {
+          alt: "USD* launch film: fully audited, running publicly on Solana",
+          hero: { src: `${PROJECTS}/perena/perena-horizontal-compressed.mp4`, clip: [6, 12.2], posterTime: 7 },
+          stills: ["USD* APY over a field of flowers", "USD* against the market, from the film", "USD*’s stats and performance"],
+        }),
       },
       {
-        id: 'huch-asset-3',
-        type: 'image',
-        src: '/media/projects/huch/huch-asset-3.png',
-        alt: 'Huch social media',
-        caption: 'Social media kit'
-      }
+        slug: "perena-purple",
+        title: "Perena Purple membership app",
+        label: "Perena Purple",
+        type: "apps",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        // Public in the registry's latest pass; listed, not shown, until there are frames to fill a kit.
+        source: "BPSTU-429, 568, 608, 759; Figma Perena 534:590, 778:3443",
+        summary: "Onboarding with NDA and wallet verification, the member dashboard and quarterly reports for Perena’s invitation-only membership.",
+      },
     ],
-    metadata: {
-      client: 'Huch',
-      year: '2025',
-      services: ['Platform Design', 'Development', 'Branding', 'Social Media', 'Customer Research']
-    }
   },
   {
-    id: 'uni',
-    title: 'UNI — Brand Identity',
-    description: 'Brand identity for a Bitcoin-denominated stablecoin. Logo system, brand narrative, type & palette, and visual language.',
-    category: 'Branding',
-    link: '/portfolio/uni',
-    featuredMedia: {
-      desktop: {
-        type: 'image',
-        src: '/media/projects/uni/uni-brand-overview-horizontal.png',
-        alt: 'UNI Brand Identity Overview',
-        width: 5760,
-        height: 3240
-      },
-      mobile: {
-        type: 'image',
-        src: '/media/projects/uni/uni-brand-overview-vertical.png',
-        alt: 'UNI Brand Identity Overview',
-        width: 1080,
-        height: 1620
-      }
-    },
-    // data/brandPortfolio.ts calls UNI a street-food brand; this entry (and the
-    // "Refined Stability" line in its artwork) says stablecoin.
-    deliverables: ['branding'],
-    industries: ['crypto'],
-    showcaseMedia: [
+    slug: "arch-network",
+    name: "Arch Network",
+    tier: tierOf("arch-network"),
+    industry: ["crypto"],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    summary:
+      "Arch Network’s design partner since 2025: the BTC All-In Summit in Las Vegas, the Arch and Arch Prime identities, and the pages that launch the chain.",
+    work: [
       {
-        id: 'uni-asset-1',
-        type: 'image',
-        src: '/media/projects/uni/uni-brand-asset-1.png',
-        alt: 'UNI brand asset',
-        caption: 'Logo system'
+        slug: "arch-btc-summit",
+        title: "BTC All-In Summit, Las Vegas",
+        label: "BTC Summit",
+        type: "branding",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "arch-vegas reel",
+        summary: "Event identity, screens and motion for Arch Network’s BTC All-In Summit in Las Vegas.",
+        kit: kit("arch-btc-summit", {
+          alt: "The BTC All-In Summit’s door projection, Las Vegas",
+          hero: { src: `${PROJECTS}/arch-vegas/arch-vegas-horizontal-compressed.mp4`, clip: [1, 13], posterTime: 4.4 },
+          stills: ["The sponsor wall", "The summit’s sponsor screens at the venue", "The BTC All-In Summit wordmark"],
+        }),
       },
       {
-        id: 'uni-asset-2',
-        type: 'image',
-        src: '/media/projects/uni/uni-brand-asset-2.png',
-        alt: 'UNI brand asset',
-        caption: 'Type & palette'
+        slug: "arch-brand",
+        title: "Arch Network identity",
+        label: "Identity",
+        type: "branding",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        source: "/brands/arch; our versions, not arch.network's current homepage",
+        summary: "Arch Network’s identity and design system: the mark, the serif, the orange, and the diagrams.",
+        brandPage: "arch",
+        kit: kit("arch-brand", {
+          alt: "The Arch Network brand page: the lockup over the city at night",
+          stills: ["Arch’s isometric system: the native-tech stack", "The Arch Network lockup on Arch orange", "An Arch diagram: the finance district"],
+        }),
       },
       {
-        id: 'uni-asset-3',
-        type: 'image',
-        src: '/media/projects/uni/uni-brand-asset-3.png',
-        alt: 'UNI brand asset',
-        caption: 'Visual language'
-      }
+        slug: "arch-chain",
+        title: "Chain page",
+        label: "Chain page",
+        type: "websites",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        // Captured from our build (Arch-Network/arch-site, preview arch-site-drab.vercel.app/chain), not the live site's Arch Prime chrome.
+        source: "Clients/Arch/arch-site/src/app/chain; our build captured 2026-10-23",
+        summary: "The page that introduces Arch’s chain, purpose-built for credit at scale. Designed and built.",
+        liveUrl: "https://www.arch.network/chain",
+        kit: kit("arch-chain", {
+          alt: "The Arch chain page we built, scrolling",
+          clip: true,
+          vertical: true,
+          stills: ["Built for clearing", "What clearing makes possible", "Credit needs its own chain"],
+        }),
+      },
+      {
+        slug: "arch-site",
+        title: "arch.network site",
+        label: "Website",
+        type: "websites",
+        year: "2026",
+        // Our build of the homepage, /chain and /ecosystem. Today's homepage (Arch Prime) isn't ours, so no link.
+        status: "archived",
+        visibility: "public",
+        // The homepage shows only as a still while Tyler confirms it's ours; the frame is /ecosystem.
+        source: "Our build of arch.network (Arch-Network/arch-site, preview arch-site-drab.vercel.app) and the blog preview, captured 2026-10-23",
+        summary: "The arch.network site we built: the homepage, the chain pages and /ecosystem, and a blog redesign.",
+        kit: kit("arch-site", {
+          alt: "The arch.network Ecosystem page we built",
+          vertical: true,
+          stills: ["The arch.network homepage we built", "The Arch blog redesign", "“Bitcoin should do more. Now it can.”"],
+        }),
+      },
+      {
+        slug: "arch-prime-brand",
+        industry: ["crypto", "finance"],
+        title: "Arch Prime identity",
+        label: "Arch Prime",
+        type: "branding",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        source: "/brands/arch-prime",
+        summary: "The product brand that descends from Arch Network, with its own palette and a place system for the app.",
+        brandPage: "arch-prime",
+        kit: kit("arch-prime-brand", {
+          alt: "The Arch Prime brand page: the Prime arch over the city",
+          stills: ["An Arch Prime building, for Earn products", "An Arch Prime building, for Earn pools", "An Arch Prime building, for Earn strategies"],
+        }),
+      },
+      {
+        slug: "arch-podcast",
+        title: "“Bitcoin Builders” podcast graphics",
+        label: "Podcast",
+        type: "content",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "Figma Arch '25 584:400",
+      },
+      {
+        slug: "arch-prime-films",
+        title: "Arch Prime launch films",
+        label: "Launch films",
+        type: "launch-videos",
+        year: "2026",
+        status: "shipped",
+        visibility: "needs-ok",
+        source: "Clients/Arch/launch-video/for-review",
+        summary: "The Ascent, Build the Bank, Everything Becomes Prime. Not cleared: voice, score and footage licences.",
+      },
     ],
-    metadata: {
-      client: 'UNI',
-      year: '2025',
-      services: ['Brand Identity', 'Logo Design', 'Visual Language']
-    }
+    flags: [
+      "arch.network's homepage (Arch Prime) is not our build: never use captures of it",
+      "Arch Prime's app, films and decks stay confidential until it launches",
+    ],
   },
   {
-    id: 'bump',
-    title: 'Bump — Brand & Product Design',
-    description: 'Brand identity, product design, UX, and customer research for a memecoin platform.',
-    category: 'Branding, Product Design, UX, Research',
-    link: '/portfolio/bump',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/bump/bump-brand-overview-horizontal-compressed.mp4',
-        poster: '/media/projects/bump/bump-desktop-poster.jpg',
-        alt: 'Bump Brand & Product Design Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/bump/bump-brand-overview-vertical-compressed.mp4',
-        poster: '/media/projects/bump/bump-mobile-poster.jpg',
-        alt: 'Bump Brand & Product Design Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    deliverables: ['branding', 'apps'],
-    industries: ['crypto'],
-    // Under Apps, lead with the platform itself rather than the brand reel.
-    deliverableMedia: {
-      apps: {
-        desktop: {
-          type: 'image',
-          src: '/media/projects/bump/bump-asset-3.png',
-          alt: 'Bump platform: trending coins and the explore view',
-          width: 1080,
-          height: 1080
-        },
-        mobile: {
-          type: 'image',
-          src: '/media/projects/bump/bump-asset-3.png',
-          alt: 'Bump platform: trending coins and the explore view',
-          width: 1080,
-          height: 1080
-        }
-      }
-    },
-    showcaseMedia: [
+    slug: "jinba",
+    name: "Jinba",
+    tier: tierOf("jinba"),
+    industry: ["ai"],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    summary: "A YC W26 launch package for an enterprise AI workflow builder: a full rebrand with three sub-brands, a new site and the launch film.",
+    work: [
       {
-        id: 'bump-asset-1',
-        type: 'image',
-        src: '/media/projects/bump/bump-asset-1.png',
-        alt: 'Bump brand asset',
-        caption: 'Brand identity'
+        slug: "jinba-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        source: "Live site captured 2026-10-23",
+        summary: "A refreshed website for Jinba, in the new brand, with its blog and use cases.",
+        liveUrl: "https://jinba.io",
+        kit: kit("jinba-website", {
+          alt: "jinba.io, scrolling",
+          clip: true,
+          vertical: true,
+          stills: ["SOC 2, HIPAA and GDPR", "Trusted by enterprises", "A Jinba use case: loan screening"],
+        }),
       },
       {
-        id: 'bump-asset-2',
-        type: 'image',
-        src: '/media/projects/bump/bump-asset-2.png',
-        alt: 'Bump product design',
-        caption: 'Product design'
+        slug: "jinba-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        source: "/brands/jinba",
+        summary: "Logo system, brand narrative, materials and a design system for a platform serving regulated industries.",
+        brandPage: "jinba",
+        kit: kit("jinba-brand", {
+          alt: "The Jinba brand page: the mark on its brush texture",
+          stills: ["Jinba on LinkedIn", "The Jinba brand guidelines", "Jinba’s chocolate brass material"],
+        }),
       },
       {
-        id: 'bump-asset-3',
-        type: 'image',
-        src: '/media/projects/bump/bump-asset-3.png',
-        alt: 'Bump platform UX',
-        caption: 'Platform UX'
-      }
+        slug: "jinba-film",
+        title: "YC W26 launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/aD9XnupXf_w (on /launch-videos; no local file for a kit yet)",
+      },
     ],
-    metadata: {
-      client: 'Bump',
-      year: '2025',
-      services: ['Brand Identity', 'Brand Strategy', 'Product Design', 'UX', 'Customer Research']
-    }
   },
   {
-    id: 'arch-network',
-    title: 'Arch Network — BTC All-In Summit',
-    description: 'Event branding, motion media and marketing for the BTC All-In Summit.',
-    category: 'Motion Media, Graphic Design, IRL Event',
-    link: '/portfolio/arch-network',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/arch-vegas/arch-vegas-horizontal-compressed.mp4',
-        poster: '/media/projects/arch-vegas/arch-vegas-desktop-poster.jpg',
-        alt: 'Arch Network BTC All-In Summit Project Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/arch-vegas/arch-vegas-vertical-compressed.mp4',
-        poster: '/media/projects/arch-vegas/arch-vegas-mobile-poster.jpg',
-        alt: 'Arch Network BTC All-In Summit Project Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    // Event branding and motion for a summit, not a product launch, so it's
-    // left off Launch videos.
-    deliverables: ['branding'],
-    industries: ['crypto'],
-    brandPage: 'arch',
-    showcaseMedia: [
+    slug: "livingip",
+    name: "LivingIP",
+    tier: tierOf("livingip"),
+    industry: ["crypto"],
+    // The designs are dated 2025 (the site said 2024).
+    years: "2025",
+    engagement: "Unknown",
+    trading: true,
+    summary: "UI, UX and product design for on-chain AI agents. Clarified vision, simplified flows.",
+    flags: ["Which parts are client work, and which are Blueprint's own Poaster / Living Persona?"],
+    work: [
       {
-        id: 'arch-screens',
-        type: 'video',
-        src: '/media/projects/arch-vegas/square-screens.mov',
-        poster: '/media/projects/arch-vegas/square-screens-poster.jpg',
-        alt: 'Event screen displays',
-        caption: 'Live event visuals'
+        slug: "livingip-app",
+        title: "On-chain AI agents app",
+        label: "App",
+        type: "apps",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "living-ip reel",
+        summary: "Product design for on-chain AI agents: knowledge voting, analytics and contributor profiles.",
+        kit: kit("livingip-app", {
+          alt: "A LivingIP contributor profile on a phone",
+          hero: {
+            src: `${PROJECTS}/living-ip/living-ip-horizontal-compressed.mp4`,
+            // The app on a laptop, then a phone. (Earlier stretches include “Poast”,
+            // whose ownership is a question for Tyler, and pale blurred transitions.)
+            clip: [10.1, 12.7],
+            posterTime: 12,
+          },
+          stills: ["Achievement badges", "Analytics", "Top contributors and incoming knowledge"],
+        }),
       },
-      {
-        id: 'arch-docs',
-        type: 'image',
-        src: '/media/projects/arch-vegas/square-docs-graphic.png',
-        alt: 'Documentation graphics',
-        caption: 'Technical diagrams'
-      },
-      {
-        id: 'arch-logos',
-        type: 'image',
-        src: '/media/projects/arch-vegas/square-logos.png',
-        alt: 'Logo variations',
-        caption: 'Brand system'
-      }
     ],
-    metadata: {
-      client: 'Arch Network',
-      year: '2025',
-      services: ['Motion Design', 'Event Graphics', 'Brand Design']
-    }
   },
   {
-    id: 'perena',
-    title: 'Perena — Landing Page',
-    description: 'Landing page design, development, and motion media for the launch of USD*.',
-    category: 'Design, Development, Motion Media',
-    link: '/portfolio/perena',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/perena/perena-horizontal-compressed.mp4',
-        poster: '/media/projects/perena/perena-desktop-poster.jpg',
-        posterTime: 1,
-        // The laptop and the deposit flow, as in the hero; from about 3.7s the page scrolls away to cream.
-        clip: [1, 3.6],
-        alt: 'Perena USD* Landing Page Project Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        // Stored 1920x1080 with tall pixels: it plays 2:3.
-        type: 'video',
-        src: '/media/projects/perena/perena-vertical-compressed.mp4',
-        poster: '/media/projects/perena/perena-mobile-poster.jpg',
-        posterTime: 1,
-        // The laptop and the deposit flow; later stretches are near-empty cream.
-        clip: [0.5, 3.6],
-        alt: 'Perena USD* Landing Page Project Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    deliverables: ['websites', 'launch-videos'],
-    industries: ['crypto'],
-    showcaseMedia: [
+    slug: "honeyb",
+    name: "HoneyB",
+    tier: tierOf("honeyb"),
+    industry: ["crypto", "finance"],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    summary: "From a blank slate in September 2025 to an institutional Bitcoin yield platform: the brand, the website, and the product behind it.",
+    work: [
       {
-        id: 'perena-asset-1',
-        type: 'image',
-        src: '/media/projects/perena/perena-brand-asset-1.png',
-        alt: 'Landing hero image',
-        caption: 'Landing hero dark'
+        slug: "honeyb-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "2026",
+        status: "live",
+        visibility: "public",
+        // The current site, not the earlier “orange Bitcoin” version or the AI mockups under /brands/honeyb/mockups.
+        source: "Clients/HoneyB/landing-page; live site captured 2026-10-23 (homepage only; the About page’s team photos are not cleared)",
+        summary: "The website for HoneyB, Bitcoin yield for institutions. Designed and built.",
+        liveUrl: "https://www.honeybtc.com",
+        kit: kit("honeyb-website", {
+          alt: "honeybtc.com, scrolling",
+          clip: true,
+          vertical: true,
+          stills: ["Earn more with your Bitcoin, however you hold it", "Same yield, your custodian", "The Yield page on a phone"],
+        }),
       },
       {
-        id: 'perena-asset-2',
-        type: 'image',
-        src: '/media/projects/perena/perena-brand-asset-2.png',
-        alt: 'APY breakdown section',
-        caption: 'APY breakdown'
+        slug: "honeyb-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2025",
+        status: "live",
+        visibility: "public",
+        source: "/brands/honeyb (brand-kit files only)",
+        summary: "The HoneyB identity: the mark, the honeycomb, and the 3D coins and objects that carry it.",
+        brandPage: "honeyb",
+        kit: kit("honeyb-brand", {
+          alt: "HoneyB: The Yield Layer for Bitcoin",
+          stills: ["The HoneyB glyph as a coin", "A HoneyB wallet", "HoneyB coins"],
+        }),
       },
       {
-        id: 'perena-asset-3',
-        type: 'image',
-        src: '/media/projects/perena/perena-brand-asset-3.png',
-        alt: 'Mobile versions',
-        caption: 'Mobile versions'
-      }
+        slug: "honeyb-deck",
+        title: "Pitch deck",
+        label: "Pitch deck",
+        type: "decks",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // The slides /launch already shows (Tyler's fine keeping them); the raise and its lead are blurred.
+        source: "public/launch-assets/slide-deck_assets/honeyb_deck-assets",
+        summary: "The deck that took HoneyB from a blank slate to its raise: the yield gap, the market and the field.",
+        ...deck(
+          "honeyb-deck",
+          {
+            cover: "HoneyB deck: The Yield Layer for Bitcoin",
+            slides: ["Meet HoneyB", "Market size", "Competitive landscape", "Raising, with the amount and lead blurred"],
+          },
+          [4]
+        ),
+      },
+      {
+        slug: "honeyb-app",
+        title: "Web app",
+        label: "App",
+        type: "apps",
+        year: "2026",
+        status: "shipped",
+        visibility: "needs-ok",
+        source: "Clients/HoneyB/webapp (testnet)",
+      },
+      {
+        slug: "honeyb-print",
+        title: "Brochure and Token2049 handout",
+        label: "Print",
+        type: "branding",
+        year: "2026",
+        status: "shipped",
+        visibility: "needs-ok",
+        source: "Clients/HoneyB/Brochure; Figma “Token 2049 Materials”",
+      },
     ],
-    metadata: {
-      client: 'Perena',
-      year: '2026',
-      services: ['Landing Page Design', 'Web Development', 'Motion Media']
-    }
+    flags: ["Due-diligence materials are confidential", "The RWY (Double Digit) rename isn’t public yet", "/brands/honeyb/mockups are AI-made: never use"],
   },
   {
-    id: 'autara',
-    title: 'Autara — Brand Identity & Web Design',
-    description: 'Brand identity and Framer landing page for Autara: logo system, type & palette, social kit, brand deck.',
-    category: 'Logo, Brand, Framer Landing Page, Social Assets',
-    link: '/portfolio/autara',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/autara/autara-horizontal-compressed.mp4',
-        poster: '/media/projects/autara/autara-desktop-poster.jpg',
-        // The triangle pattern into its homepage, as in the hero.
-        clip: [3.8, 7.8],
-        alt: 'Autara on Arch Network Project Reel',
-        width: 1620,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/autara/autara-vertical-compressed.mp4',
-        poster: '/media/projects/autara/autara-mobile-poster.jpg',
-        alt: 'Autara on Arch Network Project Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    // DeFi on Arch Network per /brand and the site in its media;
-    // data/brandPortfolio.ts calls it AI infrastructure.
-    deliverables: ['branding', 'websites'],
-    industries: ['crypto'],
-    deliverableMedia: {
-      websites: {
-        desktop: {
-          type: 'image',
-          src: '/media/projects/autara/recent-work-card.webp',
-          alt: 'Autara landing page on a laptop',
-          width: 2232,
-          height: 1712
-        },
-        mobile: {
-          type: 'image',
-          src: '/media/recent-work/autara-mobile.webp',
-          alt: 'Autara landing page on a laptop',
-          width: 1980,
-          height: 1596
-        }
-      }
-    },
-    showcaseMedia: [
+    slug: "bump",
+    name: "Bump.fun",
+    tier: tierOf("bump"),
+    industry: ["crypto"],
+    years: "2025",
+    engagement: "Project",
+    trading: true,
+    summary: "Brand identity, product design and customer research for a memecoin platform.",
+    work: [
       {
-        id: 'autara-logo',
-        type: 'image',
-        src: '/media/projects/autara/square-logo.png',
-        alt: 'Autara logo design',
-        caption: 'Logo system'
+        slug: "bump-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "bump reel",
+        summary: "“The orange pill for memecoins”: the Bump identity and its launch reel.",
+        kit: kit("bump-brand", {
+          alt: "The orange pill for memecoins",
+          hero: { src: `${PROJECTS}/bump/bump-brand-overview-horizontal-compressed.mp4`, posterTime: 1.6 },
+          stills: ["BUMP on an orange pill", "The blue and orange pills", "“They print money from nothing.”"],
+        }),
       },
       {
-        id: 'autara-chart',
-        type: 'image',
-        src: '/media/projects/autara/square-pie-chart.png',
-        alt: 'Data visualization design',
-        caption: 'Analytics UI'
+        slug: "bump-app",
+        title: "Memecoin platform",
+        label: "Platform",
+        type: "apps",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "Registry media: the Bump platform (leaderboard, explore, a coin page)",
+        summary: "Product design for Bump’s platform: trending coins, explore, and each coin’s page with its chart and trading.",
+        kit: kit("bump-app", {
+          alt: "The Bump platform: trending and explore",
+          stills: ["A coin’s page and price chart", "Trending and explore", "Buying a coin"],
+        }),
       },
-      {
-        id: 'autara-table',
-        type: 'image',
-        src: '/media/projects/autara/square-table.png',
-        alt: 'Dashboard table design',
-        caption: 'Data tables'
-      }
     ],
-    metadata: {
-      client: 'Autara',
-      year: '2025',
-      services: ['Brand Identity', 'Logo System', 'Framer Landing Page', 'Social Kit', 'Brand Deck']
-    }
   },
   {
-    id: 'tokenworks',
-    title: 'TokenWorks — Marketing Videos',
-    description: 'Ongoing multi-disciplinary end-to-end design, engineering, and growth: headless ecommerce, apps, media, brand, and strategy.',
-    category: 'Design & Build',
-    link: '/portfolio/tokenworks',
-    featuredMedia: {
-      desktop: {
-        type: 'video',
-        src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
-        poster: '/images/work/idscanner.png',
-        alt: 'TokenWorks Design & Build Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'video',
-        src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4', // Using same video for now
-        poster: '/media/projects/tokenworks-videos/tokenworks-mobile-poster.jpg',
-        alt: 'TokenWorks Design & Build Reel',
-        width: 1920,
-        height: 1080
-      }
-    },
-    // The reel is product videos (on /launch-videos as AV3 and IDVisor). The
-    // e-commerce and app work in the description has no media here yet, and
-    // nothing places the client in one of the industries above.
-    deliverables: ['launch-videos'],
-    industries: [],
-    deliverableMedia: {
-      // The desktop poster above is a store page, and the reel opens on black,
-      // so the wall uses a frame from 6s in and starts the reel there.
-      'launch-videos': {
-        desktop: {
-          type: 'video',
-          src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
-          poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
-          posterTime: 6,
-          // Past the black opening, as in the hero.
-          clip: [4.6, 16.4],
-          alt: 'TokenWorks product videos reel',
-          width: 1920,
-          height: 1080
-        },
-        mobile: {
-          type: 'video',
-          src: '/media/projects/tokenworks-videos/tokenworks-videos-horizontal-compressed.mp4',
-          poster: '/media/projects/tokenworks-videos/tokenworks-poster.jpg',
-          posterTime: 6,
-          // Past the black opening, as in the hero.
-          clip: [4.6, 16.4],
-          alt: 'TokenWorks product videos reel',
-          width: 1920,
-          height: 1080
-        }
-      }
-    },
-    showcaseMedia: [
+    slug: "uni",
+    name: "UNI",
+    tier: tierOf("uni"),
+    industry: ["crypto"],
+    years: "2025",
+    engagement: "Project",
+    trading: true,
+    summary: "A character-led identity for UNI, a Bitcoin stablecoin on Arch: the mark, the type and colour, and the posters and screens that launched it.",
+    flags: ["Trading status unknown (registry)"],
+    work: [
       {
-        id: 'tokenworks-idvs',
-        type: 'image',
-        src: '/media/projects/tokenworks-videos/square-idvs+.png',
-        alt: 'IDVS+ platform interface',
-        caption: 'Platform UI'
+        slug: "uni-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // data/brandPortfolio.ts calls UNI a street-food brand; this artwork says stablecoin.
+        source: "uni brand assets",
+        summary: "Brand identity for a Bitcoin-denominated stablecoin: logo system, type, palette and visual language.",
+        kit: kit("uni-brand", {
+          alt: "UNI brand overview",
+          stills: ["The UNI badge", "UNI’s “Get started” poster", "UNI on two phones"],
+        }),
       },
-      {
-        id: 'tokenworks-youtube',
-        type: 'image',
-        src: '/media/projects/tokenworks-videos/square-youtube.png',
-        alt: 'YouTube content strategy',
-        caption: 'Video content'
-      },
-      {
-        id: 'tokenworks-av3',
-        type: 'image',
-        src: '/media/projects/tokenworks-videos/square-av3.png',
-        alt: 'AV3 product showcase',
-        caption: 'Product videos'
-      }
+      { slug: "uni-landing", title: "Landing page", label: "Landing page", type: "websites", year: "2025", status: "archived", visibility: "public" },
     ],
-    metadata: {
-      client: 'TokenWorks',
-      year: '2023-2026',
-      services: ['Video Production', 'Marketing', 'Full-Stack Development', 'E-commerce']
-    }
   },
   {
-    id: 'breeze',
-    title: 'Breeze — Brand Identity & Site',
-    description: 'Brand identity and Framer site: logo system, type & palette, social kit, brand deck.',
-    category: 'Logo, Brand, Framer Landing Page, Social Assets',
-    link: '/portfolio/breeze',
-    featuredMedia: {
-      desktop: {
-        type: 'image',
-        src: '/media/projects/breeze/hero-breeze.jpg',
-        alt: 'Breeze on Arch Network Reel',
-        width: 1920,
-        height: 1080
-      },
-      mobile: {
-        type: 'image',
-        src: '/media/projects/breeze/hero-breeze-mobile.jpg',
-        alt: 'Breeze on Arch Network Reel',
-        width: 720,
-        height: 1080
-      }
-    },
-    deliverables: ['branding', 'websites'],
-    industries: ['crypto'],
-    showcaseMedia: [
+    slug: "breeze",
+    name: "Breeze",
+    tier: tierOf("breeze"),
+    industry: ["crypto"],
+    years: "2025",
+    engagement: "Project",
+    // The client retired the Breeze name; its tier decides where the work shows.
+    trading: false,
+    summary: "“Easy. Breezy. Bitcoin.” A light, sky-blue identity for a Bitcoin payments app: the logo system, type and colour, and its social kit.",
+    work: [
       {
-        id: 'breeze-animation',
-        type: 'video',
-        src: '/media/projects/breeze/square-b.mp4',
-        poster: '/media/projects/breeze/square-b-poster.jpg',
-        alt: 'Breeze logo animation',
-        caption: 'Logo animation'
+        slug: "breeze-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "breeze brand assets",
+        summary: "“Easy. Breezy. Bitcoin.” Logo system, type and palette, social kit and brand deck.",
+        kit: kit("breeze-brand", {
+          alt: "Easy. Breezy. Bitcoin.",
+          stills: ["The Breeze B, made of sky", "The Breeze app in hand", "Spend anywhere"],
+        }),
       },
-      {
-        id: 'breeze-mobile',
-        type: 'image',
-        src: '/media/projects/breeze/square-phone.png',
-        alt: 'Mobile app design',
-        caption: 'Mobile experience'
-      },
-      {
-        id: 'breeze-landscape',
-        type: 'image',
-        src: '/media/projects/breeze/square-hill.png',
-        alt: 'Brand illustration',
-        caption: 'Visual identity'
-      }
     ],
-    metadata: {
-      client: 'Breeze',
-      year: '2025',
-      services: ['Brand Identity', 'Framer Site', 'Social Media Kit']
-    }
-  }
+  },
+  {
+    slug: "autara",
+    name: "Autara",
+    tier: tierOf("autara"),
+    industry: ["crypto"],
+    years: "2025",
+    engagement: "Project",
+    // Acquired by Arch; autara.xyz is parked, so no link. Its tier decides where it shows.
+    trading: false,
+    summary: "Brand identity and a Framer website for Bitcoin lending on Arch. Acquired by Arch.",
+    work: [
+      {
+        slug: "autara-brand",
+        title: "Brand identity",
+        label: "Identity",
+        type: "branding",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        summary: "Brand identity for Autara, Bitcoin-collateralised lending on Arch: the names, the triangle pattern and the deck. Autara has since been acquired by Arch.",
+        source: "autara reel (the hero’s “brands” word still plays it)",
+        kit: kit("autara-brand", {
+          alt: "Autara: The premier Bitcoin money market",
+          hero: { src: `${PROJECTS}/autara/autara-horizontal-compressed.mp4`, clip: [4.6, 7.3], posterTime: 7 },
+          stills: ["Autara’s triangle pattern", "Autara’s site on a laptop", "Autara’s allocation chart"],
+        }),
+      },
+      { slug: "autara-landing", title: "Framer landing page", label: "Landing page", type: "websites", year: "2025", status: "archived", visibility: "public" },
+    ],
+    flags: ["autara.xyz is parked; Autara was acquired by Arch"],
+  },
+  {
+    slug: "huch",
+    name: "HUCH",
+    tier: tierOf("huch"),
+    industry: ["gaming"],
+    years: "2025–2026",
+    engagement: "Project",
+    // No longer trading; its tier still decides where its work shows. No link to a dead site.
+    trading: false,
+    summary: "A full rebrand for HUCH, the tokenization platform for gaming assets: the mark, the brand reel, the platform’s look and the pitch deck.",
+    work: [
+      {
+        slug: "huch-brand",
+        title: "Rebrand",
+        label: "Rebrand",
+        type: "branding",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        source: "huch reel and brand assets",
+        summary: "A full rebrand for HUCH, the tokenization platform for gaming assets.",
+        kit: kit("huch-brand", {
+          alt: "HUCH brand reel",
+          hero: { src: `${PROJECTS}/huch/huch-brand-overview-horizontal-compressed.mp4`, posterTime: 1.6 },
+          stills: ["The HUCH mark", "HUCH's skin analytics", "A HUCH skin card"],
+        }),
+      },
+      { slug: "huch-platform", title: "Platform design and build", label: "Platform", type: "apps", year: "2025", status: "archived", visibility: "public" },
+      {
+        slug: "huch-deck",
+        title: "Pitch deck",
+        label: "Pitch deck",
+        type: "decks",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        // The slides /launch already shows; revenue and raise figures blurred, cover line included.
+        source: "public/launch-assets/slide-deck_assets/huch_deck-assets",
+        summary: "A pitch deck for HUCH, the tokenization platform for gaming assets.",
+        showWhenArchived: true,
+        ...deck(
+          "huch-deck",
+          {
+            cover: "HUCH deck cover, with the revenue line blurred",
+            slides: ["Tokenization is no longer hype", "HUCH unlocks gaming assets", "Competitive landscape", "Traction, with the figures blurred"],
+            stills: ["HUCH deck cover, with the revenue line blurred", "The HUCH platform, from the deck", "HUCH’s moat, from the deck"],
+          },
+          [4],
+          true
+        ),
+      },
+    ],
+  },
+  {
+    slug: "herth",
+    name: "Herth",
+    tier: tierOf("herth"),
+    industry: [],
+    years: "2025–2026",
+    engagement: "Partnership",
+    trading: true,
+    summary: "The buyer side of Herth’s home search (natural-language search, saved searches, messaging), designed and built on its existing frontend.",
+    work: [
+      {
+        slug: "herth-app",
+        title: "Home search product",
+        label: "Home search",
+        type: "apps",
+        year: "2025",
+        status: "live",
+        visibility: "public",
+        source: "Figma: Herth buyer site, mobile map search, property page (exported 2026-10-23); registry: buyer account hub",
+        summary: "Find a home by how it looks: natural-language search, map search and property pages, on web and mobile.",
+        kit: kit("herth-app", {
+          alt: "Herth: What does your perfect home look like?",
+          vertical: true,
+          stills: ["A Herth property page", "Property details and street view", "A buyer’s saved homes"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "pyra",
+    name: "Pyra",
+    tier: tierOf("pyra"),
+    industry: ["crypto", "finance"],
+    years: "2025",
+    engagement: "Project",
+    trading: false,
+    summary: "A launch film for Pyra’s credit app, made in two days.",
+    work: [
+      {
+        slug: "pyra-film",
+        title: "Credit launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2025",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/A1hq1u_M7L8; cut at 1080p from our highlight reel",
+        summary: "A launch film for Pyra’s credit app, made in two days.",
+        kit: kit("pyra-film", {
+          alt: "Pyra credit launch film",
+          clip: true,
+          hero: { posterTime: 5.2 },
+          stills: ["An enhanced design", "Track loans", "Watch your portfolio grow"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "piris-labs",
+    name: "Piris Labs",
+    tier: tierOf("piris-labs"),
+    industry: ["ai"],
+    years: "2026",
+    engagement: "Project",
+    trading: true,
+    summary: "The YC W26 launch film for Piris Labs, which builds optical data movement for AI infrastructure.",
+    work: [
+      {
+        slug: "piris-film",
+        title: "YC W26 launch film",
+        label: "Launch film",
+        type: "launch-videos",
+        year: "2026",
+        status: "shipped",
+        visibility: "public",
+        source: "https://youtu.be/PeaWXlRNjPE; frames exported from the Piris Labs Figma file",
+        summary: "“We’re building the data movement platform for AI”: the YC W26 launch film, made in Figma and Jitter.",
+        kit: kit("piris-film", {
+          alt: "Piris Labs launch film: rack-to-rack data movement",
+          stills: ["Piris Labs benchmarks", "The Piris Labs end card", "A rack, close"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "pavepower",
+    name: "Pave Power",
+    tier: tierOf("pavepower"),
+    industry: [],
+    years: "",
+    engagement: "Project",
+    trading: true,
+    summary: "The website for Pave Power, which electrifies commercial fleets.",
+    work: [
+      {
+        slug: "pavepower-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "",
+        status: "live",
+        visibility: "public",
+        source: "Registry: the live pavepower.com is ours (Tyler)",
+        summary: "Enabling commercial fleets to harness the power of electric: the Pave Power website.",
+        liveUrl: "https://pavepower.com",
+        kit: kit("pavepower-website", {
+          alt: "pavepower.com",
+          vertical: true,
+          stills: ["Pave Project: an EV truck depot", "Fleet electrification done right", "Site selection, design and development"],
+        }),
+      },
+    ],
+  },
+  {
+    slug: "hashplay",
+    name: "Hashplay",
+    tier: tierOf("hashplay"),
+    industry: ["crypto"],
+    years: "2025–2026",
+    engagement: "Project",
+    trading: true,
+    summary: "“Steam for Bitcoin”: Hashplay’s website and brand, relaunched for Arch in 2026.",
+    work: [
+      {
+        slug: "hashplay-website",
+        title: "Website",
+        label: "Website",
+        type: "websites",
+        year: "2025",
+        status: "archived",
+        visibility: "public",
+        source: "Registry media: hashplay-site (hashplay.xyz is parked)",
+        summary: "Steam for Bitcoin. Play, own, trade: the Hashplay site and its games.",
+        kit: kit("hashplay-website", {
+          alt: "Hashplay: Steam for Bitcoin",
+          vertical: true,
+          stills: ["Crazy Wheel", "Scratchpad", "HashBots"],
+        }),
+      },
+      { slug: "hashplay-brand", title: "Brand", label: "Brand", type: "branding", year: "2025", status: "shipped", visibility: "public" },
+    ],
+  },
+  // Everyone else in the registry, listed in All work (Hide tier left out).
+  ...registry.clients.filter((c) => !CURATED.has(c.slug) && c.tier !== "Hide").flatMap(listedFromRegistry),
 ];
 
-// Projects added for the /work pages, after the home page's original portfolio
-// above. Both already appear on /brand as recent work and have their own
-// /brands pages; copy and media are reused from there.
-export const workOnlyProjects: PortfolioProject[] = [
-  {
-    id: 'honeyb',
-    title: 'HoneyB — Brand, Website & Deck',
-    description: 'From blank slate to market-ready in one package. We built HoneyB’s entire brand presence as a single cohesive system.',
-    category: 'Brand, Website, Deck',
-    featuredMedia: {
-      desktop: {
-        type: 'image',
-        src: '/launch-assets/web-design_assets/desktop-honeyb.png',
-        alt: 'HoneyB website on a laptop',
-        width: 1440,
-        height: 926
-      },
-      mobile: {
-        type: 'image',
-        src: '/launch-assets/web-design_assets/desktop-honeyb.png',
-        alt: 'HoneyB website on a laptop',
-        width: 1440,
-        height: 926
-      }
-    },
-    // Square crops of the /brands/honeyb mockups and artwork.
-    showcaseMedia: [
-      {
-        id: 'honeyb-laptop',
-        type: 'image',
-        src: '/media/projects/honeyb/square-laptop.jpg',
-        alt: 'HoneyB website on a laptop',
-        caption: 'Website'
-      },
-      {
-        id: 'honeyb-phone',
-        type: 'image',
-        src: '/media/projects/honeyb/square-phone.jpg',
-        alt: 'HoneyB website on a phone',
-        caption: 'Mobile site'
-      },
-      {
-        id: 'honeyb-coins',
-        type: 'image',
-        src: '/media/projects/honeyb/square-coins.jpg',
-        alt: 'HoneyB coin illustration',
-        caption: 'Brand artwork'
-      }
-    ],
-    deliverables: ['websites', 'branding'],
-    industries: ['crypto'],
-    liveUrl: 'https://www.honeybtc.com',
-    brandPage: 'honeyb',
-    deliverableMedia: {
-      branding: {
-        desktop: {
-          type: 'image',
-          src: '/media/hero/honeyb_brands-we-built.png',
-          alt: 'HoneyB brand identity',
-          width: 1080,
-          height: 984
-        },
-        mobile: {
-          type: 'image',
-          src: '/media/hero/honeyb_brands-we-built.png',
-          alt: 'HoneyB brand identity',
-          width: 1080,
-          height: 984
-        }
-      }
-    },
-    metadata: {
-      client: 'HoneyB',
-      year: '2026',
-      services: ['Brand Identity', 'Website', 'Pitch Deck']
-    }
-  },
-  {
-    id: 'jinba',
-    title: 'Jinba — Brand Identity & Website',
-    description: 'Brand identity for an enterprise automation platform serving regulated industries. Logo system, brand narrative, a refreshed website and a design system.',
-    category: 'Brand, Website, Design System',
-    featuredMedia: {
-      desktop: {
-        type: 'image',
-        src: '/media/recent-work/jinba-desktop.webp',
-        alt: 'Jinba website in a browser window',
-        width: 2232,
-        height: 1712
-      },
-      mobile: {
-        type: 'image',
-        src: '/media/recent-work/jinba-mobile.webp',
-        alt: 'Jinba website in a browser window',
-        width: 1980,
-        height: 1596
-      }
-    },
-    // Square crops of the /brands/jinba samples.
-    showcaseMedia: [
-      {
-        id: 'jinba-business-cards',
-        type: 'image',
-        src: '/media/projects/jinba/square-business-cards.jpg',
-        alt: 'Jinba business cards',
-        caption: 'Business cards'
-      },
-      {
-        id: 'jinba-stationery',
-        type: 'image',
-        src: '/media/projects/jinba/square-stationery.jpg',
-        alt: 'Jinba letterhead and envelope',
-        caption: 'Stationery'
-      },
-      {
-        id: 'jinba-logo',
-        type: 'image',
-        src: '/media/projects/jinba/square-logo.jpg',
-        alt: 'Jinba logo on a brand texture',
-        caption: 'Logo'
-      }
-    ],
-    deliverables: ['websites', 'branding'],
-    industries: ['ai'],
-    // The address in the browser bar of the site screenshot.
-    liveUrl: 'https://jinba.io',
-    brandPage: 'jinba',
-    deliverableMedia: {
-      branding: {
-        desktop: {
-          type: 'image',
-          src: '/brands/jinba/og-image.png',
-          alt: 'Jinba brand identity',
-          width: 1200,
-          height: 630
-        },
-        mobile: {
-          type: 'image',
-          src: '/brands/jinba/og-image.png',
-          alt: 'Jinba brand identity',
-          width: 1200,
-          height: 630
-        }
-      }
-    },
-    metadata: {
-      client: 'Jinba',
-      year: '2026',
-      services: ['Brand Identity', 'Website', 'Design System']
-    }
-  }
-];
+/** A registry client we list but don't show yet: its name, years, tier and kinds of work. */
+function listedFromRegistry(c: RegistryClient): Client[] {
+  const types = [...new Set(c.work.flatMap((w) => REGISTRY_TYPES[w.type] ?? []))];
+  if (types.length === 0) return [];
+  return [
+    // The registry marks its best guesses "(likely)"; the list shows the year alone.
+    listed(c.slug, c.name, c.years.replace(/\s*\(likely\)/gi, ""), types, {
+      engagement: c.engagement as Client["engagement"],
+      trading: c.trading,
+      tier: (c.tier as Client["tier"]) ?? "Archive",
+    }),
+  ];
+}
 
-export const allWorkProjects: PortfolioProject[] = [...portfolioProjects, ...workOnlyProjects];
+/** A client we list but don't show yet: a name, its years, and what we made. */
+function listed(
+  slug: string,
+  name: string,
+  years: string,
+  types: WorkType[],
+  { engagement, trading, tier = "Archive" }: Pick<Client, "engagement" | "trading"> & { tier?: Client["tier"] }
+): Client {
+  return {
+    slug,
+    name,
+    industry: [],
+    years,
+    engagement,
+    trading,
+    tier,
+    work: types.map((type, i) => ({
+      slug: `${slug}-${i + 1}`,
+      title: workTypeLabels[type].one,
+      label: workTypeLabels[type].one,
+      type,
+      year: years,
+      status: "shipped" as const,
+      visibility: "public" as const,
+    })),
+  };
+}
 
-// The home page's Featured Work (components/Home/PortfolioBento.tsx), at most
-// `max` projects. "All work" is the hand-picked `all`: recent, live clients
-// across all four kinds of work. A word picked in the hero shows every project
-// with that deliverable: `lead` first (the clients the hero names), then the
-// rest in their /work page's order, with any project that's no longer trading
-// last. So a new project needs only its entry above to show up under its words.
+// The home page's Featured Work and /work's featured clients: the Feature
+// tier, in `all`'s order. A word picked in the hero shows the Feature clients
+// with work of that kind (`lead` first), each leading with it; when fewer than
+// two have any, Show clients with it fill in. At most `max`.
 export const featuredWork: {
   max: number;
+  /** The home page shows this many; "See all work" carries the rest. */
+  home: number;
   all: string[];
   lead: Partial<Record<Deliverable, string[]>>;
 } = {
-  max: 6,
-  all: ['perena', 'arch-network', 'tokenworks', 'jinba', 'livingip', 'honeyb'],
+  max: 9,
+  home: 6,
+  all: ["tokenworks", "arch-network", "perena", "honeyb", "jinba", "huch", "bump", "uni", "autara"],
   lead: {
-    apps: ['livingip', 'bump'],
-    websites: ['perena', 'autara', 'breeze'],
-    branding: ['autara', 'arch-network', 'honeyb', 'jinba'],
-    'launch-videos': ['tokenworks'],
+    apps: ["tokenworks", "huch", "bump"],
+    websites: ["perena", "arch-network", "honeyb", "jinba"],
+    branding: ["jinba", "arch-network", "honeyb", "huch", "uni", "bump", "autara"],
+    "launch-videos": ["tokenworks", "perena"],
   },
 };

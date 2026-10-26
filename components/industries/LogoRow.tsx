@@ -8,7 +8,7 @@ export default function LogoRow({ label, logos }: { label: string; logos: { name
   return (
     <div className={`${TEXT_INSET} pb-4 pt-6 lg:pt-10`}>
       <div className="line-dash-x mb-6 lg:mb-8" />
-      <p className="mb-4 font-mono text-[11px] uppercase tracking-wide text-neutral-500 lg:mb-2">{label}</p>
+      <p className="mb-4 text-sm text-neutral-500 lg:mb-2">{label}</p>
       <ul className="-mx-2 flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-8 lg:justify-between lg:gap-x-4">
         {logos.map((logo) => (
           <li key={logo.name}>

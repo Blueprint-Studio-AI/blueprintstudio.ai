@@ -22,19 +22,19 @@ export const crypto: IndustryConfig = {
     { name: "HoneyB", src: "/logos-match-height/honeyb.png", width: 630 },
     { name: "Autara", src: "/logos-match-height/autara.png", width: 525 },
     { name: "UNI", src: "/logos-match-height/uni.png", width: 356 },
-    { name: "Bump", src: "/logos-match-height/bump.png", width: 264 },
+    { name: "Bump", src: "/logos-match-height/bump-wordmark.png", width: 445 },
     { name: "LivingIP", src: "/logos-match-height/livingip.png", width: 603 },
   ],
   offersTitle: "What we make for crypto founders",
   offers: [
-    { deliverable: "websites", line: "Landing pages and marketing sites, designed and built.", lead: "honeyb" },
-    { deliverable: "branding", line: "Identities, logo systems and the kits that carry them.", lead: "breeze" },
-    { deliverable: "apps", line: "Product design and UX for on-chain products.", lead: "bump" },
+    { deliverable: "websites", line: "Landing pages and marketing sites, designed and built.", lead: "honeyb-website" },
+    { deliverable: "branding", line: "Identities, logo systems and the kits that carry them.", lead: "arch-brand" },
+    { deliverable: "apps", line: "Product design and UX for on-chain products.", lead: "livingip-app" },
     { deliverable: "launch-videos", line: "Motion and launch media for a product going live." },
   ],
   workTitle: "Crypto work",
   // A reel, then alternate stills and reels down the wall.
-  order: ["perena", "honeyb", "arch-network", "uni", "bump", "breeze", "autara", "livingip"],
+  order: ["perena-landing", "perena-film", "arch-site", "arch-btc-summit", "arch-chain", "arch-brand", "arch-prime-brand", "honeyb-website", "honeyb-brand", "livingip-app", "bump-brand", "bump-app", "uni-brand", "breeze-brand"],
   brandPages: [
     { slug: "arch", line: "Bitcoin-native financial market infrastructure." },
     { slug: "arch-prime", line: "Arch Network’s product brand, with its own palette and a place system for the app." },
@@ -48,7 +48,7 @@ export const crypto: IndustryConfig = {
       introIsDraft: true,
       metaTitle: "Crypto Website Design",
       metaDescription:
-        "Websites for crypto teams by Blueprint Studio: Perena’s USD* launch, HoneyB, Autara and Breeze. Landing pages and marketing sites, designed and built.",
+        "Websites for crypto teams by Blueprint Studio: Perena’s USD* launch, HoneyB and Arch Network’s chain page. Landing pages and marketing sites, designed and built.",
       ogImage: "/og-industries-crypto-websites.png",
     },
   },
@@ -59,6 +59,6 @@ export const crypto: IndustryConfig = {
   },
   metaTitle: "Design for Crypto Founders",
   metaDescription:
-    "Blueprint Studio designs and builds apps, websites, brands and launch videos for crypto teams, including Perena, Arch Network, HoneyB, Bump, Autara and LivingIP.",
+    "Blueprint Studio designs and builds apps, websites, brands and launch videos for crypto teams, including Perena, Arch Network, HoneyB, Bump and LivingIP.",
   ogImage: "/og-industries-crypto.png",
 };

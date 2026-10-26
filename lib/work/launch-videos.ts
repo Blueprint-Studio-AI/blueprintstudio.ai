@@ -7,6 +7,6 @@ export const launchVideos: WorkPageConfig = {
   intro: "Product and launch videos for founders shipping something new.",
   introIsDraft: true,
   metaTitle: "Launch Video Portfolio",
-  metaDescription: "Launch and product videos by Blueprint Studio for TokenWorks and Perena.",
-  order: ["perena", "tokenworks"],
+  metaDescription: "Launch and product films by Blueprint Studio for TokenWorks, Perena, Piris Labs and Pyra.",
+  order: ["tokenworks-agevisor-3", "perena-film", "piris-film", "pyra-film", "tokenworks-idvisor"],
 };

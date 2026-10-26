@@ -15,7 +15,7 @@ export default function Quote({ testimonial }: { testimonial: Testimonial }) {
     <div className={WIDE}>
       <Reveal>
         <figure className={`${TEXT_INSET} max-w-[1120px]`}>
-          <p className="mb-6 font-mono text-[11px] uppercase tracking-wide text-neutral-500 lg:mb-10">
+          <p className="mb-6 text-sm text-neutral-500 lg:mb-10">
             In their words
           </p>
           <blockquote>
