@@ -1,40 +1,64 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { ChevronLeft } from "lucide-react";
 
-const steps = [
+export interface ProcessStep {
+  title: string;
+  description: string;
+}
+
+// /brand's steps and heading are the defaults; the service pages pass their own.
+const brandHeading = (
+  <>
+    Four steps,
+    <br />
+    <span className="text-neutral-400">starting at </span>
+    three weeks
+  </>
+);
+
+const brandSteps: ProcessStep[] = [
   {
-    number: "01",
     title: "Discover",
     description:
       "We learn your market, your audience, and what makes you different. One call, one brief, no fluff.",
   },
   {
-    number: "02",
     title: "Strategy",
     description:
       "Positioning, messaging, and a creative direction that translates your advantage into something people feel.",
   },
   {
-    number: "03",
     title: "Identity",
     description:
       "Logo system, color palette, typography, patterns. The visual building blocks of your brand, designed as a cohesive system.",
   },
   {
-    number: "04",
     title: "Delivery",
     description:
       "Brand book, social kit, application templates, and AI prompts—everything you need to stay on-brand as you scale.",
   },
 ];
 
-export default function ProcessSection() {
+export default function ProcessSection({
+  steps = brandSteps,
+  heading = brandHeading,
+  leftLabel = "LAUNCH PACKAGE",
+  rightLabel = "// FOR FOUNDERS",
+  closing = true,
+}: {
+  steps?: ProcessStep[];
+  heading?: ReactNode;
+  leftLabel?: string;
+  rightLabel?: string;
+  /** The thumbprint band and "we let our work speak for itself" line that lead into /brand's recent work. */
+  closing?: boolean;
+} = {}) {
   const [activeStep, setActiveStep] = useState(0);
   const [hasScrolled, setHasScrolled] = useState(false);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -64,7 +88,7 @@ export default function ProcessSection() {
     <>
       {/* Steps */}
       <section className="flex-1 flex justify-center items-center flex-col px-2.5 sm:px-[60px] relative z-20 bg-neutral-50">
-        <SectionHeader leftText="LAUNCH PACKAGE" rightText="// FOR FOUNDERS" />
+        <SectionHeader leftText={leftLabel} rightText={rightLabel} />
 
         <OuterContainer className="flex-1 flex items-center">
           <InnerContainer className="pt-16 sm:pt-24 lg:pt-28 pb-16 sm:pb-24 lg:pb-28 px-2.5 sm:px-6 relative">
@@ -76,13 +100,11 @@ export default function ProcessSection() {
                 letterSpacing: "-1.5px",
               }}
             >
-              Four steps,
-              <br />
-              <span className="text-neutral-400">starting at </span>
-              three weeks
+              {heading}
             </h2>
 
-            <div className="flex flex-col relative px-[48px]">
+            {/* The 48px inset clears the construction lines, which only show from `custom` up. */}
+            <div className="flex flex-col relative px-1 sm:px-6 custom:px-[48px]">
               <div
                 className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block mask-fade-y"
               />
@@ -94,9 +116,10 @@ export default function ProcessSection() {
                   ? index === activeStep
                   : index === 0;
                 const isLast = index === steps.length - 1;
+                const number = String(index + 1).padStart(2, "0");
                 return (
                   <div
-                    key={step.number}
+                    key={step.title}
                     ref={(el) => { stepRefs.current[index] = el; }}
                     onMouseEnter={() => setActiveStep(index)}
                     className="cursor-default"
@@ -105,7 +128,8 @@ export default function ProcessSection() {
                       className="transition-opacity duration-300 ease-out py-6 sm:py-8"
                       style={{ opacity: isActive ? 1 : 0.2 }}
                     >
-                      <div className="flex items-start sm:items-center gap-3 sm:gap-0">
+                      {/* Phones stack the line under the title, so it gets the full width. */}
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-0">
                         <div className="flex items-baseline gap-3 sm:gap-4 shrink-0 sm:w-[280px]">
                           <span
                             className="text-neutral-400 font-medium"
@@ -114,7 +138,7 @@ export default function ProcessSection() {
                               letterSpacing: "-0.5px",
                             }}
                           >
-                            {step.number}
+                            {number}
                           </span>
                           <span
                             className="font-semibold text-black"
@@ -150,6 +174,7 @@ export default function ProcessSection() {
       </section>
 
       {/* Thumbprint transition */}
+      {closing && (
       <div className="relative w-full z-10 overflow-visible bg-neutral-50">
         <div className="relative w-full overflow-visible" style={{ aspectRatio: "1440 / 500" }}>
           {/* Blue gradient BEHIND thumbprints — bottom 50% */}
@@ -232,6 +257,7 @@ export default function ProcessSection() {
           </h2>
         </div>
       </div>
+      )}
     </>
   );
 }

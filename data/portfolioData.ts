@@ -273,6 +273,25 @@ export const portfolioProjects: PortfolioProject[] = [
     },
     deliverables: ['branding', 'apps'],
     industries: ['crypto'],
+    // Under Apps, lead with the platform itself rather than the brand reel.
+    deliverableMedia: {
+      apps: {
+        desktop: {
+          type: 'image',
+          src: '/media/projects/bump/bump-asset-3.png',
+          alt: 'Bump platform: trending coins and the explore view',
+          width: 1080,
+          height: 1080
+        },
+        mobile: {
+          type: 'image',
+          src: '/media/projects/bump/bump-asset-3.png',
+          alt: 'Bump platform: trending coins and the explore view',
+          width: 1080,
+          height: 1080
+        }
+      }
+    },
     showcaseMedia: [
       {
         id: 'bump-asset-1',

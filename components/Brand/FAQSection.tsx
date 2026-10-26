@@ -9,7 +9,13 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
-const faqs = [
+export interface Faq {
+  question: string;
+  answer: ReactNode;
+}
+
+// /brand's questions are the defaults; the service pages pass their own.
+const brandFaqs: Faq[] = [
   {
     question: "What if I already have a logo?",
     answer:
@@ -120,7 +126,7 @@ function FaqItem({ question, answer }: FaqItemProps) {
   );
 }
 
-export default function FAQSection() {
+export default function FAQSection({ faqs = brandFaqs }: { faqs?: Faq[] } = {}) {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       <SectionHeader leftText="FAQ" rightText="// clarity" />

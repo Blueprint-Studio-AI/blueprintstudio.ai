@@ -35,6 +35,7 @@ const footerLinks: Record<string, FooterSection> = {
     title: 'Services',
     links: [
       { name: 'Brand Identity', href: '/brand' },
+      { name: 'Websites', href: '/services/websites' },
       { name: 'Launch Package', href: '/launch' },
       { name: 'Launch Videos', href: '/launch-videos' },
     ]
