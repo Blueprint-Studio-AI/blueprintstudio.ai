@@ -697,11 +697,6 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
     }, []);
     const [peek, setPeek] = useState<VariantKey | null>(null);
     const peekShown = useRef(false);
-    // Development only: ?peek=3x2 shows the 3:2 card with the menu's pictures, to compare.
-    const [peek3x2, setPeek3x2] = useState(false);
-    useEffect(() => {
-        if (process.env.NODE_ENV !== "production") setPeek3x2(new URLSearchParams(window.location.search).get("peek") === "3x2");
-    }, []);
     const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const pointerX = useMotionValue(0);
     const pointerY = useMotionValue(0);
@@ -780,7 +775,7 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                 createPortal(
                     <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
                         <motion.div
-                            className={`relative ml-4 mt-5 ${peek3x2 ? "aspect-[3/2]" : "aspect-video"} w-[176px] overflow-hidden rounded-[10px] bg-[#FAFAFA] shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]`}
+                            className="relative ml-4 mt-5 aspect-[3/2] w-[176px] overflow-hidden rounded-[10px] bg-[#FAFAFA] shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
                             style={{ transformOrigin: "0% 0%" }}
                             initial={false}
                             animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
@@ -789,7 +784,7 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
                             {VARIANTS.map((v) => (
                                 <motion.img
                                     key={v.key}
-                                    src={peek3x2 ? v.still : v.peek}
+                                    src={v.peek}
                                     alt=""
                                     className="absolute inset-0 h-full w-full object-cover"
                                     initial={false}
