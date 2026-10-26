@@ -60,7 +60,7 @@ export const SERVICES = (
         { key: "apps", href: "/?for=apps#work", hint: "From first sketch to launch", focus: "26% 30%", menuStill: `${CUTS}/apps-cut.webp` },
         { key: "websites", href: "/?for=websites#work", hint: "Marketing sites, designed and built", focus: "50% 40%", menuStill: `${CUTS}/websites-cut.webp` },
         { key: "brands", href: "/brand", hint: "Your brand in three weeks", focus: "50% 50%", menuStill: `${CUTS}/brands-cut.webp` },
-        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%", menuStill: `${CUTS}/launch-videos-cut.webp` },
+        { key: "launch-videos", href: "/launch-videos", hint: "Your launch video in seven days", focus: "60% 50%", menuStill: `${CUTS}/launch-videos-keynote.webp` },
     ] satisfies { key: VariantKey; href: string; hint: string; focus: string; menuStill?: string }[]
 ).map((service) => {
     const variant = VARIANTS.find((v) => v.key === service.key)!;
