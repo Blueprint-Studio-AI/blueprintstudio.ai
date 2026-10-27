@@ -79,7 +79,7 @@ export const VARIANTS: Variant[] = [
         word: "launch videos",
         label: "Launch videos",
         still: "/media/hero-words/launch-videos-keynote.webp",
-        peek: "/media/hero-words/launch-videos-cut-peek.webp",
+        peek: "/media/hero-words/launch-videos-stage-a3-hover.webp",
         cta: { label: "See launch videos", href: "/launch-videos" },
         // TokenWorks' AgeVisor 3 launch film, one of the films on /launch-videos.
         video: {
