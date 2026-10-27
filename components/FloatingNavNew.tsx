@@ -134,6 +134,18 @@ export const FloatingNavNew = () => {
   // All sections to observe (including contact for proper highlighting)
   const allSections = [...navSections, { id: 'contact', label: 'Contact' }];
 
+  // On phones the links scroll sideways; fade the right edge while more are hidden.
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const updateScrollFade = () => {
+    const el = scrollContainerRef.current;
+    if (el) setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+  useEffect(() => {
+    updateScrollFade();
+    window.addEventListener('resize', updateScrollFade);
+    return () => window.removeEventListener('resize', updateScrollFade);
+  }, []);
+
   // Auto-scroll to center active item on mobile
   useEffect(() => {
     if (window.innerWidth < 768 && scrollContainerRef.current) {
@@ -153,7 +165,10 @@ export const FloatingNavNew = () => {
         });
       }
     }
-  }, [activeSection, navSections]);
+    // Only when the section changes: navSections is rebuilt every render, and
+    // re-running this on any render would snap the row back mid-scroll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection]);
 
   useEffect(() => {
     // Only track sections on home page
@@ -241,8 +256,16 @@ export const FloatingNavNew = () => {
       `}>
         <div className="flex items-center px-1.5 py-1.5">
           {/* Scrollable container for mobile - nav items */}
+          <div className="relative flex min-w-0 flex-1 items-center">
+          {/* Fades the cut-off item while there's more to scroll, so it reads as scrollable */}
+          <div
+            aria-hidden="true"
+            className="md:hidden pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[rgba(244,244,247,1)] to-transparent transition-opacity duration-200"
+            style={{ opacity: canScrollRight ? 1 : 0 }}
+          />
           <div
             ref={scrollContainerRef}
+            onScroll={updateScrollFade}
             className={`
               flex items-center
               flex-1
@@ -318,6 +341,7 @@ export const FloatingNavNew = () => {
               <div aria-hidden="true" className="hidden md:block w-px h-4 bg-neutral-300/60 mx-1 flex-shrink-0" />
               <AssetGeneratorNavLink className="hidden md:flex" />
             </div>
+          </div>
           </div>
 
           {/* Divider - mobile only */}

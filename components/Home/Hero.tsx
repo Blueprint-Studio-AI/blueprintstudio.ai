@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
     AnimatePresence,
@@ -9,7 +10,9 @@ import {
     useMotionValue,
     useMotionValueEvent,
     useReducedMotion,
+    useSpring,
     useTransform,
+    useVelocity,
 } from "framer-motion";
 import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
@@ -19,6 +22,7 @@ import SectionHeader from "../ui/SectionHeader";
 import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
 import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
+import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
 // The opening: a short loader, then the reel plays full screen for a moment
 // and lands in its place under the headline. Nothing waits for a scroll.
@@ -30,8 +34,9 @@ import { useSmoothScroll } from "@/components/SmoothScroll";
 // other element. "View fullscreen" runs the same path backwards.
 
 const REEL_SRC = {
-    wide: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
-    tall: "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4",
+    full: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
+    // A 2:3 reel for phones, cut from the projects' own vertical edits.
+    small: "/media/highlight-reel/highlight-reel-mobile-2x3.mp4",
 };
 const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
@@ -45,6 +50,9 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
+
+// The second button's link for each variant.
+const LINKS = [{ key: "all", label: "See our work", href: "#work" }, ...VARIANTS.map((v) => ({ key: v.key, ...v.cta }))];
 
 /** False once the home page has mounted in this tab. */
 let firstLoad = true;
@@ -63,6 +71,8 @@ export default function Hero() {
     }, []);
 
     const [src, setSrc] = useState<string>();
+    const [variantKey, setVariantKey] = useState<VariantKey | null>(null);
+    const variant = VARIANTS.find((v) => v.key === variantKey) ?? null;
     const [hasFrame, setHasFrame] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
     const [minTimeElapsed, setMinTimeElapsed] = useState(false);
@@ -112,10 +122,36 @@ export default function Hero() {
         return () => window.removeEventListener("resize", place);
     }, [place]);
 
-    // The wide reel, or the tall one on phones.
+    // A link like /?for=websites opens on that variant.
+    useEffect(() => {
+        setVariantKey(variantFromUrl());
+    }, []);
+
+    // Other sections (Featured Work) follow the picker, and can set it:
+    // window "bp:variant" events carry { key, source }.
+    useEffect(() => {
+        const onVariant = (e: Event) => {
+            const { key, source } = (e as CustomEvent<{ key: VariantKey | null; source: string }>).detail;
+            if (source !== "hero") setVariantKey(key);
+        };
+        window.addEventListener("bp:variant", onVariant);
+        return () => window.removeEventListener("bp:variant", onVariant);
+    }, []);
+
+    const chooseVariant = (key: VariantKey | null) => {
+        setVariantKey(key);
+        window.dispatchEvent(new CustomEvent("bp:variant", { detail: { key, source: "hero" } }));
+        const url = new URL(window.location.href);
+        if (key) url.searchParams.set("for", key);
+        else url.searchParams.delete("for");
+        window.history.replaceState(window.history.state, "", url);
+        (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
+    };
+
+    // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
     useEffect(() => {
         const query = window.matchMedia("(min-width: 640px)");
-        const pick = () => setSrc(query.matches ? REEL_SRC.wide : REEL_SRC.tall);
+        const pick = () => setSrc(query.matches ? REEL_SRC.full : REEL_SRC.small);
         pick();
         query.addEventListener("change", pick);
         return () => query.removeEventListener("change", pick);
@@ -261,7 +297,11 @@ export default function Hero() {
     }, [locked, scroll, place]);
 
     const revealed = stage !== "loading" && stage !== "reel";
+    const link = LINKS.find((l) => l.key === (variant?.key ?? "all"))!;
     const fullscreen = stage === "expanded" || stage === "closing";
+    // Above the top nav while the reel is a full-screen card, so the bar never cuts
+    // across its rounded top; the nav arrives as it lands.
+    const raised = fullscreen || stage === "reel" || stage === "landing";
 
     const scrollToId = (id: string) => {
         const element = document.getElementById(id);
@@ -304,7 +344,7 @@ export default function Hero() {
                                     alt="Blueprint Studio"
                                     width={30}
                                     height={30}
-                                    className="loader-fade mb-6 h-4 w-auto sm:mb-8 sm:h-5"
+                                    className="loader-fade mb-6 h-6 w-auto sm:mb-8 sm:h-7"
                                     style={{ animationDuration: "700ms", animationDelay: "150ms" }}
                                     priority
                                 />
@@ -330,7 +370,7 @@ export default function Hero() {
             </AnimatePresence>
 
             <Section
-                className={`relative ${fullscreen ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
+                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
@@ -373,37 +413,24 @@ export default function Hero() {
                 />
 
                 <OuterContainer className="flex w-full flex-1 items-center justify-center">
-                    <InnerContainer className="relative flex w-full flex-col items-center px-6 pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
+                    <InnerContainer className="relative flex w-full flex-col items-center justify-center px-6 lg:justify-start pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
                         {/* Inner dashed vertical lines on desktop */}
                         <div className="line-dash-y absolute bottom-0 left-0 top-0 hidden custom:block" />
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
 
-                        <div className="flex flex-col items-center text-center">
+                        {/* As wide as the reel's slot below, so the statement and the frame share a left edge. */}
+                        <div className="flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]">
                             <motion.h1
                                 {...rise(0.15)}
                                 className="cursor-default font-medium text-neutral-800"
-                                style={{
-                                    fontSize: "clamp(36px, 4.2vw, 56px)",
-                                    lineHeight: 1.08,
-                                    letterSpacing: "-0.035em",
-                                    textWrap: "balance",
-                                }}
+                                style={{ fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }}
                             >
-                                Design and development for&nbsp;founders.
+                                <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
                             </motion.h1>
-                            <motion.p
-                                {...rise(0.25)}
-                                className="mt-4 max-w-[680px] cursor-default text-neutral-600"
-                                style={{
-                                    fontSize: "clamp(16px, 1.4vw, 19px)",
-                                    lineHeight: 1.4,
-                                    letterSpacing: "-0.01em",
-                                    textWrap: "balance",
-                                }}
+                            <motion.div
+                                {...rise(0.35)}
+                                className="mt-7 flex w-full max-w-[340px] flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center"
                             >
-                                Websites, products, brands and launch videos, from first sketch to&nbsp;launch.
-                            </motion.p>
-                            <motion.div {...rise(0.35)} className="mt-6 flex flex-wrap items-center justify-center gap-3">
                                 <motion.a
                                     href="#contact"
                                     onClick={(e) => {
@@ -411,7 +438,7 @@ export default function Hero() {
                                         scrollToId("contact");
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="flex h-12 items-center rounded-full px-6 text-[15px] font-medium text-white"
+                                    className="flex h-12 shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full pl-1.5 pr-6 text-[15px] font-medium text-white sm:justify-self-end"
                                     style={{
                                         background: "linear-gradient(135deg, #60AEEE 0%, #3B82F6 25%, #2563EB 50%, #1D4ED8 75%, #4F46E5 100%)",
                                         boxShadow:
@@ -419,30 +446,40 @@ export default function Hero() {
                                         textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
                                     }}
                                 >
-                                    Book a call
+                                    <Image
+                                        src="/images/tyler-face.jpg"
+                                        alt=""
+                                        width={36}
+                                        height={36}
+                                        className="h-9 w-9 rounded-full object-cover ring-2 ring-white/35"
+                                    />
+                                    Book a call with Tyler
                                 </motion.a>
                                 <motion.a
-                                    href="#work"
+                                    href={link.href}
                                     onClick={(e) => {
+                                        if (!link.href.startsWith("#")) return;
                                         e.preventDefault();
-                                        scrollToId("work");
+                                        scrollToId(link.href.slice(1));
                                     }}
                                     whileTap={{ scale: 0.97 }}
-                                    className="group flex h-12 items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
+                                    className="group flex h-12 shrink-0 whitespace-nowrap items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 sm:justify-self-start"
                                 >
-                                    See our work
+                                    {/* Springs to each label, growing away from "Book a call", which never moves. */}
+                                    <SpringText text={link.label} />
                                     <ArrowRight
                                         aria-hidden
-                                        className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                                        className="ml-1.5 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
                                     />
                                 </motion.a>
+                                <HeroLogos />
                             </motion.div>
                         </div>
 
                         {/* The reel's slot: as big as fits between the copy and the floating nav */}
                         <div
                             ref={slotRef}
-                            className="relative mt-8 aspect-[2/3] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
                         >
                             <div
                                 ref={frameRef}
@@ -475,6 +512,11 @@ export default function Hero() {
                                     playsInline
                                     preload="auto"
                                 />
+                                <AnimatePresence>
+                                    {variant && src && <VariantVideo key={variant.key} {...variant.video} compact={src === REEL_SRC.small} />}
+                                </AnimatePresence>
+                                {/* A hairline edge, so pale frames don't melt into the page. */}
+                                <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
 
                                 {stage === "docked" && (
                                     <button
@@ -522,6 +564,238 @@ export default function Hero() {
                     />
                 )}
             </Section>
+        </>
+    );
+}
+
+// A quiet row of clients beside the buttons, so there's proof on the first
+// screen without shrinking the reel. Each slot cycles through its own clients,
+// one slot after another, through a soft blur. Slots have a fixed width so the
+// row never shifts; one that doesn't fit wraps onto a hidden second line, so
+// only whole slots show. Logo files sit on a 264px-tall canvas (see
+// ClientLogoTicker), so one height gives them all the same weight.
+const HERO_LOGO_SLOTS: { name: string; logo: string; w: number; tone?: number }[][] = [
+    [
+        { name: "TokenWorks", logo: "tokenworks", w: 636 },
+        { name: "Logical", logo: "logical", w: 580 },
+        { name: "Bitfrost", logo: "bitfrost", w: 526 },
+    ],
+    [
+        { name: "Arch Network", logo: "arch-network", w: 518 },
+        { name: "Pyra", logo: "pyra", w: 476 },
+        { name: "Twelve", logo: "twelve", w: 568 },
+    ],
+    [
+        { name: "Jinba", logo: "jinba", w: 561 },
+        // HoneyB's orange turns pale in grey; darken it to match the others.
+        { name: "HoneyB", logo: "honeyb", w: 630, tone: 0.55 },
+        { name: "Reshift", logo: "reshift", w: 461 },
+    ],
+    [
+        { name: "Perena", logo: "perena", w: 682 },
+        { name: "LivingIP", logo: "livingip", w: 603 },
+        { name: "Bold", logo: "bold", w: 540 },
+    ],
+];
+const HERO_LOGO_HEIGHT = 34;
+const HERO_LOGO_SLOT = 84; // Perena, the widest, overhangs by 2px a side: the gap, and the row's own padding at the end, keep it whole
+const HERO_LOGO_EVERY_MS = 3200;
+const HERO_LOGO_STAGGER = 0.09;
+
+function HeroLogos() {
+    const reduceMotion = useReducedMotion();
+    const rowRef = useRef<HTMLDivElement>(null);
+    const [turn, setTurn] = useState(0);
+    const [paused, setPaused] = useState(false);
+    const [inView, setInView] = useState(true);
+    useEffect(() => {
+        const row = rowRef.current;
+        if (!row) return;
+        const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+        observer.observe(row);
+        return () => observer.disconnect();
+    }, []);
+    useEffect(() => {
+        if (reduceMotion || paused || !inView) return;
+        const timer = setInterval(() => {
+            if (!document.hidden) setTurn((t) => t + 1);
+        }, HERO_LOGO_EVERY_MS);
+        return () => clearInterval(timer);
+    }, [reduceMotion, paused, inView]);
+
+    return (
+        <div
+            ref={rowRef}
+            className="ml-auto hidden min-w-0 flex-wrap items-center justify-end gap-x-2.5 overflow-hidden px-1 lg:flex"
+            style={{ height: HERO_LOGO_HEIGHT }}
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
+        >
+            <span className="mr-1 whitespace-nowrap text-[13px] text-neutral-400">Trusted by</span>
+            {HERO_LOGO_SLOTS.map((slot, i) => {
+                const c = slot[turn % slot.length];
+                return (
+                    <div key={i} className="relative shrink-0" style={{ width: HERO_LOGO_SLOT, height: HERO_LOGO_HEIGHT }}>
+                        <AnimatePresence initial={false}>
+                            <motion.img
+                                key={c.logo}
+                                src={`/logos-match-height/${c.logo}.png`}
+                                alt={c.name}
+                                width={Math.round((HERO_LOGO_HEIGHT * c.w) / 264)}
+                                height={HERO_LOGO_HEIGHT}
+                                className="absolute inset-0 m-auto"
+                                style={{ height: HERO_LOGO_HEIGHT, width: "auto", maxWidth: "none" }}
+                                initial={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: 5 }}
+                                animate={{ opacity: 0.45, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(0px)`, y: 0 }}
+                                exit={{ opacity: 0, filter: `grayscale(1) brightness(${c.tone ?? 1}) blur(8px)`, y: -5 }}
+                                transition={{ duration: 0.7, ease: EASE_OUT, delay: i * HERO_LOGO_STAGGER }}
+                            />
+                        </AnimatePresence>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// The statement: the first sentence in ink and the rest in grey. What
+// we make doubles as the picker: each word switches the reel. On a desktop,
+// resting on a word floats a still of that work by the cursor. Words darken
+// into place once the reel has landed.
+const LEAD = "The design and build partner for founders.";
+const TAIL = "from first sketch to launch.";
+const PEEK_FOLLOW = { stiffness: 380, damping: 30, mass: 0.6 };
+const PEEK_HIDE_MS = 140; // long enough to cross the gap between two words
+
+function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
+    const reduceMotion = useReducedMotion();
+    let index = 0;
+    const words = (text: string, ink: boolean) =>
+        text.split(/(\s+)/).map((word, w) => {
+            if (!word.trim()) return word;
+            const delay = 0.2 + index++ * 0.025;
+            return (
+                <motion.span
+                    key={`${text}-${w}`}
+                    initial={{ color: "#D4D4D4" }}
+                    animate={revealed ? { color: ink ? "#1C1C1E" : "#9A9AA0" } : undefined}
+                    transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay }}
+                >
+                    {word}
+                </motion.span>
+            );
+        });
+
+    // The peek: only where there's a real hover, so phones just tap the words.
+    const [canHover, setCanHover] = useState(false);
+    useEffect(() => {
+        const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+        const update = () => setCanHover(query.matches);
+        update();
+        query.addEventListener("change", update);
+        return () => query.removeEventListener("change", update);
+    }, []);
+    const [peek, setPeek] = useState<VariantKey | null>(null);
+    const peekShown = useRef(false);
+    const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const pointerX = useMotionValue(0);
+    const pointerY = useMotionValue(0);
+    const x = useSpring(pointerX, PEEK_FOLLOW);
+    const y = useSpring(pointerY, PEEK_FOLLOW);
+    // It leans the way it's travelling and settles when the cursor stops.
+    const lean = useTransform(useVelocity(x), [-1400, 0, 1400], [-8, 0, 8], { clamp: true });
+    const follow = useCallback(
+        (e: PointerEvent | React.PointerEvent) => {
+            pointerX.set(e.clientX);
+            pointerY.set(e.clientY);
+            if (!peekShown.current || reduceMotion) {
+                x.jump(e.clientX);
+                y.jump(e.clientY);
+            }
+        },
+        [pointerX, pointerY, x, y, reduceMotion],
+    );
+    useEffect(() => {
+        peekShown.current = peek !== null;
+        if (!peek) return;
+        window.addEventListener("pointermove", follow, { passive: true });
+        return () => window.removeEventListener("pointermove", follow);
+    }, [peek, follow]);
+    useEffect(() => () => clearTimeout(hideTimer.current), []);
+    const showPeek = (key: VariantKey, e: React.PointerEvent) => {
+        if (!canHover || e.pointerType !== "mouse") return;
+        clearTimeout(hideTimer.current);
+        follow(e);
+        setPeek(key);
+    };
+    const hidePeek = () => {
+        clearTimeout(hideTimer.current);
+        hideTimer.current = setTimeout(() => setPeek(null), PEEK_HIDE_MS);
+    };
+
+    return (
+        <>
+            {words(LEAD, true)} {words("We make", false)}{" "}
+            {VARIANTS.map((v, i) => {
+                const active = value === v.key;
+                const delay = 0.2 + index++ * 0.025;
+                // Each word keeps its comma, so a comma never starts a line.
+                const comma = i !== VARIANTS.length - 2;
+                return (
+                    <span key={v.key}>
+                        <span className="whitespace-nowrap">
+                            <button
+                                type="button"
+                                onClick={() => onPick(active ? null : v.key)}
+                                onPointerEnter={(e) => showPeek(v.key, e)}
+                                onPointerLeave={hidePeek}
+                                aria-pressed={active}
+                                className="group/word cursor-pointer whitespace-nowrap rounded-[0.14em] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                            >
+                                <motion.span
+                                    className={`underline underline-offset-[0.14em] transition-[text-decoration-color] duration-200 ${
+                                        active ? "decoration-[#1C1C1E] decoration-[0.06em]" : "decoration-transparent decoration-dotted decoration-[0.06em] group-hover/word:decoration-[#9A9AA0]"
+                                    }`}
+                                    initial={{ color: "#D4D4D4" }}
+                                    animate={revealed ? { color: active ? "#1C1C1E" : "#6B6B70" } : undefined}
+                                    transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT, delay: active ? 0 : delay }}
+                                >
+                                    {v.word}
+                                </motion.span>
+                            </button>
+                            {comma && words(",", false)}
+                        </span>
+                        {comma ? " " : <> {words("and", false)} </>}
+                    </span>
+                );
+            })}
+            {words(TAIL, false)}
+            {canHover &&
+                revealed &&
+                createPortal(
+                    <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[65]" style={{ x, y, rotate: reduceMotion ? 0 : lean }}>
+                        <motion.div
+                            className="relative ml-4 mt-5 aspect-[3/2] w-[176px] overflow-hidden rounded-[10px] bg-[#FAFAFA] shadow-[0_18px_40px_-14px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,0,0,0.06)]"
+                            style={{ transformOrigin: "0% 0%" }}
+                            initial={false}
+                            animate={peek ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+                            transition={reduceMotion ? { duration: 0.15 } : { type: "spring", visualDuration: 0.35, bounce: 0.25 }}
+                        >
+                            {VARIANTS.map((v) => (
+                                <motion.img
+                                    key={v.key}
+                                    src={v.peek}
+                                    alt=""
+                                    className="absolute inset-0 h-full w-full object-cover"
+                                    initial={false}
+                                    animate={{ opacity: peek === v.key ? 1 : 0 }}
+                                    transition={{ duration: 0.2, ease: EASE_OUT }}
+                                />
+                            ))}
+                        </motion.div>
+                    </motion.div>,
+                    document.body,
+                )}
         </>
     );
 }
