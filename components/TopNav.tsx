@@ -50,6 +50,12 @@ const FRAME = 61; // the frame lines sit 60px in from each side, and are 1px wid
 const REST_MS = 90; // still this long on a menu's name, and its menu opens
 const LINGER_MS = 500; // or on it this long, still moving
 
+// The shape's springs run from 0 to 1, where motion counts a spring as done
+// within 0.005 of its end: a few pixels of nav. At the top of the little
+// overshoot the spring is that close and still for an instant, so it snapped to
+// the end for a frame and then went on settling, a twitch. This settles far closer.
+const MORPH = { ...SPRING.morph, restDelta: 0.0002 };
+
 type MenuId = "services" | "industries" | "products";
 // Industries only shows once there are industry pages to link to.
 const MENUS: MenuId[] = INDUSTRIES.length ? ["services", "industries", "products"] : ["services", "products"];
@@ -290,7 +296,7 @@ function DesktopNav() {
         lastPill.current = pill;
         morph.current?.stop();
         if (first || reduce || instant) pillness.jump(pill ? 1 : 0);
-        else morph.current = animateValue(pillness, pill ? 1 : 0, SPRING.morph);
+        else morph.current = animateValue(pillness, pill ? 1 : 0, MORPH);
     }, [pill, reduce, instant, pillness]);
 
     // The logo is open in the bar and folded in the pill, and opens while the
@@ -440,7 +446,7 @@ function DesktopNav() {
             hoverOpen.jump(hoverTarget);
             return;
         }
-        const controls = animateValue(hoverOpen, hoverTarget, SPRING.morph);
+        const controls = animateValue(hoverOpen, hoverTarget, MORPH);
         return () => controls.stop();
     }, [hoverTarget, reduce, instant, hoverOpen]);
     useEffect(() => {
