@@ -317,9 +317,16 @@ function DesktopNav() {
         return wide ? clamp01(pillness.get()) * (1 - h) : 1 - h;
     });
 
+    // (Experimental: which of the ways to place the pill is on show. See PillCompare.)
+    const pillMode = usePillMode();
+    // The pill's side before the links: the logo, or, balanced, as wide as the side after them.
+    const sideL = (f: number) => {
+        const own = PILL_PAD.left + logoWidth(f);
+        return pillMode === "balanced" ? Math.max(own, parts.cta + PILL_PAD.right) : own;
+    };
     const widthAt = (p: number, f: number) => {
         if (!vw) return 0;
-        const pillW = PILL_PAD.left + PILL_PAD.right + logoWidth(f) + gap + parts.links + gap + parts.cta;
+        const pillW = sideL(f) + gap + parts.links + gap + parts.cta + PILL_PAD.right;
         return mix(barW, pillW, p);
     };
     const width = useTransform(() => {
@@ -338,18 +345,18 @@ function DesktopNav() {
     // The links sit in the middle of the page (when the bar has room), and they
     // never move: the bar gathers into the pill around them, so the pill is
     // centred on the links rather than the window. `linksAt` is their left edge on screen.
-    // (Experimental: with the pill centred on the page instead, they glide to its middle.)
-    const pillCentred = usePillCentred();
     const linksAt = (p: number) => {
         const logo = logoWidth(wide ? 0 : 1);
         const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
         const inBar = FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
-        if (!pillCentred) return snap(inBar);
-        const inPill = (vw - widthAt(1, 1)) / 2 + PILL_PAD.left + logoWidth(1) + gap;
-        return snap(mix(inBar, inPill, p));
+        // Where they'd be in a pill centred in the window.
+        const inPill = (vw - widthAt(1, 1)) / 2 + sideL(1) + gap;
+        if (pillMode === "glide") return snap(mix(inBar, inPill, p));
+        if (pillMode === "offset") return snap(inPill);
+        return snap(inBar);
     };
     // The nav's left edge. The wordmark opening on hover grows the pill to the left.
-    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksAt(p) - gap - logoWidth(f) - PILL_PAD.left, p));
+    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksAt(p) - gap - sideL(f), p));
     const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : FRAME));
     // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
@@ -935,24 +942,32 @@ function DesktopNav() {
                     </motion.div>
                 </div>
             </motion.div>
-            <PillCompare centred={pillCentred} />
+            <PillCompare mode={pillMode} />
         </MotionConfig>
     );
 }
 
-// Experimental only: a switch for comparing the pill centred on the links (they
-// never move) with the pill centred on the page (they glide to its middle).
-// `?pill=centred` or `?pill=links` sets it too; it's kept for the tab.
+// Experimental only: a switch for comparing ways to place the pill. Only two of
+// these can hold at once, as "Book a call" is wider than the mark: the links in
+// the middle of the bar, the pill in the middle of the window, the links never
+// moving. Unless the pill's two sides are made the same width.
+//   links:    the links stay in the middle of the page; the pill is centred on them, so right of centre
+//   glide:    the pill is centred in the window; the links glide to its middle
+//   offset:   the pill is centred in the window; the links sit where they'll be in it, left of centre in the bar
+//   balanced: the mark's side of the pill is as wide as the call's, so everything shares the middle
+// `?pill=<mode>` sets it too; it's kept for the tab.
+type PillMode = "links" | "glide" | "offset" | "balanced";
+const PILL_MODES: PillMode[] = ["links", "glide", "offset", "balanced"];
 const PILL_KEY = "nav-pill-compare";
 const pillListeners = new Set<() => void>();
-function setPillCentred(on: boolean) {
+function setPillMode(mode: PillMode) {
     try {
-        sessionStorage.setItem(PILL_KEY, on ? "centred" : "links");
+        sessionStorage.setItem(PILL_KEY, mode);
     } catch {}
     pillListeners.forEach((f) => f());
 }
-function usePillCentred() {
-    const [on, setOn] = useState(false);
+function usePillMode() {
+    const [mode, setMode] = useState<PillMode>("links");
     useEffect(() => {
         const read = () => {
             const q = new URLSearchParams(window.location.search).get("pill");
@@ -961,25 +976,26 @@ function usePillCentred() {
                 if (q) sessionStorage.setItem(PILL_KEY, q);
                 v = q ?? sessionStorage.getItem(PILL_KEY);
             } catch {}
-            setOn(v === "centred");
+            setMode(PILL_MODES.find((m) => m === v) ?? "links");
         };
         read();
         pillListeners.add(read);
         return () => void pillListeners.delete(read);
     }, []);
-    return on;
+    return mode;
 }
-function PillCompare({ centred }: { centred: boolean }) {
-    const option = (on: boolean, label: string) => (
+function PillCompare({ mode }: { mode: PillMode }) {
+    const option = (to: PillMode, label: string, title: string) => (
         <button
             type="button"
+            title={title}
             onClick={() => {
                 const url = new URL(window.location.href);
-                url.searchParams.set("pill", on ? "centred" : "links");
+                url.searchParams.set("pill", to);
                 window.history.replaceState(window.history.state, "", url);
-                setPillCentred(on);
+                setPillMode(to);
             }}
-            className={`rounded-full px-3 py-1.5 transition-colors ${centred === on ? "bg-white text-[#1C1C1E] shadow-sm" : "text-white/70 hover:text-white"}`}
+            className={`rounded-full px-3 py-1.5 transition-colors ${mode === to ? "bg-white text-[#1C1C1E] shadow-sm" : "text-white/70 hover:text-white"}`}
         >
             {label}
         </button>
@@ -987,8 +1003,9 @@ function PillCompare({ centred }: { centred: boolean }) {
     return (
         <div className="fixed bottom-4 right-4 z-[60] hidden items-center gap-1 rounded-full bg-[#1C1C1E]/90 p-1 text-xs font-medium backdrop-blur md:flex">
             <span className="px-2 text-white/50">Pill</span>
-            {option(false, "Centred on links")}
-            {option(true, "Centred on page")}
+            {option("links", "A · Off-centre", "Links stay in the middle of the page; the pill sits right of centre")}
+            {option("offset", "C · Bar links off-centre", "Pill centred; in the bar the links sit left of centre, where they'll be in the pill")}
+            {option("balanced", "D · Balanced", "Pill centred; the mark's side is as wide as Book a call's, so nothing moves")}
         </div>
     );
 }
