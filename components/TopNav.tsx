@@ -329,19 +329,16 @@ function DesktopNav() {
     const padRightAt = (p: number) => snap(mix(barPad, PILL_PAD.right, clamp01(p)));
     const paddingLeft = useTransform(() => padLeftAt(pillness.get()));
     const paddingRight = useTransform(() => padRightAt(pillness.get()));
-    // The links sit in the middle of the bar (when there's room) and in the
-    // middle of the pill, which is centred in the window, and go straight from
-    // one to the other on the shape's spring. `linksAt` is their left edge on screen.
-    const linksAt = (p: number) => {
+    // The links sit in the middle of the page (when the bar has room), and they
+    // never move: the bar gathers into the pill around them, so the pill is
+    // centred on the links rather than the window. `linksX` is their left edge on screen.
+    const linksX = () => {
         const logo = logoWidth(wide ? 0 : 1);
         const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
-        const inBar = FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
-        const inPill = (vw - widthAt(1, 1)) / 2 + PILL_PAD.left + logoWidth(1) + gap;
-        return snap(mix(inBar, inPill, p));
+        return snap(FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap);
     };
-    // The nav's left edge. The wordmark opening on hover grows the pill to the
-    // left, so the links don't move under the pointer.
-    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksAt(p) - gap - logoWidth(f) - PILL_PAD.left, p));
+    // The nav's left edge. The wordmark opening on hover grows the pill to the left.
+    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksX() - gap - logoWidth(f) - PILL_PAD.left, p));
     const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : FRAME));
     // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
@@ -350,7 +347,7 @@ function DesktopNav() {
         if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
         const padLeft = padLeftAt(p);
         const free = Math.max(0, snap(widthAt(p, f)) - padLeft - padRightAt(p) - parts.links - 2 * gap);
-        const left = Math.min(free, Math.max(0, linksAt(p) - leftAt(p, f) - padLeft - gap));
+        const left = Math.min(free, Math.max(0, linksX() - leftAt(p, f) - padLeft - gap));
         return `${left}px auto ${free - left}px`;
     });
 
