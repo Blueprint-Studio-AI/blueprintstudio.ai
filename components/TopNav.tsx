@@ -68,6 +68,13 @@ const linkTone = (on: boolean) => (on ? "text-[rgba(28,28,30,0.96)]" : "text-[rg
 const ROW_FOCUS = "outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB]";
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
 const clamp01 = (p: number) => Math.min(1, Math.max(0, p));
+// To the screen's pixels (in steps of `step` of them). The nav's edges, padding
+// and columns all land on whole pixels every frame, so the links and chevrons
+// inside, which the browser rounds each its own way, can't flicker between two.
+const snap = (v: number, step = 1) => {
+    const d = (typeof window === "undefined" ? 1 : window.devicePixelRatio || 1) / step;
+    return Math.round(v * d) / d;
+};
 
 type Box = { x: number; y: number; w: number; h: number; on: boolean; glide: boolean };
 
@@ -312,35 +319,38 @@ function DesktopNav() {
     const width = useTransform(() => {
         const p = pillness.get();
         const f = fold.get();
-        return vw ? widthAt(p, f) : "calc(100% - 122px)";
+        return vw ? snap(widthAt(p, f)) : "calc(100% - 122px)";
     });
-    const height = useTransform(pillness, [0, 1], [BAR_H, PILL_H], { clamp: false });
-    const top = useTransform(pillness, [0, 1], [0, PILL_TOP]);
+    // In steps of two pixels, so the links in the middle of it land on whole pixels too.
+    const height = useTransform(() => snap(mix(BAR_H, PILL_H, pillness.get()), 2));
+    const top = useTransform(() => snap(mix(0, PILL_TOP, clamp01(pillness.get()))));
     const radius = useTransform(pillness, [0, 1], [0, 24]);
-    const paddingLeft = useTransform(pillness, [0, 1], [barPad, PILL_PAD.left]);
-    const paddingRight = useTransform(pillness, [0, 1], [barPad, PILL_PAD.right]);
-    // The links sit in the middle of the bar (when there's room), and they never
-    // move: the bar gathers into the pill around them, so the pill is centred on
-    // the links rather than the window. `linksX` is their left edge on screen.
-    const linksX = () => {
+    const padLeftAt = (p: number) => snap(mix(barPad, PILL_PAD.left, clamp01(p)));
+    const padRightAt = (p: number) => snap(mix(barPad, PILL_PAD.right, clamp01(p)));
+    const paddingLeft = useTransform(() => padLeftAt(pillness.get()));
+    const paddingRight = useTransform(() => padRightAt(pillness.get()));
+    // The links sit in the middle of the bar (when there's room) and in the
+    // middle of the pill, which is centred in the window, and go straight from
+    // one to the other on the shape's spring. `linksAt` is their left edge on screen.
+    const linksAt = (p: number) => {
         const logo = logoWidth(wide ? 0 : 1);
         const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
-        return FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
+        const inBar = FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
+        const inPill = (vw - widthAt(1, 1)) / 2 + PILL_PAD.left + logoWidth(1) + gap;
+        return snap(mix(inBar, inPill, p));
     };
-    const leftAt = (p: number, f: number) => mix(FRAME, linksX() - gap - logoWidth(f) - PILL_PAD.left, p);
-    const x = useTransform(() => {
-        const p = pillness.get();
-        const f = fold.get();
-        return vw ? leftAt(p, f) - (vw - widthAt(p, f)) / 2 : 0;
-    });
+    // The nav's left edge. The wordmark opening on hover grows the pill to the
+    // left, so the links don't move under the pointer.
+    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksAt(p) - gap - logoWidth(f) - PILL_PAD.left, p));
+    const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : FRAME));
     // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
         const p = pillness.get();
         const f = fold.get();
         if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
-        const padLeft = mix(barPad, PILL_PAD.left, clamp01(p));
-        const free = Math.max(0, widthAt(p, f) - padLeft - mix(barPad, PILL_PAD.right, clamp01(p)) - parts.links - 2 * gap);
-        const left = Math.min(free, Math.max(0, linksX() - leftAt(p, f) - padLeft - gap));
+        const padLeft = padLeftAt(p);
+        const free = Math.max(0, snap(widthAt(p, f)) - padLeft - padRightAt(p) - parts.links - 2 * gap);
+        const left = Math.min(free, Math.max(0, linksAt(p) - leftAt(p, f) - padLeft - gap));
         return `${left}px auto ${free - left}px`;
     });
 
@@ -689,7 +699,7 @@ function DesktopNav() {
                 aria-hidden={!revealed || undefined}
                 onPointerEnter={(e) => e.pointerType === "mouse" && setPointerInside(true)}
                 onPointerLeave={(e) => e.pointerType === "mouse" && setPointerInside(false)}
-                className="fixed inset-x-0 z-50 mx-auto hidden md:block"
+                className="fixed left-0 z-50 hidden md:block"
                 style={{ width, height, top, x, borderRadius: radius, paddingLeft, paddingRight }}
                 initial={false}
                 animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : -10 }}
