@@ -319,18 +319,29 @@ function DesktopNav() {
     const radius = useTransform(pillness, [0, 1], [0, 24]);
     const paddingLeft = useTransform(pillness, [0, 1], [barPad, PILL_PAD.left]);
     const paddingRight = useTransform(pillness, [0, 1], [barPad, PILL_PAD.right]);
-    // The links sit in the middle of the bar (when there's room) and right after
-    // the logo in the pill; the space either side always adds up to the width.
+    // The links sit in the middle of the bar (when there's room), and they never
+    // move: the bar gathers into the pill around them, so the pill is centred on
+    // the links rather than the window. `linksX` is their left edge on screen.
+    const linksX = () => {
+        const logo = logoWidth(wide ? 0 : 1);
+        const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
+        return FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
+    };
+    const leftAt = (p: number, f: number) => mix(FRAME, linksX() - gap - logoWidth(f) - PILL_PAD.left, p);
+    const x = useTransform(() => {
+        const p = pillness.get();
+        const f = fold.get();
+        return vw ? leftAt(p, f) - (vw - widthAt(p, f)) / 2 : 0;
+    });
+    // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
         const p = pillness.get();
         const f = fold.get();
         if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
-        const logo = logoWidth(f);
-        const q = clamp01(p);
-        const free = Math.max(0, widthAt(p, f) - mix(barPad, PILL_PAD.left, q) - mix(barPad, PILL_PAD.right, q) - parts.links - 2 * gap);
-        const centred = Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta));
-        const left = Math.max(0, mix(centred, logo, q));
-        return `${left}px auto ${Math.max(0, free - left)}px`;
+        const padLeft = mix(barPad, PILL_PAD.left, clamp01(p));
+        const free = Math.max(0, widthAt(p, f) - padLeft - mix(barPad, PILL_PAD.right, clamp01(p)) - parts.links - 2 * gap);
+        const left = Math.min(free, Math.max(0, linksX() - leftAt(p, f) - padLeft - gap));
+        return `${left}px auto ${free - left}px`;
     });
 
     // While it's a bar over the page, it frosts in as the page starts to move under it.
@@ -679,7 +690,7 @@ function DesktopNav() {
                 onPointerEnter={(e) => e.pointerType === "mouse" && setPointerInside(true)}
                 onPointerLeave={(e) => e.pointerType === "mouse" && setPointerInside(false)}
                 className="fixed inset-x-0 z-50 mx-auto hidden md:block"
-                style={{ width, height, top, borderRadius: radius, paddingLeft, paddingRight }}
+                style={{ width, height, top, x, borderRadius: radius, paddingLeft, paddingRight }}
                 initial={false}
                 animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : -10 }}
                 transition={revealed ? { duration: 0.7, ease: EASE_OUT } : { duration: 0 }}
