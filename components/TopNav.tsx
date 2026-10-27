@@ -985,7 +985,7 @@ function PillCompare({ centred }: { centred: boolean }) {
         </button>
     );
     return (
-        <div className="fixed bottom-4 left-4 z-[60] hidden items-center gap-1 rounded-full bg-[#1C1C1E]/90 p-1 text-xs font-medium backdrop-blur md:flex">
+        <div className="fixed bottom-4 right-4 z-[60] hidden items-center gap-1 rounded-full bg-[#1C1C1E]/90 p-1 text-xs font-medium backdrop-blur md:flex">
             <span className="px-2 text-white/50">Pill</span>
             {option(false, "Centred on links")}
             {option(true, "Centred on page")}
