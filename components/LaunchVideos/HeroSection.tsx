@@ -139,7 +139,7 @@ export default function HeroSection() {
                 <source
                   src={isMobile
                     ? "/media/highlight-reel/highlight-reel-vertical-004-compressed.mp4"
-                    : "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4"
+                    : "/media/highlight-reel/highlight-reel-horizontal-005-compressed.mp4"
                   }
                   type="video/mp4"
                 />
