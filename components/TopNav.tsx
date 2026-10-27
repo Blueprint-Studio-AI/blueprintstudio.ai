@@ -337,14 +337,19 @@ function DesktopNav() {
     const paddingRight = useTransform(() => padRightAt(pillness.get()));
     // The links sit in the middle of the page (when the bar has room), and they
     // never move: the bar gathers into the pill around them, so the pill is
-    // centred on the links rather than the window. `linksX` is their left edge on screen.
-    const linksX = () => {
+    // centred on the links rather than the window. `linksAt` is their left edge on screen.
+    // (Experimental: with the pill centred on the page instead, they glide to its middle.)
+    const pillCentred = usePillCentred();
+    const linksAt = (p: number) => {
         const logo = logoWidth(wide ? 0 : 1);
         const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
-        return snap(FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap);
+        const inBar = FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap;
+        if (!pillCentred) return snap(inBar);
+        const inPill = (vw - widthAt(1, 1)) / 2 + PILL_PAD.left + logoWidth(1) + gap;
+        return snap(mix(inBar, inPill, p));
     };
     // The nav's left edge. The wordmark opening on hover grows the pill to the left.
-    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksX() - gap - logoWidth(f) - PILL_PAD.left, p));
+    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksAt(p) - gap - logoWidth(f) - PILL_PAD.left, p));
     const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : FRAME));
     // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
@@ -353,7 +358,7 @@ function DesktopNav() {
         if (!vw) return "minmax(0,1fr) auto minmax(0,1fr)";
         const padLeft = padLeftAt(p);
         const free = Math.max(0, snap(widthAt(p, f)) - padLeft - padRightAt(p) - parts.links - 2 * gap);
-        const left = Math.min(free, Math.max(0, linksX() - leftAt(p, f) - padLeft - gap));
+        const left = Math.min(free, Math.max(0, linksAt(p) - leftAt(p, f) - padLeft - gap));
         return `${left}px auto ${free - left}px`;
     });
 
@@ -930,6 +935,60 @@ function DesktopNav() {
                     </motion.div>
                 </div>
             </motion.div>
+            <PillCompare centred={pillCentred} />
         </MotionConfig>
+    );
+}
+
+// Experimental only: a switch for comparing the pill centred on the links (they
+// never move) with the pill centred on the page (they glide to its middle).
+// `?pill=centred` or `?pill=links` sets it too; it's kept for the tab.
+const PILL_KEY = "nav-pill-compare";
+const pillListeners = new Set<() => void>();
+function setPillCentred(on: boolean) {
+    try {
+        sessionStorage.setItem(PILL_KEY, on ? "centred" : "links");
+    } catch {}
+    pillListeners.forEach((f) => f());
+}
+function usePillCentred() {
+    const [on, setOn] = useState(false);
+    useEffect(() => {
+        const read = () => {
+            const q = new URLSearchParams(window.location.search).get("pill");
+            let v = q;
+            try {
+                if (q) sessionStorage.setItem(PILL_KEY, q);
+                v = q ?? sessionStorage.getItem(PILL_KEY);
+            } catch {}
+            setOn(v === "centred");
+        };
+        read();
+        pillListeners.add(read);
+        return () => void pillListeners.delete(read);
+    }, []);
+    return on;
+}
+function PillCompare({ centred }: { centred: boolean }) {
+    const option = (on: boolean, label: string) => (
+        <button
+            type="button"
+            onClick={() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set("pill", on ? "centred" : "links");
+                window.history.replaceState(window.history.state, "", url);
+                setPillCentred(on);
+            }}
+            className={`rounded-full px-3 py-1.5 transition-colors ${centred === on ? "bg-white text-[#1C1C1E] shadow-sm" : "text-white/70 hover:text-white"}`}
+        >
+            {label}
+        </button>
+    );
+    return (
+        <div className="fixed bottom-4 left-4 z-[60] hidden items-center gap-1 rounded-full bg-[#1C1C1E]/90 p-1 text-xs font-medium backdrop-blur md:flex">
+            <span className="px-2 text-white/50">Pill</span>
+            {option(false, "Centred on links")}
+            {option(true, "Centred on page")}
+        </div>
     );
 }
