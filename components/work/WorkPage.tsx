@@ -3,6 +3,7 @@ import { workTypeLabels } from "@/data/portfolioData";
 import Section from "@/components/ui/Section";
 import { Footer } from "@/components/Footer/index";
 import { casePhone, collectionShowcase, deckShowcase, workFor, workShowcase, type WorkPageConfig } from "@/lib/work";
+import { services } from "@/lib/services";
 import CtaBand from "./CtaBand";
 import DeckShowcase from "./DeckShowcase";
 import FrameLines from "./FrameLines";
@@ -23,6 +24,7 @@ export type WorkLayout = "a" | "b";
 //    original Blueprint site's case pages).
 export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig; layout?: WorkLayout }) {
   const works = workFor(page.slug);
+  const service = services.find((s) => s.deliverable === page.slug);
   // Decks have their own layout (cover and slides) in both A and B.
   const hero = layout === "b" && page.slug !== "decks" ? collectionShowcase(works, "") : null;
 
@@ -71,7 +73,8 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
           </div>
         </div>
       </Section>
-      <CtaBand />
+      {/* The kind of work's own service page: its process, what's included and pricing. */}
+      <CtaBand secondary={service ? { href: `/services/${service.slug}`, label: "See pricing" } : undefined} />
       <Footer />
     </div>
   );
