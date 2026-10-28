@@ -18,9 +18,6 @@ import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "../ui/SectionHeader";
-import AnimatedCitySwitcher from "@/components/ui/AnimatedCitySwitcher";
-import AnimatedDate from "@/components/ui/AnimatedDate";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
@@ -221,6 +218,8 @@ export default function Hero() {
 
     const land = useCallback(() => {
         if (stageRef.current !== "reel") return;
+        // The top nav arrives with the reel, not after it.
+        window.dispatchEvent(new Event("bp:opening-landing"));
         setStage("landing");
         animate(progress, 1, LAND).then(() => {
             if (stageRef.current === "landing") setStage("docked");
@@ -370,7 +369,7 @@ export default function Hero() {
             </AnimatePresence>
 
             <Section
-                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[100svh] justify-between overflow-hidden bg-neutral-50`}
+                className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[calc(100svh-48px)] justify-between overflow-hidden bg-neutral-50 md:min-h-[calc(100svh-64px)]`}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
@@ -382,36 +381,6 @@ export default function Hero() {
                     </div>
                 </div>
 
-                <SectionHeader
-                    leftText={
-                        revealed ? (
-                            <AnimatedCitySwitcher key="city-ready" startDelay={300} />
-                        ) : (
-                            <span aria-hidden="true" className="inline-block opacity-0" style={{ minWidth: "350px" }}>
-                                Los Angeles, California
-                            </span>
-                        )
-                    }
-                    centerContent={
-                        <motion.div
-                            initial={{ opacity: 0, y: -24, filter: "blur(6px)" }}
-                            animate={revealed ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
-                            transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT }}
-                        >
-                            <Image src="/blueprint-logo-dark.svg" alt="Blueprint Studio" width={80} height={20} className="h-3 w-auto sm:h-4" />
-                        </motion.div>
-                    }
-                    rightText={
-                        revealed ? (
-                            <AnimatedDate key="date-ready" startDelay={300} />
-                        ) : (
-                            <span aria-hidden="true" className="inline-block opacity-0" style={{ minWidth: "120px" }}>
-                                00.00.0000
-                            </span>
-                        )
-                    }
-                />
-
                 <OuterContainer className="flex w-full flex-1 items-center justify-center">
                     <InnerContainer className="relative flex w-full flex-col items-center justify-center px-6 lg:justify-start pb-6 pt-10 sm:px-10 sm:pb-8 sm:pt-8 lg:px-16">
                         {/* Inner dashed vertical lines on desktop */}
@@ -419,7 +388,7 @@ export default function Hero() {
                         <div className="line-dash-y absolute bottom-0 right-0 top-0 hidden custom:block" />
 
                         {/* As wide as the reel's slot below, so the statement and the frame share a left edge. */}
-                        <div className="flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]">
+                        <div className="flex w-full flex-col items-start text-left sm:w-[min(100%,max(480px,calc((100svh-390px)*16/9)))]">
                             <motion.h1
                                 {...rise(0.15)}
                                 className="cursor-default font-medium text-neutral-800"
@@ -479,7 +448,7 @@ export default function Hero() {
                         {/* The reel's slot: as big as fits between the copy and the floating nav */}
                         <div
                             ref={slotRef}
-                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-460px)*16/9)))]"
+                            className="relative mt-8 aspect-[4/5] w-full sm:aspect-video sm:w-[min(100%,max(480px,calc((100svh-390px)*16/9)))]"
                         >
                             <div
                                 ref={frameRef}

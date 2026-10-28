@@ -82,21 +82,8 @@ export default function BlogIndex({ posts }: { posts: BlogPost[] }) {
           </div>
         </div>
 
-        <SectionHeader
-          leftText="INSIGHTS"
-          centerContent={
-            <Link href="/" className="hover:opacity-70 transition-opacity">
-              <Image
-                src="/blueprint-logo-dark.svg"
-                alt="Blueprint Studio"
-                width={80}
-                height={20}
-                className="h-3 sm:h-4 w-auto"
-              />
-            </Link>
-          }
-          rightText="// insights"
-        />
+        {/* The top nav above carries the logo now */}
+        <SectionHeader leftText="INSIGHTS" rightText="// insights" />
 
         <OuterContainer>
           <InnerContainer className="pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 lg:pb-32 px-2.5 sm:px-6 relative">
