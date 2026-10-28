@@ -9,8 +9,6 @@ export interface Film {
   year: string;
   /** The case's cover: the kit's lead still. */
   cover: KitStill;
-  /** The inside of the lid: the kit's second still. */
-  booklet: KitStill;
   /** The 16:9 key frame (printed on the disc, and the screen's poster) and its clip. */
   hero: KitMedia & { alt: string };
   /** Where the film's Showcase links: its client's page, where there is one. */

@@ -16,7 +16,6 @@ export default function LaunchVideosGallery({ works }: GalleryProps) {
       client: work.client.name,
       year: work.year,
       cover: work.kit.stills[0],
-      booklet: work.kit.stills[1],
       hero,
       links: workShowcase(work).links,
     };

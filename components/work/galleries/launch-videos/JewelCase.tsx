@@ -187,13 +187,8 @@ export function JewelCase({
           <div className="absolute inset-0 bg-[linear-gradient(118deg,rgba(255,255,255,0.32)_0%,rgba(255,255,255,0.08)_26%,rgba(255,255,255,0)_42%,rgba(255,255,255,0)_70%,rgba(255,255,255,0.1)_100%)]" />
           <div className="absolute inset-0 rounded-[3px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4),inset_0_1px_0_rgba(255,255,255,0.6)]" />
         </div>
-        {/* Inside of the lid: the booklet's back page */}
-        <div className="absolute inset-0 overflow-hidden rounded-[3px] bg-[#e9e7e2] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <div className="absolute bottom-[2px] left-[2px] top-[2px]" style={{ right: hinge }}>
-            <Image src={film.booklet.src} alt="" fill quality={85} sizes={`${w}px`} className="object-cover" draggable={false} />
-          </div>
-          <div className="absolute inset-0 bg-[linear-gradient(240deg,rgba(255,255,255,0.25),rgba(255,255,255,0)_40%)]" />
-        </div>
+        {/* Inside of the lid: the booklet's plain back */}
+        <div className="absolute inset-0 rounded-[3px] bg-[#e9e7e2] [backface-visibility:hidden] [transform:rotateY(180deg)]" />
       </motion.div>
     </motion.div>
   );

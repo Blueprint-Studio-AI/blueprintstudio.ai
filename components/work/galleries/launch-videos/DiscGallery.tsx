@@ -432,7 +432,8 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   };
 
   const film = films.find((f) => f.slug === loaded) ?? null;
-  const filmSound = film ? (film.hero.src ? (sound[film.slug] ?? null) : false) : null;
+  // A film has sound only once its clip says so; most kit clips are cut silent.
+  const filmSound = !!film?.hero.src && !!sound[film.slug];
   const status: PlayerStatus = !film ? "empty" : reading ? "reading" : playing ? "playing" : "paused";
   const shown = films.find((f) => f.slug === (screen ?? heading.current)) ?? null;
 
@@ -578,7 +579,7 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
 
         {desk === null ? (
           // Before the first layout pass: the machine's room, held.
-          <div aria-hidden="true" className="h-[364px] lg:h-[216px]" />
+          <div aria-hidden="true" className="h-[369px] lg:h-[216px]" />
         ) : desk ? (
           <div className="flex items-end gap-6 xl:gap-8" style={{ height: RACK_H }}>
             <div className="w-[392px] shrink-0 xl:w-[420px]">{player}</div>
@@ -586,7 +587,7 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
           </div>
         ) : (
           <div>
-            <div className="max-w-[460px]">{player}</div>
+            <div className="max-w-[460px] sm:mx-auto">{player}</div>
             <div
               ref={rowRef}
               data-lenis-prevent
@@ -613,6 +614,11 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
             </div>
           </div>
         )}
+
+        {/* For screen readers: what's on, when it changes */}
+        <p className="sr-only" aria-live="polite">
+          {film && !reading ? `Playing ${film.title}, ${film.client}, ${film.year}` : ""}
+        </p>
 
         {flights.map((f) => (
           <FlightDisc key={f.id} f={f} size={P.disc} onDone={landed} />
@@ -647,7 +653,7 @@ function Rack({
   const span = `calc((100% - ${RACK_PAD.l + RACK_PAD.r}px) / ${Math.max(1, n - 1)})`;
 
   return (
-    <div className="relative h-full min-w-0 flex-1 [perspective-origin:50%_8%] [perspective:1400px]" onPointerLeave={() => setHover(null)}>
+    <div className="relative h-full min-w-0 flex-1 [perspective-origin:50%_8%] [perspective:1400px]">
       {films.map((f, i) => {
         const p = pose(f.slug);
         return (
@@ -675,11 +681,14 @@ function Rack({
           aria-label={label(f)}
           aria-pressed={caseProps(f, i).lit}
           onPointerEnter={(e) => e.pointerType === "mouse" && setHover(f.slug)}
+          onPointerLeave={() => setHover(null)}
           onFocus={(e) => e.currentTarget.matches(":focus-visible") && setHover(f.slug)}
           onBlur={() => setHover(null)}
           onClick={() => onPick(f.slug)}
-          className="absolute bottom-0 top-0 z-40 cursor-pointer rounded-[8px] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="absolute bottom-0 z-40 cursor-pointer rounded-[8px] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
           style={{
+            // The case and the room it rises into.
+            height: h + 36,
             left: i === 0 ? 0 : `calc(${at(i)} - ${span} / 2)`,
             width: i === 0 ? `calc(${at(0)} + ${span} / 2)` : i === n - 1 ? `calc(100% - ${at(i)} + ${span} / 2)` : span,
           }}

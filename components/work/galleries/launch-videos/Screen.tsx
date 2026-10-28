@@ -217,12 +217,12 @@ export function Screen({
           ))}
 
         {/* On-screen display */}
-        <div className="pointer-events-none absolute left-3 top-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-white sm:left-5 sm:top-4 sm:text-[13px]" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.6), 0 0 8px rgba(0,0,0,0.35)" }}>
+        <div className="pointer-events-none absolute left-2.5 top-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white sm:left-4 sm:top-4 sm:text-[12px]">
           <AnimatePresence>
             {current && osd && (
               <motion.span
                 key={osd.key}
-                className="block"
+                className="block rounded-[6px] bg-black/45 px-2 py-1 backdrop-blur-sm sm:px-2.5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.3 } }}

@@ -173,8 +173,8 @@ export function Player({
   /** A speaker grille between the display and the keys, where there's room. */
   grille: boolean;
   muted: boolean;
-  /** Whether the film in it has a sound track; null before it's known. */
-  sound: boolean | null;
+  /** Whether the film in it has a sound track (false until the browser says so). */
+  sound: boolean;
   reduce: boolean;
   onPlay: () => void;
   onPrev: () => void;
@@ -253,28 +253,22 @@ export function Player({
             background: "linear-gradient(180deg, #0c1413, #101a19)",
             boxShadow: "inset 0 2px 6px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.8)",
           }}
-          aria-live="polite"
+          aria-hidden="true"
         >
           <div
             className={`relative text-[10px] leading-[1.5] tracking-[0.08em] ${lit ? "text-[#9ef7e4]" : "text-[#9ef7e4]/70"}`}
             style={{ textShadow: "0 0 6px rgba(110,255,225,0.45)" }}
           >
-            <div className="flex items-center justify-between gap-2 tabular-nums">
-              <span className="flex items-center gap-2">
-                <span className="inline-block w-[1.6em] text-center">{glyph}</span>
-                <span>{film ? `${track(index)}/${track(count - 1)}` : `--/${track(count - 1)}`}</span>
-              </span>
-              <span>{film && time !== null ? clock(time) : "-:--"}</span>
+            <div className="flex items-center gap-2 whitespace-nowrap tabular-nums">
+              <span className="inline-block w-[1.6em] text-center">{glyph}</span>
+              <span>{film ? `${track(index)}/${track(count - 1)}` : `--/${track(count - 1)}`}</span>
+              <span className={`ml-auto truncate ${film ? "text-[#9ef7e4]/75" : "text-[#9ef7e4]/30"}`}>{film && !sound ? "No sound" : muted ? "Mute" : "Sound"}</span>
+              <span className="min-w-[4ch] shrink-0 text-right">{film && time !== null ? clock(time) : "-:--"}</span>
             </div>
             <div className="mt-[3px] text-[12px] font-medium leading-[1.35] tracking-[0.06em]">
               {status === "empty" ? "No disc" : status === "reading" ? "Reading…" : <Marquee text={film?.title ?? ""} still={reduce} />}
             </div>
-            <div className="mt-[2px] flex items-center justify-between gap-2">
-              <span className="truncate text-[#9ef7e4]/75">{film ? `${film.client} · ${film.year}` : `${count} films`}</span>
-              <span className={`shrink-0 ${film ? "text-[#9ef7e4]/75" : "text-[#9ef7e4]/30"}`}>
-                {film && sound === false ? "No sound" : muted ? "Mute" : "Sound"}
-              </span>
-            </div>
+            <div className="mt-[2px] truncate text-[#9ef7e4]/75">{film ? `${film.client} · ${film.year}` : `${count} films`}</div>
             {/* How far into the clip */}
             <div className="mt-1.5 flex h-[3px] gap-px" aria-hidden="true">
               {Array.from({ length: segs }, (_, i) => (
@@ -308,13 +302,8 @@ export function Player({
           <Key label="Next film" onPress={onNext} size={key}>
             {Icon.next}
           </Key>
-          <Key
-            label={sound === false ? "This film has no sound" : muted ? "Sound on" : "Mute"}
-            onPress={onMute}
-            disabled={!film || sound === false}
-            size={key}
-          >
-            {muted || sound === false ? Icon.muted : Icon.sound}
+          <Key label={film && !sound ? "This film has no sound" : muted ? "Sound on" : "Mute"} onPress={onMute} disabled={!film || !sound} size={key}>
+            {muted || !sound ? Icon.muted : Icon.sound}
           </Key>
           <Key label="Eject" onPress={onEject} disabled={!film} size={key}>
             {Icon.eject}
