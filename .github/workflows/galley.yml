@@ -1,0 +1,47 @@
+name: Galley
+
+# Checks every Insights post and component example, and that .galley/manifest.json
+# matches the components and front matter. See AGENTS.md.
+on:
+  pull_request:
+    paths:
+      - "content/insights/**"
+      - "components/galley/**"
+      - "galley.config.ts"
+      - "lib/blog.ts"
+      - "lib/blog-frontmatter.ts"
+      - ".galley/**"
+      - "vendor/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/galley.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check posts and manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check posts and component examples
+        run: pnpm galley check
+      - name: Check the manifest is up to date
+        run: |
+          pnpm galley manifest
+          git diff --exit-code .galley/manifest.json || {
+            echo "::error file=.galley/manifest.json::Out of date. Run pnpm galley manifest and commit the result."
+            exit 1
+          }

@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # blueprintstudio.ai
 
 ## What we've made, per client

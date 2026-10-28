@@ -1,7 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { outline, renderPost } from "@blueprint-studio/galley/render";
+import { getAllPosts, getPostBySlug, isPublic } from "@/lib/blog";
 import BlogPost from "@/components/Blog/BlogPost";
+import { elements } from "@/components/galley/elements";
+import galley from "@/galley.config";
+import { editorEnabled } from "../edit/enabled";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -15,10 +19,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) return {};
+  if (!post || !isPublic(post)) return {};
 
   return {
-    title: `${post.title} | Blueprint Studio`,
+    title: post.title,
     description: post.description,
     alternates: {
       canonical: `/insights/${post.slug}`,
@@ -51,7 +55,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function InsightsPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post || !isPublic(post)) notFound();
+  const { content, ...meta } = post;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -84,7 +89,21 @@ export default async function InsightsPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BlogPost post={post} />
+      <BlogPost
+        post={meta}
+        body={renderPost(content, galley, { elements })}
+        toc={outline(content)
+          .filter((h) => h.depth === 2)
+          .map(({ text, id }) => ({ text, id }))}
+      />
+      {editorEnabled() ? (
+        <a
+          href={`/insights/${post.slug}/edit`}
+          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg hover:bg-black"
+        >
+          Edit this post
+        </a>
+      ) : null}
     </>
   );
 }
