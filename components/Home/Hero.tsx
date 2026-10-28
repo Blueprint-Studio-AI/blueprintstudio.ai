@@ -31,7 +31,7 @@ import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } f
 // other element. "View fullscreen" runs the same path backwards.
 
 const REEL_SRC = {
-    full: "/media/highlight-reel/highlight-reel-horizontal-003-compressed.mp4",
+    full: "/media/highlight-reel/highlight-reel-horizontal-005-compressed.mp4",
     // A 2:3 reel for phones, cut from the projects' own vertical edits.
     small: "/media/highlight-reel/highlight-reel-mobile-2x3.mp4",
 };
