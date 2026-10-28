@@ -10,9 +10,10 @@ export function generateStaticParams() {
   return workPages.map((page) => ({ deliverable: page.slug }));
 }
 
-type Props = { params: Promise<{ deliverable: string }>; searchParams: Promise<{ layout?: string }> };
+type Props = { params: Promise<{ deliverable: string }>; searchParams: Promise<{ layout?: string; gallery?: string }> };
 
-// Two layouts to compare, outside production only: ?layout=a (default) or ?layout=b.
+// Two layouts to compare, outside production only: ?layout=a (default) or ?layout=b,
+// and ?gallery=off for the page without its gallery.
 // Production never reads the query, so its pages stay static.
 const COMPARE = process.env.VERCEL_ENV !== "production";
 
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DeliverablePage({ params, searchParams }: Props) {
   const page = getWorkPage((await params).deliverable);
   if (!page) notFound();
-  const layout: WorkLayout = COMPARE && (await searchParams).layout === "b" ? "b" : "a";
-  return <WorkPage page={page} layout={layout} />;
+  const query = await searchParams;
+  const layout: WorkLayout = COMPARE && query.layout === "b" ? "b" : "a";
+  return <WorkPage page={page} layout={layout} gallery={!(COMPARE && query.gallery === "off")} />;
 }

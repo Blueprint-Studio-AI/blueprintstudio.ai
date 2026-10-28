@@ -10,6 +10,7 @@ import CaseStack from "./CaseStack";
 import Reveal from "./Reveal";
 import Showcase from "./Showcase";
 import WorkHeader, { PAGE_END, STACK, TEXT_INSET, WIDE } from "./WorkHeader";
+import { GALLERIES } from "./galleries";
 
 export type WorkLayout = "a" | "b";
 
@@ -21,8 +22,18 @@ export type WorkLayout = "a" | "b";
 //    three's stills beside it; below, each piece as a case: its name, then big
 //    images one after another, then its story where we have one (after the
 //    original Blueprint site's case pages).
-export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig; layout?: WorkLayout }) {
+export default function WorkPage({
+  page,
+  layout = "a",
+  gallery = true,
+}: {
+  page: WorkPageConfig;
+  layout?: WorkLayout;
+  /** False shows the page without its gallery (?gallery=off), to compare. */
+  gallery?: boolean;
+}) {
   const works = workFor(page.slug);
+  const Gallery = gallery ? GALLERIES[page.slug] : undefined;
   // Decks have their own layout (cover and slides) in both A and B.
   const hero = layout === "b" && page.slug !== "decks" ? collectionShowcase(works, "") : null;
 
@@ -41,6 +52,7 @@ export default function WorkPage({ page, layout = "a" }: { page: WorkPageConfig;
           introIsDraft={page.introIsDraft}
           current={page.slug}
         />
+        {Gallery && <Gallery works={works} />}
         <div className={`${WIDE} ${PAGE_END}`}>
           <div className={`${TEXT_INSET} ${STACK}`}>
             {hero && (
