@@ -90,7 +90,7 @@ function BladeFace({ blade, sizes = "120px" }: { blade: BrandBlade; sizes?: stri
         <span className="truncate text-[11.5px] font-semibold leading-none tracking-[-0.01em] text-neutral-900">{blade.short}</span>
       </div>
       <div className="relative shrink-0 bg-[#EDEDEC]" style={{ height: BW }}>
-        <Image src={lead.src} alt="" fill sizes={sizes} quality={80} className="object-cover" draggable={false} />
+        <Image src={lead.src} alt="" fill sizes={sizes} quality={75} className="object-cover" draggable={false} />
       </div>
       <div className="flex shrink-0 flex-col" style={{ height: CHIPS }}>
         {blade.palette.length > 0
@@ -102,7 +102,7 @@ function BladeFace({ blade, sizes = "120px" }: { blade: BrandBlade; sizes?: stri
             ))
           : rest.map((still) => (
               <div key={still.src} className="relative flex-1 bg-[#EDEDEC]">
-                <Image src={still.src} alt="" fill sizes={sizes} quality={80} className="object-cover" draggable={false} />
+                <Image src={still.src} alt="" fill sizes={sizes} quality={75} className="object-cover" draggable={false} />
               </div>
             ))}
       </div>
@@ -215,9 +215,10 @@ function warm(blade: BrandBlade) {
   warmed.add(blade.slug);
   const hero = blade.showcase.frames[0].hero;
   const pictures = [
+    // The hero as Showcase's Stage asks for it (its quality and size), so it's the same file.
     getImageProps({ src: hero.poster, alt: "", sizes: HERO_SIZES, quality: 80, width: 2560, height: 1440 }).props,
     ...blade.stills.map((s) => getImageProps({ src: s.src, alt: "", sizes: STILL_SIZES, quality: 85, fill: true }).props),
-    ...blade.stills.map((s) => getImageProps({ src: s.src, alt: "", sizes: SPINE_SIZES, quality: 80, fill: true }).props),
+    ...blade.stills.map((s) => getImageProps({ src: s.src, alt: "", sizes: SPINE_SIZES, quality: 75, fill: true }).props),
   ];
   for (const props of pictures) {
     const img = new window.Image();
@@ -575,8 +576,9 @@ function Spread({
   const blade = blades[index];
   const [spine] = useState(() => window.innerWidth >= SPINE_FROM);
   // Two springs: the blade's flight, and the card unfolding.
-  const fly = useMotionValue(0);
-  const unfold = useMotionValue(0);
+  // With reduced motion it's simply open, from the first frame.
+  const fly = useMotionValue(reduce ? 1 : 0);
+  const unfold = useMotionValue(reduce ? 1 : 0);
   // Refs, as the transforms below read them on every frame.
   const from = useRef<Placement>(null!);
   if (!from.current) from.current = placement(index);
@@ -783,7 +785,7 @@ function HeroFlight({ blade, fly, faceScale }: { blade: BrandBlade; fly: MotionV
   const heroOpacity = useTransform(fly, (t) => smooth(0.25, 0.6, t));
   return (
     <span className="absolute inset-0 block bg-[#EDEDEC]">
-      <Image src={blade.stills[0].src} alt="" fill sizes={SPINE_SIZES} quality={80} className="object-cover" />
+      <Image src={blade.stills[0].src} alt="" fill sizes={SPINE_SIZES} quality={75} className="object-cover" />
       <motion.span className="absolute inset-0 block" style={{ opacity: heroOpacity }}>
         {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img {...heroImg} className="absolute inset-0 h-full w-full object-cover" />
