@@ -48,30 +48,17 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://blueprintstudio.ai',
     siteName: 'Blueprint Studio',
-    title: 'Blueprint Studio · World-Class Design & Development Solutions',
-    description:
-      "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
-    images: [
-      {
-        url: 'https://blueprintstudio.ai/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Blueprint Studio',
-      },
-    ],
+    // The link preview's words; its picture is app/opengraph-image.tsx.
+    title: 'Blueprint Studio · The design and build partner for founders',
+    description: "We make apps, websites, brands and launch videos, from first sketch to launch.",
   },
   
   twitter: {
     card: 'summary_large_image',
     site: '@bpstu',    
     creator: '@bpstu',  
-    title:
-      'Blueprint Studio · World-Class Design & Development Solutions',
-    description:
-      "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
-    images: [
-      'https://blueprintstudio.ai/og-image.jpg'
-    ],
+    title: 'Blueprint Studio · The design and build partner for founders',
+    description: "We make apps, websites, brands and launch videos, from first sketch to launch.",
   },
 
   /* TODO: Add when verification tokens are ready
