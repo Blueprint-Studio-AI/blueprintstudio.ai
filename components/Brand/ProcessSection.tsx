@@ -9,7 +9,8 @@ import { ChevronLeft } from "lucide-react";
 
 export interface ProcessStep {
   title: string;
-  description: string;
+  /** A node, so a service page can mark a line as draft. */
+  description: ReactNode;
 }
 
 // /brand's steps and heading are the defaults; the service pages pass their own.

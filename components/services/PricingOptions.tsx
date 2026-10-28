@@ -4,23 +4,29 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 import { BookCallButton, SecondaryButton } from "@/components/ui/CallToAction";
 import type { PricingOption, RichText } from "@/lib/services";
+import Draft from "@/components/work/Draft";
 import Reveal from "@/components/work/Reveal";
 import Rich from "./Rich";
 
 // The ways to buy this service, side by side, in /brand's pricing language
 // (white cards, green checks, the blue ring on the one this page leads with).
 // Prices come only from the data file, which only repeats prices the site
-// already publishes; an option without one is "Scoped on a call".
+// already publishes; an option without one is "Scoped on a call". Two options
+// sit side by side in a narrower row, three across the full width.
 export default function PricingOptions({
   title,
   intro,
+  introIsDraft,
   options,
   note,
+  noteIsDraft,
 }: {
   title: string;
   intro: string;
+  introIsDraft?: boolean;
   options: PricingOption[];
   note?: RichText;
+  noteIsDraft?: boolean;
 }) {
   return (
     <div id="pricing">
@@ -35,10 +41,16 @@ export default function PricingOptions({
               >
                 {title}
               </h2>
-              <p className="mt-3 text-balance text-base leading-[1.45] text-neutral-500">{intro}</p>
+              <p className="mt-3 text-balance text-base leading-[1.45] text-neutral-500">
+                <Draft when={!!introIsDraft}>{intro}</Draft>
+              </p>
             </div>
 
-            <div className="grid items-stretch gap-4 lg:grid-cols-3 lg:gap-5">
+            <div
+              className={`grid items-stretch gap-4 lg:gap-5 ${
+                options.length === 2 ? "mx-auto max-w-[760px] md:grid-cols-2" : "lg:grid-cols-3"
+              }`}
+            >
               {options.map((option, i) => (
                 <Reveal key={option.name} delay={i * 0.06} className="h-full">
                   <Card option={option} />
@@ -48,7 +60,9 @@ export default function PricingOptions({
 
             {note && (
               <p className="mx-auto mt-10 max-w-[560px] text-balance px-4 text-center text-sm leading-[1.5] text-neutral-500 sm:mt-12">
-                <Rich text={note} />
+                <Draft when={!!noteIsDraft}>
+                  <Rich text={note} />
+                </Draft>
               </p>
             )}
           </div>
@@ -59,7 +73,7 @@ export default function PricingOptions({
 }
 
 function Card({ option }: { option: PricingOption }) {
-  const { name, price, pricePrefix, priceNote, description, includes, action, featured } = option;
+  const { name, price, pricePrefix, priceNote, description, includes, action, featured, draft } = option;
   const body = (
     <div className={`flex h-full flex-col rounded-[22px] p-6 sm:p-8 ${featured ? "bg-white" : "bg-[#FBFBFB]"}`}>
       <h3 className="text-[18px] font-medium tracking-[-0.36px] text-black">{name}</h3>
@@ -72,7 +86,9 @@ function Card({ option }: { option: PricingOption }) {
         <span className="mt-1 block min-h-[20px] text-sm text-neutral-500">{priceNote}</span>
       </div>
 
-      <p className="mt-4 text-[15px] leading-[1.45] text-neutral-600">{description}</p>
+      <p className="mt-4 text-[15px] leading-[1.45] text-neutral-600">
+        <Draft when={!!draft}>{description}</Draft>
+      </p>
 
       <ul className="mt-6 space-y-3 border-t border-neutral-200 pt-6">
         {includes.map((item) => (

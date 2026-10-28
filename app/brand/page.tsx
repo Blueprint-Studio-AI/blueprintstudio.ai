@@ -17,8 +17,11 @@ export const metadata: Metadata = {
     "visual identity",
     "brand GPT",
   ],
+  // /brand is the paid landing page; /services/branding is the page meant to
+  // rank for the same searches, so search engines are pointed there and the
+  // two don't compete. The share card stays this page's own.
   alternates: {
-    canonical: "/brand",
+    canonical: "/services/branding",
   },
   openGraph: {
     type: "website",

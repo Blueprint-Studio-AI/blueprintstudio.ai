@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -12,7 +13,7 @@ export default function IncludedSection({
   tag,
 }: {
   title: string;
-  intro: string;
+  intro: ReactNode;
   items: IncludedListItem[];
   tag: string;
 }) {

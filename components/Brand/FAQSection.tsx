@@ -126,7 +126,10 @@ function FaqItem({ question, answer }: FaqItemProps) {
   );
 }
 
-export default function FAQSection({ faqs = brandFaqs }: { faqs?: Faq[] } = {}) {
+export default function FAQSection({
+  faqs = brandFaqs,
+  title = "Frequently Asked Questions",
+}: { faqs?: Faq[]; title?: string } = {}) {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       <SectionHeader leftText="FAQ" rightText="// clarity" />
@@ -151,7 +154,7 @@ export default function FAQSection({ faqs = brandFaqs }: { faqs?: Faq[] } = {}) 
                   textWrap: "balance",
                 }}
               >
-                Frequently Asked Questions
+                {title}
               </h2>
             </div>
 

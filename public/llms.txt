@@ -34,6 +34,16 @@ Two engagement models:
 - [Privacy Policy](https://blueprintstudio.ai/privacy-policy): Privacy policy
 - [Terms of Service](https://blueprintstudio.ai/terms): Terms of service
 
+## Service Pages
+
+What we make, with recent work, process, what's included, pricing and FAQs.
+
+- [Websites](https://blueprintstudio.ai/services/websites): Website design and development
+- [Apps](https://blueprintstudio.ai/services/apps): App design and development for startups
+- [Branding](https://blueprintstudio.ai/services/branding): Brand identity design for startups, from $18K
+- [Launch videos](https://blueprintstudio.ai/services/launch-videos): Launch video production for startups, from $8,000
+- [Full Launch Package](https://blueprintstudio.ai/launch): Brand, website, pitch deck and launch video, from $50K
+
 ## Brand Work
 
 Brand identity case studies, each with its logo system, colour and type systems, downloadable brand kit, and a `design.md` design system for coding agents.

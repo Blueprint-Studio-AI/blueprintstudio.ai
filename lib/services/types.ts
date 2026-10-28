@@ -5,6 +5,9 @@ import type { TestimonialId } from "@/data/testimonials";
 // sales structure (hero, recent work, process, what's included, a client's
 // words, pricing, FAQ, call to action), with /brand's own components where
 // they generalize. A new service is a file like websites.ts, listed in ./index.ts.
+//
+// `draft: true` on a line marks copy Tyler hasn't written or approved yet:
+// outside production it renders with a "Draft" tag (components/work/Draft).
 
 /** Text with optional inline links: a plain string, or runs of text and links. */
 export type RichText = string | (string | { label: string; href: string })[];
@@ -18,6 +21,7 @@ export interface IncludedItem {
   caption: string;
   /** "contain" for previews that mustn't be cropped (e.g. a square phone shot). */
   fit?: "cover" | "contain";
+  draft?: boolean;
 }
 
 export interface PricingOption {
@@ -34,6 +38,13 @@ export interface PricingOption {
   action: { kind: "call" } | { kind: "link"; href: string; label: string };
   /** The option this page leads with. */
   featured?: boolean;
+  /**
+   * The price in USD as a number, for the page's schema.org Offer. Only on
+   * an option that is this service sold at a published price (not an add-on
+   * or another package).
+   */
+  offerPrice?: number;
+  draft?: boolean;
 }
 
 export interface ServiceConfig {
@@ -46,18 +57,24 @@ export interface ServiceConfig {
   intro: string;
   /** True until Tyler has written the copy; outside production it renders with a "Draft" tag. */
   introIsDraft?: boolean;
+  /** Published numbers shown in a row under the hero, e.g. /brand's "25+ Brands Built". Only figures the site already states. */
+  stats?: { value: string; label: string }[];
   workTitle: string;
   /** Work slugs (data/portfolioData.ts) for the recent work, in order. The rest of the deliverable's page is a link away. */
   featured: string[];
   process: {
     /** Renders as "{lead} <faint>{faint}</faint> {rest}", the way /brand sets "Four steps, starting at three weeks". */
     heading: { lead: string; faint: string; rest: string };
-    steps: { title: string; description: string }[];
+    steps: { title: string; description: string; draft?: boolean }[];
   };
-  included: { title: string; intro: string; items: IncludedItem[] };
+  included: { title: string; intro: string; introIsDraft?: boolean; items: IncludedItem[] };
   testimonial?: TestimonialId;
-  pricing: { title: string; intro: string; options: PricingOption[]; note?: RichText };
-  faqs: { question: string; answer: RichText }[];
+  pricing: { title: string; intro: string; introIsDraft?: boolean; options: PricingOption[]; note?: RichText; noteIsDraft?: boolean };
+  /** The FAQ's heading; /brand's "Frequently Asked Questions" when left out. */
+  faqTitle?: string;
+  faqs: { question: string; answer: RichText; draft?: boolean }[];
+  /** Other service pages to point to near the foot of the page, by slug. */
+  related?: string[];
   cta: { heading: string; body: string; isDraft?: boolean };
   metaTitle: string;
   metaDescription: string;

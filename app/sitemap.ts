@@ -22,10 +22,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: `${base}/`,              lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    // Service / offering pages
-    { url: `${base}/brand`,         lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
+    // Service / offering pages. /brand and /launch-videos are left out: they're
+    // the paid landing pages, canonical to /services/branding and
+    // /services/launch-videos, and a sitemap lists only canonical URLs.
     { url: `${base}/launch`,        lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    { url: `${base}/launch-videos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     ...services.map((service) => ({
       url: `${base}/services/${service.slug}`,
       lastModified: now,

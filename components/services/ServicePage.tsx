@@ -4,9 +4,11 @@ import { CallToActions, SecondaryButton } from "@/components/ui/CallToAction";
 import ProcessSection from "@/components/Brand/ProcessSection";
 import FAQSection from "@/components/Brand/FAQSection";
 import { testimonials } from "@/data/testimonials";
-import type { ServiceConfig } from "@/lib/services";
+import { getService, type ServiceConfig } from "@/lib/services";
+import { getCombo, industries, industryProjects } from "@/lib/industries";
 import { workBySlugs, workFor, workShowcase } from "@/lib/work";
 import CtaBand from "@/components/work/CtaBand";
+import Draft from "@/components/work/Draft";
 import FrameLines from "@/components/work/FrameLines";
 import Quote from "@/components/work/Quote";
 import Reveal from "@/components/work/Reveal";
@@ -15,18 +17,23 @@ import Showcase from "@/components/work/Showcase";
 import WorkHeader, { PAGE_END, STACK, TEXT_INSET, WIDE } from "@/components/work/WorkHeader";
 import IncludedSection from "./IncludedSection";
 import PricingOptions from "./PricingOptions";
+import Related, { type RelatedService } from "./Related";
 import Rich from "./Rich";
+import Stats from "./Stats";
 
 // The template behind every /services/<slug> page, on /brand's structure:
 // hero, recent work, process, what's included, a client's words, pricing,
 // FAQ and a call. Process, the included list and the FAQ are /brand's own
-// components with this service's content.
+// components with this service's content. Optional parts (the stats under the
+// hero's buttons, the related services) render only for a service that sets them.
 export default function ServicePage({ service }: { service: ServiceConfig }) {
   const featured = workBySlugs(service.featured);
   const all = workFor(service.deliverable);
   const testimonial = service.testimonial ? testimonials[service.testimonial] : undefined;
   const tag = service.label.toLowerCase();
   const { lead, faint, rest } = service.process.heading;
+  const related = relatedServices(service);
+  const byIndustry = industryLinks(service);
 
   return (
     <div>
@@ -44,7 +51,12 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
           }
           intro={service.intro}
           introIsDraft={service.introIsDraft}
-          actions={<CallToActions secondary={{ href: "#pricing", label: "See pricing" }} />}
+          actions={
+            <>
+              <CallToActions secondary={{ href: "#pricing", label: "See pricing" }} />
+              {service.stats && <Stats stats={service.stats} />}
+            </>
+          }
           links={false}
         />
         <section aria-labelledby="recent-title" className={`${WIDE} ${PAGE_END}`}>
@@ -68,7 +80,10 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
         leftLabel="PROCESS"
         rightLabel={`// ${tag}`}
         closing={false}
-        steps={service.process.steps}
+        steps={service.process.steps.map((step) => ({
+          title: step.title,
+          description: <Draft when={!!step.draft}>{step.description}</Draft>,
+        }))}
         heading={
           <>
             {lead}
@@ -81,8 +96,11 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
 
       <IncludedSection
         title={service.included.title}
-        intro={service.included.intro}
-        items={service.included.items}
+        intro={<Draft when={!!service.included.introIsDraft}>{service.included.intro}</Draft>}
+        items={service.included.items.map((item) => ({
+          ...item,
+          description: <Draft when={!!item.draft}>{item.description}</Draft>,
+        }))}
         tag={tag}
       />
 
@@ -99,11 +117,27 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
       <PricingOptions
         title={service.pricing.title}
         intro={service.pricing.intro}
+        introIsDraft={service.pricing.introIsDraft}
         options={service.pricing.options}
         note={service.pricing.note}
+        noteIsDraft={service.pricing.noteIsDraft}
       />
 
-      <FAQSection faqs={service.faqs.map((f) => ({ question: f.question, answer: <Rich text={f.answer} /> }))} />
+      <FAQSection
+        title={service.faqTitle}
+        faqs={service.faqs.map((f) => ({
+          question: f.question,
+          answer: (
+            <Draft when={!!f.draft}>
+              <Rich text={f.answer} />
+            </Draft>
+          ),
+        }))}
+      />
+
+      {related.length > 0 && (
+        <Related services={related} industries={byIndustry} industriesLabel={`${service.label} by industry`} />
+      )}
 
       <CtaBand
         heading={service.cta.heading}
@@ -114,4 +148,34 @@ export default function ServicePage({ service }: { service: ServiceConfig }) {
       <Footer />
     </div>
   );
+}
+
+/** The service's `related` pages, each with a frame from its lead work. */
+function relatedServices(service: ServiceConfig): RelatedService[] {
+  return (service.related ?? []).flatMap((slug) => {
+    const other = getService(slug);
+    const lead = other && workBySlugs(other.featured)[0];
+    if (!other || !lead) return [];
+    return [
+      {
+        href: `/services/${other.slug}`,
+        label: other.label,
+        line: other.headline,
+        image: lead.kit.hero.poster,
+        alt: lead.kit.hero.alt,
+      },
+    ];
+  });
+}
+
+/** The industries with this kind of work: their combo page for it where one exists, else the industry page. */
+function industryLinks(service: ServiceConfig) {
+  return industries
+    .filter((industry) => industryProjects(industry, service.deliverable).length > 0)
+    .map((industry) => {
+      const combo = getCombo(industry.slug, service.deliverable);
+      return combo
+        ? { href: `/industries/${industry.slug}/${service.deliverable}`, label: combo.combo.title }
+        : { href: `/industries/${industry.slug}`, label: industry.label };
+    });
 }
