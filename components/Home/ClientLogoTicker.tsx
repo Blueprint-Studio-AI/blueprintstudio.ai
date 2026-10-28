@@ -296,6 +296,7 @@ export default function ClientLogoTicker() {
             style={
               {
                 height: `calc(var(--logo-h) * ${client.scale ?? 1})`,
+                translate: client.y ? `0 calc(var(--logo-h) * ${(client.scale ?? 1) * client.y})` : undefined,
                 filter: on ? "grayscale(0) brightness(1)" : `grayscale(1) brightness(${client.tone ?? 1})`,
                 "--ink": client.ink ?? 0.5,
               } as React.CSSProperties

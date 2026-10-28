@@ -51,12 +51,24 @@ export const metadata: Metadata = {
     title: 'Blueprint Studio · World-Class Design & Development Solutions',
     description:
       "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
+    // The reel's closing frame, and its first 8 seconds for the apps that play
+    // a clip in the preview (iMessage); everywhere else shows the picture.
     images: [
       {
-        url: 'https://blueprintstudio.ai/og-image.jpg',
+        url: '/og/blueprint-studio.jpg',
         width: 1200,
         height: 630,
         alt: 'Blueprint Studio',
+      },
+    ],
+    videos: [
+      {
+        // In full: Next resolves images against metadataBase, but not videos.
+        url: 'https://blueprintstudio.ai/og/blueprint-studio-reel.mp4',
+        secureUrl: 'https://blueprintstudio.ai/og/blueprint-studio-reel.mp4',
+        type: 'video/mp4',
+        width: 1280,
+        height: 720,
       },
     ],
   },
@@ -69,9 +81,7 @@ export const metadata: Metadata = {
       'Blueprint Studio · World-Class Design & Development Solutions',
     description:
       "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
-    images: [
-      'https://blueprintstudio.ai/og-image.jpg'
-    ],
+    images: ['/og/blueprint-studio.jpg'],
   },
 
   /* TODO: Add when verification tokens are ready

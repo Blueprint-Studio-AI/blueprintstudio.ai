@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       "Thinking on product, design, and building things that work. Insights from Blueprint Studio.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og/blueprint-studio.jpg",
         width: 1200,
         height: 630,
         alt: "Blueprint Studio Insights",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: "Insights | Blueprint Studio",
     description:
       "Thinking on product, design, and building things that work. Insights from Blueprint Studio.",
-    images: ["/og-image.jpg"],
+    images: ["/og/blueprint-studio.jpg"],
   },
 };
 
