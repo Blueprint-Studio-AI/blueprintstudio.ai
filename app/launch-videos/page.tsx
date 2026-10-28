@@ -15,8 +15,11 @@ export const metadata: Metadata = {
     "startup video production",
     "launch video agency",
   ],
+  // /launch-videos is the paid landing page; /services/launch-videos is the
+  // page meant to rank for the same searches, so search engines are pointed
+  // there and the two don't compete. The share card stays this page's own.
   alternates: {
-    canonical: "/launch-videos",
+    canonical: "/services/launch-videos",
   },
   openGraph: {
     type: "website",

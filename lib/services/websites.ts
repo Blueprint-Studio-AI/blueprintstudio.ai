@@ -96,7 +96,7 @@ export const websites: ServiceConfig = {
         priceNote: "on Brand Identity, from $18,000",
         description: "Your brand identity, with the website designed and built alongside it.",
         includes: ["Logo system", "Design system", "Social kit & AI prompts", "Website"],
-        action: { kind: "link", href: "/brand", label: "See Brand Identity" },
+        action: { kind: "link", href: "/services/branding", label: "See Brand Identity" },
       },
       {
         name: "Full Launch Package",
@@ -123,7 +123,7 @@ export const websites: ServiceConfig = {
       question: "How much does a website cost?",
       answer: [
         "It depends on scope, so we price a website on its own after a call. With ",
-        { label: "Brand Identity", href: "/brand" },
+        { label: "Brand Identity", href: "/services/branding" },
         ", a website is a $15,000 add-on.",
       ],
     },
@@ -136,7 +136,7 @@ export const websites: ServiceConfig = {
       question: "What if I need a brand too?",
       answer: [
         "Add a website to ",
-        { label: "Brand Identity", href: "/brand" },
+        { label: "Brand Identity", href: "/services/branding" },
         ", or take the ",
         { label: "Launch Package", href: "/launch" },
         ": brand, website, pitch deck and launch video, starting at $50K.",

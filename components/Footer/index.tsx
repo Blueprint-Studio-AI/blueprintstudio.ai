@@ -31,10 +31,13 @@ const footerLinks: Record<string, FooterSection> = {
   services: {
     title: 'Services',
     links: [
-      { name: 'Brand Identity', href: '/brand' },
+      // The service pages (the ones meant to rank); /brand and /launch-videos
+      // are the paid landing pages.
       { name: 'Websites', href: '/services/websites' },
+      { name: 'Apps', href: '/services/apps' },
+      { name: 'Brand Identity', href: '/services/branding' },
+      { name: 'Launch Videos', href: '/services/launch-videos' },
       { name: 'Launch Package', href: '/launch' },
-      { name: 'Launch Videos', href: '/launch-videos' },
     ]
   },
   products: {
