@@ -53,6 +53,67 @@ const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const LAYOUT_SPRING = { type: "spring", visualDuration: 0.6, bounce: 0.1 } as const;
 const CHIP_SPRING = { type: "spring", visualDuration: 0.4, bounce: 0.18 } as const;
 
+// (Experimental) Three ways to show each client, to compare: "now", a big
+// frame with three stills beside it; "single", only the big frame, the full
+// width of the column; "grid", only the frame, two to a row. `?work=<view>`
+// sets it too; it's kept for the tab.
+type WorkView = "now" | "single" | "grid";
+const WORK_VIEWS: WorkView[] = ["now", "single", "grid"];
+const VIEW_KEY = "home-work-compare";
+const viewListeners = new Set<() => void>();
+
+function setWorkView(view: WorkView) {
+  try {
+    sessionStorage.setItem(VIEW_KEY, view);
+  } catch {}
+  viewListeners.forEach((f) => f());
+}
+
+function useWorkView() {
+  const [view, setView] = useState<WorkView>("now");
+  useEffect(() => {
+    const read = () => {
+      const q = new URLSearchParams(window.location.search).get("work");
+      let v = q;
+      try {
+        if (q) sessionStorage.setItem(VIEW_KEY, q);
+        v = q ?? sessionStorage.getItem(VIEW_KEY);
+      } catch {}
+      setView(WORK_VIEWS.find((m) => m === v) ?? "now");
+    };
+    read();
+    viewListeners.add(read);
+    return () => void viewListeners.delete(read);
+  }, []);
+  return view;
+}
+
+function WorkCompare({ view }: { view: WorkView }) {
+  const option = (to: WorkView, label: string, title: string) => (
+    <button
+      type="button"
+      title={title}
+      onClick={() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("work", to);
+        window.history.replaceState(window.history.state, "", url);
+        setWorkView(to);
+      }}
+      className={`rounded-full px-3 py-1.5 transition-colors ${view === to ? "bg-white text-[#1C1C1E] shadow-sm" : "text-white/70 hover:text-white"}`}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="fixed bottom-[88px] left-1/2 z-[60] flex -translate-x-1/2 items-center gap-1 rounded-full bg-[#1C1C1E]/90 p-1 text-xs font-medium backdrop-blur md:bottom-16 md:left-auto md:right-4 md:translate-x-0">
+      <span className="px-2 text-white/50">Work</span>
+      {option("now", "Now", "A big frame with three stills beside it")}
+      {option("single", "One each", "Only the big frame, the full width of the column")}
+      {option("grid", "Grid", "Only the frame, two to a row")}
+    </div>
+  );
+}
+
 function filterFromUrl(): Filter {
   const key = new URLSearchParams(window.location.search).get("for");
   return FILTERS.find((f) => f.key !== null && f.key === key)?.key ?? null;
@@ -71,14 +132,14 @@ function seeAllFor(filter: Filter) {
 }
 
 /** One client in the section's frame: dashed lines, then its card. */
-function ClientSection({ data, first }: { data: ShowcaseData; first: boolean }) {
+function ClientSection({ data, first, view }: { data: ShowcaseData; first: boolean; view: WorkView }) {
   return (
     <div className="w-full">
       {!first && <div className="w-full line-dash-x" />}
       <InnerContainer className="relative px-2.5 py-10 sm:px-6 sm:py-16 lg:py-20">
         <div className="absolute bottom-0 left-0 top-0 hidden line-dash-y custom:block" />
         <div className="absolute bottom-0 right-0 top-0 hidden line-dash-y custom:block" />
-        <Showcase data={data} staged />
+        {view === "now" ? <Showcase data={data} staged /> : <Showcase data={data} staged single sizes="(min-width: 1024px) 950px, 94vw" />}
       </InnerContainer>
     </div>
   );
@@ -179,7 +240,7 @@ function Chips({ value, onPick }: { value: Filter; onPick: (key: Filter) => void
  * page below follows smoothly instead of jumping. It only clips while it
  * springs (overflow: clip, which keeps the reels' sticky column working).
  */
-function WorkList({ filter }: { filter: Filter }) {
+function WorkList({ filter, view }: { filter: Filter; view: WorkView }) {
   const reduce = usePrefersReducedMotion();
   const items = itemsFor(filter);
   const seeAll = seeAllFor(filter);
@@ -239,21 +300,43 @@ function WorkList({ filter }: { filter: Filter }) {
   return (
     <motion.div style={{ height: heightStyle, overflow: clipping ? "clip" : undefined }} className="w-full">
       <div ref={innerRef} className="relative w-full">
-        <AnimatePresence initial={false} mode="popLayout">
-          {items.map((item, i) => (
-            <motion.div
-              key={item.id}
-              layout="position"
-              initial={enter}
-              animate={shown}
-              exit={exit}
-              transition={{ layout: LAYOUT_SPRING, default: { duration: 0.45, ease: EASE_OUT, delay: 0.03 + Math.min(i, 3) * 0.05 } }}
-              className="relative z-[1] w-full"
-            >
-              <ClientSection data={item} first={i === 0} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {view === "grid" ? (
+          <InnerContainer className="relative grid gap-x-6 gap-y-12 px-2.5 py-10 sm:grid-cols-2 sm:px-6 sm:py-16 lg:gap-y-16 lg:py-20">
+            <div className="absolute bottom-0 left-0 top-0 hidden line-dash-y custom:block" />
+            <div className="absolute bottom-0 right-0 top-0 hidden line-dash-y custom:block" />
+            <AnimatePresence initial={false} mode="popLayout">
+              {items.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  layout="position"
+                  initial={enter}
+                  animate={shown}
+                  exit={exit}
+                  transition={{ layout: LAYOUT_SPRING, default: { duration: 0.45, ease: EASE_OUT, delay: 0.03 + Math.min(i, 3) * 0.05 } }}
+                  className="relative z-[1] w-full"
+                >
+                  <Showcase data={item} staged single sizes="(min-width: 640px) 470px, 94vw" />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </InnerContainer>
+        ) : (
+          <AnimatePresence initial={false} mode="popLayout">
+            {items.map((item, i) => (
+              <motion.div
+                key={item.id}
+                layout="position"
+                initial={enter}
+                animate={shown}
+                exit={exit}
+                transition={{ layout: LAYOUT_SPRING, default: { duration: 0.45, ease: EASE_OUT, delay: 0.03 + Math.min(i, 3) * 0.05 } }}
+                className="relative z-[1] w-full"
+              >
+                <ClientSection data={item} first={i === 0} view={view} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
 
         {/* It glides with the projects rather than jumping ahead of them. */}
         <motion.div layout="position" transition={{ layout: LAYOUT_SPRING }} className="w-full">
@@ -277,6 +360,7 @@ function WorkList({ filter }: { filter: Filter }) {
 
 export default function PortfolioBento() {
   const [filter, setFilter] = useState<Filter>(null);
+  const view = useWorkView();
   // Bumped to remount the list without animating, for a ?for= link.
   const [epoch, setEpoch] = useState(0);
 
@@ -348,11 +432,12 @@ export default function PortfolioBento() {
 
         <div className="w-full max-w-[1000px]">
           <MotionConfig reducedMotion="user">
-            <WorkList key={epoch} filter={filter} />
+            <WorkList key={`${epoch}-${view}`} filter={filter} view={view} />
           </MotionConfig>
         </div>
       </OuterContainer>
       <div className="w-full line-dash-x" />
+      <WorkCompare view={view} />
     </Section>
   );
 }

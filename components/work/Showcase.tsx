@@ -378,14 +378,32 @@ export default function Showcase({
   staged = false,
   eager = false,
   titleAs = "h3",
+  single = false,
+  sizes,
 }: {
   data: ShowcaseData;
   /** Join the home page's staged clip loading. */
   staged?: boolean;
   eager?: boolean;
   titleAs?: "h2" | "h3";
+  /** Just the big frame and its caption, without the three stills. */
+  single?: boolean;
+  /** The frame's image sizes, when it isn't the usual three columns wide. */
+  sizes?: string;
 }) {
   const { active, picked, pick } = useActiveFrame(data);
+
+  if (single)
+    return (
+      <article id={data.id} aria-label={data.title || undefined} className="scroll-mt-24">
+        <div className="group/project relative">
+          <div className="group/stage relative">
+            <Stage data={data} active={active} picked={picked} staged={staged} eager={eager} sizes={sizes} />
+          </div>
+          <Caption data={data} active={active} as={titleAs} className="pt-5 lg:pt-7" />
+        </div>
+      </article>
+    );
 
   return (
     <article id={data.id} aria-label={data.title || undefined} className="scroll-mt-24 lg:grid lg:grid-cols-4 lg:gap-5 wide:gap-6">
