@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
@@ -12,11 +12,12 @@ import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import { LAND, MORPH, NUDGE, clamp01, lerp, smooth, useMedia, useScrollLock } from "../shared";
 
 // The brands as a swatch fan, pinned at one rivet. Each blade carries a brand:
-// its mark on top, then its own colours from its kit (or, for a brand without
-// one, its kit stills), then its name. Hover fans them wide and lifts the one
-// under the pointer; on touch, drag turns the fan. Pick a blade and it leaves
-// the fan and opens into a spread of the brand's kit: the reel or hero, the
-// stills, the palette, the mark.
+// its name at the end, its mark, then its own colours from its kit (or, for a
+// brand without one, its kit stills). Hover fans them wide and lifts the one
+// under the pointer; on touch, drag runs along the fan and it opens around
+// the blade under your finger. Pick a blade and it leaves the fan: on a wide
+// screen it stands up as the spine of a spread and the brand's kit unfolds
+// beside it; on a narrower one it flies into the spread's big frame.
 
 export interface BrandSwatch {
   name: string;
@@ -28,6 +29,8 @@ export interface BrandSwatch {
 export interface BrandBlade {
   slug: string;
   name: string;
+  /** The name on the blade's end, where a long one won't fit. */
+  short: string;
   /** Under the name: its client where that differs, what it is, the year. */
   meta: string[];
   title: string;
@@ -52,14 +55,23 @@ const PX = FW / 2;
 const PY = FH - 44;
 /** Rivet to the middle of a blade. */
 const ARM = BH / 2 - RIVET;
-/** Never smaller than this: on a phone the fan runs off both edges and turns instead. */
+/** Never smaller than this: on a phone the fan runs to the screen's edges. */
 const MIN_SCALE = 0.66;
+// A blade's bands, top to bottom: its name, its mark, its colours (or stills), its foot.
+const END = 28;
+const CHIPS = 240;
 
-// The fan's spread, in degrees: at rest, opened by a hovering pointer, and on
-// touch (narrower, so every blade is on a phone's screen to tap; drag turns it).
-const SPREAD = { rest: 92, open: 124, touch: 80 };
+// The fan's spread, in degrees: at rest, and opened by a hovering pointer.
+const SPREAD = { rest: 92, open: 124 };
 /** How far the neighbours part around a lifted blade. */
 const PART = 5;
+// On touch the fan opens around one blade: it stands in the middle and the
+// rest gather toward the edges (TOUCH_REACH degrees at most), so every blade
+// stays on a phone's screen, however far along you are.
+const TOUCH_REACH = 37;
+const TOUCH_EASE = 2.1;
+/** Finger travel, in px, from one blade to the next. */
+const TOUCH_STEP = 34;
 
 /** Black or white text on a swatch. */
 function ink(hex: string) {
@@ -68,36 +80,42 @@ function ink(hex: string) {
   return 0.299 * r + 0.587 * g + 0.114 * b > 150 ? "#171717" : "#FFFFFF";
 }
 
-/** The face of a blade, in the fan's units. Also flies out with the blade when it opens. */
-function BladeFace({ blade }: { blade: BrandBlade }) {
+/** The face of a blade, in the fan's units. It's also the spine of the open spread. */
+function BladeFace({ blade, sizes = "120px" }: { blade: BrandBlade; sizes?: string }) {
   const [lead, ...rest] = blade.stills;
-  const chips = blade.palette.slice(0, 4);
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[10px] bg-white">
-      <div className="relative shrink-0 bg-[#EDEDEC]" style={{ height: BW }}>
-        <Image src={lead.src} alt="" fill sizes="120px" quality={80} className="object-cover" draggable={false} />
+      {/* Right-aligned: in the fan, each blade's right edge is the part the one above leaves showing. */}
+      <div className="flex shrink-0 items-center justify-end px-2.5" style={{ height: END }}>
+        <span className="truncate text-[11.5px] font-semibold leading-none tracking-[-0.01em] text-neutral-900">{blade.short}</span>
       </div>
-      <div className="flex shrink-0 flex-col" style={{ height: BW * 2 }}>
-        {chips.length > 0
-          ? chips.map((s) => (
-              <div
-                key={s.name}
-                className="flex flex-1 flex-col justify-end px-2.5 pb-[7px]"
-                style={{ background: s.bg, color: ink(s.hex) }}
-              >
-                <span className="text-[9.5px] font-semibold leading-none">{s.name}</span>
+      <div className="relative shrink-0 bg-[#EDEDEC]" style={{ height: BW }}>
+        <Image src={lead.src} alt="" fill sizes={sizes} quality={80} className="object-cover" draggable={false} />
+      </div>
+      <div className="flex shrink-0 flex-col" style={{ height: CHIPS }}>
+        {blade.palette.length > 0
+          ? blade.palette.map((s) => (
+              <div key={s.name} className="flex min-h-0 flex-1 flex-col justify-end px-2.5 pb-[6px]" style={{ background: s.bg, color: ink(s.hex) }}>
+                <span className="truncate text-[9.5px] font-semibold leading-none">{s.name}</span>
                 <span className="mt-[3px] font-mono text-[8.5px] leading-none opacity-70">{s.hex}</span>
               </div>
             ))
           : rest.map((still) => (
               <div key={still.src} className="relative flex-1 bg-[#EDEDEC]">
-                <Image src={still.src} alt="" fill sizes="120px" quality={80} className="object-cover" draggable={false} />
+                <Image src={still.src} alt="" fill sizes={sizes} quality={80} className="object-cover" draggable={false} />
               </div>
             ))}
       </div>
-      <div className="flex-1 border-t border-black/[0.06] px-2.5 pt-[11px]">
-        <p className="truncate text-[12.5px] font-semibold leading-tight tracking-[-0.01em] text-neutral-900">{blade.name}</p>
-        <p className="mt-[3px] truncate text-[9.5px] leading-tight text-neutral-500">{blade.year}</p>
+      <div className="relative flex-1 border-t border-black/[0.06] px-2.5 pt-[8px]">
+        <p className="truncate text-[9.5px] leading-tight text-neutral-500">
+          {blade.title.length > 18 ? "Identity" : blade.title} · {blade.year}
+        </p>
+        {/* The punched hole the rivet goes through. */}
+        <span
+          aria-hidden
+          className="absolute left-1/2 h-[14px] w-[14px] -translate-x-1/2 rounded-full bg-[#E9E9E6] shadow-[inset_0_1px_2px_rgba(0,0,0,0.28)]"
+          style={{ bottom: RIVET - 7 }}
+        />
       </div>
     </div>
   );
@@ -184,8 +202,13 @@ function Blade({
   );
 }
 
-// The spread's pictures, fetched and decoded while a blade is lifted, so the
-// flight never waits on them.
+const HERO_SIZES = "(min-width: 1024px) 900px, 100vw";
+const STILL_SIZES = "(min-width: 1024px) 160px, 33vw";
+/** The blade grown into the spread's spine. */
+const SPINE_SIZES = "220px";
+
+// The spread's pictures, fetched and decoded while a blade is lifted (or
+// pressed), so the flight never waits on them.
 const warmed = new Set<string>();
 function warm(blade: BrandBlade) {
   if (warmed.has(blade.slug)) return;
@@ -194,7 +217,7 @@ function warm(blade: BrandBlade) {
   const pictures = [
     getImageProps({ src: hero.poster, alt: "", sizes: HERO_SIZES, quality: 80, width: 2560, height: 1440 }).props,
     ...blade.stills.map((s) => getImageProps({ src: s.src, alt: "", sizes: STILL_SIZES, quality: 85, fill: true }).props),
-    getImageProps({ src: blade.stills[0].src, alt: "", sizes: HERO_SIZES, quality: 70, fill: true }).props,
+    ...blade.stills.map((s) => getImageProps({ src: s.src, alt: "", sizes: SPINE_SIZES, quality: 80, fill: true }).props),
   ];
   for (const props of pictures) {
     const img = new window.Image();
@@ -226,13 +249,20 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
   const [entered, setEntered] = useState(false);
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState<number | null>(null);
+  // On touch, where along the fan the finger is (a blade index, in between while dragging).
+  const [along, setAlongState] = useState<number | null>(null);
+  const alongRef = useRef<number | null>(null);
+  const setAlong = (a: number | null) => {
+    alongRef.current = a;
+    setAlongState(a);
+  };
   const [open, setOpen] = useState<number | null>(null);
   const rot = useMotionValue(0);
   const motionRefs = useRef<{ angle: MotionValue<number>; up: MotionValue<number> }[]>([]);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const quietFocus = useRef(false);
 
-  // Fit the fan to its column; on a phone it stays big and runs off the edges.
+  // Fit the fan to its column; on a phone it stays big and runs to the edges.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -257,10 +287,12 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
     return () => clearTimeout(t);
   }, [entered]);
 
-  const spread = touch ? SPREAD.touch : hover || focus !== null ? SPREAD.open : SPREAD.rest;
+  const spread = hover || focus !== null ? SPREAD.open : SPREAD.rest;
   const base = useCallback((i: number, s = spread) => -s / 2 + (i * s) / (n - 1), [n, spread]);
+  const centre = along ?? focus ?? (n - 1) / 2;
   const targetOf = (i: number) => {
     if (!entered && !reduce) return 0;
+    if (touch) return TOUCH_REACH * Math.tanh((i - centre) / TOUCH_EASE);
     const a = base(i);
     if (focus === null) return a;
     return a + (i < focus ? -PART : i > focus ? PART : 0);
@@ -285,21 +317,16 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
     [base, rot, scale]
   );
 
-  // Drag turns the fan. A touch fan settles with the nearest blade on top; a
-  // mouse fan springs back, as it all fits.
-  const drag = useRef<{ x: number; r0: number; id: number; moved: boolean } | null>(null);
+  // Drag. With a mouse it turns the fan, which springs back (it all fits);
+  // on touch it runs along the fan, which opens around the blade underneath.
+  const drag = useRef<{ x: number; r0: number; a0: number; id: number; moved: boolean } | null>(null);
   const dragged = useRef(false);
   const rotAnim = useRef<AnimationPlaybackControls | null>(null);
-  const nearest = () => {
-    let best = 0;
-    for (let i = 1; i < n; i++) if (Math.abs(base(i) + rot.get()) < Math.abs(base(best) + rot.get())) best = i;
-    return best;
-  };
   const settle = () => {
     if (touch) {
-      const k = nearest();
-      setFocus(k);
-      rotAnim.current = animate(rot, -base(k), NUDGE);
+      const a = alongRef.current;
+      if (a !== null) setFocus(Math.round(a));
+      setAlong(null);
     } else {
       rotAnim.current = animate(rot, 0, { ...NUDGE, bounce: 0.25 });
     }
@@ -311,6 +338,8 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
   };
 
   const fanned = blades.map((_, i) => targetOf(i));
+  const lifted = touch ? Math.round(centre) : focus;
+
   // The fan moves under a still pointer as it opens and parts: once it has
   // settled, the blade that's now under the pointer is the one lifted.
   const pointerAt = useRef<{ x: number; y: number } | null>(null);
@@ -332,14 +361,14 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
     return () => clearTimeout(t);
   }, [touch, entered, n, reduce]);
   useEffect(() => {
-    if (focus !== null) warm(blades[focus]);
-  }, [focus, blades]);
+    if (lifted !== null) warm(blades[lifted]);
+  }, [lifted, blades]);
 
   return (
     <div className="relative">
       <div
         ref={wrapRef}
-        // Full bleed on a phone, so the fan runs off the screen's edges rather than the column's.
+        // Full bleed on a phone, so the fan runs to the screen's edges rather than the column's.
         className="relative -mx-5 overflow-x-clip sm:mx-0"
         style={{ height: FH * scale }}
       >
@@ -356,8 +385,10 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
           }}
           onPointerDown={(e) => {
             if (e.button !== 0) return;
-            drag.current = { x: e.clientX, r0: rot.get(), id: e.pointerId, moved: false };
+            drag.current = { x: e.clientX, r0: rot.get(), a0: centre, id: e.pointerId, moved: false };
             dragged.current = false;
+            const el = (e.target as HTMLElement).closest<HTMLElement>("[data-blade]");
+            if (el) warm(blades[Number(el.dataset.blade)]);
           }}
           onPointerMove={(e) => {
             if (e.pointerType === "mouse") pointerAt.current = { x: e.clientX, y: e.clientY };
@@ -371,11 +402,13 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
               rotAnim.current?.stop();
               fanRef.current?.setPointerCapture(e.pointerId);
             }
-            // About as far as the finger moves, at the blades' middle.
-            const limit = spread / 2 + 6;
-            const next = d.r0 + (dx * 57.3) / (300 * scale);
-            rot.set(Math.max(-limit, Math.min(limit, next)));
-            if (touch) setFocus(nearest());
+            if (touch) {
+              // Drag left to bring the blades on the right to the middle.
+              setAlong(Math.max(0, Math.min(n - 1, d.a0 - dx / TOUCH_STEP)));
+            } else {
+              const limit = spread / 2 + 6;
+              rot.set(Math.max(-limit, Math.min(limit, d.r0 + (dx * 57.3) / (300 * scale))));
+            }
           }}
           onPointerUp={(e) => {
             const d = drag.current;
@@ -396,9 +429,10 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
               blade={blade}
               index={i}
               target={fanned[i]}
-              lift={focus === i && open === null ? LIFT : 0}
-              // The first brand lies on top, its whole face showing; the rest fan out beneath it.
-              z={focus === i ? n + 1 : n - i}
+              lift={lifted === i && open === null ? LIFT : 0}
+              // The first brand lies on top, its whole face showing; the rest fan out
+              // beneath it. On touch, the blades nearest the middle lie on top.
+              z={lifted === i ? n + 1 : touch ? n - Math.round(Math.abs(i - centre) * 2) : n - i}
               rot={rot}
               hidden={open === i}
               delay={entering ? i * 0.035 : 0}
@@ -409,7 +443,7 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
               onFocusChange={(k) => {
                 if (quietFocus.current) return;
                 if (k === null) {
-                  if (!hover) setFocus(null);
+                  if (!hover && !touch) setFocus(null);
                 } else setFocus(k);
               }}
               buttonRef={(el) => {
@@ -433,7 +467,7 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
           />
         </div>
       </div>
-      <FanCaption blade={focus !== null ? blades[focus] : null} />
+      <FanCaption blade={lifted !== null ? blades[lifted] : null} />
       {open !== null && (
         <Spread
           blades={blades}
@@ -493,21 +527,35 @@ function Meta({ items }: { items: string[] }) {
   );
 }
 
+// --- The spread ----------------------------------------------------------------
+
+/** Wide enough for the blade to stand as the spread's spine. */
+const SPINE_FROM = 1024;
+const PAD = 24;
+
 /** The open card's box: centred on a wide screen, the whole screen on a phone. */
 function cardBox(): Placement {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   if (vw < 640) return { cx: vw / 2, cy: vh / 2, w: vw, h: vh, rotate: 0, radius: 0 };
-  const w = Math.min(1160, vw - 48);
-  const h = vw >= 1024 ? Math.min(760, vh - 48) : vh - 48;
+  const w = Math.min(1180, vw - 48);
+  const h = vw >= SPINE_FROM ? Math.min(780, vh - 40) : vh - 48;
   return { cx: vw / 2, cy: vh / 2, w, h, rotate: 0, radius: 24 };
 }
 
+/** The spine's box: the blade grown to the card's height, at its left. */
+function spineBox(card: Placement): Placement {
+  const h = card.h - PAD * 2;
+  const w = (h * BW) / BH;
+  return { cx: card.cx - card.w / 2 + PAD + w / 2, cy: card.cy, w, h, rotate: 0, radius: (10 * h) / BH };
+}
+
 /**
- * The spread. The blade flies from its place in the fan to the spread's big
- * frame, turning level as it grows: its face gives way to its top still, then
- * to the brand's hero, which lands exactly where the frame plays it. The card
- * opens behind it. Closing runs the same flight back into the fan.
+ * The spread. On a wide screen the blade leaves the fan and stands up, grown,
+ * as the spread's spine; the card unfolds from behind it with the brand's kit.
+ * Narrower, the blade flies into the spread's big frame, its face giving way
+ * to the brand's hero, which lands where the frame plays it. Either way, only
+ * one copy of anything is on screen at a time, and closing runs it back.
  */
 function Spread({
   blades,
@@ -525,46 +573,66 @@ function Spread({
   onClosed: (i: number) => void;
 }) {
   const blade = blades[index];
-  const p = useMotionValue(0);
-  // Refs, as the flight's transforms below read them on every frame.
+  const [spine] = useState(() => window.innerWidth >= SPINE_FROM);
+  // Two springs: the blade's flight, and the card unfolding.
+  const fly = useMotionValue(0);
+  const unfold = useMotionValue(0);
+  // Refs, as the transforms below read them on every frame.
   const from = useRef<Placement>(null!);
   if (!from.current) from.current = placement(index);
-  const target = useRef<Placement>(null!);
+  const target = useRef<Placement | null>(null);
   const [card, setCard] = useState<Placement>(cardBox);
+  const cardRef = useRef(card);
+  cardRef.current = card;
   const [phase, setPhase] = useState<"flying" | "landed" | "closing">(reduce ? "landed" : "flying");
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null!);
   const indexRef = useRef(index);
   indexRef.current = index;
   useScrollLock(true);
 
-  // Where the hero sits in the card: the flight's landing spot.
+  // Where the blade lands: the spine, or the hero's frame in the card.
   const measure = useCallback(() => {
-    const el = dialogRef.current?.querySelector("[data-spread-stage]");
-    const r = el?.getBoundingClientRect();
-    if (!r) return;
-    target.current = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height, rotate: 0, radius: r.width >= 600 ? 18 : 14 };
-  }, []);
+    if (spine) {
+      target.current = spineBox(cardRef.current);
+      return;
+    }
+    const r = dialogRef.current?.querySelector("[data-spread-stage]")?.getBoundingClientRect();
+    if (r) target.current = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height, rotate: 0, radius: 14 };
+  }, [spine]);
 
   useLayoutEffect(() => {
     measure();
     if (reduce) {
-      p.set(1);
+      fly.set(1);
+      unfold.set(1);
       dialogRef.current?.focus({ preventScroll: true });
       return;
     }
-    const a = animate(p, 1, MORPH);
+    const a = animate(fly, 1, MORPH);
+    // The card starts to open as the blade arrives.
+    const t = setTimeout(() => animate(unfold, 1, { type: "spring", visualDuration: 0.42, bounce: 0.06, restDelta: 0.004, restSpeed: 0.05 }), spine ? 260 : 120);
     a.then(() => {
       setPhase("landed");
       dialogRef.current?.focus({ preventScroll: true });
     });
-    return () => a.stop();
-  }, [measure, p, reduce]);
+    return () => {
+      a.stop();
+      clearTimeout(t);
+    };
+  }, [measure, fly, unfold, reduce, spine]);
 
   useEffect(() => {
-    const onResize = () => setCard(cardBox());
+    const onResize = () => {
+      const c = cardBox();
+      cardRef.current = c;
+      setCard(c);
+      measure();
+      // Nudge the transforms to follow.
+      fly.set(fly.get());
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [measure, fly]);
 
   const close = useCallback(() => {
     if (phase === "closing") return;
@@ -573,12 +641,22 @@ function Spread({
       onClosed(i);
       return;
     }
-    // From wherever the hero is now, back to wherever its blade is now.
+    // From wherever it is now, back to wherever its blade is now.
     measure();
     from.current = placement(i);
     setPhase("closing");
-    animate(p, 0, LAND).then(() => onClosed(i));
-  }, [phase, measure, onClosed, p, placement, reduce]);
+    animate(unfold, 0, { type: "spring", visualDuration: 0.3, bounce: 0, restDelta: 0.004, restSpeed: 0.05 });
+    // The blade leaves once the card has nearly folded away behind it.
+    let started = false;
+    const go = () => {
+      if (started) return;
+      started = true;
+      off();
+      animate(fly, 0, LAND).then(() => onClosed(i));
+    };
+    const off = unfold.on("change", (u) => u < 0.22 && go());
+    setTimeout(go, spine ? 260 : 60);
+  }, [phase, measure, onClosed, fly, unfold, placement, reduce, spine]);
 
   const step = useCallback((d: number) => onIndex((indexRef.current + d + blades.length) % blades.length), [blades.length, onIndex]);
 
@@ -592,50 +670,35 @@ function Spread({
     return () => window.removeEventListener("keydown", onKey);
   }, [close, step]);
 
-  // The flyer's box, turn and corners, all from one spring.
+  // The flight: centre, size, turn and corners, from one spring. The blade is
+  // level well before it lands.
   const at = (t: number) => {
     const a = from.current;
     const b = target.current ?? a;
-    const w = Math.max(4, lerp(a.w, b.w, t));
-    const h = Math.max(4, lerp(a.h, b.h, t));
-    return { left: lerp(a.cx, b.cx, t) - w / 2, top: lerp(a.cy, b.cy, t) - h / 2, w, h };
+    return {
+      cx: lerp(a.cx, b.cx, t),
+      cy: lerp(a.cy, b.cy, t),
+      w: Math.max(4, lerp(a.w, b.w, t)),
+      h: Math.max(4, lerp(a.h, b.h, t)),
+      rotate: lerp(a.rotate, 0, smooth(0, 0.6, t)),
+      radius: lerp(a.radius, b.radius, clamp01(t)),
+    };
   };
-  const left = useTransform(p, (t) => at(t).left);
-  const top = useTransform(p, (t) => at(t).top);
-  const width = useTransform(p, (t) => at(t).w);
-  const height = useTransform(p, (t) => at(t).h);
-  const rotate = useTransform(p, (t) => lerp(from.current.rotate, 0, t));
-  const radius = useTransform(p, (t) => lerp(from.current.radius, target.current?.radius ?? 18, clamp01(t)));
-  const faceOpacity = useTransform(p, (t) => 1 - smooth(0.04, 0.26, t));
-  const faceScale = useTransform(p, () => from.current.w / BW);
-  const heroOpacity = useTransform(p, (t) => smooth(0.3, 0.75, t));
-  const backdrop = useTransform(p, (t) => clamp01(t));
-  const cardOpacity = useTransform(p, (t) => smooth(0.06, 0.42, t));
-  const cardScale = useTransform(p, (t) => lerp(0.97, 1, clamp01(t)));
-
-  const hero = blade.showcase.frames[0].hero;
-  const heroImg = getImageProps({ src: hero.poster, alt: "", sizes: HERO_SIZES, quality: 80, width: 2560, height: 1440 }).props;
+  const backdrop = useTransform(fly, (t) => smooth(0, 0.5, t));
+  // The blade's face, scaled as one piece: with the box (as the spine), or as it left the fan (into the frame).
+  const spineScale = useTransform(fly, (t) => at(t).h / BH);
+  const heroFaceScale = useTransform(fly, () => from.current.w / BW);
 
   return createPortal(
     <div className="fixed inset-0 z-[100]" data-lenis-prevent>
       <motion.div className="absolute inset-0 bg-[rgba(12,12,14,0.45)]" style={{ opacity: backdrop }} onClick={close} />
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${blade.name}: ${blade.title}`}
-        tabIndex={-1}
-        className="absolute overflow-hidden bg-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.5)] outline-none"
-        style={{
-          left: card.cx - card.w / 2,
-          top: card.cy - card.h / 2,
-          width: card.w,
-          height: card.h,
-          borderRadius: card.radius,
-          opacity: cardOpacity,
-          scale: cardScale,
-          pointerEvents: phase === "closing" ? "none" : "auto",
-        }}
+      <Card
+        card={card}
+        spine={spine}
+        unfold={unfold}
+        dialogRef={dialogRef}
+        label={`${blade.name}: ${blade.title}`}
+        closing={phase === "closing"}
       >
         <AnimatePresence initial={false}>
           <motion.div
@@ -646,149 +709,344 @@ function Spread({
             exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.16 } }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           >
-            <SpreadBody blade={blade} index={index} count={blades.length} onStep={step} onClose={close} />
+            {spine ? (
+              <SpineBody blade={blade} index={index} count={blades.length} spineW={spineBox(card).w} onStep={step} onClose={close} />
+            ) : (
+              <StackBody blade={blade} index={index} count={blades.length} heroHidden={phase !== "landed"} onStep={step} onClose={close} />
+            )}
           </motion.div>
         </AnimatePresence>
-      </motion.div>
-      {/* The blade, in flight. Gone once it lands: the frame underneath shows the same picture. */}
-      {phase !== "landed" && (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute overflow-hidden bg-[#EDEDEC] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)]"
-          style={{ left, top, width, height, rotate, borderRadius: radius }}
-        >
-          <Image src={blade.stills[0].src} alt="" fill sizes="(min-width: 1024px) 760px, 100vw" quality={70} className="object-cover" />
-          <motion.div className="absolute inset-0" style={{ opacity: heroOpacity }}>
-            {/* eslint-disable-next-line jsx-a11y/alt-text */}
-            <img {...heroImg} className="absolute inset-0 h-full w-full object-cover" />
-          </motion.div>
-          <motion.div className="absolute left-0 top-0 origin-top-left" style={{ width: BW, height: BH, scale: faceScale, opacity: faceOpacity }}>
-            <BladeFace blade={blade} />
-          </motion.div>
-        </motion.div>
+      </Card>
+      {spine ? (
+        // The blade itself: in flight, then standing as the spine.
+        <Flyer at={at} fly={fly}>
+          <ScaledFace scale={spineScale}>
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={blade.slug}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <BladeFace blade={blade} sizes={SPINE_SIZES} />
+              </motion.div>
+            </AnimatePresence>
+          </ScaledFace>
+        </Flyer>
+      ) : (
+        phase !== "landed" && (
+          <Flyer at={at} fly={fly}>
+            <HeroFlight blade={blade} fly={fly} faceScale={heroFaceScale} />
+          </Flyer>
+        )
       )}
     </div>,
     document.body
   );
 }
 
-const HERO_SIZES = "(min-width: 1024px) 760px, 100vw";
-const STILL_SIZES = "(min-width: 1024px) 250px, 33vw";
+/** The flying (or standing) blade: a box placed by `at`. */
+function Flyer({ at, fly, children }: { at: (t: number) => Placement; fly: MotionValue<number>; children: ReactNode }) {
+  const left = useTransform(fly, (t) => at(t).cx - at(t).w / 2);
+  const top = useTransform(fly, (t) => at(t).cy - at(t).h / 2);
+  const width = useTransform(fly, (t) => at(t).w);
+  const height = useTransform(fly, (t) => at(t).h);
+  const rotate = useTransform(fly, (t) => at(t).rotate);
+  const corner = useTransform(fly, (t) => at(t).radius);
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute overflow-hidden shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)]"
+      style={{ left, top, width, height, rotate, borderRadius: corner }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
-/** The kit, laid out as a spread: media on the left page, the system on the right. */
-function SpreadBody({
+/** A blade's face at its own size, scaled to the box it's in. */
+function ScaledFace({ scale, children }: { scale: MotionValue<number>; children: ReactNode }) {
+  return (
+    <motion.div className="absolute left-0 top-0 origin-top-left" style={{ width: BW, height: BH, scale }}>
+      {children}
+    </motion.div>
+  );
+}
+
+/** Narrow screens: the blade's face gives way to its top still, then the hero, as it flies into the frame. */
+function HeroFlight({ blade, fly, faceScale }: { blade: BrandBlade; fly: MotionValue<number>; faceScale: MotionValue<number> }) {
+  const hero = blade.showcase.frames[0].hero;
+  const heroImg = getImageProps({ src: hero.poster, alt: "", sizes: HERO_SIZES, quality: 80, width: 2560, height: 1440 }).props;
+  const faceOpacity = useTransform(fly, (t) => 1 - smooth(0.04, 0.26, t));
+  const heroOpacity = useTransform(fly, (t) => smooth(0.25, 0.6, t));
+  return (
+    <span className="absolute inset-0 block bg-[#EDEDEC]">
+      <Image src={blade.stills[0].src} alt="" fill sizes={SPINE_SIZES} quality={80} className="object-cover" />
+      <motion.span className="absolute inset-0 block" style={{ opacity: heroOpacity }}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+        <img {...heroImg} className="absolute inset-0 h-full w-full object-cover" />
+      </motion.span>
+      <motion.span className="absolute inset-0 block" style={{ opacity: faceOpacity }}>
+        <ScaledFace scale={faceScale}>
+          <BladeFace blade={blade} />
+        </ScaledFace>
+      </motion.span>
+    </span>
+  );
+}
+
+/** The white card. With a spine it unfolds from behind it; otherwise it fades up behind the flight. */
+function Card({
+  card,
+  spine,
+  unfold,
+  dialogRef,
+  label,
+  closing,
+  children,
+}: {
+  card: Placement;
+  spine: boolean;
+  unfold: MotionValue<number>;
+  dialogRef: React.RefObject<HTMLDivElement>;
+  label: string;
+  closing: boolean;
+  children: ReactNode;
+}) {
+  const cardRef = useRef(card);
+  cardRef.current = card;
+  // Folded, the card is exactly the spine's box; open, the whole card.
+  const clipPath = useTransform(unfold, (u) => {
+    const card = cardRef.current;
+    const s = spineBox(card);
+    const t = clamp01(u);
+    const top = lerp(PAD, 0, t);
+    const left = lerp(PAD, 0, t);
+    const right = lerp(card.w - PAD - s.w, 0, t);
+    const r = lerp(s.radius, card.radius, t);
+    return `inset(${top.toFixed(1)}px ${right.toFixed(1)}px ${top.toFixed(1)}px ${left.toFixed(1)}px round ${r.toFixed(1)}px)`;
+  });
+  // Folded, it's hidden: the blade itself is all there is until the card opens from behind it.
+  const opacity = useTransform(unfold, (u) => (spine ? smooth(0.02, 0.2, u) : smooth(0, 0.6, u)));
+  return (
+    <motion.div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      tabIndex={-1}
+      className="absolute overflow-hidden bg-white outline-none"
+      style={{
+        left: card.cx - card.w / 2,
+        top: card.cy - card.h / 2,
+        width: card.w,
+        height: card.h,
+        borderRadius: card.radius,
+        clipPath: spine ? clipPath : undefined,
+        opacity,
+        pointerEvents: closing ? "none" : "auto",
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function SpreadNav({ index, count, onStep, onClose }: { index: number; count: number; onStep: (d: number) => void; onClose: () => void }) {
+  return (
+    <div className="flex shrink-0 items-center gap-1.5">
+      <span className="mr-1 hidden text-sm tabular-nums text-neutral-400 sm:inline">
+        {index + 1} / {count}
+      </span>
+      <RoundButton label="Previous brand" onClick={() => onStep(-1)}>
+        <ArrowLeft className="h-4 w-4" />
+      </RoundButton>
+      <RoundButton label="Next brand" onClick={() => onStep(1)}>
+        <ArrowRight className="h-4 w-4" />
+      </RoundButton>
+      <RoundButton label="Close" onClick={onClose} className="ml-1.5">
+        <X className="h-4 w-4" />
+      </RoundButton>
+    </div>
+  );
+}
+
+/**
+ * Wide screens: the spine (the blade, standing in its own column) and the kit
+ * beside it: the name and nav, the hero as big as the page allows, then the
+ * stills, the story, the mark and the links along the foot.
+ */
+function SpineBody({
   blade,
   index,
   count,
+  spineW,
   onStep,
   onClose,
 }: {
   blade: BrandBlade;
   index: number;
   count: number;
+  spineW: number;
   onStep: (d: number) => void;
   onClose: () => void;
 }) {
   const data = blade.showcase;
   const picked = useMemo(() => new Set([data.initial]), [data.initial]);
-  const stills = data.stills;
-
   return (
-    <div className="flex h-full flex-col bg-white">
-      <div className="flex shrink-0 items-center justify-between gap-4 px-4 pb-1 pt-3 sm:px-6 sm:pt-5 lg:px-7">
-        <p className="text-sm text-neutral-500">
-          <Meta items={blade.meta} />
-        </p>
-        <div className="flex items-center gap-1.5">
-          <span className="mr-1 hidden text-sm tabular-nums text-neutral-400 sm:inline">
-            {index + 1} / {count}
-          </span>
-          <RoundButton label="Previous brand" onClick={() => onStep(-1)}>
-            <ArrowLeft className="h-4 w-4" />
-          </RoundButton>
-          <RoundButton label="Next brand" onClick={() => onStep(1)}>
-            <ArrowRight className="h-4 w-4" />
-          </RoundButton>
-          <RoundButton label="Close" onClick={onClose} className="ml-1.5">
-            <X className="h-4 w-4" />
-          </RoundButton>
+    <div className="flex h-full" style={{ padding: PAD, gap: 28 }}>
+      {/* Room for the spine, which stands here. */}
+      <div aria-hidden className="shrink-0" style={{ width: spineW }} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex shrink-0 items-start justify-between gap-6">
+          <div className="min-w-0">
+            <h2 className="text-[32px] font-medium leading-[1.05] tracking-[-0.035em] text-black">{blade.name}</h2>
+            <p className="mt-1.5 text-sm text-neutral-500">
+              <Meta items={blade.meta} />
+            </p>
+          </div>
+          <SpreadNav index={index} count={count} onStep={onStep} onClose={onClose} />
         </div>
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-8 pt-3 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8 lg:overflow-hidden lg:px-7 lg:pb-7" data-lenis-prevent>
-        <div className="flex min-h-0 flex-col gap-2.5 sm:gap-3">
-          <div className="group/stage relative" data-spread-stage>
+        {/* The hero, as big as the room allows at 16:9. */}
+        <div className="mt-5 min-h-0 flex-1" style={{ containerType: "size" }}>
+          <div className="group/stage relative" style={{ width: "min(100cqw, calc(100cqh * 16 / 9))" }}>
             <Stage data={data} active={data.initial} picked={picked} eager sizes={HERO_SIZES} />
           </div>
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-            {stills.map((still) => (
-              <div key={still.src} className="relative aspect-square overflow-hidden rounded-[10px] bg-[#EDEDEC] lg:rounded-[14px]">
+        </div>
+        <div className="mt-4 flex shrink-0 gap-5">
+          <div className="flex shrink-0 gap-2.5">
+            {data.stills.map((still) => (
+              <div key={still.src} className="relative h-[140px] w-[140px] overflow-hidden rounded-[12px] bg-[#EDEDEC]">
                 <Image src={still.src} alt={still.alt} fill sizes={STILL_SIZES} quality={85} className="object-cover" />
               </div>
             ))}
           </div>
+          <div className="flex min-w-0 flex-1 flex-col">
+            {data.summary && <p className="line-clamp-3 text-pretty text-sm leading-[1.5] text-neutral-600">{data.summary}</p>}
+            <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
+              {blade.mark && <MarkTile mark={blade.mark} name={blade.name} small />}
+              <SpreadLinks links={data.links} />
+            </div>
+          </div>
         </div>
-        <aside className="mt-7 flex min-h-0 flex-col lg:mt-0 lg:overflow-y-auto" data-lenis-prevent>
-          <h2 className="text-[30px] font-medium leading-[1.05] tracking-[-0.035em] text-black lg:text-[38px]">{blade.name}</h2>
-          {data.summary && <p className="mt-3 text-pretty text-[15px] leading-[1.5] text-neutral-600">{data.summary}</p>}
-          {blade.palette.length > 0 && (
-            <div className="mt-7">
-              <p className="text-sm text-neutral-500">Colour</p>
-              <div className="mt-3 grid grid-cols-3 gap-x-2.5 gap-y-3.5">
-                {blade.palette.map((s) => (
-                  <div key={s.name}>
-                    <div className="h-14 rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ background: s.bg }} />
-                    <p className="mt-1.5 truncate text-[12.5px] font-medium leading-tight text-neutral-900">{s.name}</p>
-                    <p className="mt-0.5 font-mono text-[11px] leading-tight text-neutral-500">{s.hex}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {/* The mark and links sit at the foot of the page, like a book's colophon. */}
-          <div className="lg:mt-auto" />
-          {blade.mark && (
-            <div className="mt-7">
-              <p className="text-sm text-neutral-500">Mark</p>
-              <div className={`mt-3 flex h-24 items-center justify-center rounded-[12px] px-6 ${blade.mark.dark ? "bg-[#111111]" : "bg-[#F4F4F2]"}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={blade.mark.src} alt={`${blade.name} logo`} className="max-h-11 max-w-full object-contain" />
-              </div>
-            </div>
-          )}
-          {data.links.length > 0 && (
-            <div className="mt-7 flex flex-wrap gap-2">
-              {data.links.map((link) =>
-                link.external ? (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener"
-                    className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-neutral-900 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-black"
-                  >
-                    {link.label}
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </a>
-                ) : (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-black/[0.05] px-4 text-sm font-medium text-black transition-colors duration-200 hover:bg-black/[0.09]"
-                  >
-                    {link.label}
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover/link:translate-x-0.5" />
-                  </Link>
-                )
-              )}
-            </div>
-          )}
-        </aside>
       </div>
     </div>
   );
 }
 
-function RoundButton({ label, onClick, className = "", children }: { label: string; onClick: () => void; className?: string; children: React.ReactNode }) {
+/** Narrower screens: one scrolling column: the hero, the stills, the name and story, the colours, the mark. */
+function StackBody({
+  blade,
+  index,
+  count,
+  heroHidden,
+  onStep,
+  onClose,
+}: {
+  blade: BrandBlade;
+  index: number;
+  count: number;
+  /** While the blade flies in carrying the hero, the frame waits for it. */
+  heroHidden: boolean;
+  onStep: (d: number) => void;
+  onClose: () => void;
+}) {
+  const data = blade.showcase;
+  const picked = useMemo(() => new Set([data.initial]), [data.initial]);
+  return (
+    <div className="flex h-full flex-col bg-white">
+      <div className="flex shrink-0 items-center justify-between gap-4 px-4 pb-1 pt-3 sm:px-6 sm:pt-5">
+        <p className="text-sm text-neutral-500">
+          <Meta items={blade.meta} />
+        </p>
+        <SpreadNav index={index} count={count} onStep={onStep} onClose={onClose} />
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-8 pt-3 sm:px-6" data-lenis-prevent>
+        <div className="group/stage relative" data-spread-stage style={{ visibility: heroHidden ? "hidden" : "visible" }}>
+          <Stage data={data} active={data.initial} picked={picked} eager sizes={HERO_SIZES} />
+        </div>
+        <div className="mt-2.5 grid grid-cols-3 gap-2.5 sm:mt-3 sm:gap-3">
+          {data.stills.map((still) => (
+            <div key={still.src} className="relative aspect-square overflow-hidden rounded-[10px] bg-[#EDEDEC]">
+              <Image src={still.src} alt={still.alt} fill sizes={STILL_SIZES} quality={85} className="object-cover" />
+            </div>
+          ))}
+        </div>
+        <h2 className="mt-7 text-[30px] font-medium leading-[1.05] tracking-[-0.035em] text-black">{blade.name}</h2>
+        {data.summary && <p className="mt-3 text-pretty text-[15px] leading-[1.5] text-neutral-600">{data.summary}</p>}
+        {blade.palette.length > 0 && (
+          <div className="mt-7">
+            <p className="text-sm text-neutral-500">Colour</p>
+            <div className="mt-3 grid grid-cols-3 gap-x-2.5 gap-y-3.5">
+              {blade.palette.map((s) => (
+                <div key={s.name}>
+                  <div className="h-14 rounded-[10px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ background: s.bg }} />
+                  <p className="mt-1.5 truncate text-[12.5px] font-medium leading-tight text-neutral-900">{s.name}</p>
+                  <p className="mt-0.5 font-mono text-[11px] leading-tight text-neutral-500">{s.hex}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {blade.mark && (
+          <div className="mt-7">
+            <p className="text-sm text-neutral-500">Mark</p>
+            <div className="mt-3">
+              <MarkTile mark={blade.mark} name={blade.name} />
+            </div>
+          </div>
+        )}
+        <div className="mt-7">
+          <SpreadLinks links={data.links} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MarkTile({ mark, name, small = false }: { mark: { src: string; dark: boolean }; name: string; small?: boolean }) {
+  return (
+    <div className={`flex items-center justify-center rounded-[12px] ${mark.dark ? "bg-[#111111]" : "bg-[#F4F4F2]"} ${small ? "h-9 px-4" : "h-24 px-6"}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={mark.src} alt={`${name} logo`} className={`max-w-full object-contain ${small ? "max-h-[18px]" : "max-h-11"}`} />
+    </div>
+  );
+}
+
+function SpreadLinks({ links }: { links: ShowcaseData["links"] }) {
+  if (links.length === 0) return null;
+  return (
+    <>
+      {links.map((link) =>
+        link.external ? (
+          <a
+            key={link.href}
+            href={link.href}
+            target="_blank"
+            rel="noopener"
+            className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-neutral-900 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-black"
+          >
+            {link.label}
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+        ) : (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="group/link mr-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-black/[0.05] px-4 text-sm font-medium text-black transition-colors duration-200 hover:bg-black/[0.09]"
+          >
+            {link.label}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover/link:translate-x-0.5" />
+          </Link>
+        )
+      )}
+    </>
+  );
+}
+
+function RoundButton({ label, onClick, className = "", children }: { label: string; onClick: () => void; className?: string; children: ReactNode }) {
   return (
     <motion.button
       type="button"

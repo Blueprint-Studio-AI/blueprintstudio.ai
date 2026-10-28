@@ -35,6 +35,8 @@ function blade(work: ShownWork): BrandBlade {
   return {
     slug: work.slug,
     name,
+    // The blade's end is narrow: a long name gives way to the work's short label.
+    short: name.length > 13 ? work.label : name,
     // The client where it isn't the name, what it is, and the year.
     meta: [
       name !== work.client.name && work.client.name,
