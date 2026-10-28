@@ -43,11 +43,13 @@ export function useScrollLock(on: boolean) {
     if (!on) return;
     const scroller = (window as unknown as { locomotiveScroll?: Lenis }).locomotiveScroll;
     const html = document.documentElement;
-    const before = html.style.overflow;
+    const before = [html.style.overflow, html.style.scrollbarGutter];
     scroller?.stop?.();
+    // Keep the scrollbar's room, so the page doesn't jump sideways as it goes.
+    html.style.scrollbarGutter = "stable";
     html.style.overflow = "hidden";
     return () => {
-      html.style.overflow = before;
+      [html.style.overflow, html.style.scrollbarGutter] = before;
       scroller?.start?.();
     };
   }, [on]);

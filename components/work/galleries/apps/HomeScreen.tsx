@@ -906,7 +906,8 @@ function Caption({
   onOpen: (i: number) => void;
 }) {
   return (
-    <div className="relative mt-6 min-h-[132px] lg:mt-8">
+    // Room for the tallest of these, so opening an app never moves the page below.
+    <div className="relative mt-6 min-h-[280px] lg:mt-8 lg:min-h-[180px]">
       <AnimatePresence initial={false} mode="popLayout">
         {app ? (
           <motion.div

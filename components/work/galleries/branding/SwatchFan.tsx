@@ -163,7 +163,7 @@ function Blade({
       onFocus={() => onFocusChange(index)}
       onBlur={() => onFocusChange(null)}
       onClick={() => onOpen(index)}
-      className="absolute cursor-pointer rounded-[10px] shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.06),0_10px_28px_-10px_rgba(0,0,0,0.32)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+      className="group/blade absolute cursor-pointer rounded-[10px] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
       style={{
         left: PX - BW / 2,
         top: PY - (BH - RIVET),
@@ -175,7 +175,10 @@ function Blade({
         visibility: hidden ? "hidden" : "visible",
       }}
     >
-      <BladeFace blade={blade} />
+      {/* Pressed, the blade gives a little. */}
+      <span className="absolute inset-0 rounded-[10px] shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.06),0_10px_28px_-10px_rgba(0,0,0,0.32)] transition-transform duration-150 ease-out group-active/blade:scale-[0.97]">
+        <BladeFace blade={blade} />
+      </span>
     </motion.button>
   );
 }
@@ -226,6 +229,7 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
   const rot = useMotionValue(0);
   const motionRefs = useRef<{ angle: MotionValue<number>; up: MotionValue<number> }[]>([]);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const quietFocus = useRef(false);
 
   // Fit the fan to its column; on a phone it stays big and runs off the edges.
   useEffect(() => {
@@ -306,6 +310,13 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
   };
 
   const fanned = blades.map((_, i) => targetOf(i));
+  // On touch there's no hover to say the blades can be picked, so once the fan
+  // is open the middle one stands lifted, its name under it.
+  useEffect(() => {
+    if (!touch || !entered) return;
+    const t = setTimeout(() => setFocus((f) => (f === null ? Math.floor((n - 1) / 2) : f)), reduce ? 0 : 700);
+    return () => clearTimeout(t);
+  }, [touch, entered, n, reduce]);
   useEffect(() => {
     if (focus !== null) warm(blades[focus]);
   }, [focus, blades]);
@@ -370,7 +381,8 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
               index={i}
               target={fanned[i]}
               lift={focus === i && open === null ? LIFT : 0}
-              z={focus === i ? n + 1 : i + 1}
+              // The first brand lies on top, its whole face showing; the rest fan out beneath it.
+              z={focus === i ? n + 1 : n - i}
               rot={rot}
               hidden={open === i}
               delay={entering ? i * 0.035 : 0}
@@ -378,7 +390,12 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
               register={register}
               onHover={(k) => !drag.current?.moved && setFocus(k)}
               onOpen={openBlade}
-              onFocusChange={(k) => (k === null ? !hover && setFocus(null) : setFocus(k))}
+              onFocusChange={(k) => {
+                if (quietFocus.current) return;
+                if (k === null) {
+                  if (!hover) setFocus(null);
+                } else setFocus(k);
+              }}
               buttonRef={(el) => {
                 buttons.current[i] = el;
               }}
@@ -410,7 +427,10 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
           reduce={reduce}
           onClosed={(i) => {
             setOpen(null);
+            // Focus goes back to the blade, without lifting it under a pointer that's elsewhere.
+            quietFocus.current = true;
             buttons.current[i]?.focus({ preventScroll: true });
+            quietFocus.current = false;
           }}
         />
       )}
@@ -574,7 +594,7 @@ function Spread({
   const faceScale = useTransform(p, () => from.current.w / BW);
   const heroOpacity = useTransform(p, (t) => smooth(0.3, 0.75, t));
   const backdrop = useTransform(p, (t) => clamp01(t));
-  const cardOpacity = useTransform(p, (t) => smooth(0.15, 0.7, t));
+  const cardOpacity = useTransform(p, (t) => smooth(0.06, 0.42, t));
   const cardScale = useTransform(p, (t) => lerp(0.97, 1, clamp01(t)));
 
   const hero = blade.showcase.frames[0].hero;
