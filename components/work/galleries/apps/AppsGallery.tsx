@@ -22,21 +22,31 @@ const PHONE_ALT: Record<string, string> = {
   "herth-app": "Herth’s map search on a phone",
 };
 
-/** Clips that pass through a laptop or phone mockup: inside the tablet they read as a device in a device. */
-const NO_CLIP = new Set(["livingip-app"]);
+/**
+ * Heroes that are presentations rather than screens: LivingIP's is the app in
+ * a phone (and its clip a laptop), Herth's its site in a browser window on a
+ * green ground. Inside the tablet they'd read as a device in a device, so these
+ * apps open on their own captures; the heroes stay in the pieces below.
+ */
+const PRESENTATION_HERO = new Set(["livingip-app", "herth-app"]);
+
+/** The stills in the order they read best as an app's screens, where not the kit's. */
+const STILL_ORDER: Record<string, number[]> = { "livingip-app": [2, 1, 0] };
 
 function screens(work: ShownWork): AppScreen[] {
   const { hero, stills } = work.kit;
-  const list: AppScreen[] = [
-    {
+  const list: AppScreen[] = [];
+  if (hero.vertical) list.push({ src: hero.vertical.poster, alt: PHONE_ALT[work.slug] ?? `${work.title}, on a phone`, shape: "tall" });
+  if (!PRESENTATION_HERO.has(work.slug)) {
+    // The full screen leads; the phone screen pairs with the first still after it.
+    list.unshift({
       src: hero.poster,
       alt: hero.alt,
       shape: "wide",
-      ...(hero.src && !NO_CLIP.has(work.slug) ? { clip: { src: hero.src, range: hero.clip, start: hero.posterTime } } : {}),
-    },
-  ];
-  if (hero.vertical) list.push({ src: hero.vertical.poster, alt: PHONE_ALT[work.slug] ?? `${work.title}, on a phone`, shape: "tall" });
-  for (const still of stills) list.push({ src: still.src, alt: still.alt, shape: "square" });
+      ...(hero.src ? { clip: { src: hero.src, range: hero.clip, start: hero.posterTime } } : {}),
+    });
+  }
+  for (const i of STILL_ORDER[work.slug] ?? [0, 1, 2]) list.push({ src: stills[i].src, alt: stills[i].alt, shape: "square" });
   return list;
 }
 
