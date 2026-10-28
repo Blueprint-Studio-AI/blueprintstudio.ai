@@ -777,19 +777,15 @@ function ScaledFace({ scale, children }: { scale: MotionValue<number>; children:
   );
 }
 
-/** Narrow screens: the blade's face gives way to its top still, then the hero, as it flies into the frame. */
+/** Narrow screens: the blade's face lifts off the hero underneath as it flies into the frame (one crossfade). */
 function HeroFlight({ blade, fly, faceScale }: { blade: BrandBlade; fly: MotionValue<number>; faceScale: MotionValue<number> }) {
   const hero = blade.showcase.frames[0].hero;
   const heroImg = getImageProps({ src: hero.poster, alt: "", sizes: HERO_SIZES, quality: 80, width: 2560, height: 1440 }).props;
-  const faceOpacity = useTransform(fly, (t) => 1 - smooth(0.04, 0.26, t));
-  const heroOpacity = useTransform(fly, (t) => smooth(0.25, 0.6, t));
+  const faceOpacity = useTransform(fly, (t) => 1 - smooth(0.06, 0.4, t));
   return (
     <span className="absolute inset-0 block bg-[#EDEDEC]">
-      <Image src={blade.stills[0].src} alt="" fill sizes={SPINE_SIZES} quality={75} className="object-cover" />
-      <motion.span className="absolute inset-0 block" style={{ opacity: heroOpacity }}>
-        {/* eslint-disable-next-line jsx-a11y/alt-text */}
-        <img {...heroImg} className="absolute inset-0 h-full w-full object-cover" />
-      </motion.span>
+      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+      <img {...heroImg} className="absolute inset-0 h-full w-full object-cover" />
       <motion.span className="absolute inset-0 block" style={{ opacity: faceOpacity }}>
         <ScaledFace scale={faceScale}>
           <BladeFace blade={blade} />
