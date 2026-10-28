@@ -174,6 +174,15 @@ export default function PricingSection() {
                 </li>
               </ul>
 
+              {/* Proof: a partnership that ran for years */}
+              <a
+                href="/work/clients/tokenworks"
+                className="group -mt-2 inline-flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+              >
+                See three years with TokenWorks
+                <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+              </a>
+
               {/* Button */}
               <motion.button
                 className="group relative w-full py-3 px-6 font-medium flex items-center justify-center text-white rounded-xl mt-auto text-sm overflow-hidden"
