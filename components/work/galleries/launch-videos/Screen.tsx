@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { getImageProps } from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useClipLoad } from "@/lib/work/videoQueue";
@@ -15,18 +15,175 @@ function hasSoundTrack(v: HTMLVideoElement): boolean | null {
   return null;
 }
 
+const YT = "https://www.youtube-nocookie.com";
+
+/** What a YouTube film tells the machine: it started (cut to it), sound was refused (it plays muted), it ended, or it failed. */
+export type FilmEvent = "playing" | "muted" | "ended" | "failed";
+
+type YTInfo = { currentTime?: number; duration?: number; playerState?: number; muted?: boolean };
+
 /**
- * One film on the screen: its poster at once, its clip once its disc is in
- * (useClipLoad), looping just the kit's stretch of it as the Showcase does.
- * It stays mounted after it has played, so putting the disc back in is quick.
+ * The full film from YouTube, driven through the IFrame API's postMessage
+ * protocol (no script), so the machine's own keys play, pause and mute it.
+ * It stays hidden until it actually plays, then the screen cuts to it. It
+ * asks for sound; where the browser refuses, it starts muted and says so.
  */
-function FilmLayer({
+function YouTubeFilm({
+  id,
+  title,
+  play,
+  muted,
+  onTime,
+  onEvent,
+}: {
+  id: string;
+  title: string;
+  play: boolean;
+  muted: boolean;
+  onTime: (t: number, length: number) => void;
+  onEvent: (e: FilmEvent) => void;
+}) {
+  const ref = useRef<HTMLIFrameElement>(null);
+  const [src, setSrc] = useState<string | null>(null);
+  const [shown, setShown] = useState(false);
+  const live = useRef({ play, muted, onTime, onEvent });
+  live.current = { play, muted, onTime, onEvent };
+  const st = useRef({ ready: false, state: -1, started: false, refused: false, duration: 0, timers: [] as number[] });
+
+  const send = useCallback((func: string, args: unknown[] = []) => {
+    ref.current?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args, id: 1, channel: "widget" }), YT);
+  }, []);
+
+  // The player sends its events back to our origin, so the URL waits for the browser.
+  useEffect(() => {
+    const q = new URLSearchParams({
+      enablejsapi: "1",
+      playsinline: "1",
+      rel: "0",
+      autoplay: "1",
+      controls: "0",
+      disablekb: "1",
+      iv_load_policy: "3",
+      mute: live.current.muted ? "1" : "0",
+      origin: window.location.origin,
+    });
+    setSrc(`${YT}/embed/${id}?${q}`);
+  }, [id]);
+
+  useEffect(() => {
+    const s = st.current;
+    const later = (ms: number, fn: () => void) => s.timers.push(window.setTimeout(fn, ms));
+    const state = (n: number) => {
+      s.state = n;
+      if (n === 1 && !s.started) {
+        s.started = true;
+        setShown(true);
+        live.current.onEvent("playing");
+      }
+      if (n === 0) {
+        // The end: back to the top, paused, as a disc stops.
+        send("seekTo", [0, true]);
+        send("pauseVideo");
+        live.current.onEvent("ended");
+      }
+    };
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== YT || e.source !== ref.current?.contentWindow || typeof e.data !== "string") return;
+      let d: { event?: string; info?: unknown };
+      try {
+        d = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      if ((d.event === "onReady" || d.event === "initialDelivery") && !s.ready) {
+        s.ready = true;
+        send("addEventListener", ["onStateChange"]);
+        send("addEventListener", ["onError"]);
+        // No auto-captions over the picture.
+        send("unloadModule", ["captions"]);
+        send(live.current.muted ? "mute" : "unMute");
+        // autoplay=1 starts it; only a pause pressed while it loaded needs saying.
+        if (!live.current.play) send("pauseVideo");
+        // Sound refused: still not going two seconds on (and not just buffering), start it muted.
+        later(2000, () => {
+          if (s.started || s.state === 3 || !live.current.play || live.current.muted) return;
+          s.refused = true;
+          send("mute");
+          send("playVideo");
+          live.current.onEvent("muted");
+          later(5000, () => {
+            if (!s.started && s.state !== 3) live.current.onEvent("failed");
+          });
+        });
+      } else if (d.event === "onError") {
+        live.current.onEvent("failed");
+      } else if (d.event === "onStateChange" && typeof d.info === "number") {
+        state(d.info);
+      } else if (d.event === "infoDelivery" && d.info && typeof d.info === "object") {
+        const info = d.info as YTInfo;
+        if (typeof info.duration === "number" && info.duration > 0) s.duration = info.duration;
+        // The player muted itself to get going (some browsers' rule for sound): say so on the machine.
+        if (info.muted === true && !live.current.muted && !s.refused && s.ready) {
+          s.refused = true;
+          live.current.onEvent("muted");
+        }
+        if (typeof info.playerState === "number") state(info.playerState);
+        if (typeof info.currentTime === "number") live.current.onTime(info.currentTime, s.duration);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("message", onMessage);
+      s.timers.forEach(clearTimeout);
+    };
+  }, [send]);
+
+  // The machine's keys.
+  useEffect(() => {
+    if (st.current.ready) send(play ? "playVideo" : "pauseVideo");
+  }, [play, send]);
+  useEffect(() => {
+    if (st.current.ready) send(muted ? "mute" : "unMute");
+  }, [muted, send]);
+
+  // Tell the player we're listening until it answers; no answer in six seconds and the kit loop takes over.
+  const onLoad = () => {
+    const s = st.current;
+    let n = 0;
+    const t = window.setInterval(() => {
+      if (s.ready || n++ >= 24) {
+        clearInterval(t);
+        if (!s.ready) live.current.onEvent("failed");
+        return;
+      }
+      ref.current?.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1, channel: "widget" }), YT);
+    }, 250);
+    s.timers.push(t);
+  };
+
+  if (!src) return null;
+  return (
+    <iframe
+      ref={ref}
+      src={src}
+      title={title}
+      allow="autoplay; encrypted-media; picture-in-picture"
+      referrerPolicy="strict-origin-when-cross-origin"
+      onLoad={onLoad}
+      // Taller than the screen, so the film letterboxes inside it and YouTube's own title bar
+      // and logo sit in the bars, cropped off by the screen's edges; the picture fills the screen.
+      className={`absolute inset-x-0 -top-[30%] h-[160%] w-full border-0 transition-opacity duration-300 ease-out ${shown ? "opacity-100" : "opacity-0"}`}
+    />
+  );
+}
+
+/** The kit's clip, looping just its stretch as the Showcase does: for a film with no YouTube cut, or when YouTube fails. */
+function KitLoop({
   film,
   on,
   stageRef,
   play,
   muted,
-  instant,
   onTime,
   onSound,
 }: {
@@ -35,7 +192,6 @@ function FilmLayer({
   stageRef: RefObject<HTMLDivElement | null>;
   play: boolean;
   muted: boolean;
-  instant: boolean;
   onTime: (t: number, length: number) => void;
   onSound: (sound: boolean) => void;
 }) {
@@ -61,7 +217,79 @@ function FilmLayer({
     else v.pause();
   }, [on, play, muted, load]);
 
-  const poster = getImageProps({ alt: hero.alt, src: hero.poster, width: 2560, height: 1440, quality: 80, sizes: "(min-width: 1024px) 940px, 100vw" }).props;
+  if (!hero.src || !load) return null;
+  return (
+    <video
+      ref={videoRef}
+      src={hero.src}
+      muted={muted}
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+      onLoadedMetadata={(e) => {
+        e.currentTarget.currentTime = start;
+        if (on && play) e.currentTarget.play().catch(() => {});
+      }}
+      onTimeUpdate={(e) => {
+        const v = e.currentTarget;
+        // Loop just the clip; this also catches the browser's own loop back to 0.
+        if (clip && (v.currentTime < clip[0] - 0.25 || v.currentTime >= clip[1])) v.currentTime = clip[0];
+        if (on) onTime(Math.max(0, v.currentTime - from), clip ? clip[1] - clip[0] : v.duration || 0);
+      }}
+      onEnded={(e) => {
+        e.currentTarget.currentTime = from;
+        if (on && play) e.currentTarget.play().catch(() => {});
+      }}
+      onPlaying={(e) => {
+        setShown(true);
+        const v = e.currentTarget;
+        // Chrome only counts decoded sound once some has played.
+        setTimeout(() => {
+          const s = hasSoundTrack(v);
+          if (s !== null) onSound(s);
+        }, 400);
+      }}
+      onCanPlayThrough={done}
+      onSuspend={done}
+      onError={done}
+      className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${shown ? "opacity-100" : "opacity-0"}`}
+    />
+  );
+}
+
+/**
+ * One film on the screen: its poster at once, then the full film from YouTube
+ * once its disc is in (the kit's loop where there's no YouTube cut, or it
+ * fails). The layer stays mounted after it has played; the iframe doesn't.
+ */
+function FilmLayer({
+  film,
+  on,
+  failed,
+  stageRef,
+  play,
+  muted,
+  instant,
+  onTime,
+  onSound,
+  onFilm,
+}: {
+  film: Film;
+  on: boolean;
+  /** YouTube failed for this film: play its kit loop instead. */
+  failed: boolean;
+  stageRef: RefObject<HTMLDivElement | null>;
+  play: boolean;
+  muted: boolean;
+  instant: boolean;
+  onTime: (t: number, length: number) => void;
+  onSound: (sound: boolean) => void;
+  onFilm: (e: FilmEvent) => void;
+}) {
+  const { hero } = film;
+  const poster = hero.remote
+    ? { src: hero.poster }
+    : getImageProps({ alt: hero.alt, src: hero.poster, width: 2560, height: 1440, quality: 80, sizes: "(min-width: 1024px) 940px, 100vw" }).props;
 
   return (
     <motion.div
@@ -91,44 +319,12 @@ function FilmLayer({
       }
       aria-hidden={!on}
     >
-      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-      <img {...poster} loading="eager" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
-      {hero.src && load && (
-        <video
-          ref={videoRef}
-          src={hero.src}
-          muted={muted}
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-          onLoadedMetadata={(e) => {
-            e.currentTarget.currentTime = start;
-            if (on && play) e.currentTarget.play().catch(() => {});
-          }}
-          onTimeUpdate={(e) => {
-            const v = e.currentTarget;
-            // Loop just the clip; this also catches the browser's own loop back to 0.
-            if (clip && (v.currentTime < clip[0] - 0.25 || v.currentTime >= clip[1])) v.currentTime = clip[0];
-            if (on) onTime(Math.max(0, v.currentTime - from), clip ? clip[1] - clip[0] : v.duration || 0);
-          }}
-          onEnded={(e) => {
-            e.currentTarget.currentTime = from;
-            if (on && play) e.currentTarget.play().catch(() => {});
-          }}
-          onPlaying={(e) => {
-            setShown(true);
-            const v = e.currentTarget;
-            // Chrome only counts decoded sound once some has played.
-            setTimeout(() => {
-              const s = hasSoundTrack(v);
-              if (s !== null) onSound(s);
-            }, 400);
-          }}
-          onCanPlayThrough={done}
-          onSuspend={done}
-          onError={done}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${shown ? "opacity-100" : "opacity-0"}`}
-        />
+      {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
+      <img {...poster} alt="" loading="eager" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
+      {film.youtube && !failed ? (
+        on && <YouTubeFilm id={film.youtube} title={`${film.title}, ${film.client}`} play={play} muted={muted} onTime={onTime} onEvent={onFilm} />
+      ) : (
+        <KitLoop film={film} on={on} stageRef={stageRef} play={play} muted={muted} onTime={onTime} onSound={onSound} />
       )}
     </motion.div>
   );
@@ -153,6 +349,8 @@ export function Screen({
   onToggle,
   onTime,
   onSound,
+  onFilm,
+  failed,
   stageRef,
 }: {
   films: Film[];
@@ -170,6 +368,9 @@ export function Screen({
   onToggle: () => void;
   onTime: (t: number, length: number) => void;
   onSound: (slug: string, sound: boolean) => void;
+  onFilm: (slug: string, e: FilmEvent) => void;
+  /** Films whose YouTube cut failed; they play their kit loop. */
+  failed: ReadonlySet<string>;
   stageRef: RefObject<HTMLDivElement>;
 }) {
   const film = films.find((f) => f.slug === current) ?? null;
@@ -207,12 +408,14 @@ export function Screen({
               key={f.slug}
               film={f}
               on={f.slug === current}
+              failed={failed.has(f.slug)}
               stageRef={stageRef}
               play={play}
               muted={muted}
               instant={instant}
               onTime={onTime}
               onSound={(s) => onSound(f.slug, s)}
+              onFilm={(e) => onFilm(f.slug, e)}
             />
           ))}
 

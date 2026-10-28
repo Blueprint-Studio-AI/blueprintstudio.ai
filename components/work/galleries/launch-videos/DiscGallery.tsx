@@ -6,9 +6,9 @@ import { animate, AnimatePresence, motion, motionValue, useMotionValue, type Ani
 import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import { Disc } from "./Disc";
-import { JewelCase, RACK_POSES, ROW_POSES, type CasePose, type CaseSize } from "./JewelCase";
+import { JewelCase, RACK_POSES, ROW_POSES, type CasePose, type CaseSize, type Poses } from "./JewelCase";
 import { Player, PLAYER_DESK, PLAYER_PHONE, type PlayerStatus } from "./Player";
-import { Screen, type Osd } from "./Screen";
+import { Screen, type FilmEvent, type Osd } from "./Screen";
 import { EASE_OUT, FLIGHT_SPRING, POP_SPRING, SEAT_SPRING, wait, type Film, type Spot } from "./shared";
 
 // Launch films as discs. Each film is a jewel case on a rack (a row you swipe
@@ -19,11 +19,28 @@ import { EASE_OUT, FLIGHT_SPRING, POP_SPRING, SEAT_SPRING, wait, type Film, type
 // puts the film on the screen.
 
 const DESK = "(min-width: 1024px)";
-const RACK_CASE: CaseSize = { w: 164, h: 146, d: 26 };
 const ROW_CASE: CaseSize = { w: 128, h: 114, d: 18 };
-// The rack's height, and the room it leaves at each end for the end cases.
+// The rack's height: the player's.
 const RACK_H = PLAYER_DESK.well + PLAYER_DESK.pad * 2;
-const RACK_PAD = { l: 74, r: 64 };
+
+/**
+ * How the rack stands its cases: five or so turned halfway, covers showing;
+ * the more there are, the further they turn spines-out (and a little smaller),
+ * as on a shelf of CDs, so nine or ten still fit beside the player. Pads leave
+ * room at each end for the end cases.
+ */
+function rackLayout(n: number): { size: CaseSize; poses: Poses; pad: { l: number; r: number } } {
+  const dense = Math.min(1, Math.max(0, (n - 5) / 4));
+  const turn = 50 + 18 * dense;
+  const size: CaseSize = dense > 0.5 ? { w: 150, h: 134, d: 25 } : { w: 164, h: 146, d: 26 };
+  const a = (turn * Math.PI) / 180;
+  const reach = (size.w / 2) * Math.cos(a) + (size.d / 2) * Math.sin(a);
+  return {
+    size,
+    poses: { ...RACK_POSES, rest: { ...RACK_POSES.rest, rotateY: turn }, out: { ...RACK_POSES.out, rotateY: turn } },
+    pad: { l: Math.round(reach + 12), r: Math.round(reach + 2) },
+  };
+}
 // Degrees a second, once it's up to speed.
 const SPIN = 270;
 
@@ -199,7 +216,10 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const [screen, setScreen] = useState<string | null>(null);
   const [mounted, setMounted] = useState<ReadonlySet<string>>(() => new Set());
   const [playing, setPlaying] = useState(true);
-  const [muted, setMuted] = useState(true);
+  // Films ask for sound; where the browser refuses, the player starts muted and says so (soundHint).
+  const [muted, setMuted] = useState(false);
+  const [soundHint, setSoundHint] = useState(false);
+  const [failed, setFailed] = useState<ReadonlySet<string>>(() => new Set()); // YouTube failed: kit loop instead
   const [reading, setReading] = useState(false);
   const [time, setTime] = useState<{ t: number; length: number } | null>(null);
   const [sound, setSound] = useState<Record<string, boolean>>({});
@@ -215,18 +235,26 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const pending = useRef<Cmd | null>(null);
   const returning = useRef(new Map<string, Promise<void>>());
   const flightId = useRef(0);
-  const live = useRef({ reduce, desk, playing });
-  live.current = { reduce, desk, playing };
+  const live = useRef({ reduce, desk, playing, failed, soundHint });
+  live.current = { reduce, desk, playing, failed, soundHint };
   const osdTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(osdTimer.current), []);
 
-  const flash = useCallback((text: string, hold = false) => {
+  // A message on the screen: gone after a moment, or held (`true`) until the next one.
+  const flash = useCallback((text: string, hold: boolean | number = false) => {
     clearTimeout(osdTimer.current);
     setOsd({ text, key: performance.now() });
-    if (hold) return;
-    osdTimer.current = setTimeout(() => setOsd(live.current.playing ? null : { text: "❚❚ Pause", key: performance.now() }), 1600);
+    if (hold === true) return;
+    osdTimer.current = setTimeout(
+      () => setOsd(live.current.playing ? null : { text: "❚❚ Pause", key: performance.now() }),
+      typeof hold === "number" ? hold : 1600
+    );
   }, []);
+
+  /** The full film from YouTube, unless it has none or it has failed here. */
+  const onYouTube = (slug: string) => !!films.find((f) => f.slug === slug)?.youtube && !live.current.failed.has(slug);
+  const playFlash = () => (live.current.soundHint ? flash("Muted · press the sound key", 4000) : flash("▶ Play"));
 
   const spotOf = (el: Element | null | undefined): Spot => {
     const root = rootRef.current?.getBoundingClientRect();
@@ -351,7 +379,9 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
       setLoaded(slug);
       setScreen(slug);
       setTime(null);
-      flash("▶ Play");
+      // A YouTube film reads until it plays (onFilm).
+      setReading(onYouTube(slug));
+      if (!onYouTube(slug)) playFlash();
       return;
     }
     if (prev) eject(prev); // the two discs pass each other
@@ -383,12 +413,35 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
     setTimeout(() => setLifted((s) => withKey(s, slug, false)), 80);
     setTimeout(() => setPresent((s) => withKey(s, slug, false)), 220);
     await trip;
-    // The whir: the disc spins up and the display reads it, then the screen comes on.
+    // The whir: the disc spins up and the display reads it, then the screen comes on, on the
+    // film's poster. A YouTube film reads on until it plays (onFilm); a kit loop is there at once.
     await wait(300);
     if (heading.current !== slug) return;
-    setReading(false);
     setScreen(slug);
-    flash("▶ Play");
+    if (!onYouTube(slug)) {
+      setReading(false);
+      playFlash();
+    }
+  };
+
+  const onFilm = (slug: string, e: FilmEvent) => {
+    if (slug !== heading.current) return;
+    if (e === "playing") {
+      setReading(false);
+      playFlash();
+    } else if (e === "muted") {
+      live.current.soundHint = true;
+      setMuted(true);
+      setSoundHint(true);
+    } else if (e === "ended") {
+      setPlaying(false);
+      flash("■ End", true);
+    } else if (e === "failed") {
+      // Play the kit's loop instead.
+      setFailed((s) => withKey(s, slug, true));
+      setReading(false);
+      playFlash();
+    }
   };
 
   const run = (cmd: Cmd) => {
@@ -428,12 +481,13 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const toggleMute = () => {
     const next = !muted;
     setMuted(next);
+    setSoundHint(false);
     flash(next ? "Mute" : "Sound on");
   };
 
   const film = films.find((f) => f.slug === loaded) ?? null;
-  // A film has sound only once its clip says so; most kit clips are cut silent.
-  const filmSound = !!film?.hero.src && !!sound[film.slug];
+  // A YouTube film has sound; a kit loop only once its clip says so (most are cut silent).
+  const filmSound = !!film && (film.youtube && !failed.has(film.slug) ? true : !!film.hero.src && !!sound[film.slug]);
   const status: PlayerStatus = !film ? "empty" : reading ? "reading" : playing ? "playing" : "paused";
   const shown = films.find((f) => f.slug === (screen ?? heading.current)) ?? null;
 
@@ -466,9 +520,11 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
       status={status}
       time={time?.t ?? null}
       progress={time && time.length > 0 ? Math.min(1, time.t / time.length) : null}
+      length={time && time.length > 0 ? time.length : null}
       grille={desk !== false}
       muted={muted}
       sound={filmSound}
+      soundHint={soundHint && muted && !!film}
       reduce={reduce}
       onPlay={togglePlay}
       onPrev={() => step(-1)}
@@ -511,13 +567,15 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
                   </span>
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <a
-                    href={`#${shown.slug}`}
-                    className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-black/[0.05] px-4 text-sm font-medium text-black transition-colors duration-200 hover:bg-black/[0.09]"
-                  >
-                    About the film
-                    <ArrowDown className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover/link:translate-y-0.5" />
-                  </a>
+                  {shown.piece && (
+                    <a
+                      href={`#${shown.piece}`}
+                      className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-black/[0.05] px-4 text-sm font-medium text-black transition-colors duration-200 hover:bg-black/[0.09]"
+                    >
+                      About the film
+                      <ArrowDown className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover/link:translate-y-0.5" />
+                    </a>
+                  )}
                   {shown.links.map((link) =>
                     link.external ? (
                       <a
@@ -573,6 +631,8 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
             onToggle={togglePlay}
             onTime={(t, length) => setTime({ t, length })}
             onSound={(slug, s) => setSound((m) => (m[slug] === s ? m : { ...m, [slug]: s }))}
+            onFilm={onFilm}
+            failed={failed}
             stageRef={stageRef}
           />
         </div>
@@ -647,10 +707,11 @@ function Rack({
   label: (f: Film) => string;
 }) {
   const n = films.length;
-  const { w, h } = RACK_CASE;
+  const { size, poses, pad } = rackLayout(n);
+  const { w, h } = size;
   // Each case's centre along the rack.
-  const at = (i: number) => `calc(${RACK_PAD.l}px + (100% - ${RACK_PAD.l + RACK_PAD.r}px) * ${n > 1 ? i / (n - 1) : 0.5})`;
-  const span = `calc((100% - ${RACK_PAD.l + RACK_PAD.r}px) / ${Math.max(1, n - 1)})`;
+  const at = (i: number) => `calc(${pad.l}px + (100% - ${pad.l + pad.r}px) * ${n > 1 ? i / (n - 1) : 0.5})`;
+  const span = `calc((100% - ${pad.l + pad.r}px) / ${Math.max(1, n - 1)})`;
 
   return (
     <div className="relative h-full min-w-0 flex-1 [perspective-origin:50%_8%] [perspective:1400px]">
@@ -670,7 +731,7 @@ function Rack({
               animate={{ opacity: p === "rest" ? 0.9 : 0.45, scaleX: p === "rest" ? 0.85 : 1.05 }}
               transition={{ duration: 0.4, ease: EASE_OUT }}
             />
-            <JewelCase {...caseProps(f, i)} size={RACK_CASE} poses={RACK_POSES} />
+            <JewelCase {...caseProps(f, i)} size={size} poses={poses} />
           </div>
         );
       })}

@@ -68,6 +68,8 @@ function Key({
   onPress,
   disabled,
   accent,
+  attention,
+  reduce,
   size,
   children,
 }: {
@@ -75,6 +77,9 @@ function Key({
   onPress: () => void;
   disabled?: boolean;
   accent?: boolean;
+  /** A lit ring that breathes, asking for a press. */
+  attention?: boolean;
+  reduce?: boolean;
   size: number;
   children: ReactNode;
 }) {
@@ -99,6 +104,15 @@ function Key({
           : "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 1px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.16), 0 3px 6px -2px rgba(0,0,0,0.12)",
       }}
     >
+      {attention && (
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-[3px] rounded-full border-2 border-[#FF6A1A]"
+          initial={{ opacity: 0 }}
+          animate={reduce ? { opacity: 1 } : { opacity: [1, 0.25, 1] }}
+          transition={reduce ? { duration: 0 } : { duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
       {children}
     </motion.button>
   );
@@ -150,9 +164,11 @@ export function Player({
   status,
   time,
   progress,
+  length,
   grille,
   muted,
   sound,
+  soundHint,
   reduce,
   onPlay,
   onPrev,
@@ -168,13 +184,17 @@ export function Player({
   count: number;
   status: PlayerStatus;
   time: number | null;
-  /** How far into the clip, 0 to 1. */
+  /** How far into the film, 0 to 1. */
   progress: number | null;
+  /** The film's length in seconds, once known. */
+  length: number | null;
   /** A speaker grille between the display and the keys, where there's room. */
   grille: boolean;
   muted: boolean;
   /** Whether the film in it has a sound track (false until the browser says so). */
   sound: boolean;
+  /** The browser refused sound: the mute key calls for a press. */
+  soundHint: boolean;
   reduce: boolean;
   onPlay: () => void;
   onPrev: () => void;
@@ -248,6 +268,7 @@ export function Player({
       {/* Display, speaker and keys */}
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div
+          data-readout
           className="relative overflow-hidden rounded-[10px] px-3 pb-2 pt-2.5 font-mono uppercase"
           style={{
             background: "linear-gradient(180deg, #0c1413, #101a19)",
@@ -268,7 +289,11 @@ export function Player({
             <div className="mt-[3px] text-[12px] font-medium leading-[1.35] tracking-[0.06em]">
               {status === "empty" ? "No disc" : status === "reading" ? "Reading…" : <Marquee text={film?.title ?? ""} still={reduce} />}
             </div>
-            <div className="mt-[2px] truncate text-[#9ef7e4]/75">{film ? `${film.client} · ${film.year}` : `${count} films`}</div>
+            <div className="mt-[2px] flex items-center gap-2 whitespace-nowrap text-[#9ef7e4]/75">
+              <span className="min-w-0 truncate">{film ? [film.client, film.year].filter(Boolean).join(" · ") : `${count} films`}</span>
+              {/* The film's whole length */}
+              {film && length ? <span className="ml-auto shrink-0 tabular-nums">{clock(length)}</span> : null}
+            </div>
             {/* How far into the clip */}
             <div className="mt-1.5 flex h-[3px] gap-px" aria-hidden="true">
               {Array.from({ length: segs }, (_, i) => (
@@ -302,7 +327,14 @@ export function Player({
           <Key label="Next film" onPress={onNext} size={key}>
             {Icon.next}
           </Key>
-          <Key label={film && !sound ? "This film has no sound" : muted ? "Sound on" : "Mute"} onPress={onMute} disabled={!film || !sound} size={key}>
+          <Key
+            label={film && !sound ? "This film has no sound" : muted ? "Sound on" : "Mute"}
+            onPress={onMute}
+            disabled={!film || !sound}
+            attention={soundHint && sound}
+            reduce={reduce}
+            size={key}
+          >
             {muted || !sound ? Icon.muted : Icon.sound}
           </Key>
           <Key label="Eject" onPress={onEject} disabled={!film} size={key}>
