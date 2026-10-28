@@ -37,7 +37,12 @@ const REEL_SRC = {
 };
 const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
-const REEL_HOLD_MS = 1400; // full-screen beat before it lands
+const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
+// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s and the
+// word at 5s. The opening plays a touch fast and holds a little longer, so the
+// ring comes as the reel starts down onto the page and the word as it settles.
+// Past `until` (and on every loop after) it plays at its own speed.
+const OPENING = { rate: 1.5, until: 5, holdMs: 2300 };
 const CARD_RADIUS = 16;
 const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
@@ -202,14 +207,16 @@ export default function Hero() {
     // visitor who arrived further down the page (/#pricing), it's simply in place.
     useEffect(() => {
         if (stage !== "loading" || !videoReady || !minTimeElapsed) return;
+        const opening = !reduceMotion && window.scrollY <= 100;
+        if (opening && src === REEL_SRC.full && videoRef.current) videoRef.current.playbackRate = OPENING.rate;
         videoRef.current?.play().catch(() => {});
-        if (reduceMotion || window.scrollY > 100) {
+        if (!opening) {
             progress.set(1);
             setStage("docked");
         } else {
             setStage("reel");
         }
-    }, [stage, videoReady, minTimeElapsed, reduceMotion, progress, setStage]);
+    }, [stage, videoReady, minTimeElapsed, reduceMotion, progress, setStage, src]);
 
     // Once the reel is in place, the portfolio videos below can start loading.
     useEffect(() => {
@@ -229,7 +236,7 @@ export default function Hero() {
     // Hold the reel for a beat, or land straight away if the visitor scrolls or presses a key.
     useEffect(() => {
         if (stage !== "reel") return;
-        const hold = setTimeout(land, REEL_HOLD_MS);
+        const hold = setTimeout(land, src === REEL_SRC.full ? OPENING.holdMs : REEL_HOLD_MS);
         const now = () => land();
         window.addEventListener("wheel", now, { passive: true });
         window.addEventListener("touchmove", now, { passive: true });
@@ -240,7 +247,7 @@ export default function Hero() {
             window.removeEventListener("touchmove", now);
             window.removeEventListener("keydown", now);
         };
-    }, [stage, land]);
+    }, [stage, land, src]);
 
     // From the keyboard, focus moves to Close; from a click it stays put.
     const [focusClose, setFocusClose] = useState(false);
@@ -480,6 +487,10 @@ export default function Hero() {
                                     muted
                                     playsInline
                                     preload="auto"
+                                    onTimeUpdate={(e) => {
+                                        const v = e.currentTarget;
+                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.until) v.playbackRate = 1;
+                                    }}
                                 />
                                 <AnimatePresence>
                                     {variant && src && <VariantVideo key={variant.key} {...variant.video} compact={src === REEL_SRC.small} />}
