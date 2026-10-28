@@ -55,8 +55,9 @@ const ARM = BH / 2 - RIVET;
 /** Never smaller than this: on a phone the fan runs off both edges and turns instead. */
 const MIN_SCALE = 0.66;
 
-// The fan's spread, in degrees: at rest, opened by a hovering pointer, and on touch.
-const SPREAD = { rest: 92, open: 124, touch: 118 };
+// The fan's spread, in degrees: at rest, opened by a hovering pointer, and on
+// touch (narrower, so every blade is on a phone's screen to tap; drag turns it).
+const SPREAD = { rest: 92, open: 124, touch: 80 };
 /** How far the neighbours part around a lifted blade. */
 const PART = 5;
 
@@ -310,6 +311,19 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
   };
 
   const fanned = blades.map((_, i) => targetOf(i));
+  // The fan moves under a still pointer as it opens and parts: once it has
+  // settled, the blade that's now under the pointer is the one lifted.
+  const pointerAt = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    if (!fine || open !== null) return;
+    const t = setTimeout(() => {
+      const at = pointerAt.current;
+      if (!at || drag.current?.moved) return;
+      const el = document.elementFromPoint(at.x, at.y)?.closest<HTMLElement>("[data-blade]");
+      if (el) setFocus(Number(el.dataset.blade));
+    }, 420);
+    return () => clearTimeout(t);
+  }, [focus, spread, fine, open]);
   // On touch there's no hover to say the blades can be picked, so once the fan
   // is open the middle one stands lifted, its name under it.
   useEffect(() => {
@@ -336,6 +350,7 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
           onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
           onPointerLeave={(e) => {
             if (e.pointerType !== "mouse") return;
+            pointerAt.current = null;
             setHover(false);
             setFocus(null);
           }}
@@ -345,6 +360,7 @@ export default function SwatchFan({ blades }: { blades: BrandBlade[] }) {
             dragged.current = false;
           }}
           onPointerMove={(e) => {
+            if (e.pointerType === "mouse") pointerAt.current = { x: e.clientX, y: e.clientY };
             const d = drag.current;
             if (!d || d.id !== e.pointerId) return;
             const dx = e.clientX - d.x;

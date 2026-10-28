@@ -146,9 +146,18 @@ export default function HomeScreen({ apps }: { apps: AppItem[] }) {
   const tilt = useMotionValue(0);
 
   // The tablet lies back until the pointer comes near (or an app is open).
+  // Rising, it moves the icons under a still pointer: once it's level, the
+  // icon that's now under the pointer is already in its hover state.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
   const lying = fine === true && !reduce && !near && !opened;
   useEffect(() => {
     const a = animate(tilt, lying ? 14 : 0, { type: "spring", visualDuration: 0.6, bounce: 0.12 });
+    a.then(() => {
+      const at = pointer.current;
+      if (lying || !at) return;
+      const el = document.elementFromPoint(at.x, at.y)?.closest<HTMLElement>("[data-app-icon]");
+      setHot(el ? Number(el.dataset.appIcon) : null);
+    });
     return () => a.stop();
   }, [lying, tilt]);
 
@@ -232,7 +241,14 @@ export default function HomeScreen({ apps }: { apps: AppItem[] }) {
       <div
         className="hidden sm:block"
         onPointerEnter={(e) => e.pointerType === "mouse" && setNear(true)}
-        onPointerLeave={(e) => e.pointerType === "mouse" && setNear(false)}
+        onPointerMove={(e) => {
+          if (e.pointerType === "mouse") pointer.current = { x: e.clientX, y: e.clientY };
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType !== "mouse") return;
+          pointer.current = null;
+          setNear(false);
+        }}
       >
         <div style={{ perspective: 2400 }}>
           <motion.div className="relative" style={{ rotateX: tilt, transformOrigin: "50% 100%", containerType: "inline-size" }}>
@@ -258,6 +274,7 @@ export default function HomeScreen({ apps }: { apps: AppItem[] }) {
                     {apps.map((a, i) => (
                       <HomeIcon
                         key={a.slug}
+                        index={i}
                         app={a}
                         size={cq(104)}
                         label={cq(14.5)}
@@ -305,6 +322,7 @@ export default function HomeScreen({ apps }: { apps: AppItem[] }) {
             {apps.map((a, i) => (
               <div key={a.slug} className="flex justify-center">
                 <HomeIcon
+                  index={i}
                   app={a}
                   size="62px"
                   label="11.5px"
@@ -347,6 +365,7 @@ function Wallpaper() {
 }
 
 function HomeIcon({
+  index,
   app,
   size,
   label,
@@ -355,6 +374,7 @@ function HomeIcon({
   onOpen,
   onHover,
 }: {
+  index: number;
   app: AppItem;
   size: string;
   label: string;
@@ -367,6 +387,7 @@ function HomeIcon({
     <motion.button
       type="button"
       aria-label={`Open ${app.name}: ${app.title}`}
+      data-app-icon={index}
       onClick={onOpen}
       onPointerEnter={(e) => e.pointerType === "mouse" && onHover(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && onHover(false)}
