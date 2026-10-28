@@ -30,12 +30,12 @@ export default function SiteCaption({ tabs, active }: { tabs: SiteTab[]; active:
                 </p>
                 {tab.summary && <p className="mt-3 max-w-[60ch] text-pretty text-sm leading-[1.5] text-neutral-500">{tab.summary}</p>}
               </div>
-              {(tab.links.length > 0 || tab.address) && (
+              {(tab.links.length > 0 || tab.visit) && (
                 <div className="flex shrink-0 flex-wrap gap-2 lg:pt-1.5">
                   {/* From lg the Visit link is in the address bar. */}
-                  {tab.address && (
+                  {tab.visit && (
                     <a
-                      href={tab.address.href}
+                      href={tab.visit}
                       target="_blank"
                       rel="noopener"
                       className="group/link inline-flex h-9 items-center gap-1.5 rounded-full bg-neutral-900 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-black lg:hidden"

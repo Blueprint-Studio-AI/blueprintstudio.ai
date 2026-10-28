@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Favicon, useTabKeys } from "./Browser";
+import { Favicon, useTabKeys } from "./Chrome";
 import type { SiteTab } from "./types";
 
 // Below lg the screen is too small for a row of tabs, so they sit under the
@@ -11,7 +11,19 @@ import type { SiteTab } from "./types";
 
 const chipId = (key: string) => `websites-chip-${key}`;
 
-export default function TabChips({ tabs, active, onPick, reduce }: { tabs: SiteTab[]; active: string; onPick: (key: string) => void; reduce: boolean }) {
+export default function TabChips({
+  tabs,
+  active,
+  loading,
+  onPick,
+  reduce,
+}: {
+  tabs: SiteTab[];
+  active: string;
+  loading: boolean;
+  onPick: (key: string) => void;
+  reduce: boolean;
+}) {
   const rowRef = useRef<HTMLDivElement>(null);
   const keys = useTabKeys(tabs, active, onPick, chipId);
   const first = useRef(true);
@@ -54,7 +66,7 @@ export default function TabChips({ tabs, active, onPick, reduce }: { tabs: SiteT
                   : "bg-black/[0.04] text-neutral-500 [@media(hover:hover)]:hover:bg-black/[0.07] [@media(hover:hover)]:hover:text-neutral-800"
               }`}
             >
-              <Favicon src={tab.favicon} className="h-[18px] w-[18px]" />
+              <Favicon src={tab.favicon} loading={on && loading && !reduce} className="h-[18px] w-[18px]" />
               {tab.title}
             </motion.button>
           );
