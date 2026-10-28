@@ -30,6 +30,15 @@ export const testimonials = {
     company: "TokenWorks",
     image: "/testimonials/daniel-greene.jpg",
   },
+  // components/LaunchVideos/TestimonialTicker.tsx (also on /brand). Jinba was
+  // a rebrand, site and launch film; the quote doesn't say which it was about.
+  "sina-meraji": {
+    quote: "I actually fucking love this version, I got goosebumps",
+    name: "Sina Meraji",
+    role: "CMO",
+    company: "Jinba",
+    image: "/testimonials/sina.jpg",
+  },
   // components/LaunchVideos/TestimonialTicker.tsx
   "sam-karu": {
     quote:

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 export interface IncludedListItem {
   title: string;
-  description: string;
+  /** A node, so a service page can mark a line as draft. */
+  description: ReactNode;
   image: string;
   /** Names the client the preview is from. */
   caption: string;
