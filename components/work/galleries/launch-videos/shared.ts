@@ -19,9 +19,9 @@ export interface Film {
 export const CASE_SPRING = { type: "spring", visualDuration: 0.34, bounce: 0.14 } as const;
 export const LID_SPRING = { type: "spring", visualDuration: 0.3, bounce: 0.1 } as const;
 export const LIFT_SPRING = { type: "spring", visualDuration: 0.24, bounce: 0.08 } as const;
-// A flight's progress, 0 to 1. It counts as landed once it's within a hair of
-// the spot and all but still, not after the spring's last invisible wobble.
-export const FLIGHT_SPRING = { type: "spring", visualDuration: 0.5, bounce: 0.06, restDelta: 0.008, restSpeed: 0.8 } as const;
+// A flight's progress, 0 to 1. The gallery hands the disc over the moment it
+// first reaches its spot, so the bounce gets it there on time and never shows.
+export const FLIGHT_SPRING = { type: "spring", visualDuration: 0.5, bounce: 0.2, restDelta: 0.008, restSpeed: 0.8 } as const;
 // A disc rising off the spindle (px).
 export const POP_SPRING = { type: "spring", visualDuration: 0.13, bounce: 0, restDelta: 1, restSpeed: 60 } as const;
 // A disc dropping onto the spindle.
