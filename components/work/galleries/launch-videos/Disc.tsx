@@ -1,8 +1,8 @@
 "use client";
 
 import { useId } from "react";
-import Image from "next/image";
 import { motion, type MotionValue } from "framer-motion";
+import { FilmImg } from "./FilmImg";
 import type { Film } from "./shared";
 
 // Rings of the disc, as a share of its radius: the hole, the clear hub, the
@@ -41,16 +41,8 @@ export function Disc({
       {/* The print, and what turns with it */}
       <motion.div className="absolute inset-0 rounded-full" style={{ rotate }}>
         <div className="absolute inset-0 overflow-hidden rounded-full" style={{ maskImage: annulus(PRINT), WebkitMaskImage: annulus(PRINT) }}>
-          <Image
-            src={film.hero.poster}
-            alt=""
-            fill
-            quality={75}
-            // One size for every disc (in its case, in the air, in the player), so it's loaded once.
-            sizes="320px"
-            className="object-cover"
-            draggable={false}
-          />
+          {/* One size for every disc (in its case, in the air, in the player), so it's loaded once. */}
+          <FilmImg src={film.hero.poster} remote={film.hero.remote} sizes="320px" />
           {/* A darker band at the rim for the lettering */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_closest-side,transparent_62%,rgba(0,0,0,0.5)_92%)]" />
         </div>

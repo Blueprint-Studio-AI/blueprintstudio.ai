@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import Image from "next/image";
+import { FilmImg } from "./FilmImg";
 import { motion } from "framer-motion";
 import { Disc } from "./Disc";
 import { CASE_SPRING, LID_SPRING, LIFT_SPRING, track, type Film } from "./shared";
@@ -181,7 +181,7 @@ export function JewelCase({
             <span className="absolute bottom-[14%] left-1/2 h-[9%] w-px -translate-x-1/2 bg-white/20" />
           </div>
           <div className="absolute bottom-[2px] right-[2px] top-[2px]" style={{ left: hinge }}>
-            <Image src={film.cover.src} alt="" fill quality={85} sizes={`${w}px`} className="object-cover" draggable={false} />
+            <FilmImg src={film.cover.src} remote={film.cover.remote} quality={85} sizes={`${w}px`} />
           </div>
           {/* Glare and the plastic's edge */}
           <div className="absolute inset-0 bg-[linear-gradient(118deg,rgba(255,255,255,0.32)_0%,rgba(255,255,255,0.08)_26%,rgba(255,255,255,0)_42%,rgba(255,255,255,0)_70%,rgba(255,255,255,0.1)_100%)]" />

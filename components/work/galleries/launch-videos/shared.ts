@@ -1,17 +1,25 @@
 import type { KitMedia, KitStill } from "@/data/portfolioData";
 import type { ShowcaseLink } from "@/lib/work";
 
+/** An image of the film: one of our kit files, or (remote) its YouTube thumbnail, shown as a plain <img>. */
+export type FilmImage = KitStill & { remote?: boolean };
+
 /** One launch film, as the disc player needs it (serializable, built on the server). */
 export interface Film {
+  /** Its piece of work's slug, or yt-<id> for a film with no piece. */
   slug: string;
   title: string;
   client: string;
   year: string;
-  /** The case's cover: the kit's lead still. */
-  cover: KitStill;
-  /** The 16:9 key frame (printed on the disc, and the screen's poster) and its clip. */
-  hero: KitMedia & { alt: string };
-  /** Where the film's Showcase links: its client's page, where there is one. */
+  /** The full film on YouTube; without one the disc plays the kit's loop. */
+  youtube?: string;
+  /** The case's cover: the kit's lead still, else the film's YouTube thumbnail. */
+  cover: FilmImage;
+  /** The 16:9 key frame (printed on the disc, and the screen's poster) and the kit's clip. */
+  hero: KitMedia & { alt: string; /** The poster is the YouTube thumbnail. */ remote?: boolean };
+  /** The film's piece further down this page, where it has one. */
+  piece?: string;
+  /** Where the film's Showcase links (its client's page), or its client's page where it has no piece. */
   links: ShowcaseLink[];
 }
 
