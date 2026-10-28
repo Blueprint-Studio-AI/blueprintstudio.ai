@@ -1,22 +1,38 @@
+import type { ReactNode } from "react";
 import type { KitMedia } from "@/data/portfolioData";
 
 /** One site as a browser tab. Serializable, so the server page can hand it over. */
 export interface SiteTab {
   /** The work's slug. */
   key: string;
-  /** The tab's title: the client, or the piece where a client has two sites here. */
+  /** The tab's title: the client, or the page's own title where a client has two sites here. */
   title: string;
-  /** The client's mark, from our logo files; a plain globe without one. */
+  /** The site's favicon or the client's mark, from our files. */
   favicon?: string;
-  /** What the screen shows: the kit's poster, and its clip where it's a recording of the site. */
-  hero: KitMedia & { alt: string };
-  /** The address bar: only for a site that's live, which also gets a Visit link. */
-  address?: { host: string; path: string; href: string };
-  archived: boolean;
+  /** The capture: shown until the live page paints, or instead of it. Its clip plays only when there's no live page. */
+  hero: KitMedia & { alt: string; vertical?: KitMedia };
+  /** The real page, live in the browser, where we can frame it. */
+  frame?: string;
+  /** The live page is too heavy for a phone's data (the phone keeps the capture). */
+  heavy?: boolean;
+  /** The address bar: the live site's domain, or where an archived site used to be. */
+  address: { host: string; path: string; live: boolean };
+  /** Where "Visit site" goes, for a site that's live. */
+  visit?: string;
+  /** The page's top colour, for the phone's status bar. */
+  tint: string;
   /** The caption: the client, the year, the piece, its line, and the links Showcase gives it. */
   name: string;
   year: string;
   label: string;
   summary?: string;
   links: { label: string; href: string }[];
+}
+
+/** Copy rendered on the server, so it carries the Draft mark outside production. */
+export interface SiteLabels {
+  /** The address bar's word for a site that's no longer live. */
+  archived: ReactNode;
+  /** The phone's hint that a tap hands the screen to the site. */
+  tap: ReactNode;
 }
