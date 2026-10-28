@@ -40,7 +40,7 @@ function Stand() {
   const footZ = ARM_Z + BEND + FOOT.depth / 2;
   const strip = ((BEND * Math.PI) / 2 / BEND_STEPS.length) * 1.15;
   return (
-    <div aria-hidden className="relative [transform-style:preserve-3d]" style={{ height: `${FLOOR}cqw` }}>
+    <div aria-hidden className="absolute inset-x-0 bottom-0 [transform-style:preserve-3d]" style={{ height: `${FLOOR}cqw` }}>
       {/* Shadows on the floor: a wide soft one under the display, a close one under the foot. */}
       <div
         className="absolute left-1/2 h-[30cqw] w-[78cqw] rounded-[50%] bg-[radial-gradient(closest-side,rgba(24,24,20,0.15),rgba(24,24,20,0.05)_58%,transparent)]"
@@ -51,7 +51,7 @@ function Stand() {
         style={{ top: `${FLOOR}cqw`, transform: `translate(-50%, -50%) translateZ(${footZ}cqw) rotateX(90deg)` }}
       />
       {/* The arm: its thickness, then its face, in shade just under the display. */}
-      {[1, 2, 3].map((i) => (
+      {[3, 2, 1].map((i) => (
         <div
           key={i}
           className="absolute left-1/2 top-[-6cqw] w-[17cqw]"
@@ -140,9 +140,11 @@ export default function Computer({ tabs, archived }: { tabs: SiteTab[]; archived
           style={reduce ? undefined : { rotateX, rotateY, y, scale }}
           className="relative origin-[50%_45%] [transform-style:preserve-3d] motion-reduce:![transform:none]"
         >
+          {/* Back to front (stand, body, face), so it paints right even where a browser flattens the scene. */}
+          <Stand />
           <div className="relative [transform-style:preserve-3d]">
             {/* The body behind the glass. */}
-            {SLICES.map((i) => (
+            {[...SLICES].reverse().map((i) => (
               <div
                 key={i}
                 aria-hidden
@@ -150,8 +152,9 @@ export default function Computer({ tabs, archived }: { tabs: SiteTab[]; archived
                 style={{ transform: `translateZ(${-((i + 1) * DEPTH) / SLICES.length}cqw)`, backgroundColor: sliceShade(i) }}
               />
             ))}
-            {/* The face: an aluminium rim round the black glass. */}
-            <div className="relative rounded-[1.35cqw] bg-[linear-gradient(180deg,#F1F2F3,#CDD0D3_50%,#A8ABB0)] p-[max(2px,0.26cqw)] shadow-[0_0_0_0.5px_rgba(0,0,0,0.16)]">
+            {/* The face: an aluminium rim round the black glass. Its own plane at z = 0, so
+                Safari sorts it in front of the arm behind it (it paints flat content first). */}
+            <div className="relative rounded-[1.35cqw] bg-[linear-gradient(180deg,#F1F2F3,#CDD0D3_50%,#A8ABB0)] p-[max(2px,0.26cqw)] shadow-[0_0_0_0.5px_rgba(0,0,0,0.16)] [transform:translateZ(0)]">
               {/* The glass: its sheen shows on the bezel round the screen. */}
               <motion.div
                 className="relative rounded-[1.12cqw] bg-[#0B0B0C] bg-[length:260%_100%] bg-no-repeat p-[1.45cqw] [background-image:linear-gradient(112deg,transparent_34%,rgba(255,255,255,0.13)_47%,rgba(255,255,255,0.05)_53%,transparent_64%)] motion-reduce:![background-position:50%_0%]"
@@ -169,7 +172,7 @@ export default function Computer({ tabs, archived }: { tabs: SiteTab[]; archived
               </motion.div>
             </div>
           </div>
-          <Stand />
+          <div aria-hidden style={{ height: `${FLOOR}cqw` }} />
         </motion.div>
       </div>
       <TabChips tabs={tabs} active={active} onPick={pick} reduce={reduce} />
