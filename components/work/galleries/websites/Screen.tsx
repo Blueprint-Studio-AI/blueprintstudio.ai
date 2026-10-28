@@ -192,8 +192,9 @@ export default function Screen({
   const lastWheel = useRef(0);
   const tab = tabs.find((t) => t.key === active) ?? tabs[0];
   const run = `${tab.key}-${reload}`;
-  const live = !!tab.frame && enabled && near;
-  const hasClip = !tab.frame && !!tab.hero.src;
+  const framed = !!tab.frame && !(variant === "phone" && tab.heavy);
+  const live = framed && enabled && near;
+  const hasClip = !framed && !!tab.hero.src;
 
   useEffect(() => {
     const el = ref.current;
@@ -223,14 +224,14 @@ export default function Screen({
 
   // A capture is there at once; a live page reports when it loads, or gives up when slow.
   useEffect(() => {
-    if (!tab.frame) {
+    if (!framed) {
       onReady(tab.key);
       return;
     }
     if (!live) return;
     const slow = setTimeout(() => onReady(tab.key), SLOW_MS);
     return () => clearTimeout(slow);
-  }, [run, live, tab.frame, tab.key, onReady]);
+  }, [run, live, framed, tab.key, onReady]);
 
   useEffect(() => {
     if (!inView) setEngaged(false);
@@ -271,7 +272,9 @@ export default function Screen({
         if (e.pointerType === "mouse" && shown && Date.now() - lastWheel.current > SCROLLING_MS) setEngaged(true);
       }}
       onClick={() => shown && setEngaged(true)}
-      className={`group/page relative overflow-hidden ${variant === "phone" && !(tab.frame && tab.hero.vertical) ? "bg-black" : "bg-[#F3F3F2]"} ${className}`}
+      // On the phone, the space round a capture takes the page's own top colour (black round a desktop capture, as a phone shows a picture).
+      style={variant === "phone" ? { backgroundColor: tab.hero.vertical ? tab.tint : "#000000" } : undefined}
+      className={`group/page relative overflow-hidden ${variant === "phone" ? "" : "bg-[#F3F3F2]"} ${className}`}
     >
       {tabs.map((t, i) => (
         <div key={t.key} className="absolute inset-0" style={{ visibility: t.key === active ? "visible" : "hidden" }}>

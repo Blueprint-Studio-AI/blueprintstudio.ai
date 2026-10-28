@@ -13,7 +13,7 @@ import type { SiteTab } from "./websites/types";
 
 type Source =
   /** Live, and still the version we made. */
-  | { kind: "live"; url: string }
+  | { kind: "live"; url: string; heavy?: boolean }
   /** Changed or gone where it shipped, but our build is still deployed. */
   | { kind: "build"; url: string; shipped: string; title?: string }
   /** Nothing we can frame: our capture. */
@@ -29,7 +29,8 @@ const SOURCES: Record<string, Source> = {
   // The live page is our kit capture; "the live pavepower.com is ours" (Tyler).
   "pavepower-website": { kind: "live", url: "https://www.pavepower.com/" },
   // Our build (Blueprint-Studio-AI/hashplay-site), still deployed; hashplay.xyz is parked.
-  "hashplay-website": { kind: "live", url: "https://hashplay-site.vercel.app/" },
+  // Its game reels make it about 23 MB to load, so phones keep the capture.
+  "hashplay-website": { kind: "live", url: "https://hashplay-site.vercel.app/", heavy: true },
   // arch.network/chain is a new design that isn't ours; our build (Arch-Network/arch-site) is still deployed.
   "arch-chain": { kind: "build", url: "https://arch-site-drab.vercel.app/chain", shipped: "arch.network/chain", title: "Chain | Arch" },
   // arch.network/ecosystem now redirects into the new site; our build's page is still deployed.
@@ -69,13 +70,16 @@ function split(url: string) {
 }
 
 /**
- * Whether a site still lets other sites frame it (X-Frame-Options, CSP
- * frame-ancestors), checked at most hourly. A failed check counts as yes:
- * the browser keeps the capture up if the page never loads.
+ * Whether a site is still up and still lets other sites frame it
+ * (X-Frame-Options, CSP frame-ancestors), checked at most hourly. A check
+ * that can't connect counts as yes: the browser keeps the capture up if the
+ * page never loads.
  */
 async function frameable(url: string): Promise<boolean> {
   try {
     const res = await fetch(url, { method: "HEAD", next: { revalidate: 3600 }, signal: AbortSignal.timeout(3000) });
+    // Gone (a 404 or 410 would load as a page and replace the capture); 405 is only a server that won't answer HEAD.
+    if (!res.ok && res.status !== 405) return false;
     const xfo = res.headers.get("x-frame-options")?.toLowerCase() ?? "";
     if (xfo.includes("deny") || xfo.includes("sameorigin")) return false;
     const ancestors = res.headers.get("content-security-policy")?.match(/frame-ancestors([^;]*)/i)?.[1] ?? null;
@@ -106,9 +110,10 @@ async function tabOf(work: ShownWork, works: ShownWork[]): Promise<SiteTab> {
       ...(kit.hero.vertical ? { vertical: kit.hero.vertical } : {}),
     },
     frame,
+    heavy: source.kind === "live" && source.heavy,
     address: { ...split(live ? source.url : source.shipped), live },
     visit: live ? (work.liveUrl ?? source.url) : undefined,
-    tint: (frame && TINTS[work.slug]) || "#000000",
+    tint: (frame && !(source.kind === "live" && source.heavy) && TINTS[work.slug]) || "#000000",
     name: client.name,
     year: work.year,
     label: work.title,

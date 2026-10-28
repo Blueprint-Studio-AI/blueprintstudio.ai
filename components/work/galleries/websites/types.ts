@@ -13,6 +13,8 @@ export interface SiteTab {
   hero: KitMedia & { alt: string; vertical?: KitMedia };
   /** The real page, live in the browser, where we can frame it. */
   frame?: string;
+  /** The live page is too heavy for a phone's data (the phone keeps the capture). */
+  heavy?: boolean;
   /** The address bar: the live site's domain, or where an archived site used to be. */
   address: { host: string; path: string; live: boolean };
   /** Where "Visit site" goes, for a site that's live. */
