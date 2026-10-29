@@ -3,17 +3,15 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, RotateCw } from "lucide-react";
-import { AddressText, CHROME_FONT, Favicon, LoadBar, TrafficLights, useTabKeys } from "./Chrome";
+import { AddressText, CHROME_FONT, Favicon, OriginalTag, TrafficLights, useTabKeys } from "./Chrome";
 import Screen, { PANEL } from "./Screen";
 import type { SiteTab } from "./types";
 
 // The browser on the display's screen, drawn after Chrome on a Mac: the tab
 // strip (from lg up; smaller screens pick from the strip under the display),
 // the toolbar, and the page. Picking a tab swaps the page in the same frame,
-// as a browser does; the new tab's shape springs up out of the toolbar, its
-// favicon turns to a loading ring and a thin bar runs along the toolbar
-// while the live site loads. Back and forward sit greyed, as in a fresh tab;
-// reload starts the page over.
+// as a browser does, and the new tab's shape springs up out of the toolbar.
+// Back and forward sit greyed, as in a fresh tab; reload starts the page over.
 
 /** The tab shape rising out of the toolbar when it's picked. */
 const RISE = { type: "spring", visualDuration: 0.28, bounce: 0.32 } as const;
@@ -24,14 +22,12 @@ export const tabId = (key: string) => `websites-tab-${key}`;
 function Tabs({
   tabs,
   active,
-  loading,
   onPick,
   touched,
   reduce,
 }: {
   tabs: SiteTab[];
   active: string;
-  loading: boolean;
   onPick: (key: string) => void;
   touched: boolean;
   reduce: boolean;
@@ -87,7 +83,7 @@ function Tabs({
             )}
             {/* Focus ring for the keyboard. */}
             <span aria-hidden className="pointer-events-none absolute inset-x-[2px] bottom-[3px] top-[6px] rounded-[8px] ring-[#2563EB] [button:focus-visible>&]:ring-2" />
-            <Favicon src={tab.favicon} loading={on && loading && !reduce} className="relative h-[14px] w-[14px] xl:h-[16px] xl:w-[16px]" />
+            <Favicon src={tab.favicon} className="relative h-[14px] w-[14px] xl:h-[16px] xl:w-[16px]" />
             {/* A long title fades out at the tab's edge; the padding keeps a short one clear of the fade. */}
             <span className="relative min-w-0 flex-1 overflow-hidden whitespace-nowrap py-[2px] pr-[10px] [mask-image:linear-gradient(90deg,#000_calc(100%-12px),transparent)] xl:pr-[12px]">
               {tab.title}
@@ -121,12 +117,11 @@ export default function Browser({
   onPick,
   touched,
   reduce,
-  loading,
   reload,
   onReload,
-  onReady,
   enabled,
   archived,
+  original,
   tapLabel,
 }: {
   tabs: SiteTab[];
@@ -134,25 +129,24 @@ export default function Browser({
   onPick: (key: string) => void;
   touched: boolean;
   reduce: boolean;
-  loading: boolean;
   reload: number;
   onReload: () => void;
-  onReady: (key: string) => void;
   /** Whether this is the browser on show, so it may load the live site. */
   enabled: boolean;
   /** The address bar's word for a site that's no longer live (rendered on the server, Draft-marked). */
   archived: ReactNode;
+  /** The tag on a live site that's still ours (rendered on the server, Draft-marked). */
+  original: ReactNode;
   tapLabel: ReactNode;
 }) {
   const tab = tabs.find((t) => t.key === active) ?? tabs[0];
-  const run = `${tab.key}-${reload}`;
 
   return (
     <div className={`relative overflow-hidden rounded-[max(2px,0.3cqw)] bg-white antialiased ${CHROME_FONT}`}>
       {/* From lg: the tab strip, then the toolbar. */}
       <div className="hidden h-[40px] items-end bg-[#DFE1E5] pl-[14px] pr-[10px] lg:flex">
         <TrafficLights className="mb-[14px] mr-[12px] gap-[8px]" />
-        <Tabs tabs={tabs} active={active} loading={loading} onPick={onPick} touched={touched} reduce={reduce} />
+        <Tabs tabs={tabs} active={active} onPick={onPick} touched={touched} reduce={reduce} />
       </div>
       <div className="relative hidden h-[42px] items-center gap-[6px] border-b border-black/[0.08] px-[10px] lg:flex">
         <span aria-hidden className="flex items-center gap-[2px] text-[#5F6368]">
@@ -166,6 +160,7 @@ export default function Browser({
         <ReloadButton onReload={onReload} reduce={reduce} size="big" />
         <span className="ml-[4px] flex h-[30px] min-w-0 flex-1 items-center gap-[8px] rounded-full bg-[#F0F1F2] px-[13px] text-[13.5px]">
           <AddressText tab={tab} archived={archived} icon="h-[13px] w-[13px]" />
+          {tab.original && <OriginalTag label={original} className="-mr-[7px] ml-auto text-[11.5px]" />}
         </span>
         {/* The Visit link grows out of the address bar for a live site. */}
         <motion.div
@@ -195,7 +190,6 @@ export default function Browser({
             )}
           </AnimatePresence>
         </motion.div>
-        <LoadBar run={run} loading={loading} armed={touched} reduce={reduce} className="-bottom-px" />
       </div>
       {/* Below lg: one slim toolbar. */}
       <div className="relative flex h-[30px] items-center border-b border-black/[0.08] bg-[#F7F7F8] px-[9px] sm:h-[38px] sm:px-[12px] lg:hidden">
@@ -208,7 +202,6 @@ export default function Browser({
         <span className="flex w-[34px] shrink-0 justify-end sm:w-[46px]">
           <ReloadButton onReload={onReload} reduce={reduce} size="small" />
         </span>
-        <LoadBar run={run} loading={loading} armed={touched} reduce={reduce} className="-bottom-px" />
       </div>
       <Screen
         tabs={tabs}
@@ -216,7 +209,6 @@ export default function Browser({
         variant="desktop"
         enabled={enabled}
         reload={reload}
-        onReady={onReady}
         reduce={reduce}
         tapLabel={tapLabel}
         labelledBy={tabId(active)}

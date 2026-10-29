@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { motion, type MotionStyle } from "framer-motion";
 import { Lock, RotateCw } from "lucide-react";
-import { AddressText, CHROME_FONT, LoadBar } from "./Chrome";
+import { AddressText, CHROME_FONT } from "./Chrome";
 import Screen from "./Screen";
 import type { SiteTab } from "./types";
 
@@ -61,24 +61,8 @@ function StatusBar({ tint }: { tint: string }) {
   );
 }
 
-/** Safari's bottom bar: the address in a pill, its loading bar, and reload. */
-function SafariBar({
-  tab,
-  archived,
-  run,
-  loading,
-  armed,
-  reduce,
-  onReload,
-}: {
-  tab: SiteTab;
-  archived: ReactNode;
-  run: string;
-  loading: boolean;
-  armed: boolean;
-  reduce: boolean;
-  onReload: () => void;
-}) {
+/** Safari's bottom bar: the address in a pill, and reload. */
+function SafariBar({ tab, archived, onReload }: { tab: SiteTab; archived: ReactNode; onReload: () => void }) {
   return (
     <div className="relative shrink-0 border-t border-black/[0.06] bg-[#F6F6F6]" style={{ height: pt(94) }}>
       <div
@@ -104,7 +88,6 @@ function SafariBar({
         >
           <RotateCw style={{ width: pt(17), height: pt(17) }} strokeWidth={2.3} />
         </button>
-        <LoadBar run={run} loading={loading} armed={armed} reduce={reduce} className="bottom-0" />
       </div>
       {/* The home indicator. */}
       <span aria-hidden className="absolute left-1/2 -translate-x-1/2 rounded-full bg-black/85" style={{ bottom: pt(8), width: pt(134), height: pt(5) }} />
@@ -117,11 +100,8 @@ export default function Phone({
   reduce,
   tabs,
   active,
-  touched,
-  loading,
   reload,
   onReload,
-  onReady,
   enabled,
   archived,
   tapLabel,
@@ -131,18 +111,14 @@ export default function Phone({
   reduce: boolean;
   tabs: SiteTab[];
   active: string;
-  touched: boolean;
-  loading: boolean;
   reload: number;
   onReload: () => void;
-  onReady: (key: string) => void;
   enabled: boolean;
   archived: ReactNode;
   tapLabel: ReactNode;
   labelledBy: string;
 }) {
   const tab = tabs.find((t) => t.key === active) ?? tabs[0];
-  const run = `${tab.key}-${reload}`;
   return (
     <div className="mx-auto w-[min(70cqw,300px)] [container-type:inline-size]">
       <div className="relative pb-[14cqw] [perspective-origin:50%_40%] [perspective:520cqw]">
@@ -194,14 +170,13 @@ export default function Phone({
                     variant="phone"
                     enabled={enabled}
                     reload={reload}
-                    onReady={onReady}
                     reduce={reduce}
                     tapLabel={tapLabel}
                     labelledBy={labelledBy}
                     className="h-full"
                   />
                 </div>
-                <SafariBar tab={tab} archived={archived} run={run} loading={loading} armed={touched} reduce={reduce} onReload={onReload} />
+                <SafariBar tab={tab} archived={archived} onReload={onReload} />
               </div>
             </div>
           </div>

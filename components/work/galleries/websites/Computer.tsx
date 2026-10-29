@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { animate, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import Browser, { tabId } from "./Browser";
@@ -38,11 +38,9 @@ function usePhoneLayout() {
 
 export default function Computer({ tabs, labels }: { tabs: SiteTab[]; labels: SiteLabels }) {
   const [active, setActive] = useState(tabs[0].key);
-  // The first pick turns on the tab's spring and the loading bar; the page loads with them at rest.
+  // The first pick turns on the tab's spring; the page loads with it at rest.
   const [touched, setTouched] = useState(false);
   const [reload, setReload] = useState(0);
-  // The page in front has painted (or given up waiting).
-  const [ready, setReady] = useState<string | null>(null);
   const reduce = usePrefersReducedMotion();
   const phone = usePhoneLayout();
   const sectionRef = useRef<HTMLElement>(null);
@@ -78,29 +76,22 @@ export default function Computer({ tabs, labels }: { tabs: SiteTab[]; labels: Si
     setActive(key);
     setTouched(true);
   };
-  const restart = () => {
-    setReload((r) => r + 1);
-    setReady(null);
-    setTouched(true);
-  };
-  const onReady = useCallback((key: string) => setReady(key), []);
-  const tab = tabs.find((t) => t.key === active) ?? tabs[0];
-  const loading = ready !== tab.key;
+  const restart = () => setReload((r) => r + 1);
 
-  const shared = { tabs, active, touched, reduce, loading, reload, onReady, archived: labels.archived, tapLabel: labels.tap };
+  const shared = { tabs, active, reduce, reload, archived: labels.archived, tapLabel: labels.tap };
 
   return (
     <section ref={sectionRef} aria-label="Websites we've built" className="[container-type:inline-size]">
       <div className="hidden sm:block">
         <Monitor turn={turn} glare={glare} reduce={reduce} onPointerMove={lean} onPointerLeave={() => light.set(0)}>
-          <Browser {...shared} onPick={pick} onReload={restart} enabled={phone === false} />
+          <Browser {...shared} touched={touched} original={labels.original} onPick={pick} onReload={restart} enabled={phone === false} />
         </Monitor>
       </div>
       <div className="sm:hidden">
         <Phone {...shared} turn={turn} onReload={restart} enabled={phone === true} labelledBy={tabId(active)} />
       </div>
-      <TabChips tabs={tabs} active={active} loading={loading} onPick={pick} reduce={reduce} />
-      <SiteCaption tabs={tabs} active={active} />
+      <TabChips tabs={tabs} active={active} onPick={pick} reduce={reduce} />
+      <SiteCaption tabs={tabs} active={active} original={labels.original} />
     </section>
   );
 }

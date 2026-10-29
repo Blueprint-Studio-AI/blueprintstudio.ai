@@ -1,13 +1,16 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { OriginalTag } from "./Chrome";
 import type { SiteTab } from "./types";
 
 // The site in front, under the display, in Showcase's type: the client, the
 // year and the piece, its line, and its links. Every caption is laid in the
 // same grid cell, so the block keeps the tallest one's height and nothing
-// below moves when the tab changes.
+// below moves when the tab changes. Below lg the Visit link and the
+// Original tag are here; from lg they're in the address bar.
 
-export default function SiteCaption({ tabs, active }: { tabs: SiteTab[]; active: string }) {
+export default function SiteCaption({ tabs, active, original }: { tabs: SiteTab[]; active: string; original: ReactNode }) {
   return (
     <div className="mt-6 grid sm:mt-8 lg:mt-6">
       {tabs.map((tab) => {
@@ -31,7 +34,8 @@ export default function SiteCaption({ tabs, active }: { tabs: SiteTab[]; active:
                 {tab.summary && <p className="mt-3 max-w-[60ch] text-pretty text-sm leading-[1.5] text-neutral-500">{tab.summary}</p>}
               </div>
               {(tab.links.length > 0 || tab.visit) && (
-                <div className="flex shrink-0 flex-wrap gap-2 lg:pt-1.5">
+                <div className="flex shrink-0 flex-wrap items-center gap-2 lg:pt-1.5">
+                  {tab.original && <OriginalTag label={original} className="mr-1 text-[13px] lg:hidden" />}
                   {/* From lg the Visit link is in the address bar. */}
                   {tab.visit && (
                     <a
