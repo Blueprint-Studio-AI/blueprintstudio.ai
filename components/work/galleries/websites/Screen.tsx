@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getImageProps } from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
@@ -8,10 +8,13 @@ import { useClipLoad } from "@/lib/work/videoQueue";
 import type { SiteTab } from "./types";
 
 // The page inside the browser. Every tab's capture stays mounted underneath,
-// so a swap never waits on an image. The tab in front loads the real site in
-// a sandboxed frame, drawn at a real width (1440 on the display, 393 on the
-// phone) and scaled to fit, and shows it once it has loaded; a page that
-// never loads leaves the capture up. Only that one frame exists at a time.
+// so a tab shows at once and never waits on an image. The tab in front loads
+// the real site in a sandboxed frame, drawn at a real width (1440 on the
+// display, 393 on the phone) and scaled to fit, and takes the capture's place
+// once it has loaded; a page that never loads leaves the capture up.
+// A site stays loaded once opened, as a browser tab does. On the display, the
+// other tabs' sites then load behind, one at a time, so picking one shows it
+// live straight away; a phone loads only the tabs you pick.
 //
 // The frame takes the pointer only once you mean it: on the display, when
 // the pointer moves over it after the page has stopped scrolling (so
@@ -20,9 +23,9 @@ import type { SiteTab } from "./types";
 
 export const PANEL = "websites-screen";
 const SANDBOX = "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox";
-/** A page that hasn't loaded by now stops the loading signals; its capture stays up. */
+/** A page that hasn't loaded by now stops holding up the next one behind it; its capture stays up. */
 const SLOW_MS = 12000;
-/** How long after a page loads before it's shown: long enough for most sites' own entrance to settle. */
+/** How long after a page loads before it takes the capture's place: long enough for most sites' own entrance to settle. */
 const SETTLE_MS = 650;
 /** Wheel this recently means the page is still scrolling past. */
 const SCROLLING_MS = 450;
@@ -110,23 +113,37 @@ function Clip({ tab, variant, playing, onPlaying }: { tab: SiteTab; variant: Scr
   );
 }
 
-/** The live site. Drawn at a real width and scaled to the screen, hidden until it has loaded and settled. */
+/** The live site. Drawn at a real width and scaled to the screen, hidden until it has loaded and settled, and while its tab is behind. */
 function LiveFrame({
   tab,
   variant,
   size,
+  front,
   engaged,
   onLoaded,
+  onDone,
 }: {
   tab: SiteTab;
   variant: ScreenVariant;
   size: { w: number; h: number };
+  /** Its tab is the one in front. */
+  front: boolean;
   engaged: boolean;
   onLoaded: () => void;
+  /** Loaded, or given up on: the next site may start loading behind. */
+  onDone: () => void;
 }) {
   const [shown, setShown] = useState(false);
   const settle = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => () => clearTimeout(settle.current), []);
+  useEffect(() => {
+    const slow = setTimeout(onDone, SLOW_MS);
+    return () => {
+      clearTimeout(slow);
+      clearTimeout(settle.current);
+    };
+    // Once, when the frame starts loading.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const width = RENDER_WIDTH[variant];
   const scale = size.w / width;
   return (
@@ -136,19 +153,21 @@ function LiveFrame({
       sandbox={SANDBOX}
       referrerPolicy="strict-origin-when-cross-origin"
       loading="eager"
-      tabIndex={shown ? 0 : -1}
+      tabIndex={front && shown ? 0 : -1}
+      aria-hidden={!front}
       onLoad={() => {
         // The capture stays up while the site plays its own entrance, so it doesn't flash in half-drawn.
         clearTimeout(settle.current);
         settle.current = setTimeout(() => {
           setShown(true);
           onLoaded();
+          onDone();
         }, SETTLE_MS);
       }}
       className={`absolute left-0 top-0 origin-top-left border-0 bg-white transition-opacity duration-200 ease-out ${shown ? "opacity-100" : "opacity-0"} ${
-        engaged ? "" : "pointer-events-none"
+        front && engaged ? "" : "pointer-events-none"
       }`}
-      style={{ width, height: size.h / scale, transform: `scale(${scale})` }}
+      style={{ width, height: size.h / scale, transform: `scale(${scale})`, visibility: front ? "visible" : "hidden" }}
     />
   );
 }
@@ -159,7 +178,6 @@ export default function Screen({
   variant,
   enabled,
   reload,
-  onReady,
   reduce,
   tapLabel,
   labelledBy,
@@ -170,10 +188,8 @@ export default function Screen({
   variant: ScreenVariant;
   /** Whether this screen is the one on show, so it may load the live site. */
   enabled: boolean;
-  /** Bumped by the reload button: the page starts over. */
+  /** Bumped by the reload button: the page in front starts over. */
   reload: number;
-  /** The page in front has painted (or given up), so the loading signals stop. */
-  onReady: (key: string) => void;
   reduce: boolean;
   tapLabel: ReactNode;
   labelledBy: string;
@@ -184,7 +200,12 @@ export default function Screen({
   const [near, setNear] = useState(false);
   const [inView, setInView] = useState(false);
   const [engaged, setEngaged] = useState(false);
-  const [painted, setPainted] = useState<string | null>(null);
+  // The sites opened so far, in order; each one's reloads; and the frames
+  // (by run) that have painted, or are done loading either way.
+  const [opened, setOpened] = useState<string[]>([]);
+  const [reloads, setReloads] = useState<Record<string, number>>({});
+  const [painted, setPainted] = useState<ReadonlySet<string>>(() => new Set());
+  const [done, setDone] = useState<ReadonlySet<string>>(() => new Set());
   const [coarse, setCoarse] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   // The visitor's own play or pause wins over scrolling in and out of view.
@@ -192,7 +213,9 @@ export default function Screen({
   const lastWheel = useRef(0);
   const tab = tabs.find((t) => t.key === active) ?? tabs[0];
   const run = `${tab.key}-${reload}`;
-  const framed = !!tab.frame && !(variant === "phone" && tab.heavy);
+  const frameRun = (key: string) => `${key}-${reloads[key] ?? 0}`;
+  const canFrame = (t: SiteTab) => !!t.frame && !(variant === "phone" && t.heavy);
+  const framed = canFrame(tab);
   const live = framed && enabled && near;
   const hasClip = !framed && !!tab.hero.src;
 
@@ -222,16 +245,28 @@ export default function Screen({
     setIsPlaying(false);
   }, [run]);
 
-  // A capture is there at once; a live page reports when it loads, or gives up when slow.
+  // The tab in front opens its site as soon as it may.
   useEffect(() => {
-    if (!framed) {
-      onReady(tab.key);
-      return;
-    }
-    if (!live) return;
-    const slow = setTimeout(() => onReady(tab.key), SLOW_MS);
-    return () => clearTimeout(slow);
-  }, [run, live, framed, tab.key, onReady]);
+    if (live) setOpened((o) => (o.includes(tab.key) ? o : [...o, tab.key]));
+  }, [live, tab.key]);
+
+  // Reload starts the site in front over.
+  const lastReload = useRef(reload);
+  useEffect(() => {
+    if (reload === lastReload.current) return;
+    lastReload.current = reload;
+    setReloads((r) => ({ ...r, [tab.key]: (r[tab.key] ?? 0) + 1 }));
+  }, [reload, tab.key]);
+
+  // On the display, once nothing is loading, the next tab's site loads behind.
+  // Not a heavy one, and not when the visitor has asked to save data.
+  const busy = opened.some((key) => !done.has(frameRun(key)));
+  useEffect(() => {
+    if (variant !== "desktop" || !enabled || !near || busy) return;
+    if ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return;
+    const next = tabs.find((t) => t.frame && !t.heavy && !opened.includes(t.key));
+    if (next) setOpened((o) => [...o, next.key]);
+  }, [variant, enabled, near, busy, tabs, opened]);
 
   useEffect(() => {
     if (!inView) setEngaged(false);
@@ -251,12 +286,8 @@ export default function Screen({
     };
   }, [engaged]);
 
-  const loaded = useCallback(() => {
-    setPainted(run);
-    onReady(tab.key);
-  }, [run, tab.key, onReady]);
-
-  const shown = live && painted === run;
+  const add = (set: ReadonlySet<string>, key: string) => (set.has(key) ? set : new Set(set).add(key));
+  const shown = live && painted.has(frameRun(tab.key));
   const playing = inView && (choice === "play" || (choice === "auto" && !reduce));
   // With reduced motion a clip neither plays nor downloads until someone presses play.
   const clipAllowed = hasClip && (!reduce || choice === "play");
@@ -282,7 +313,24 @@ export default function Screen({
         </div>
       ))}
       {clipAllowed && <Clip key={run} tab={tab} variant={variant} playing={playing} onPlaying={setIsPlaying} />}
-      {live && size.w > 0 && <LiveFrame key={run} tab={tab} variant={variant} size={size} engaged={engaged} onLoaded={loaded} />}
+      {size.w > 0 &&
+        opened.map((key) => {
+          const t = tabs.find((x) => x.key === key);
+          if (!t || !canFrame(t)) return null;
+          const r = frameRun(key);
+          return (
+            <LiveFrame
+              key={r}
+              tab={t}
+              variant={variant}
+              size={size}
+              front={live && key === tab.key}
+              engaged={engaged}
+              onLoaded={() => setPainted((p) => add(p, r))}
+              onDone={() => setDone((d) => add(d, r))}
+            />
+          );
+        })}
       {/* On a touch screen the site takes touches only after a tap, so the page still scrolls past it. */}
       <span className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center">
         <AnimatePresence>

@@ -19,6 +19,8 @@ export interface SiteTab {
   address: { host: string; path: string; live: boolean };
   /** Where "Visit site" goes, for a site that's live. */
   visit?: string;
+  /** The live site is still the one we made, unchanged, so it gets the Original tag. */
+  original: boolean;
   /** The page's top colour, for the phone's status bar. */
   tint: string;
   /** The caption: the client, the year, the piece, its line, and the links Showcase gives it. */
@@ -33,6 +35,8 @@ export interface SiteTab {
 export interface SiteLabels {
   /** The address bar's word for a site that's no longer live. */
   archived: ReactNode;
+  /** The tag on a live site that's still the one we made. */
+  original: ReactNode;
   /** The phone's hint that a tap hands the screen to the site. */
   tap: ReactNode;
 }

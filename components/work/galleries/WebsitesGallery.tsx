@@ -7,15 +7,15 @@ import type { SiteTab } from "./websites/types";
 
 // /work/websites opens on a desktop display with a browser on it, each site
 // we built a tab. Where the site is still live and still ours, the tab shows
-// the real thing in a sandboxed frame you can scroll and click; where it
-// isn't, our build as it shipped, or our own capture of it. Never a client's
-// current site we didn't make.
+// the real thing in a sandboxed frame you can scroll and click, tagged
+// Original; where it isn't, our build as it shipped, or our own capture of
+// it. Never a client's current site we didn't make.
 
 type Source =
-  /** Live, and still the version we made. */
-  | { kind: "live"; url: string; heavy?: boolean }
-  /** Changed or gone where it shipped, but our build is still deployed. */
-  | { kind: "build"; url: string; shipped: string; title?: string }
+  /** Live. Still the version we made, unless `changed`: then it's linked, but the screen keeps our capture. */
+  | { kind: "live"; url: string; changed?: boolean }
+  /** Changed or gone where it shipped, but our build is still deployed. `heavy`: too big for a phone's data. */
+  | { kind: "build"; url: string; shipped: string; title?: string; heavy?: boolean }
   /** Nothing we can frame: our capture. */
   | { kind: "capture"; shipped: string };
 
@@ -30,13 +30,13 @@ const SOURCES: Record<string, Source> = {
   "pavepower-website": { kind: "live", url: "https://www.pavepower.com/" },
   // Our build (Blueprint-Studio-AI/hashplay-site), still deployed; hashplay.xyz is parked.
   // Its game reels make it about 23 MB to load, so phones keep the capture.
-  "hashplay-website": { kind: "live", url: "https://hashplay-site.vercel.app/", heavy: true },
+  "hashplay-website": { kind: "build", url: "https://hashplay-site.vercel.app/", shipped: "hashplay.xyz", heavy: true },
   // arch.network/chain is a new design that isn't ours; our build (Arch-Network/arch-site) is still deployed.
   "arch-chain": { kind: "build", url: "https://arch-site-drab.vercel.app/chain", shipped: "arch.network/chain", title: "Chain | Arch" },
   // arch.network/ecosystem now redirects into the new site; our build's page is still deployed.
   "arch-site": { kind: "build", url: "https://arch-site-drab.vercel.app/ecosystem", shipped: "arch.network/ecosystem", title: "Ecosystem | Arch" },
-  // perena.org has been redesigned since and refuses framing.
-  "perena-landing": { kind: "capture", shipped: "perena.org" },
+  // perena.org has changed since, but it's close to ours (Tyler), so it's linked; it refuses framing, so the screen keeps our capture.
+  "perena-landing": { kind: "live", url: "https://perena.org/", changed: true },
   // Today's idscanner.com isn't ours; our 2024 build's deployments are behind a login.
   "tokenworks-idvisor-page": { kind: "capture", shipped: "idscanner.com" },
 };
@@ -99,6 +99,7 @@ async function tabOf(work: ShownWork, works: ShownWork[]): Promise<SiteTab> {
   // when there's no live page.
   const recording = !frame && kit.hero.src?.startsWith(`/media/kits/${work.slug}/`);
   const live = source.kind === "live";
+  const heavy = source.kind === "build" && !!source.heavy;
   return {
     key: work.slug,
     title: (source.kind === "build" && source.title) || (twice ? work.title : client.name),
@@ -110,10 +111,11 @@ async function tabOf(work: ShownWork, works: ShownWork[]): Promise<SiteTab> {
       ...(kit.hero.vertical ? { vertical: kit.hero.vertical } : {}),
     },
     frame,
-    heavy: source.kind === "live" && source.heavy,
+    heavy,
     address: { ...split(live ? source.url : source.shipped), live },
     visit: live ? (work.liveUrl ?? source.url) : undefined,
-    tint: (frame && !(source.kind === "live" && source.heavy) && TINTS[work.slug]) || "#000000",
+    original: live && !source.changed && !!frame,
+    tint: (frame && !heavy && TINTS[work.slug]) || "#000000",
     name: client.name,
     year: work.year,
     label: work.title,
@@ -130,7 +132,7 @@ export default async function WebsitesGallery({ works }: GalleryProps) {
     <div className={`${WIDE} pb-16 sm:pb-24 lg:pb-32`}>
       <div className={TEXT_INSET}>
         {/* New copy, so it's marked Draft outside production. */}
-        <Computer tabs={tabs} labels={{ archived: <Draft>Archived</Draft>, tap: <Draft>Tap to use the site</Draft> }} />
+        <Computer tabs={tabs} labels={{ archived: <Draft>Archived</Draft>, original: <Draft>Original</Draft>, tap: <Draft>Tap to use the site</Draft> }} />
       </div>
     </div>
   );
