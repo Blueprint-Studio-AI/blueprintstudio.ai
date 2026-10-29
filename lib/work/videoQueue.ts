@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 // The home page's staged loading for portfolio clips. They stay unloaded until
 // the hero reel has landed (it sends "bp:opening-landed"), so they don't
 // compete with it; then they load in page order, two at a time. A clip that
-// comes near the screen, or that someone asks for, loads straight away.
+// comes near the screen after that, or that someone asks for, loads straight away.
 // Elsewhere (the /work pages) clips simply load as they come near the screen.
 
 type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
@@ -82,6 +82,13 @@ export function useClipLoad(
         // Near the screen: jump the queue without taking a slot (and on pages
         // without the queue, that's the only way in).
         if (staged && waiter?.started) return;
+        // Near the screen while the reel is still landing (the first card sits
+        // just under it): first in line, but it still waits for the reel.
+        if (waiter && !released) {
+          waiting.splice(waiting.indexOf(waiter), 1);
+          waiting.unshift(waiter);
+          return;
+        }
         if (waiter) waiter.started = true;
         setLoad(true);
       },
