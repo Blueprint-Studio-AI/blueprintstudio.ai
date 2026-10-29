@@ -131,7 +131,7 @@ export function JewelCase({
           <span className="flex shrink-0 items-center gap-1.5 font-mono text-[0.85em] tabular-nums text-white/50">
             <span
               className={`h-[5px] w-[5px] rounded-full transition-[background-color,box-shadow] duration-300 ${
-                lit ? "bg-[#FF6A1A] shadow-[0_0_6px_1px_rgba(255,106,26,0.7)]" : "bg-white/15"
+                lit ? "bg-[#3B82F6] shadow-[0_0_6px_1px_rgba(59,130,246,0.7)]" : "bg-white/15"
               }`}
             />
             {track(index)}
