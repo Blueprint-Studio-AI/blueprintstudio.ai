@@ -38,11 +38,12 @@ const REEL_SRC = {
 const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
-// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s and the
-// word at 5s. The opening plays a touch fast and holds a little longer, so the
-// ring comes as the reel starts down onto the page and the word as it settles.
-// Past `until` (and on every loop after) it plays at its own speed.
-const OPENING = { rate: 1.5, until: 5, holdMs: 2300 };
+// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s, and the
+// word fully in at 5.5s, held till 7s. The flash plays a touch fast; the logo
+// plays at its own speed (as does every loop after), and the reel lands once the
+// logo is in. It follows the film, not a clock, so a slow connection can't start
+// it down mid-logo; `maxMs` lands it anyway if the film stalls.
+const OPENING = { rate: 1.5, logo: 3.5, land: 5.7, maxMs: 7000 };
 const CARD_RADIUS = 16;
 const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
@@ -233,15 +234,27 @@ export default function Hero() {
         });
     }, [progress, setStage]);
 
-    // Hold the reel for a beat, or land straight away if the visitor scrolls or presses a key.
+    // Hold the reel for a beat (the full reel: till its logo is in), or land
+    // straight away if the visitor scrolls or presses a key.
     useEffect(() => {
         if (stage !== "reel") return;
-        const hold = setTimeout(land, src === REEL_SRC.full ? OPENING.holdMs : REEL_HOLD_MS);
+        const video = videoRef.current;
+        const film = src === REEL_SRC.full && video;
+        let tick = 0;
+        const follow = () => {
+            if (!film) return;
+            if (film.currentTime >= OPENING.logo) film.playbackRate = 1;
+            if (film.currentTime >= OPENING.land) land();
+            else tick = requestAnimationFrame(follow);
+        };
+        follow();
+        const hold = setTimeout(land, film ? OPENING.maxMs : REEL_HOLD_MS);
         const now = () => land();
         window.addEventListener("wheel", now, { passive: true });
         window.addEventListener("touchmove", now, { passive: true });
         window.addEventListener("keydown", now);
         return () => {
+            cancelAnimationFrame(tick);
             clearTimeout(hold);
             window.removeEventListener("wheel", now);
             window.removeEventListener("touchmove", now);
@@ -489,7 +502,8 @@ export default function Hero() {
                                     preload="auto"
                                     onTimeUpdate={(e) => {
                                         const v = e.currentTarget;
-                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.until) v.playbackRate = 1;
+                                        // After an early landing (a scroll), the logo still gets its own speed.
+                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.logo) v.playbackRate = 1;
                                     }}
                                 />
                                 <AnimatePresence>
