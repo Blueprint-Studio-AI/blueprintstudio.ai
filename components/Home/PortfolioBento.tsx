@@ -8,9 +8,9 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { Pause, Play } from "lucide-react";
 import { portfolioProjects, type PortfolioProject, type MediaAsset, type ShowcaseMedia } from "@/data/portfolioData";
 
-const portfolioSections = [
-  ...portfolioProjects
-];
+// Off the home page for now, to keep it shorter; their portfolio pages stay up.
+const HIDDEN_ON_HOME = ['tokenworks', 'breeze'];
+const portfolioSections = portfolioProjects.filter((p) => !HIDDEN_ON_HOME.includes(p.id));
 
 // Portfolio videos stay unloaded until the hero reel has landed (it sends
 // "bp:opening-landed"), so they don't compete with it. Then they load in page
@@ -208,7 +208,7 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
 export default function PortfolioBento() {
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [spacerHeights, setSpacerHeights] = useState<number[]>(
-    portfolioProjects.map(() => 100)
+    portfolioSections.map(() => 100)
   );
 
   const measureHeights = useCallback(() => {
@@ -260,7 +260,7 @@ export default function PortfolioBento() {
 
         {/* Render all project sections sequentially */}
         <div className="w-full max-w-[1000px]">
-          {portfolioProjects.map((project, sectionIndex) => (
+          {portfolioSections.map((project, sectionIndex) => (
             <div key={project.id} className="w-full">
               {sectionIndex > 0 && (
                 <div className="w-full line-dash-x" />
