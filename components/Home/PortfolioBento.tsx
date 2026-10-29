@@ -14,7 +14,8 @@ const portfolioSections = [
 
 // Portfolio videos stay unloaded until the hero reel has landed (it sends
 // "bp:opening-landed"), so they don't compete with it. Then they load in page
-// order, two at a time. A card that comes near the screen loads straight away.
+// order, two at a time. A card that comes near the screen after that loads
+// straight away.
 type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
 const waiting: Waiter[] = [];
 const MAX_LOADING = 2;
@@ -80,6 +81,13 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
         if (!entry.isIntersecting) return;
         observer.disconnect();
         if (waiter.started) return;
+        // Near the screen while the reel is still landing (the first card sits
+        // just under it): first in line, but it still waits for the reel.
+        if (!released) {
+          waiting.splice(waiting.indexOf(waiter), 1);
+          waiting.unshift(waiter);
+          return;
+        }
         waiter.started = true; // jumps the queue without taking a slot
         setShouldLoad(true);
       },
