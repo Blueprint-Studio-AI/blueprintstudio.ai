@@ -347,6 +347,8 @@ html.lenis body {
   @keyframes loader-word {
     from { opacity: 0; filter: blur(10px); transform: translateY(10px); }
   }
+  /* A return visit skips the opening (lib/intro); the head script marks <html> before the first paint. */
+  [data-intro="skip"] .home-loader { display: none; }
   .loader-fade { animation: loader-fade 500ms ease-out both; }
   .loader-word { animation: loader-word 500ms cubic-bezier(0.4, 0, 0.2, 1) both; }
   @media (prefers-reduced-motion: reduce) {

@@ -15,13 +15,13 @@ export default function Section({ children, className, semantic = "section", ...
       `
   
   if (semantic === "section") return (
-    <section className={style}>
+    <section className={style} {...props}>
       {children}
     </section>
   )
 
   if (semantic ==="div") return (
-    <div className={style}>
+    <div className={style} {...props}>
       {children}
     </div>
   );

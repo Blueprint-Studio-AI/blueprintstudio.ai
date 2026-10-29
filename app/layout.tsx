@@ -9,6 +9,7 @@ import Background from "@/components/ui/Background";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
+import { introScript } from "@/lib/intro"
 
 const inter = Inter({
   subsets: ['latin'],
@@ -142,6 +143,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Before the first paint: skip the home page's opening on a return visit (lib/intro). */}
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
