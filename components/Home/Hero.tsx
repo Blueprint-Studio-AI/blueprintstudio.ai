@@ -35,15 +35,16 @@ const REEL_SRC = {
     // A 2:3 reel for phones, cut from the projects' own vertical edits.
     small: "/media/highlight-reel/highlight-reel-mobile-2x3.mp4",
 };
-const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to read its line
+const LOADER_MIN_MS = 1800; // from the loader's first frame: its last word lands at 1.3s, then a beat to read the line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
-// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s, and the
-// word fully in at 5.5s, held till 7s. Up to then it plays a touch fast, and the
-// reel starts down onto the page as the word lands; after, and on every loop, it
-// plays at its own speed. It follows the film, not a clock, so a slow connection
-// can't start it down mid-logo; `maxMs` lands it anyway if the film stalls.
-const OPENING = { rate: 1.5, land: 5.5, maxMs: 6000 };
+// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s and its
+// word at 5s. The flash plays a touch fast, full screen, and the reel starts down
+// `land` seconds in, so it settles on the page just as the logo begins; the logo
+// plays in place at its own speed, as does every loop after. It follows the film,
+// not a clock, so on a slow connection the logo still can't start mid-flight;
+// `maxMs` lands it anyway if the film stalls.
+const OPENING = { rate: 1.5, land: 2.25, logo: 3.5, maxMs: 3000 };
 const CARD_RADIUS = 16;
 const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
@@ -209,7 +210,16 @@ export default function Hero() {
     useEffect(() => {
         if (stage !== "loading" || !videoReady || !minTimeElapsed) return;
         const opening = !reduceMotion && window.scrollY <= 100;
-        if (opening && src === REEL_SRC.full && videoRef.current) videoRef.current.playbackRate = OPENING.rate;
+        const film = videoRef.current;
+        if (opening && src === REEL_SRC.full && film) {
+            film.playbackRate = OPENING.rate;
+            // Back to its own speed on the frame the logo starts (timeupdate, below, is the fallback).
+            const watch = () => {
+                if (film.currentTime >= OPENING.logo) film.playbackRate = 1;
+                else film.requestVideoFrameCallback?.(watch);
+            };
+            film.requestVideoFrameCallback?.(watch);
+        }
         videoRef.current?.play().catch(() => {});
         if (!opening) {
             progress.set(1);
@@ -234,8 +244,8 @@ export default function Hero() {
         });
     }, [progress, setStage]);
 
-    // Hold the reel for a beat (the full reel: till its logo is in), or land
-    // straight away if the visitor scrolls or presses a key.
+    // Hold the reel for a beat (the full reel: till its flash is nearly done), or
+    // land straight away if the visitor scrolls or presses a key.
     useEffect(() => {
         if (stage !== "reel") return;
         const video = videoRef.current;
@@ -243,12 +253,8 @@ export default function Hero() {
         let tick = 0;
         const follow = () => {
             if (!film) return;
-            if (film.currentTime < OPENING.land) {
-                tick = requestAnimationFrame(follow);
-                return;
-            }
-            film.playbackRate = 1;
-            land();
+            if (film.currentTime >= OPENING.land) land();
+            else tick = requestAnimationFrame(follow);
         };
         follow();
         const hold = setTimeout(land, film ? OPENING.maxMs : REEL_HOLD_MS);
@@ -355,8 +361,8 @@ export default function Hero() {
                                 className="loader-fade absolute inset-0 rounded-2xl"
                                 style={{
                                     backgroundColor: "#FBFBFB",
-                                    animationDuration: "800ms",
-                                    animationDelay: "1100ms",
+                                    animationDuration: "700ms",
+                                    animationDelay: "500ms",
                                     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.015)",
                                 }}
                             />
@@ -505,8 +511,7 @@ export default function Hero() {
                                     preload="auto"
                                     onTimeUpdate={(e) => {
                                         const v = e.currentTarget;
-                                        // After an early landing (a scroll), the rest still plays at its own speed.
-                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.land) v.playbackRate = 1;
+                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.logo) v.playbackRate = 1;
                                     }}
                                 />
                                 <AnimatePresence>
