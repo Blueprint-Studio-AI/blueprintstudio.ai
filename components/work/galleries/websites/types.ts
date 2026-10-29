@@ -15,6 +15,8 @@ export interface SiteTab {
   frame?: string;
   /** The live page is too heavy for a phone's data (the phone keeps the capture). */
   heavy?: boolean;
+  /** How long the live page's own intro plays after it loads (ms), so the capture stays up through it. */
+  intro?: number;
   /** The address bar: the live site's domain, or where an archived site used to be. */
   address: { host: string; path: string; live: boolean };
   /** Where "Visit site" goes, for a site that's live. */

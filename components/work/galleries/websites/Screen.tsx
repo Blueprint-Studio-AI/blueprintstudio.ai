@@ -162,7 +162,7 @@ function LiveFrame({
           setShown(true);
           onLoaded();
           onDone();
-        }, SETTLE_MS);
+        }, tab.intro ?? SETTLE_MS);
       }}
       className={`absolute left-0 top-0 origin-top-left border-0 bg-white transition-opacity duration-200 ease-out ${shown ? "opacity-100" : "opacity-0"} ${
         front && engaged ? "" : "pointer-events-none"

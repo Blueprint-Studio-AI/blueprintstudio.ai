@@ -14,8 +14,11 @@ import type { SiteTab } from "./websites/types";
 type Source =
   /** Live. Still the version we made, unless `changed`: then it's linked, but the screen keeps our capture. */
   | { kind: "live"; url: string; changed?: boolean }
-  /** Changed or gone where it shipped, but our build is still deployed. `heavy`: too big for a phone's data. */
-  | { kind: "build"; url: string; shipped: string; title?: string; heavy?: boolean }
+  /**
+   * Changed or gone where it shipped, but our build is still deployed. `heavy`: too big for a
+   * phone's data. `intro`: how long its own loading screen plays after it loads (ms).
+   */
+  | { kind: "build"; url: string; shipped: string; title?: string; heavy?: boolean; intro?: number }
   /** Nothing we can frame: our capture. */
   | { kind: "capture"; shipped: string };
 
@@ -30,7 +33,8 @@ const SOURCES: Record<string, Source> = {
   "pavepower-website": { kind: "live", url: "https://www.pavepower.com/" },
   // Our build (Blueprint-Studio-AI/hashplay-site), still deployed; hashplay.xyz is parked.
   // Its game reels make it about 23 MB to load, so phones keep the capture.
-  "hashplay-website": { kind: "build", url: "https://hashplay-site.vercel.app/", shipped: "hashplay.xyz", heavy: true },
+  // It opens on its own loading count, then types its headline in; the capture stays up till that's done.
+  "hashplay-website": { kind: "build", url: "https://hashplay-site.vercel.app/", shipped: "hashplay.xyz", heavy: true, intro: 4200 },
   // arch.network/chain is a new design that isn't ours; our build (Arch-Network/arch-site) is still deployed.
   "arch-chain": { kind: "build", url: "https://arch-site-drab.vercel.app/chain", shipped: "arch.network/chain", title: "Chain | Arch" },
   // arch.network/ecosystem now redirects into the new site; our build's page is still deployed.
@@ -112,6 +116,7 @@ async function tabOf(work: ShownWork, works: ShownWork[]): Promise<SiteTab> {
     },
     frame,
     heavy,
+    intro: source.kind === "build" ? source.intro : undefined,
     address: { ...split(live ? source.url : source.shipped), live },
     visit: live ? (work.liveUrl ?? source.url) : undefined,
     original: live && !source.changed && !!frame,
