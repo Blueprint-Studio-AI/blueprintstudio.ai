@@ -35,6 +35,10 @@ const REEL_SRC = {
     // A 2:3 reel for phones, cut from the projects' own vertical edits.
     small: "/media/highlight-reel/highlight-reel-mobile-2x3.mp4",
 };
+// The full reel again in AV1, at half the size, so its opening plays through on
+// a slower connection. Browsers that can't play AV1 (Safari before M3 Macs and
+// the iPhone 15 Pro) get the H.264.
+const REEL_AV1 = { src: "/media/highlight-reel/highlight-reel-horizontal-005-av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' };
 const LOADER_MIN_MS = 1800; // from the loader's first frame: its last word lands at 1.3s, then a beat to read the line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
@@ -81,6 +85,7 @@ export default function Hero() {
     }, []);
 
     const [src, setSrc] = useState<string>();
+    const [av1, setAv1] = useState(false);
     const [variantKey, setVariantKey] = useState<VariantKey | null>(null);
     const variant = VARIANTS.find((v) => v.key === variantKey) ?? null;
     const [hasFrame, setHasFrame] = useState(false);
@@ -161,6 +166,7 @@ export default function Hero() {
     // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
     useEffect(() => {
         const query = window.matchMedia("(min-width: 640px)");
+        setAv1(document.createElement("video").canPlayType(REEL_AV1.type) === "probably");
         const pick = () => setSrc(query.matches ? REEL_SRC.full : REEL_SRC.small);
         pick();
         query.addEventListener("change", pick);
@@ -510,7 +516,7 @@ export default function Hero() {
                                 />
                                 <video
                                     ref={videoRef}
-                                    src={src}
+                                    src={src === REEL_SRC.full && av1 ? REEL_AV1.src : src}
                                     className="absolute inset-0 h-full w-full object-cover"
                                     style={{ opacity: hasFrame ? 1 : 0, transition: "opacity 300ms cubic-bezier(.16, 1, .3, 1)" }}
                                     loop
