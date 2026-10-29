@@ -39,11 +39,11 @@ const LOADER_MIN_MS = 2400; // from the loader's first frame: long enough to rea
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
 // Nick's reel opens on a flash of work, then the logo: its ring at 3.5s, and the
-// word fully in at 5.5s, held till 7s. The flash plays a touch fast; the logo
-// plays at its own speed (as does every loop after), and the reel lands once the
-// logo is in. It follows the film, not a clock, so a slow connection can't start
-// it down mid-logo; `maxMs` lands it anyway if the film stalls.
-const OPENING = { rate: 1.5, logo: 3.5, land: 5.7, maxMs: 7000 };
+// word fully in at 5.5s, held till 7s. Up to then it plays a touch fast, and the
+// reel starts down onto the page as the word lands; after, and on every loop, it
+// plays at its own speed. It follows the film, not a clock, so a slow connection
+// can't start it down mid-logo; `maxMs` lands it anyway if the film stalls.
+const OPENING = { rate: 1.5, land: 5.5, maxMs: 6000 };
 const CARD_RADIUS = 16;
 const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
@@ -243,9 +243,12 @@ export default function Hero() {
         let tick = 0;
         const follow = () => {
             if (!film) return;
-            if (film.currentTime >= OPENING.logo) film.playbackRate = 1;
-            if (film.currentTime >= OPENING.land) land();
-            else tick = requestAnimationFrame(follow);
+            if (film.currentTime < OPENING.land) {
+                tick = requestAnimationFrame(follow);
+                return;
+            }
+            film.playbackRate = 1;
+            land();
         };
         follow();
         const hold = setTimeout(land, film ? OPENING.maxMs : REEL_HOLD_MS);
@@ -502,8 +505,8 @@ export default function Hero() {
                                     preload="auto"
                                     onTimeUpdate={(e) => {
                                         const v = e.currentTarget;
-                                        // After an early landing (a scroll), the logo still gets its own speed.
-                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.logo) v.playbackRate = 1;
+                                        // After an early landing (a scroll), the rest still plays at its own speed.
+                                        if (v.playbackRate !== 1 && v.currentTime >= OPENING.land) v.playbackRate = 1;
                                     }}
                                 />
                                 <AnimatePresence>
