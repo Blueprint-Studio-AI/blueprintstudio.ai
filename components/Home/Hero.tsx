@@ -38,16 +38,22 @@ const REEL_SRC = {
 const LOADER_MIN_MS = 1800; // from the loader's first frame: its last word lands at 1.3s, then a beat to read the line
 const VIDEO_FALLBACK_MS = 6000; // land anyway if the reel is slow to load
 const REEL_HOLD_MS = 1400; // full-screen beat before it lands (the phone reel)
-// Nick's reel opens on a flash of work, then the logo: its ring at 3.5s and its
-// word at 5s. The flash plays a touch fast, full screen, and the reel starts down
-// `land` seconds in, so it settles on the page just as the logo begins; the logo
-// plays in place at its own speed, as does every loop after. It follows the film,
-// not a clock, so on a slow connection the logo still can't start mid-flight;
-// `maxMs` lands it anyway if the film stalls.
-const OPENING = { rate: 1.5, land: 2.25, logo: 3.5, maxMs: 3000 };
+// Nick's reel opens on a flash of work, then the logo: its thumbprint lands at
+// 3.58s and sends out a ripple, and its word follows at 5s. The flash plays a
+// touch fast, full screen, and the reel starts down `land` seconds in. The rest
+// of the flash is paced from the moment it actually starts down (a busy page can
+// start it late), so the thumbprint lands as the reel touches down on the page,
+// `touch` later, and the reel settles as the ripple spreads. The logo plays in
+// place at its own speed, as does every loop after. It follows the film, not a
+// clock, so on a slow connection the logo still can't start mid-flight; `maxMs`
+// lands it anyway if the film stalls.
+const OPENING = { rate: 1.5, land: 2.65, logo: 3.58, touch: 0.65, maxMs: 3000 };
 const CARD_RADIUS = 16;
 const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
+// The opening's landing: quicker, with a little give, so there's a moment it
+// touches down (0.6s in) rather than a glide to a stop.
+const TOUCHDOWN = { type: "spring", visualDuration: 0.75, bounce: 0.2 } as const;
 const LIFT = { type: "spring", visualDuration: 0.6, bounce: 0.08 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
@@ -234,12 +240,14 @@ export default function Hero() {
         if (stage === "docked") window.dispatchEvent(new Event("bp:opening-landed"));
     }, [stage]);
 
-    const land = useCallback(() => {
+    const land = useCallback((onCue = false) => {
         if (stageRef.current !== "reel") return;
+        const film = videoRef.current;
+        if (onCue && film) film.playbackRate = Math.min(2, Math.max(1, (OPENING.logo - film.currentTime) / OPENING.touch));
         // The top nav arrives with the reel, not after it.
         window.dispatchEvent(new Event("bp:opening-landing"));
         setStage("landing");
-        animate(progress, 1, LAND).then(() => {
+        animate(progress, 1, TOUCHDOWN).then(() => {
             if (stageRef.current === "landing") setStage("docked");
         });
     }, [progress, setStage]);
@@ -253,11 +261,11 @@ export default function Hero() {
         let tick = 0;
         const follow = () => {
             if (!film) return;
-            if (film.currentTime >= OPENING.land) land();
+            if (film.currentTime >= OPENING.land) land(true);
             else tick = requestAnimationFrame(follow);
         };
         follow();
-        const hold = setTimeout(land, film ? OPENING.maxMs : REEL_HOLD_MS);
+        const hold = setTimeout(() => land(), film ? OPENING.maxMs : REEL_HOLD_MS);
         const now = () => land();
         window.addEventListener("wheel", now, { passive: true });
         window.addEventListener("touchmove", now, { passive: true });
