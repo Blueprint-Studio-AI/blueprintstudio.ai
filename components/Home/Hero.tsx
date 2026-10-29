@@ -18,6 +18,7 @@ import { ArrowRight, Maximize2, X } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
+import { introSeen, introSkipped } from "@/lib/intro";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
@@ -94,6 +95,17 @@ export default function Hero() {
     const refocusRef = useRef(false);
     const progress = useMotionValue(0); // 0 = full-screen card, 1 = in its slot
     const backdropOpacity = useTransform(progress, [0, 1], [1, 0]);
+
+    // A return visit (lib/intro) opens on the page as the opening leaves it: no
+    // loader, no full-screen reel. Before the frame is first placed, so it never
+    // shows full screen.
+    useLayoutEffect(() => {
+        const skip = introSkipped();
+        document.documentElement.dataset.intro = skip ? "skip" : "play";
+        if (!skip) return;
+        progress.set(1);
+        setStage("docked");
+    }, [progress, setStage]);
 
     // Place the frame for the current stage and progress.
     const place = useCallback(() => {
@@ -235,9 +247,12 @@ export default function Hero() {
         }
     }, [stage, videoReady, minTimeElapsed, reduceMotion, progress, setStage, src]);
 
-    // Once the reel is in place, the portfolio videos below can start loading.
+    // Once the reel is in place, the portfolio videos below can start loading,
+    // and the opening won't play again soon.
     useEffect(() => {
-        if (stage === "docked") window.dispatchEvent(new Event("bp:opening-landed"));
+        if (stage !== "docked") return;
+        window.dispatchEvent(new Event("bp:opening-landed"));
+        introSeen();
     }, [stage]);
 
     const land = useCallback(() => {
@@ -356,7 +371,7 @@ export default function Hero() {
                 {stage === "loading" && (
                     <motion.div
                         key="loader"
-                        className="fixed inset-0 z-[100] bg-neutral-50"
+                        className="home-loader fixed inset-0 z-[100] bg-neutral-50"
                         exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
                     >
                         <div
@@ -405,6 +420,13 @@ export default function Hero() {
 
             <Section
                 className={`relative ${raised ? "z-[60]" : "z-20"} min-h-[calc(100svh-48px)] justify-between overflow-hidden bg-neutral-50 md:min-h-[calc(100svh-64px)]`}
+                onClick={(e) => {
+                    // With a word picked, a click anywhere else on the hero's text or
+                    // background (not a link, a button or the reel) goes back to the whole line.
+                    const target = e.target as Element;
+                    if (!variantKey || stageRef.current !== "docked" || target.closest("a, button") || frameRef.current?.contains(target)) return;
+                    chooseVariant(null);
+                }}
             >
                 {/* Artificial vertical lines to match the background */}
                 <div className="pointer-events-none absolute inset-0 flex justify-center px-2.5 sm:px-[60px]">
