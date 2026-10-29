@@ -98,16 +98,16 @@ function Key({
       style={{
         width: size,
         height: size,
-        background: accent ? "linear-gradient(#ff8a47, #f2601a)" : "linear-gradient(#fbfaf8, #e2e0db)",
+        background: accent ? "linear-gradient(#4f8dff, #2563eb)" : "linear-gradient(#fbfaf8, #e2e0db)",
         boxShadow: accent
-          ? "inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 1px rgba(120,30,0,0.25), 0 0 0 1px rgba(150,50,0,0.25), 0 1px 2px rgba(0,0,0,0.25), 0 3px 6px -2px rgba(200,70,0,0.35)"
+          ? "inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 1px rgba(10,30,110,0.3), 0 0 0 1px rgba(20,50,150,0.3), 0 1px 2px rgba(0,0,0,0.25), 0 3px 6px -2px rgba(37,99,235,0.4)"
           : "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 1px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.16), 0 3px 6px -2px rgba(0,0,0,0.12)",
       }}
     >
       {attention && (
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute -inset-[3px] rounded-full border-2 border-[#FF6A1A]"
+          className="pointer-events-none absolute -inset-[3px] rounded-full border-2 border-[#3B82F6]"
           initial={{ opacity: 0 }}
           animate={reduce ? { opacity: 1 } : { opacity: [1, 0.25, 1] }}
           transition={reduce ? { duration: 0 } : { duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
@@ -347,7 +347,7 @@ export function Player({
       <span
         aria-hidden="true"
         className={`absolute rounded-full transition-[background-color,box-shadow] duration-500 ${
-          playing ? "bg-[#FF6A1A] shadow-[0_0_8px_2px_rgba(255,106,26,0.55)]" : lit ? "bg-[#ffb48a]" : "bg-[#cfccc5]"
+          playing ? "bg-[#3B82F6] shadow-[0_0_8px_2px_rgba(59,130,246,0.55)]" : lit ? "bg-[#a9c4fb]" : "bg-[#cfccc5]"
         }`}
         style={{ width: 6, height: 6, top: pad * 0.6, right: radius * 0.75 }}
       />

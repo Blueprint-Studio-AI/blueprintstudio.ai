@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { getImageProps } from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useClipLoad } from "@/lib/work/videoQueue";
 import { EASE_OUT, type Film } from "./shared";
 
@@ -330,7 +330,6 @@ function FilmLayer({
   );
 }
 
-export type Osd = { text: string; key: number } | null;
 
 /**
  * The big screen the player feeds: a dark bezel around the picture. With no
@@ -344,7 +343,6 @@ export function Screen({
   play,
   muted,
   instant,
-  osd,
   standby,
   onToggle,
   onTime,
@@ -361,8 +359,6 @@ export function Screen({
   play: boolean;
   muted: boolean;
   instant: boolean;
-  /** A short on-screen message: PLAY, PAUSE, MUTE. */
-  osd: Osd;
   /** The standby screen's message. */
   standby: string;
   onToggle: () => void;
@@ -418,24 +414,6 @@ export function Screen({
               onFilm={(e) => onFilm(f.slug, e)}
             />
           ))}
-
-        {/* On-screen display */}
-        <div className="pointer-events-none absolute left-2.5 top-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white sm:left-4 sm:top-4 sm:text-[12px]">
-          <AnimatePresence>
-            {current && osd && (
-              <motion.span
-                key={osd.key}
-                className="block rounded-[6px] bg-black/45 px-2 py-1 backdrop-blur-sm sm:px-2.5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.3 } }}
-                transition={{ duration: 0.12 }}
-              >
-                {osd.text}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
 
         {/* Glass */}
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.07),rgba(255,255,255,0)_38%)]" />

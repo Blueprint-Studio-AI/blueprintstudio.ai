@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import Link from "next/link";
 import { animate, AnimatePresence, motion, motionValue, useMotionValue, type AnimationPlaybackControls, type MotionValue } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
@@ -8,7 +8,7 @@ import { usePrefersReducedMotion } from "@/lib/hooks/usePrefersReducedMotion";
 import { Disc } from "./Disc";
 import { JewelCase, RACK_POSES, ROW_POSES, type CasePose, type CaseSize, type Poses } from "./JewelCase";
 import { Player, PLAYER_DESK, PLAYER_PHONE, type PlayerStatus } from "./Player";
-import { Screen, type FilmEvent, type Osd } from "./Screen";
+import { Screen, type FilmEvent } from "./Screen";
 import { EASE_OUT, FLIGHT_SPRING, POP_SPRING, SEAT_SPRING, wait, type Film, type Spot } from "./shared";
 
 // Launch films as discs. Each film is a jewel case on a rack (a row you swipe
@@ -223,7 +223,6 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const [reading, setReading] = useState(false);
   const [time, setTime] = useState<{ t: number; length: number } | null>(null);
   const [sound, setSound] = useState<Record<string, boolean>>({});
-  const [osd, setOsd] = useState<Osd>(null);
   const [hover, setHover] = useState<string | null>(null);
 
   const spin = useSpin(!!loaded && playing && inView, reduce);
@@ -237,24 +236,9 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const flightId = useRef(0);
   const live = useRef({ reduce, desk, playing, failed, soundHint });
   live.current = { reduce, desk, playing, failed, soundHint };
-  const osdTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => () => clearTimeout(osdTimer.current), []);
-
-  // A message on the screen: gone after a moment, or held (`true`) until the next one.
-  const flash = useCallback((text: string, hold: boolean | number = false) => {
-    clearTimeout(osdTimer.current);
-    setOsd({ text, key: performance.now() });
-    if (hold === true) return;
-    osdTimer.current = setTimeout(
-      () => setOsd(live.current.playing ? null : { text: "❚❚ Pause", key: performance.now() }),
-      typeof hold === "number" ? hold : 1600
-    );
-  }, []);
 
   /** The full film from YouTube, unless it has none or it has failed here. */
   const onYouTube = (slug: string) => !!films.find((f) => f.slug === slug)?.youtube && !live.current.failed.has(slug);
-  const playFlash = () => (live.current.soundHint ? flash("Muted · press the sound key", 4000) : flash("▶ Play"));
 
   const spotOf = (el: Element | null | undefined): Spot => {
     const root = rootRef.current?.getBoundingClientRect();
@@ -323,7 +307,6 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
     setScreen(null);
     setReading(false);
     setTime(null);
-    setOsd(null);
     if (live.current.reduce) {
       setLoaded(null);
       setAway((s) => withKey(s, slug, false));
@@ -362,10 +345,7 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
   const insert = async (slug: string) => {
     const prev = heading.current;
     if (prev === slug) {
-      if (!live.current.playing) {
-        setPlaying(true);
-        flash("▶ Play");
-      }
+      if (!live.current.playing) setPlaying(true);
       return;
     }
     await returning.current.get(slug);
@@ -381,7 +361,6 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
       setTime(null);
       // A YouTube film reads until it plays (onFilm).
       setReading(onYouTube(slug));
-      if (!onYouTube(slug)) playFlash();
       return;
     }
     if (prev) eject(prev); // the two discs pass each other
@@ -418,29 +397,23 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
     await wait(300);
     if (heading.current !== slug) return;
     setScreen(slug);
-    if (!onYouTube(slug)) {
-      setReading(false);
-      playFlash();
-    }
+    if (!onYouTube(slug)) setReading(false);
   };
 
   const onFilm = (slug: string, e: FilmEvent) => {
     if (slug !== heading.current) return;
     if (e === "playing") {
       setReading(false);
-      playFlash();
     } else if (e === "muted") {
       live.current.soundHint = true;
       setMuted(true);
       setSoundHint(true);
     } else if (e === "ended") {
       setPlaying(false);
-      flash("■ End", true);
     } else if (e === "failed") {
       // Play the kit's loop instead.
       setFailed((s) => withKey(s, slug, true));
       setReading(false);
-      playFlash();
     }
   };
 
@@ -475,14 +448,11 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
     }
     const next = !playing;
     setPlaying(next);
-    if (next) flash("▶ Play");
-    else flash("❚❚ Pause", true);
   };
   const toggleMute = () => {
     const next = !muted;
     setMuted(next);
     setSoundHint(false);
-    flash(next ? "Mute" : "Sound on");
   };
 
   const film = films.find((f) => f.slug === loaded) ?? null;
@@ -626,7 +596,6 @@ export default function DiscGallery({ films, hint }: { films: Film[]; /** The li
             play={playing && inView}
             muted={muted}
             instant={reduce}
-            osd={osd}
             standby="No disc"
             onToggle={togglePlay}
             onTime={(t, length) => setTime({ t, length })}
