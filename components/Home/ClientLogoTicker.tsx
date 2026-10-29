@@ -16,6 +16,23 @@ const LINGER_MS = 500; // or stays on it this long, still moving
 const CLOSE_MS = 160; // time to cross from a logo to its card
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
+// Each logo's box in a row of the given height (44px on phones, 60px from sm up, as
+// --logo-h below), in whole pixels. A fractional height or nudge leaves a logo's edges
+// between two pixel rows. Whenever a logo fades up or turns to colour under the pointer,
+// the browser draws it on a layer of its own for the fade and back into the marquee
+// after, and each resolves that fraction differently, so the logo hops up or down a
+// fraction of a pixel, most visibly at 1x. On whole pixels both draw it the same. The
+// width is rounded too, so every logo starts on a whole pixel and only the marquee's own
+// offset is fractional.
+function logoBox(client: Client, rowH: number) {
+  const h = Math.round(rowH * (client.scale ?? 1));
+  return {
+    h: `${h}px`,
+    w: `${Math.round((h * client.w) / 264)}px`,
+    top: `${Math.round((rowH - h) / 2 + h * (client.y ?? 0))}px`,
+  };
+}
+
 // The nav's Services menu, in miniature: grows out of the logo on a spring.
 const CARD = {
   closed: { opacity: 0, scale: 0.92, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
@@ -283,6 +300,8 @@ export default function ClientLogoTicker() {
       {clients.map((client, index) => {
         const on = active === index;
         const ring = on && ringCopy && copy;
+        const phone = logoBox(client, 44);
+        const wide = logoBox(client, 60);
         const logo = (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -292,11 +311,15 @@ export default function ClientLogoTicker() {
             height={264}
             decoding="async"
             draggable={false}
-            className={`w-auto select-none transition-[opacity,filter] duration-500 ease-out ${on ? "opacity-100" : "opacity-[var(--ink)] [@media(hover:hover)]:group-hover/logo:opacity-[calc(var(--ink)_+_0.2)]"}`}
+            className={`mt-[var(--top)] h-[var(--h)] w-[var(--w)] max-w-none shrink-0 select-none transition-[opacity,filter] duration-500 ease-out sm:mt-[var(--top-sm)] sm:h-[var(--h-sm)] sm:w-[var(--w-sm)] ${on ? "opacity-100" : "opacity-[var(--ink)] [@media(hover:hover)]:group-hover/logo:opacity-[calc(var(--ink)_+_0.2)]"}`}
             style={
               {
-                height: `calc(var(--logo-h) * ${client.scale ?? 1})`,
-                translate: client.y ? `0 calc(var(--logo-h) * ${(client.scale ?? 1) * client.y})` : undefined,
+                "--h": phone.h,
+                "--w": phone.w,
+                "--top": phone.top,
+                "--h-sm": wide.h,
+                "--w-sm": wide.w,
+                "--top-sm": wide.top,
                 filter: on ? "grayscale(0) brightness(1)" : `grayscale(1) brightness(${client.tone ?? 1})`,
                 "--ink": client.ink ?? 0.5,
               } as React.CSSProperties
@@ -308,7 +331,7 @@ export default function ClientLogoTicker() {
           "data-index": index,
           tabIndex: copy ? -1 : undefined,
           "aria-describedby": on && !copy ? describedBy : undefined,
-          className: `group/logo flex h-full items-center rounded-lg outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${ring ? "outline outline-2 outline-offset-4 outline-[#2563EB]" : ""} ${client.href ? "cursor-pointer" : "cursor-default"}`,
+          className: `group/logo flex h-full items-start rounded-lg outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${ring ? "outline outline-2 outline-offset-4 outline-[#2563EB]" : ""} ${client.href ? "cursor-pointer" : "cursor-default"}`,
           onPointerDown: (e: React.PointerEvent) => {
             pointerType.current = e.pointerType;
             preload();
