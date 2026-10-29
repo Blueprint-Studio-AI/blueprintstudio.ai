@@ -38,7 +38,7 @@ function Tabs({
   const quiet = new Set([at(active), at(hover)]);
 
   return (
-    <div role="tablist" aria-label="Websites" onKeyDown={keys} className="flex h-[34px] min-w-0 flex-1 items-stretch">
+    <div role="tablist" aria-label="Websites" onKeyDown={keys} className="flex h-[27px] min-w-0 flex-1 items-stretch xl:h-[29px]">
       {tabs.map((tab, i) => {
         const on = tab.key === active;
         return (
@@ -56,7 +56,7 @@ function Tabs({
             onPointerLeave={() => setHover((h) => (h === tab.key ? null : h))}
             whileTap={reduce ? undefined : PRESS}
             transition={MORPH}
-            className={`relative flex min-w-0 max-w-[220px] flex-auto items-center gap-[6px] pl-[9px] pr-[2px] text-left text-[11.5px] leading-none tracking-[-0.003em] outline-none focus-visible:z-20 xl:gap-[7px] xl:pl-[11px] xl:text-[12px] ${
+            className={`relative flex min-w-0 max-w-[190px] flex-auto items-center gap-[5px] pl-[8px] pr-[2px] text-left text-[10.5px] leading-none tracking-[-0.003em] outline-none focus-visible:z-20 xl:gap-[6px] xl:pl-[9px] xl:text-[11px] ${
               on ? "z-10 cursor-default text-[#1F1F1F]" : "cursor-pointer text-[#45474A]"
             }`}
           >
@@ -67,25 +67,25 @@ function Tabs({
                 animate={{ scaleY: 1, scaleX: 1 }}
                 transition={RISE}
                 style={{ originY: 1 }}
-                className="absolute inset-x-0 bottom-0 top-[5px] rounded-t-[9px] bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.08),0_-1px_3px_rgba(0,0,0,0.04)]"
+                className="absolute inset-x-0 bottom-0 top-[4px] rounded-t-[7px] bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.08),0_-1px_3px_rgba(0,0,0,0.04)]"
               >
                 {/* The curves where the tab flows into the toolbar. */}
-                <span className="absolute -left-[9px] bottom-0 h-[9px] w-[9px] bg-[radial-gradient(circle_at_0_0,transparent_8.5px,#fff_9px)]" />
-                <span className="absolute -right-[9px] bottom-0 h-[9px] w-[9px] bg-[radial-gradient(circle_at_100%_0,transparent_8.5px,#fff_9px)]" />
+                <span className="absolute -left-[7px] bottom-0 h-[7px] w-[7px] bg-[radial-gradient(circle_at_0_0,transparent_6.5px,#fff_7px)]" />
+                <span className="absolute -right-[7px] bottom-0 h-[7px] w-[7px] bg-[radial-gradient(circle_at_100%_0,transparent_6.5px,#fff_7px)]" />
               </motion.span>
             )}
-            {!on && hover === tab.key && <span aria-hidden className="absolute inset-x-[2px] bottom-[4px] top-[6px] rounded-[8px] bg-white/60" />}
+            {!on && hover === tab.key && <span aria-hidden className="absolute inset-x-[2px] bottom-[3px] top-[5px] rounded-[6px] bg-white/60" />}
             {i > 0 && (
               <span
                 aria-hidden
-                className={`absolute left-0 top-1/2 h-[16px] w-px -translate-y-[calc(50%-2px)] bg-[#9AA0A6]/60 ${quiet.has(i) || quiet.has(i - 1) ? "opacity-0" : ""}`}
+                className={`absolute left-0 top-1/2 h-[13px] w-px -translate-y-[calc(50%-2px)] bg-[#9AA0A6]/60 ${quiet.has(i) || quiet.has(i - 1) ? "opacity-0" : ""}`}
               />
             )}
             {/* Focus ring for the keyboard. */}
-            <span aria-hidden className="pointer-events-none absolute inset-x-[2px] bottom-[3px] top-[6px] rounded-[8px] ring-[#2563EB] [button:focus-visible>&]:ring-2" />
-            <Favicon src={tab.favicon} className="relative h-[14px] w-[14px] xl:h-[16px] xl:w-[16px]" />
+            <span aria-hidden className="pointer-events-none absolute inset-x-[2px] bottom-[2px] top-[5px] rounded-[6px] ring-[#2563EB] [button:focus-visible>&]:ring-2" />
+            <Favicon src={tab.favicon} className="relative h-[12px] w-[12px] xl:h-[13px] xl:w-[13px]" />
             {/* A long title fades out at the tab's edge; the padding keeps a short one clear of the fade. */}
-            <span className="relative min-w-0 flex-1 overflow-hidden whitespace-nowrap py-[2px] pr-[10px] [mask-image:linear-gradient(90deg,#000_calc(100%-12px),transparent)] xl:pr-[12px]">
+            <span className="relative min-w-0 flex-1 overflow-hidden whitespace-nowrap py-[2px] pr-[8px] [mask-image:linear-gradient(90deg,#000_calc(100%-10px),transparent)] xl:pr-[10px]">
               {tab.title}
             </span>
           </motion.button>
@@ -103,10 +103,10 @@ function ReloadButton({ onReload, reduce, size }: { onReload: () => void; reduce
       whileTap={reduce ? undefined : { scale: 0.9 }}
       aria-label="Reload the page"
       className={`flex shrink-0 items-center justify-center rounded-full text-[#5F6368] outline-none transition-colors duration-150 hover:bg-black/[0.06] hover:text-[#1F1F1F] focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
-        size === "big" ? "h-[28px] w-[28px]" : "h-[22px] w-[22px] sm:h-[26px] sm:w-[26px]"
+        size === "big" ? "h-[24px] w-[24px]" : "h-[22px] w-[22px] sm:h-[26px] sm:w-[26px]"
       }`}
     >
-      <RotateCw className={size === "big" ? "h-[14px] w-[14px]" : "h-[11px] w-[11px] sm:h-[13px] sm:w-[13px]"} strokeWidth={2.2} />
+      <RotateCw className={size === "big" ? "h-[12.5px] w-[12.5px]" : "h-[11px] w-[11px] sm:h-[13px] sm:w-[13px]"} strokeWidth={2.2} />
     </motion.button>
   );
 }
@@ -144,23 +144,23 @@ export default function Browser({
   return (
     <div className={`relative overflow-hidden rounded-[max(2px,0.3cqw)] bg-white antialiased ${CHROME_FONT}`}>
       {/* From lg: the tab strip, then the toolbar. */}
-      <div className="hidden h-[40px] items-end bg-[#DFE1E5] pl-[14px] pr-[10px] lg:flex">
-        <TrafficLights className="mb-[14px] mr-[12px] gap-[8px]" />
+      <div className="hidden h-[31px] items-end bg-[#DFE1E5] pl-[11px] pr-[8px] lg:flex xl:h-[33px]">
+        <TrafficLights className="mb-[7px] mr-[10px] gap-[6px] xl:mb-[8px]" dot="h-[9px] w-[9px] xl:h-[10px] xl:w-[10px]" />
         <Tabs tabs={tabs} active={active} onPick={onPick} touched={touched} reduce={reduce} />
       </div>
-      <div className="relative hidden h-[42px] items-center gap-[6px] border-b border-black/[0.08] px-[10px] lg:flex">
-        <span aria-hidden className="flex items-center gap-[2px] text-[#5F6368]">
-          <span className="flex h-[28px] w-[28px] items-center justify-center opacity-40">
-            <ArrowLeft className="h-[16px] w-[16px]" strokeWidth={2} />
+      <div className="relative hidden h-[32px] items-center gap-[4px] border-b border-black/[0.08] px-[8px] lg:flex xl:h-[34px]">
+        <span aria-hidden className="flex items-center gap-[1px] text-[#5F6368]">
+          <span className="flex h-[24px] w-[24px] items-center justify-center opacity-40">
+            <ArrowLeft className="h-[14px] w-[14px]" strokeWidth={2} />
           </span>
-          <span className="flex h-[28px] w-[28px] items-center justify-center opacity-40">
-            <ArrowRight className="h-[16px] w-[16px]" strokeWidth={2} />
+          <span className="flex h-[24px] w-[24px] items-center justify-center opacity-40">
+            <ArrowRight className="h-[14px] w-[14px]" strokeWidth={2} />
           </span>
         </span>
         <ReloadButton onReload={onReload} reduce={reduce} size="big" />
-        <span className="ml-[4px] flex h-[30px] min-w-0 flex-1 items-center gap-[8px] rounded-full bg-[#F0F1F2] px-[13px] text-[13.5px]">
-          <AddressText tab={tab} archived={archived} icon="h-[13px] w-[13px]" />
-          {tab.original && <OriginalTag label={original} className="-mr-[7px] ml-auto text-[11.5px]" />}
+        <span className="ml-[3px] flex h-[24px] min-w-0 flex-1 items-center gap-[6px] rounded-full bg-[#F0F1F2] px-[11px] text-[11.5px] xl:h-[25px] xl:text-[12px]">
+          <AddressText tab={tab} archived={archived} icon="h-[11px] w-[11px]" />
+          {tab.original && <OriginalTag label={original} className="-mr-[7px] ml-auto text-[10px] xl:text-[10.5px]" />}
         </span>
         {/* The Visit link grows out of the address bar for a live site. */}
         <motion.div
@@ -181,10 +181,10 @@ export default function Browser({
                 exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.85, transition: { duration: 0.12 } }}
                 transition={MORPH}
                 whileTap={reduce ? undefined : PRESS}
-                className="group/visit ml-[4px] inline-flex h-[30px] items-center gap-[5px] whitespace-nowrap rounded-full bg-neutral-900 pl-[13px] pr-[11px] text-[12.5px] font-medium text-white outline-none transition-colors duration-200 hover:bg-black focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+                className="group/visit ml-[3px] inline-flex h-[24px] items-center gap-[4px] whitespace-nowrap rounded-full bg-neutral-900 pl-[10px] pr-[8px] text-[11px] font-medium xl:h-[25px] xl:text-[11.5px] text-white outline-none transition-colors duration-200 hover:bg-black focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
               >
                 Visit site
-                <ArrowUpRight className="h-[13px] w-[13px] transition-transform duration-300 ease-out group-hover/visit:-translate-y-px group-hover/visit:translate-x-px" />
+                <ArrowUpRight className="h-[11px] w-[11px] transition-transform duration-300 ease-out group-hover/visit:-translate-y-px group-hover/visit:translate-x-px" />
                 <span className="sr-only">(opens in a new tab)</span>
               </motion.a>
             )}
