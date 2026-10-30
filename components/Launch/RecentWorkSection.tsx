@@ -141,6 +141,9 @@ function FeaturedProject({ onViewProject }: { onViewProject: () => void }) {
 
         <button
           onClick={onViewProject}
+          data-track="project_open"
+          data-track-project={featuredProject.name.toLowerCase()}
+          data-track-via="spotlight"
           className="group inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-700 transition-colors cursor-pointer"
         >
           <span>View Full Project</span>
@@ -157,6 +160,7 @@ export default function RecentWorkSection() {
   return (
     <Section
       id="portfolio"
+      data-section="recent_work"
       className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden"
     >
       {/* Vertical lines */}

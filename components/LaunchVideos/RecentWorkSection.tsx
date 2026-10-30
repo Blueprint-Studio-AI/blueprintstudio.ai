@@ -130,6 +130,9 @@ function VideoCard({ project }: { project: FeaturedProject }) {
             {/* Play button overlay - only element on video */}
             <button
               onClick={() => project.youtubeId && setIsPlaying(true)}
+              data-track="video_play"
+              data-track-video={project.name}
+              data-track-once
               className={`absolute inset-0 flex items-center justify-center ${
                 project.youtubeId ? "cursor-pointer" : "cursor-default"
               }`}
@@ -173,7 +176,7 @@ function VideoCard({ project }: { project: FeaturedProject }) {
 
 export default function RecentWorkSection() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="recent_work" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
         {/* Vertical lines */}
         <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
           <div className="w-full flex-1 flex justify-center relative">

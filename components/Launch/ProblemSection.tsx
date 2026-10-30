@@ -19,7 +19,7 @@ const comparison = [
 
 export default function ProblemSection() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="problem" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -75,6 +75,9 @@ export default function ProblemSection() {
                 <GradientButton
                   className="w-full justify-center"
                   onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="https://cal.com/blueprint-studio/intro-call"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -136,6 +139,9 @@ export default function ProblemSection() {
                 <GradientButton
                   className="w-full justify-center"
                   onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="https://cal.com/blueprint-studio/intro-call"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

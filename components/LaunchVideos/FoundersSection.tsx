@@ -16,7 +16,7 @@ const founders = [
 
 export default function FoundersSection() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="founders" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

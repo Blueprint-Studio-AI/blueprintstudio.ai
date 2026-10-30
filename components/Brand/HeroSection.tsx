@@ -32,7 +32,7 @@ export default function HeroSection() {
           transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const, delay },
         };
   return (
-    <Section className="relative bg-[#FAFAFA] overflow-hidden min-h-fit">
+    <Section data-section="hero" className="relative bg-[#FAFAFA] overflow-hidden min-h-fit">
       {/* Top nav — shared SectionHeader strip, matching /launch & /launch-videos:
           construction labels flanking the centred logo + a dashed divider beneath.
           Wrapped in motion so it blur-drops in first, then the hero builds below. */}
@@ -46,7 +46,7 @@ export default function HeroSection() {
           divider={false}
           leftText=""
           centerContent={
-            <Link href="/" className="hover:opacity-70 transition-opacity">
+            <Link href="/" data-track="nav_click" data-track-item="logo" data-track-menu="top" className="hover:opacity-70 transition-opacity">
               <Image
                 src="/blueprint-logo-dark.svg"
                 alt="Blueprint Studio"
@@ -119,6 +119,9 @@ export default function HeroSection() {
               </motion.div>
               <motion.div className="relative z-10" {...intro(0.54)}>
                 <GradientButton
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="https://cal.com/blueprint-studio/intro-call"
                   // Figma "Book a call" spec: 52px tall, 12px radius, 16px text,
                   // 86px side padding (→ ~271px wide), 12px gap to the arrow.
                   style={{

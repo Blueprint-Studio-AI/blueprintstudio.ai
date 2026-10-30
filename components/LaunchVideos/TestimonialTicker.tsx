@@ -177,7 +177,7 @@ export default function TestimonialTicker() {
   }, []);
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="testimonials" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       <SectionHeader leftText="TESTIMONIALS" rightText="// what founders say" />
 
       <OuterContainer className="flex-1 flex items-center">

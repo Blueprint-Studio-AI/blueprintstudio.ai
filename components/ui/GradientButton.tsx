@@ -8,12 +8,15 @@ interface GradientButtonProps {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** data-track and its props (lib/analytics), passed on to the button. */
+  [data: `data-${string}`]: string | boolean | undefined;
 }
 
-export default function GradientButton({ onClick, children, className = "", style }: GradientButtonProps) {
+export default function GradientButton({ onClick, children, className = "", style, ...data }: GradientButtonProps) {
   const reduce = useReducedMotion();
   return (
     <motion.button
+      {...data}
       onClick={onClick}
       // Figma primary-button spec (keep in sync with GradientCTAButton):
       // 52px tall, 12px radius, 16px text, 3-stop gradient, and an inner

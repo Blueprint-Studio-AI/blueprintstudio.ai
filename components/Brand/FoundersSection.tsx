@@ -16,7 +16,7 @@ const founders = [
 
 export default function FoundersSection() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="founders" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       <SectionHeader leftText="TEAM" rightText="// who's behind this" />
 
       <OuterContainer className="flex-1 flex items-center">

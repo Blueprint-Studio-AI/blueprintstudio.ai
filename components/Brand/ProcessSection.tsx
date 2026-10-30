@@ -63,7 +63,7 @@ export default function ProcessSection() {
   return (
     <>
       {/* Steps */}
-      <section className="flex-1 flex justify-center items-center flex-col px-2.5 sm:px-[60px] relative z-20 bg-neutral-50">
+      <section data-section="process" className="flex-1 flex justify-center items-center flex-col px-2.5 sm:px-[60px] relative z-20 bg-neutral-50">
         <SectionHeader leftText="LAUNCH PACKAGE" rightText="// FOR FOUNDERS" />
 
         <OuterContainer className="flex-1 flex items-center">

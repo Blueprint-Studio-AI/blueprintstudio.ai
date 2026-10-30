@@ -27,7 +27,7 @@ export default function PricingSection() {
   const total = productAdded ? "$120,000" : "$50,000";
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section data-section="pricing" className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
@@ -135,6 +135,9 @@ export default function PricingSection() {
                   <div className="mt-auto pt-8">
                     <button
                       onClick={() => setProductAdded(!productAdded)}
+                      data-track="package_addon"
+                      data-track-addon="product"
+                      data-track-added={!productAdded}
                       className={`w-full py-2.5 px-6 rounded-lg border text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                         productAdded
                           ? "border-[#186FF5] text-[#186FF5]"

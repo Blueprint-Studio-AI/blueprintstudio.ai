@@ -166,7 +166,14 @@ type PackageItem = (typeof packageItems)[number];
 function VideoCard({ video }: { video: { thumbnail: string; label: string; videoType: string; youtubeId: string } }) {
   const [isPlaying, setIsPlaying] = useState(false);
   return (
-    <div className="group cursor-pointer" onClick={() => setIsPlaying(true)}>
+    <div
+      className="group cursor-pointer"
+      onClick={() => setIsPlaying(true)}
+      // Only the poster plays the film; once the player is in, clicks are the player's.
+      data-track={isPlaying ? undefined : "video_play"}
+      data-track-video={video.label}
+      data-track-once
+    >
       <div className="rounded-xl border border-neutral-300">
         <div className="relative aspect-video bg-neutral-900 [clip-path:inset(0_round_11px)] [transform:translateZ(0)]">
           {isPlaying ? (
@@ -393,7 +400,7 @@ export default function PackageSection() {
   };
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section data-section="package" className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

@@ -40,7 +40,7 @@ export default function HeroSection() {
   }, [isMobile]);
 
   return (
-    <Section className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
+    <Section data-section="hero" className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -54,7 +54,7 @@ export default function HeroSection() {
       <SectionHeader
         leftText="YC LAUNCH VIDEOS"
         centerContent={
-          <Link href="/" className="hover:opacity-70 transition-opacity">
+          <Link href="/" data-track="nav_click" data-track-item="logo" data-track-menu="top" className="hover:opacity-70 transition-opacity">
             <Image
               src="/blueprint-logo-dark.svg"
               alt="Blueprint Studio"
@@ -108,6 +108,9 @@ export default function HeroSection() {
               {/* CTA Button */}
               <button
                 className="w-fit py-3 px-6 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 transition-all duration-200 text-sm group"
+                data-track="cta_click"
+                data-track-cta="book_call"
+                data-track-href="https://cal.com/blueprint-studio/intro-call"
                 onClick={() =>
                   window.open(
                     "https://cal.com/blueprint-studio/intro-call",
