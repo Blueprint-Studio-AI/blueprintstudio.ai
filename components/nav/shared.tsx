@@ -102,18 +102,27 @@ export const ASSET_GENERATOR = {
 
 export const INSIGHTS = { label: "Insights", href: "/insights" };
 
-/** Goes to a home page section with Locomotive's eased scroll, 80px clear of the top, or loads /#section from any other page. */
+/**
+ * Goes to a section with Locomotive's eased scroll, 80px clear of the top: on this
+ * page if it has one (the landing pages' own calendars are #contact too, so Book a
+ * call stays on the page), or else the home page's, loading /#section.
+ */
 export function useGoToSection() {
     const pathname = usePathname();
     const { scroll, isReady } = useSmoothScroll();
     return (id: string) => {
-        if (pathname !== "/") {
-            window.location.href = `/#${id}`;
+        const element = document.getElementById(id);
+        if (!element) {
+            if (pathname !== "/") window.location.href = `/#${id}`;
             return;
         }
-        const element = document.getElementById(id);
-        if (!element) return;
-        if (isReady && scroll) scroll.scrollTo(element, { offset: -80, duration: 1.2 });
+        // Sections that open as they come into view (/launch-videos' steps) push the
+        // target down during the scroll: once it ends, cover what's left.
+        const settle = (tries: number) => () => {
+            if (tries && Math.abs(element.getBoundingClientRect().top - 80) > 4)
+                scroll?.scrollTo(element, { offset: -80, duration: 0.6, onComplete: settle(tries - 1) });
+        };
+        if (isReady && scroll) scroll.scrollTo(element, { offset: -80, duration: 1.2, onComplete: settle(2) });
         else window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
     };
 }
