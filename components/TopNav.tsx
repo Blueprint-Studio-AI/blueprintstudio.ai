@@ -180,8 +180,13 @@ function FrameLines() {
 }
 
 // The landing pages' heroes run straight up into the nav: no frame lines or
-// divider over them, and the hero's own background (/brand's is lighter).
-const PLAIN_NAV: Record<string, string> = { "/brand": "bg-[#FAFAFA]", "/launch": "bg-neutral-50", "/launch-videos": "bg-neutral-50" };
+// divider over them, and the hero's own background (/brand's is lighter). With
+// no frame to sit in, the bar frosts in across the whole window, in that colour.
+const PLAIN_NAV: Record<string, { bg: string; rgb: string }> = {
+    "/brand": { bg: "bg-[#FAFAFA]", rgb: "250, 250, 250" },
+    "/launch": { bg: "bg-neutral-50", rgb: "246, 246, 246" },
+    "/launch-videos": { bg: "bg-neutral-50", rgb: "246, 246, 246" },
+};
 
 export function TopNav() {
     const pathname = usePathname();
@@ -191,7 +196,7 @@ export function TopNav() {
     return (
         <>
             {/* The page's top cell: its background, lines and divider are there from the start, like the frame. */}
-            <header id="top-nav" data-track-menu="top" className={`relative z-40 px-2.5 sm:px-[60px] ${plain ?? "bg-neutral-50"}`}>
+            <header id="top-nav" data-track-menu="top" className={`relative z-40 px-2.5 sm:px-[60px] ${plain?.bg ?? "bg-neutral-50"}`}>
                 {!plain && <FrameLines />}
                 <div className="relative flex h-12 items-center px-3 sm:px-5 md:h-16">
                     <motion.div
@@ -278,7 +283,12 @@ function DesktopNav() {
             window.removeEventListener("resize", measure);
         };
     }, []);
-    const barW = vw - 2 * FRAME;
+    // The bar runs between the frame lines, or edge to edge on a page without
+    // them, padded so that its contents sit in the same place either way.
+    const plain = PLAIN_NAV[pathname];
+    const edge = plain ? 0 : FRAME;
+    const barW = vw - 2 * edge;
+    const frameW = vw - 2 * FRAME;
 
     // The shape follows `compact` straight away, on a spring. With reduced
     // motion the nav fades out, changes shape and fades back in instead.
@@ -349,14 +359,14 @@ function DesktopNav() {
     const width = useTransform(() => {
         const p = pillness.get();
         const f = fold.get();
-        return vw ? snap(widthAt(p, f)) : "calc(100% - 122px)";
+        return vw ? snap(widthAt(p, f)) : `calc(100% - ${2 * edge}px)`;
     });
     // In steps of two pixels, so the links in the middle of it land on whole pixels too.
     const height = useTransform(() => snap(mix(BAR_H, PILL_H, pillness.get()), 2));
     const top = useTransform(() => snap(mix(0, PILL_TOP, clamp01(pillness.get()))));
     const radius = useTransform(pillness, [0, 1], [0, 24]);
-    const padLeftAt = (p: number) => snap(mix(barPad, PILL_PAD.left, clamp01(p)));
-    const padRightAt = (p: number) => snap(mix(barPad, PILL_PAD.right, clamp01(p)));
+    const padLeftAt = (p: number) => snap(mix(barPad + FRAME - edge, PILL_PAD.left, clamp01(p)));
+    const padRightAt = (p: number) => snap(mix(barPad + FRAME - edge, PILL_PAD.right, clamp01(p)));
     const paddingLeft = useTransform(() => padLeftAt(pillness.get()));
     const paddingRight = useTransform(() => padRightAt(pillness.get()));
     // The links sit in the middle of the page (when the bar has room), and they
@@ -364,12 +374,12 @@ function DesktopNav() {
     // centred on the links rather than the window. `linksX` is their left edge on screen.
     const linksX = () => {
         const logo = logoWidth(wide ? 0 : 1);
-        const free = Math.max(0, barW - 2 * barPad - parts.links - 2 * gap);
+        const free = Math.max(0, frameW - 2 * barPad - parts.links - 2 * gap);
         return snap(FRAME + barPad + Math.min(Math.max(free / 2, logo), Math.max(logo, free - parts.cta)) + gap);
     };
     // The nav's left edge. The wordmark opening on hover grows the pill to the left.
-    const leftAt = (p: number, f: number) => snap(mix(FRAME, linksX() - gap - logoWidth(f) - PILL_PAD.left, p));
-    const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : FRAME));
+    const leftAt = (p: number, f: number) => snap(mix(edge, linksX() - gap - logoWidth(f) - PILL_PAD.left, p));
+    const x = useTransform(() => (vw ? leftAt(pillness.get(), fold.get()) : edge));
     // The space either side of the links always adds up to the width.
     const columns = useTransform(() => {
         const p = pillness.get();
@@ -388,7 +398,7 @@ function DesktopNav() {
         const p = clamp01(pillness.get());
         return p + (1 - p) * frost.get();
     });
-    const surfaceColor = useTransform(pillness, [0, 1], ["rgba(246, 246, 246, 0.9)", "rgba(255, 255, 255, 0.76)"]);
+    const surfaceColor = useTransform(pillness, [0, 1], [`rgba(${plain?.rgb ?? "246, 246, 246"}, 0.9)`, "rgba(255, 255, 255, 0.76)"]);
     const surfaceShadow = useTransform(
         pillness,
         [0, 1],
