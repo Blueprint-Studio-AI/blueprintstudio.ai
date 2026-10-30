@@ -282,7 +282,7 @@ function Dashboard({ report: r, upToHour }: { report: Report; upToHour: number }
                 title="Hero words"
                 note={
                     heroPickers
-                        ? `${fmt(r.heroOpens.visitors)} visitors opened the word menu and ${fmt(heroPickers)} picked a word. Below: what they did next, credited to the last word picked before it.`
+                        ? `${fmt(r.heroOpens.visitors)} visitors tried the words (rested on one or picked one) and ${fmt(heroPickers)} picked a word. Below: what they did next, credited to the last word picked before it.`
                         : "Which word visitors pick in the hero, and what they do after."
                 }
             >
@@ -378,15 +378,15 @@ function Dashboard({ report: r, upToHour }: { report: Report; upToHour: number }
                 </Card>
                 <Card
                     title="The reel"
-                    note={r.reelOpens ? `Opened on ${pct(r.reelOpens, r.homeViews)} of home page views (${fmt(r.reelOpens)}). How far those people watched:` : "Opens of the full reel, and how far people watch."}
+                    note={r.homeViews ? `How much of the reel people saw while it was on screen, of ${fmt(r.homeViews)} home page views. ${r.reelOpens ? `${fmt(r.reelOpens)} opened it full screen (${pct(r.reelOpens, r.homeViews)}).` : "Nobody opened it full screen."}` : "How much of the reel people saw on the home page, and how many opened it full screen."}
                 >
-                    {r.reelOpens ? (
+                    {r.homeViews ? (
                         <BarList
-                            items={r.reel.map((p) => ({ key: String(p.percent), label: p.percent === 100 ? "Watched to the end" : `Watched ${p.percent}%`, value: p.n, text: shareFirst(p.n, r.reelOpens) }))}
-                            of={r.reelOpens}
+                            items={r.reel.map((p) => ({ key: String(p.percent), label: p.percent === 100 ? "Saw it all" : `Saw ${p.percent}%`, value: p.n, text: shareFirst(p.n, r.homeViews) }))}
+                            of={r.homeViews}
                         />
                     ) : (
-                        <Empty>Nobody opened the reel in this period.</Empty>
+                        <Empty>Nobody saw the home page in this period.</Empty>
                     )}
                 </Card>
             </div>
