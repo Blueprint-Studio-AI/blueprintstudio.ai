@@ -179,6 +179,8 @@ export default function AssetGeneratorBand() {
                     href={assetGeneratorUrl("/asset-generator/landing", "home_band")}
                     target="_blank"
                     rel="noopener"
+                    data-track="cta_click"
+                    data-track-cta="primary"
                     className="group relative flex h-11 items-center gap-2 overflow-hidden rounded-[12px] px-5 text-[15px] font-medium text-white transition-[filter] hover:brightness-110"
                     style={{
                       background: BRAND_GRADIENT,
@@ -196,6 +198,8 @@ export default function AssetGeneratorBand() {
                     href={assetGeneratorUrl("/mcp-setup", "home_band")}
                     target="_blank"
                     rel="noopener"
+                    data-track="cta_click"
+                    data-track-cta="secondary"
                     className="group flex items-center gap-1.5 whitespace-nowrap text-[15px] font-medium text-neutral-700 transition-colors hover:text-neutral-900"
                   >
                     Connect your AI app

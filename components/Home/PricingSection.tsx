@@ -193,6 +193,10 @@ export default function PricingSection() {
                   damping: 30
                 }}
                 onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                data-track="cta_click"
+                data-track-cta="book_call"
+                data-track-href="https://cal.com/blueprint-studio/intro-call"
+                data-track-plan="partnership"
               >
                 {/* Shader-like animated gradient */}
                 <motion.div
@@ -276,6 +280,8 @@ export default function PricingSection() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    data-track="cta_click"
+                    data-track-cta="package"
                     className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 transition-colors group"
                   >
                     <span className="font-medium text-sm text-black">{item.name}</span>
@@ -346,6 +352,9 @@ export default function PricingSection() {
                 {/* Inner button: glides to the booking calendar */}
                 <a
                   href="#contact"
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-plan="project"
                   onClick={(e) => {
                     const target = document.getElementById("contact");
                     if (!target) return;

@@ -7,6 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import { OuterLines } from "./GridLines";
+import { track, trackOnce } from "@/lib/analytics/track";
 import { CLIENT_LOGOS as clients, type ClientLogo as Client } from "./clientLogos";
 
 const CARD_W = 264;
@@ -14,6 +15,7 @@ const EDGE = 8; // the card keeps this clear of the band's sides
 const REST_MS = 90; // the pointer rests on a logo this long, and its card opens
 const LINGER_MS = 500; // or stays on it this long, still moving
 const CLOSE_MS = 160; // time to cross from a logo to its card
+const COUNTS_MS = 600; // a card open this long counts as looked at (logo_open)
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 // Each logo's box in a row of the given height (44px on phones, 60px from sm up, as
@@ -86,7 +88,15 @@ function CardBody({ client, describedBy }: { client: Client; describedBy: string
     >
       {client.href ? (
         // The logo itself is the keyboard's way in, so the card stays out of the tab order.
-        <Link href={client.href} prefetch={false} tabIndex={-1} className="group/card block rounded-[12px]">
+        <Link
+          href={client.href}
+          prefetch={false}
+          tabIndex={-1}
+          data-track="project_open"
+          data-track-project={client.logo}
+          data-track-href={client.href}
+          className="group/card block rounded-[12px]"
+        >
           {body}
         </Link>
       ) : (
@@ -153,10 +163,15 @@ export default function ClientLogoTicker() {
     for (const client of clients) if (client.still) new window.Image().src = client.still;
   };
 
+  // Which clients people look into: a card that stays open a moment, once per client a page view.
+  const countTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const springHeight = useRef(false);
   const open = (index: number, el: HTMLElement) => {
     clearTimeout(openTimer.current);
     clearTimeout(closeTimer.current);
+    clearTimeout(countTimer.current);
+    const shownVia = via.current;
+    countTimer.current = setTimeout(() => trackOnce("logo_open", { client: clients[index].name, via: shownVia }, clients[index].name), COUNTS_MS);
     const wasOpen = active !== null;
     springHeight.current = wasOpen;
     anchor.current = el;
@@ -168,6 +183,7 @@ export default function ClientLogoTicker() {
   const close = () => {
     clearTimeout(openTimer.current);
     clearTimeout(closeTimer.current);
+    clearTimeout(countTimer.current);
     setActive(null);
     setRingCopy(false);
   };
@@ -281,6 +297,7 @@ export default function ClientLogoTicker() {
     () => () => {
       clearTimeout(openTimer.current);
       clearTimeout(closeTimer.current);
+      clearTimeout(countTimer.current);
     },
     [],
   );
@@ -370,6 +387,10 @@ export default function ClientLogoTicker() {
             if (!(e.relatedTarget as HTMLElement | null)?.closest?.("[data-logo]")) close();
           },
           onClick: (e: React.MouseEvent) => {
+            // A link about to be followed (on a phone the first tap only shows the card).
+            if (client.href && (e.detail === 0 || pointerType.current === "mouse" || active === index)) {
+              track("project_open", { project: client.logo, href: client.href, section: "logos" });
+            }
             // Enter or Space: a link goes, a plain logo toggles its card.
             if (e.detail === 0) {
               if (!client.href) {
