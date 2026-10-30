@@ -19,6 +19,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import { introSeen, introSkipped } from "@/lib/intro";
+import { track } from "@/lib/analytics/track";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
@@ -166,7 +167,7 @@ export default function Hero() {
         if (key) url.searchParams.set("for", key);
         else url.searchParams.delete("for");
         window.history.replaceState(window.history.state, "", url);
-        (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
+        track("hero_variant", { variant: key ?? "everything" });
     };
 
     // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
