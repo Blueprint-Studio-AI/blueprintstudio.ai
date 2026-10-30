@@ -43,3 +43,6 @@ aireadme.txt
 
 # brand-page download zips — generated from the loose files by scripts/build-zips.mjs
 public/**/*.zip
+
+# local analytics dev store (lib/analytics/server/local-store.ts)
+.analytics/
