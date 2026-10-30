@@ -4,6 +4,7 @@
 // lives inside the main app, it posts to the real same-origin /api/subscribe.
 import { useRef, useState } from "react";
 import { useTurnstileToken } from "@/lib/use-turnstile";
+import { track } from "@/lib/analytics/track";
 
 const ENDPOINT = "/api/subscribe";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,10 +22,12 @@ export default function Newsletter() {
     if (!EMAIL_RE.test(email)) {
       setError("Enter a valid email");
       setStatus("error");
+      track("form_submit", { form: "newsletter", ok: false, reason: "invalid_email", section: "footer" });
       return;
     }
     setStatus("loading");
     setError("");
+    let code = 0; // the reply's HTTP status, for form_submit's reason when it fails
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
@@ -37,9 +40,12 @@ export default function Newsletter() {
           turnstileToken,
         }),
       });
+      code = res.status;
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Subscription failed");
       setStatus("done");
+      track("form_submit", { form: "newsletter", ok: true, section: "footer" });
     } catch (err) {
+      track("form_submit", { form: "newsletter", ok: false, reason: code ? `http_${code}` : "network", section: "footer" });
       setError(err instanceof Error ? err.message : "Failed to subscribe");
       setStatus("error");
     }

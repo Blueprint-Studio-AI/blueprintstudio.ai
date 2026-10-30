@@ -86,6 +86,7 @@ export default function Hero() {
   return (
     <section
       id="top"
+      data-section="hero"
       ref={section}
       // sticky, not fixed: it keeps its place in flow, so the sheet below starts
       // exactly where the hero ends and no spacer is needed.
