@@ -6,7 +6,7 @@ import { TopNav } from "@/components/TopNav";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Toaster } from "@/components/ui/toaster"
 import Background from "@/components/ui/Background";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { FirstPartyAnalytics } from "@/lib/analytics/FirstPartyAnalytics"
 import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
 import { introScript } from "@/lib/intro"
@@ -169,7 +169,8 @@ export default function RootLayout({
           </main>
         </SmoothScrollProvider>
         <Analytics />
-        <SpeedInsights />
+        {/* Page views and web vitals for our own analytics (lib/analytics); replaces Speed Insights, off since September. */}
+        <FirstPartyAnalytics />
         {/* The ID is only set on Vercel; without it, gtag.js would load as id=undefined. */}
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
       </body>
