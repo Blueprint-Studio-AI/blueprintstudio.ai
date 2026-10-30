@@ -11,6 +11,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
 import { introScript } from "@/lib/intro"
 import { AnalyticsEvents } from "@/lib/analytics/AnalyticsEvents"
+import { FIRST_PARTY } from "@/lib/analytics/track"
 
 const inter = Inter({
   subsets: ['latin'],
@@ -170,8 +171,8 @@ export default function RootLayout({
           </main>
         </SmoothScrollProvider>
         <Analytics />
-        {/* Page views and web vitals for our own analytics (lib/analytics); replaces Speed Insights, off since September. */}
-        <FirstPartyAnalytics />
+        {/* Page views and web vitals for our own analytics (lib/analytics), once it's switched on; replaces Speed Insights, off since September. */}
+        {FIRST_PARTY && <FirstPartyAnalytics />}
         <AnalyticsEvents />
         {/* The ID is only set on Vercel; without it, gtag.js would load as id=undefined. */}
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}

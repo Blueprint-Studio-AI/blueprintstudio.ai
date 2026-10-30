@@ -5,11 +5,13 @@
 import { useRef, useState } from "react";
 import { useTurnstileToken } from "@/lib/use-turnstile";
 import { track } from "@/lib/analytics/track";
+import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const ENDPOINT = "/api/subscribe";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Newsletter() {
+  const { slug } = useBrand();
   const [email, setEmail] = useState("");
   const [nlCheck, setNlCheck] = useState(""); // honeypot: hidden, and named so browser autofill leaves it alone
   const mountedAtRef = useRef(Date.now());
@@ -34,7 +36,8 @@ export default function Newsletter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          source: "jinba_footer_newsletter",
+          // Which brand page the sign-up came from (it was "jinba_footer_newsletter" on every one).
+          source: `brands_${slug}_footer_newsletter`,
           nlCheck,
           elapsedMs: Date.now() - mountedAtRef.current,
           turnstileToken,

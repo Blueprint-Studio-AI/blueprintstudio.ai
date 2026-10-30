@@ -1,11 +1,15 @@
 // One call records something a visitor did: track("nav_click", { item: "Brand" }).
-// Each event goes to Google Analytics and to our own collector (first-party.ts).
+// Each event goes to Google Analytics, and to our own collector (first-party.ts) once
+// NEXT_PUBLIC_FIRST_PARTY_ANALYTICS is "on"; until then Google Analytics is the only one.
 // Names are snake_case and props are flat (strings, numbers, booleans), so both can take them.
 // The catalog of events, and where each one fires, is docs/analytics/events.md.
 
 import { sendFirstParty } from "./first-party";
 
 export type EventProps = Record<string, string | number | boolean | undefined>;
+
+/** Our own collector is off until it has a database (docs/analytics/README.md). */
+export const FIRST_PARTY = process.env.NEXT_PUBLIC_FIRST_PARTY_ANALYTICS === "on";
 
 // Google Analytics keeps 25 params an event and 100 characters a value.
 const MAX_PARAMS = 25;
@@ -28,6 +32,7 @@ export function track(name: string, props: EventProps = {}) {
     try {
         (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", name, p);
     } catch {}
+    if (!FIRST_PARTY) return;
     try {
         sendFirstParty(name, p);
     } catch {}

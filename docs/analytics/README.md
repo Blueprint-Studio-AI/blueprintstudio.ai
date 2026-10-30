@@ -1,5 +1,7 @@
 # Our own analytics
 
+> **Off for launch (30 October 2026).** The site ships with Google Analytics only, which gets every `track()` event in [events.md](events.md). The browser sends nothing to our collector until `NEXT_PUBLIC_FIRST_PARTY_ANALYTICS=on` is set at build time, and the dashboard stays a 404 in production without `ANALYTICS_PASSWORD`. Turning it on takes the database (below), those settings and a redeploy. Set the switch in `.env.local` to try it in development.
+
 blueprintstudio.ai records what visitors do itself, in its own database, and shows it on a private dashboard at `/analytics`. It sets no cookies, keeps nothing on the visitor's device, and adds about 1 KB (gzipped) to a page's first load.
 
 It runs next to Google Analytics, which still gets every `track()` event, and Vercel Web Analytics. For why we built this and what we'd still buy, see [first-party-vs-third-party.md](first-party-vs-third-party.md).
