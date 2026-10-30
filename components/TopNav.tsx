@@ -27,6 +27,7 @@ import {
     SERVICES,
     SPRING,
     isNavHidden,
+    onServiceClick,
     useCurrentItem,
     useGoToSection,
     useNavReveal,
@@ -82,6 +83,21 @@ const snap = (v: number, step = 1) => {
     const d = (typeof window === "undefined" ? 1 : window.devicePixelRatio || 1) / step;
     return Math.round(v * d) / d;
 };
+
+// The pointer's kind and, for a mouse, where it last was. Noted for the whole
+// visit, not from when the nav mounts: the nav is off some pages (isNavHidden),
+// and coming back from one it mounts under a mouse that hasn't moved. The browser
+// says the mouse entered whichever name now sits under it, and with no position
+// to compare, the nav took that for a hand reaching for the menu and opened it.
+const pointer: { type: string; at: { x: number; y: number } | null } = { type: "mouse", at: null };
+if (typeof window !== "undefined") {
+    const note = (e: PointerEvent) => {
+        pointer.type = e.pointerType;
+        pointer.at = e.pointerType === "mouse" ? { x: e.clientX, y: e.clientY } : null;
+    };
+    window.addEventListener("pointermove", note, { passive: true });
+    window.addEventListener("pointerdown", note, { passive: true });
+}
 
 type Box = { x: number; y: number; w: number; h: number; on: boolean; glide: boolean };
 
@@ -393,8 +409,6 @@ function DesktopNav() {
     const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const openedAt = useRef(0);
-    const pointerType = useRef("mouse");
-    const pointerAt = useRef<{ x: number; y: number } | null>(null);
 
     const show = (id: MenuId) => {
         clearTimeout(closeTimer.current);
@@ -431,9 +445,11 @@ function DesktopNav() {
     };
     // Whether this event comes from the pointer moving, rather than the page moving
     // under it. React handles it before the window's listener notes the new position.
+    // Until we know where the mouse is, only a move counts: an enter alone may be
+    // the page arriving under a mouse that hasn't moved.
     const handMoved = (e: React.PointerEvent) => {
-        const at = pointerAt.current;
-        return !at || at.x !== e.clientX || at.y !== e.clientY;
+        const at = pointer.at;
+        return at ? at.x !== e.clientX || at.y !== e.clientY : e.type === "pointermove";
     };
     const focusFirst = (id: MenuId) => contents[id]?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
 
@@ -518,24 +534,14 @@ function DesktopNav() {
         // Placed again when the nav changes shape under an open menu.
     }, [menu, sizes, items, pill]);
 
-    useEffect(() => {
-        const note = (e: PointerEvent) => {
-            pointerType.current = e.pointerType;
-            pointerAt.current = e.pointerType === "mouse" ? { x: e.clientX, y: e.clientY } : null;
-        };
-        window.addEventListener("pointermove", note, { passive: true });
-        window.addEventListener("pointerdown", note, { passive: true });
-        return () => {
-            window.removeEventListener("pointermove", note);
-            window.removeEventListener("pointerdown", note);
-        };
-    }, []);
+    // A menu belongs to its page: going to another, by Back and Forward too, closes it.
+    useEffect(() => hide(), [pathname]);
 
     useEffect(() => {
         if (!menu) {
             setRow(null);
             // Closed under a still pointer: light whatever is really under it now.
-            const at = pointerAt.current;
+            const at = pointer.at;
             const under = at ? document.elementFromPoint(at.x, at.y) : null;
             if (!under || !regionRef.current?.contains(under)) setHovered(null);
             return;
@@ -646,7 +652,7 @@ function DesktopNav() {
                 onClick={(e) => {
                     const keys = e.detail === 0;
                     // Already opened by the hover that led to this click: the click confirms it.
-                    if (menu === id && !keys && pointerType.current === "mouse" && performance.now() - openedAt.current < 600) return;
+                    if (menu === id && !keys && pointer.type === "mouse" && performance.now() - openedAt.current < 600) return;
                     if (menu === id) return dismiss();
                     dismissed.current = false;
                     show(id);
@@ -809,7 +815,10 @@ function DesktopNav() {
                                                                 >
                                                                     <Link
                                                                         href={service.href}
-                                                                        onClick={dismiss}
+                                                                        onClick={(e) => {
+                                                                            dismiss();
+                                                                            onServiceClick(e, service.href, goToSection);
+                                                                        }}
                                                                         data-track="nav_click"
                                                                         data-track-item={service.label}
                                                                         data-track-group="services"

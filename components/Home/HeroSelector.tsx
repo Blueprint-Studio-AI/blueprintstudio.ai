@@ -95,9 +95,9 @@ export const VARIANTS: Variant[] = [
 const WIDTH_SPRING = { type: "spring", visualDuration: 0.32, bounce: 0.1 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
-/** The variant in the URL (?for=websites), if any. */
-export function variantFromUrl(): VariantKey | null {
-    const key = new URLSearchParams(window.location.search).get("for");
+/** The variant in a query string (?for=websites), the page's own by default, if any. */
+export function variantFromUrl(search = window.location.search): VariantKey | null {
+    const key = new URLSearchParams(search).get("for");
     return VARIANTS.some((v) => v.key === key) ? (key as VariantKey) : null;
 }
 
