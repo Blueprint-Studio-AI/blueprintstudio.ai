@@ -64,6 +64,18 @@ const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
 const LIFT = { type: "spring", visualDuration: 0.6, bounce: 0.08 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const REEL_STEPS = [25, 50, 75, 100]; // reel_progress: how much of one pass has been seen
+const REEL_AT = "bp:reel-at"; // sessionStorage: { src, t }, where the reel was, for a return in the same visit
+const NEAR = "50% 0px"; // within half a screen of the window, the reel plays (see "Nobody watching")
+
+/** Where the reel was when this visit last left the home page, if it was this film. */
+function reelAt(src: string | null) {
+    try {
+        const at = JSON.parse(sessionStorage.getItem(REEL_AT) ?? "null");
+        return at && at.src === src && at.t > 0 ? Number(at.t) : 0;
+    } catch {
+        return 0;
+    }
+}
 
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
@@ -266,30 +278,106 @@ export default function Hero() {
 
     // A new src (first load, or crossing 640px) reloads and pauses the video:
     // cover it until its first frame, and keep it playing once the loader's gone.
+    // Back on the page later in the same visit (no opening), it picks up where it
+    // was: cued while still covered, so the first frame shown is that one.
     useEffect(() => {
         const video = videoRef.current;
         if (!video || !src) return;
         video.setAttribute("fetchpriority", "high");
         setHasFrame(false);
-        const frame = () => setHasFrame(true);
+        let cue = document.documentElement.dataset.intro === "skip" ? reelAt(video.getAttribute("src")) : 0;
+        const frame = () => {
+            if (!cue) setHasFrame(true);
+        };
         let resumed = false; // only the first canplay after a swap; later ones are seeks
         const playable = () => {
+            if (cue) return; // cueing: played once it's there
             setVideoReady(true);
             if (resumed) return;
             resumed = true;
             if (stageRef.current !== "loading") video.play().catch(() => {});
         };
+        const cued = () => {
+            if (!cue) return;
+            cue = 0;
+            setHasFrame(true);
+            playable();
+        };
+        const cueUp = () => {
+            if (!cue) return;
+            if (cue < video.duration - 1) video.currentTime = cue;
+            else cued(); // the end of the film: from the top
+        };
+        video.addEventListener("loadedmetadata", cueUp);
+        video.addEventListener("seeked", cued);
         video.addEventListener("loadeddata", frame);
         video.addEventListener("canplay", playable);
+        if (video.readyState >= 1) cueUp();
         if (video.readyState >= 2) frame();
         if (video.readyState >= 3) playable();
+        const giveUp = setTimeout(cued, 2000); // a cue that never lands plays from wherever it is
         const fallback = setTimeout(() => setVideoReady(true), VIDEO_FALLBACK_MS);
         return () => {
+            video.removeEventListener("loadedmetadata", cueUp);
+            video.removeEventListener("seeked", cued);
             video.removeEventListener("loadeddata", frame);
             video.removeEventListener("canplay", playable);
+            clearTimeout(giveUp);
             clearTimeout(fallback);
         };
     }, [src]);
+
+    // Nobody watching, nothing playing. The reel, and a picked word's clip over
+    // it, pause once the frame is more than half a screen away or the tab is in
+    // the background, and play again before the frame is back in view, so no one
+    // sees them stopped. Where the reel is goes in the visit's storage (above).
+    useEffect(() => {
+        const video = videoRef.current;
+        const frame = frameRef.current;
+        if (!video || !frame) return;
+        let near = true;
+        const sync = () => {
+            if (stageRef.current === "loading") return; // the opening starts it
+            const run = near && !document.hidden;
+            for (const film of frame.querySelectorAll("video")) {
+                if (run && film.paused) film.play().catch(() => {});
+                else if (!run && !film.paused) film.pause();
+            }
+        };
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                near = entry.isIntersecting;
+                sync();
+            },
+            { rootMargin: NEAR },
+        );
+        io.observe(frame);
+        document.addEventListener("visibilitychange", sync);
+        window.addEventListener("pageshow", sync);
+        frame.addEventListener("play", sync, true); // a film started while no one's looking (media events don't bubble)
+        let saved = -1;
+        const save = (always = false) => {
+            const t = video.currentTime;
+            // Only a film that's showing and not being cued: a mount (React mounts twice
+            // in development) or a cue would otherwise write 0 over where it was.
+            if (video.readyState < 2 || video.seeking || t < 0.5) return;
+            if (!always && Math.abs(t - saved) < 1) return;
+            saved = t;
+            try {
+                sessionStorage.setItem(REEL_AT, JSON.stringify({ src: video.getAttribute("src"), t }));
+            } catch {}
+        };
+        const tick = () => save();
+        video.addEventListener("timeupdate", tick);
+        return () => {
+            save(true);
+            io.disconnect();
+            document.removeEventListener("visibilitychange", sync);
+            window.removeEventListener("pageshow", sync);
+            frame.removeEventListener("play", sync, true);
+            video.removeEventListener("timeupdate", tick);
+        };
+    }, []);
 
     // How much of the reel people see: the seconds it plays while it's at least
     // half on screen, the tab is in front and no picked word's clip covers it,
