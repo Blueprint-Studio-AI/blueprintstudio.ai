@@ -224,7 +224,7 @@ For where people go from the nav, use a **Path exploration** starting from
 ## Cal.com: stop the booking embed reporting into our property (Tyler)
 
 Every page with the booking calendar logs a second `page_view`, for
-`/blueprint-studio/intro-call/embed?...`, plus a `scroll` at 90% within a few
+`/tyler-stupart/intro-call/embed?...`, plus a `scroll` at 90% within a few
 seconds, sent from the `app.cal.com` frame to `G-3Q7XS383XP`. Those hits never
 carry `traffic_type`, so even our own visits count. Cal's booking page opened
 in a tab (each "Book a call" that opens cal.com) sends the same `page_view` and
@@ -236,9 +236,9 @@ whether it's embedded or not. The embed's config only takes layout, theme and
 page-type settings, with no switch for apps, and a page can't control the
 scripts in a cross-origin frame.
 
-In Cal.com (app.cal.com, signed in as Blueprint Studio):
+In Cal.com (app.cal.com, signed in as Tyler: the site books into cal.com/tyler-stupart/intro-call):
 
-1. Event Types → **Intro Call** (`blueprint-studio/intro-call`) → **Apps**
+1. Event Types → **Intro Call** (`tyler-stupart/intro-call`) → **Apps**
    tab → **Google Analytics** → switch it off → **Save**.
 2. If other event types have it too, do the same there. Or remove the app for
    everything: Settings → Apps → Installed apps → Analytics → Google

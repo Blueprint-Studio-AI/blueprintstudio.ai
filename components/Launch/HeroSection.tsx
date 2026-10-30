@@ -123,8 +123,8 @@ export default function HeroSection() {
                 className="w-full"
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/blueprint-studio/intro-call"
-                onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                data-track-href="https://cal.com/tyler-stupart/intro-call"
+                onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
               >
                 Book a Call
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

@@ -192,10 +192,10 @@ export default function PricingSection() {
                   stiffness: 500,
                   damping: 30
                 }}
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/blueprint-studio/intro-call"
+                data-track-href="https://cal.com/tyler-stupart/intro-call"
                 data-track-plan="partnership"
               >
                 {/* Shader-like animated gradient */}

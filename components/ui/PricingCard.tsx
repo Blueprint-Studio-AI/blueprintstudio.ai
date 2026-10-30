@@ -90,13 +90,13 @@ export function GradientCTAButton() {
       }}
       onClick={() =>
         window.open(
-          "https://cal.com/blueprint-studio/intro-call",
+          "https://cal.com/tyler-stupart/intro-call",
           "_blank"
         )
       }
       data-track="cta_click"
       data-track-cta="book_call"
-      data-track-href="https://cal.com/blueprint-studio/intro-call"
+      data-track-href="https://cal.com/tyler-stupart/intro-call"
     >
       {/* Static sheen — animating backgroundPosition here was a no-op (no
           backgroundSize set, so nothing moved) yet repainted every frame. */}

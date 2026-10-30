@@ -74,10 +74,10 @@ export default function ProblemSection() {
               <div className="pt-2">
                 <GradientButton
                   className="w-full justify-center"
-                  onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                  onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/blueprint-studio/intro-call"
+                  data-track-href="https://cal.com/tyler-stupart/intro-call"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -138,10 +138,10 @@ export default function ProblemSection() {
               <div className="py-4 sm:py-5 px-3 sm:px-6 relative z-10">
                 <GradientButton
                   className="w-full justify-center"
-                  onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                  onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/blueprint-studio/intro-call"
+                  data-track-href="https://cal.com/tyler-stupart/intro-call"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

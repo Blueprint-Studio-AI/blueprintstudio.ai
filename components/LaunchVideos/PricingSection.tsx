@@ -90,11 +90,11 @@ export default function PricingSection() {
                   className="w-full py-3 px-6 font-medium flex items-center justify-center bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 text-sm group"
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/blueprint-studio/intro-call"
+                  data-track-href="https://cal.com/tyler-stupart/intro-call"
                   data-track-plan="fast"
                   onClick={() =>
                     window.open(
-                      "https://cal.com/blueprint-studio/intro-call",
+                      "https://cal.com/tyler-stupart/intro-call",
                       "_blank"
                     )
                   }
@@ -145,11 +145,11 @@ export default function PricingSection() {
                   className="w-full py-3 px-6 font-medium flex items-center justify-center bg-white text-black border border-neutral-300 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all duration-200 text-sm group"
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/blueprint-studio/intro-call"
+                  data-track-href="https://cal.com/tyler-stupart/intro-call"
                   data-track-plan="studio"
                   onClick={() =>
                     window.open(
-                      "https://cal.com/blueprint-studio/intro-call",
+                      "https://cal.com/tyler-stupart/intro-call",
                       "_blank"
                     )
                   }

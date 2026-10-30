@@ -92,10 +92,10 @@ export default function HeroSection() {
                 className="w-fit py-3 px-6 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 transition-all duration-200 text-sm group"
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/blueprint-studio/intro-call"
+                data-track-href="https://cal.com/tyler-stupart/intro-call"
                 onClick={() =>
                   window.open(
-                    "https://cal.com/blueprint-studio/intro-call",
+                    "https://cal.com/tyler-stupart/intro-call",
                     "_blank"
                   )
                 }

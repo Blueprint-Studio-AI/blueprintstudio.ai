@@ -96,7 +96,7 @@ export default function CTASection() {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-8">
                 <Cal
                   namespace="launch-video-call"
-                  calLink="blueprint-studio/intro-call"
+                  calLink="tyler-stupart/intro-call"
                   style={{ width: "100%", height: "100%" }}
                   config={{ layout: "month_view", theme: "light" }}
                 />

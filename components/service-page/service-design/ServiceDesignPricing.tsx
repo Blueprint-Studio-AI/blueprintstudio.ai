@@ -141,7 +141,7 @@ export function ServiceDesignPricing() {
                 className="w-full bg-white text-black rounded-full py-4 font-medium flex items-center justify-center group-hover:bg-gray-100 transition-colors"
                 onMouseEnter={() => setShowCalendarPreview(true)}
                 onMouseLeave={() => setShowCalendarPreview(false)}
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
               >
                 <span>Book a Call</span>
                 <ArrowUpRight className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -207,7 +207,7 @@ export function ServiceDesignPricing() {
 
               <button 
                 className="w-full border-2 border-black rounded-full py-4 font-medium flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
                 onMouseEnter={() => setShowChatPreview(true)}
                 onMouseLeave={() => setShowChatPreview(false)}
               >

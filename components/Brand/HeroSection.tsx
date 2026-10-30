@@ -92,7 +92,7 @@ export default function HeroSection() {
                 <GradientButton
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/blueprint-studio/intro-call"
+                  data-track-href="https://cal.com/tyler-stupart/intro-call"
                   // Figma "Book a call" spec: 52px tall, 12px radius, 16px text,
                   // 86px side padding (→ ~271px wide), 12px gap to the arrow.
                   style={{
@@ -103,7 +103,7 @@ export default function HeroSection() {
                     fontSize: 16,
                   }}
                   onClick={() =>
-                    window.open("https://cal.com/blueprint-studio/intro-call", "_blank")
+                    window.open("https://cal.com/tyler-stupart/intro-call", "_blank")
                   }
                 >
                   Book a call

@@ -186,7 +186,7 @@ export const FloatingNav = () => {
             </Link>
 
           <div className="flex items-center gap-1.5">
-            <NavLink href="https://cal.com/blueprint-studio/intro-call" darker>
+            <NavLink href="https://cal.com/tyler-stupart/intro-call" darker>
               Start
             </NavLink>
             <NavLink 
