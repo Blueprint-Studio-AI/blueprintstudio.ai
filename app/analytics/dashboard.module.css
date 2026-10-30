@@ -1,0 +1,697 @@
+/* The analytics dashboard. A CSS module, so none of this reaches the public
+   pages (Tailwind classes would land in the site-wide stylesheet). Colors are
+   roles: the site's neutrals, and chart colors checked with the dataviz
+   validator in both modes (series, ordinal ramp, status). */
+
+.root {
+    color-scheme: light;
+    --page: #f6f6f6;
+    --surface: #ffffff;
+    --ink: #1c1c1c;
+    --ink-2: #5e5e5e;
+    --muted: #7b8089;
+    --line: #e6e6e6;
+    --grid: #ececec;
+    --axis: #c3c6cc;
+    --wash: rgba(28, 28, 28, 0.04);
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --ramp-1: #86b6ef;
+    --ramp-2: #5598e7;
+    --ramp-3: #2a78d6;
+    --ramp-4: #1c5cab;
+    --ramp-5: #104281;
+    --ramp-ink-1: #0b0b0b;
+    --ramp-ink-2: #0b0b0b;
+    --good: #0ca30c;
+    --warn: #fab219;
+    --poor: #d03b3b;
+    --good-text: #006300;
+    --poor-text: #b42318;
+    --banner: #fff6e0;
+    --banner-line: #f1d48a;
+
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+    .root {
+        color-scheme: dark;
+        --page: #0f0f0f;
+        --surface: #1a1a19;
+        --ink: #f0efec;
+        --ink-2: #c3c2b7;
+        --muted: #8f8d86;
+        --line: #2c2c2a;
+        --grid: #262624;
+        --axis: #383835;
+        --wash: rgba(255, 255, 255, 0.05);
+        --series-1: #3987e5;
+        --series-2: #d95926;
+        --ramp-1: #184f95;
+        --ramp-2: #256abf;
+        --ramp-3: #3987e5;
+        --ramp-4: #6da7ec;
+        --ramp-5: #9ec5f4;
+        --ramp-ink-1: #ffffff;
+        --ramp-ink-2: #ffffff;
+        --good-text: #0ca30c;
+        --poor-text: #e66767;
+        --banner: #2a2414;
+        --banner-line: #5c4a1c;
+    }
+}
+
+.wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 20px 16px 64px;
+}
+
+@media (min-width: 768px) {
+    .wrap {
+        padding: 36px 32px 80px;
+    }
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: 20px;
+}
+
+.title {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.subtitle {
+    margin: 4px 0 0;
+    color: var(--ink-2);
+    font-size: 13px;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+
+.live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-2);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.liveDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 22%, transparent);
+}
+
+.liveDotOff {
+    background: var(--axis);
+    box-shadow: none;
+}
+
+.periods {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+}
+
+.period {
+    padding: 6px 12px;
+    border-radius: 7px;
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.period:hover {
+    background: var(--wash);
+    color: var(--ink);
+}
+
+.periodOn,
+.periodOn:hover {
+    background: var(--ink);
+    color: var(--surface);
+}
+
+.banner code {
+    white-space: nowrap;
+}
+
+.banner {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--banner-line);
+    border-radius: 10px;
+    background: var(--banner);
+    font-size: 13px;
+}
+
+.error {
+    composes: banner;
+}
+
+/* Tiles ------------------------------------------------------------------- */
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 900px) {
+    .tiles {
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    }
+}
+
+.tile {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    min-width: 0;
+}
+
+.tileHero,
+.tile:last-child {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+    .tileHero,
+    .tile:last-child {
+        grid-column: auto;
+    }
+}
+
+.tileLabel {
+    color: var(--ink-2);
+    font-size: 13px;
+}
+
+.tileValue {
+    margin-top: 6px;
+    font-size: 28px;
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.tileHero .tileValue {
+    font-size: 48px;
+}
+
+.tileSub {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.up {
+    color: var(--good-text);
+}
+
+.down {
+    color: var(--poor-text);
+}
+
+/* Cards ------------------------------------------------------------------- */
+
+.grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 900px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.card {
+    padding: 18px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    min-width: 0;
+    margin-bottom: 10px;
+}
+
+.grid .card {
+    margin-bottom: 0;
+}
+
+/* Two cards sharing one column of the grid. */
+.stack {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-width: 0;
+}
+
+@media (min-width: 768px) {
+    .card {
+        padding: 20px 22px;
+    }
+}
+
+.cardTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+}
+
+.cardNote {
+    margin: 4px 0 14px;
+    color: var(--ink-2);
+    font-size: 13px;
+    max-width: 62ch;
+}
+
+.subhead {
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.empty {
+    padding: 18px 0 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* Bar lists --------------------------------------------------------------- */
+
+.list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.row {
+    padding: 6px 6px 7px;
+    margin: 0 -6px;
+    border-radius: 6px;
+}
+
+.row:hover {
+    background: var(--wash);
+}
+
+.rowTop {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.labelSub {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.value {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    text-align: right;
+}
+
+.valueSub {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.bar {
+    height: 6px;
+    margin-top: 5px;
+    border-radius: 0 3px 3px 0;
+    background: var(--series-1);
+    min-width: 2px;
+}
+
+.barZero {
+    background: var(--axis);
+    width: 2px;
+}
+
+.more {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* Trend ------------------------------------------------------------------- */
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    color: var(--ink-2);
+}
+
+.legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.key {
+    display: inline-block;
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+}
+
+.chart {
+    position: relative;
+    outline: none;
+    touch-action: pan-y;
+}
+
+.chart:focus-visible {
+    box-shadow: 0 0 0 2px var(--series-1);
+    border-radius: 6px;
+}
+
+.chart svg {
+    display: block;
+    overflow: visible;
+}
+
+.tooltip {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.tipTitle {
+    color: var(--ink-2);
+    margin-bottom: 4px;
+}
+
+.tipRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tipRow strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.details {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.details summary {
+    cursor: pointer;
+    color: var(--ink-2);
+}
+
+/* Tables ------------------------------------------------------------------ */
+
+.scroller {
+    /* Positioned, so screen-reader-only text inside is clipped with the rest. */
+    position: relative;
+    overflow-x: auto;
+    margin: 0 -4px;
+    padding: 0 4px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--grid);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.table th:first-child,
+.table td:first-child {
+    text-align: left;
+    padding-left: 0;
+    white-space: normal;
+}
+
+.table thead th {
+    color: var(--ink-2);
+    font-weight: 500;
+    font-size: 12px;
+    vertical-align: bottom;
+}
+
+.table tbody tr:last-child td,
+.table tbody tr:last-child th {
+    border-bottom: 0;
+}
+
+/* The hero-word table: headers wrap so it fits a phone. */
+.matrix thead th {
+    white-space: normal;
+    min-width: 44px;
+    line-height: 1.25;
+}
+
+.matrix td {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.cell {
+    display: inline-block;
+    min-width: 44px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.c0 {
+    color: var(--muted);
+}
+
+.c1 {
+    background: var(--ramp-1);
+    color: var(--ramp-ink-1);
+}
+
+.c2 {
+    background: var(--ramp-2);
+    color: var(--ramp-ink-2);
+}
+
+.c3 {
+    background: var(--ramp-3);
+    color: #fff;
+}
+
+.c4 {
+    background: var(--ramp-4);
+    color: #fff;
+}
+
+.c5 {
+    background: var(--ramp-5);
+    color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    .c4,
+    .c5 {
+        color: #0b0b0b;
+    }
+}
+
+.scale {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-top: 10px;
+    color: var(--ink-2);
+    font-size: 12px;
+}
+
+.swatch {
+    display: inline-block;
+    width: 18px;
+    height: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Status: always an icon and a word, never the color alone. */
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.statusIcon {
+    display: inline-grid;
+    place-items: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.good {
+    background: var(--good);
+}
+
+.needs-work {
+    background: var(--warn);
+    color: #0b0b0b;
+}
+
+.poor {
+    background: var(--poor);
+}
+
+.few {
+    color: var(--muted);
+}
+
+/* Footer ------------------------------------------------------------------ */
+
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-top: 24px;
+    color: var(--ink-2);
+    font-size: 12px;
+}
+
+.footer p {
+    margin: 0 0 4px;
+    max-width: 70ch;
+}
+
+.button {
+    appearance: none;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: var(--wash);
+}
+
+.buttonPrimary {
+    composes: button;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--surface);
+}
+
+.buttonPrimary:hover {
+    background: var(--ink);
+    opacity: 0.9;
+}
+
+/* Sign in ------------------------------------------------------------------- */
+
+.signin {
+    max-width: 360px;
+    margin: 12vh auto 0;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.signin form {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.input {
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--page);
+    color: var(--ink);
+    font: inherit;
+    font-size: 16px;
+}
+
+.input:focus {
+    outline: 2px solid var(--series-1);
+    outline-offset: 0;
+}
