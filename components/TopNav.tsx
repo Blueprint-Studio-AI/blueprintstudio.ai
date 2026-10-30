@@ -33,6 +33,7 @@ import {
     type NavItem,
 } from "@/components/nav/shared";
 import { FoldingLogo, logoWidth } from "@/components/nav/logo";
+import { trackOnce } from "@/lib/analytics/track";
 
 // The nav at the top of the page. From md up it's one nav with two shapes: a
 // bar across the top of the page, which stays put as the page scrolls, and,
@@ -138,6 +139,8 @@ function Logo({
             onPointerLeave={onPointerLeave}
             whileTap={{ scale: 0.97 }}
             transition={SPRING.press}
+            data-track="nav_click"
+            data-track-item="logo"
             aria-label="Blueprint Studio"
             className={`flex w-fit shrink-0 items-center rounded-md ${FOCUS}`}
         >
@@ -167,7 +170,7 @@ export function TopNav() {
     return (
         <>
             {/* The page's top cell: its background, lines and divider are there from the start, like the frame. */}
-            <header id="top-nav" className="relative z-40 bg-neutral-50 px-2.5 sm:px-[60px]">
+            <header id="top-nav" data-track-menu="top" className="relative z-40 bg-neutral-50 px-2.5 sm:px-[60px]">
                 <FrameLines />
                 <div className="relative flex h-12 items-center px-3 sm:px-5 md:h-16">
                     <motion.div
@@ -399,6 +402,7 @@ function DesktopNav() {
         openedAt.current = performance.now();
         setLingering(true);
         setMenu(id);
+        trackOnce("nav_menu_open", { item: id, menu: "top" }, id);
     };
     const hide = () => {
         clearTimeout(openTimer.current);
@@ -595,6 +599,8 @@ function DesktopNav() {
                 }}
                 whileTap={{ scale: 0.97 }}
                 transition={SPRING.press}
+                data-track="nav_click"
+                data-track-item={label}
                 aria-current={current === id ? "page" : undefined}
                 className={`flex h-8 items-center whitespace-nowrap rounded-full px-2.5 text-sm font-medium transition-colors duration-200 lg:px-3 ${linkTone(lit === id)} ${FOCUS}`}
             >
@@ -699,6 +705,8 @@ function DesktopNav() {
         <MotionConfig reducedMotion="user">
             <motion.div
                 ref={containerRef}
+                data-track-menu="top"
+                data-track-shape={pill ? "pill" : "bar"}
                 aria-hidden={!revealed || undefined}
                 onPointerEnter={(e) => e.pointerType === "mouse" && setPointerInside(true)}
                 onPointerLeave={(e) => e.pointerType === "mouse" && setPointerInside(false)}
@@ -802,6 +810,9 @@ function DesktopNav() {
                                                                     <Link
                                                                         href={service.href}
                                                                         onClick={dismiss}
+                                                                        data-track="nav_click"
+                                                                        data-track-item={service.label}
+                                                                        data-track-group="services"
                                                                         onPointerEnter={() => setRow(service.key)}
                                                                         onFocus={() => setRow(service.key)}
                                                                         className={`flex items-center gap-3 rounded-xl p-1.5 pr-3 ${ROW_FOCUS}`}
@@ -835,6 +846,9 @@ function DesktopNav() {
                                                     <motion.div variants={ROW}>
                                                         <Link
                                                             href={`/#${PRICING.id}`}
+                                                            data-track="nav_click"
+                                                            data-track-item={PRICING.label}
+                                                            data-track-group="services"
                                                             onClick={(e) => {
                                                                 dismiss();
                                                                 if (pathname !== "/") return;
@@ -857,6 +871,9 @@ function DesktopNav() {
                                                             <Link
                                                                 href={industry.href}
                                                                 onClick={dismiss}
+                                                                data-track="nav_click"
+                                                                data-track-item={industry.label}
+                                                                data-track-group="industries"
                                                                 className={`group block rounded-xl p-3 transition-colors duration-200 hover:bg-black/[0.035] ${ROW_FOCUS}`}
                                                             >
                                                                 <span className="flex items-center justify-between">
@@ -896,6 +913,9 @@ function DesktopNav() {
                                                             target="_blank"
                                                             rel="noopener"
                                                             onClick={dismiss}
+                                                            data-track="nav_click"
+                                                            data-track-item={ASSET_GENERATOR.label}
+                                                            data-track-group="products"
                                                             className={`group block rounded-xl p-1.5 transition-colors duration-200 hover:bg-black/[0.035] ${ROW_FOCUS}`}
                                                         >
                                                             <span className="relative block aspect-[1248/600] overflow-hidden rounded-[10px] bg-neutral-100 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">

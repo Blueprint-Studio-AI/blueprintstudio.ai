@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import OuterContainer from "../ui/OuterContainer";
 import InnerContainer from "../ui/InnerContainer";
 import Section from "../ui/Section";
+import { useCalBookings } from "@/lib/analytics/cal";
 
 const Cal = dynamic(() => import("@calcom/embed-react").then((mod) => mod.default), {
   ssr: false,
@@ -17,6 +18,7 @@ const Cal = dynamic(() => import("@calcom/embed-react").then((mod) => mod.defaul
 });
 
 export default function ScheduleCallSection() {
+  useCalBookings("intro-call");
   useEffect(() => {
     (async function () {
       const { getCalApi } = await import("@calcom/embed-react");

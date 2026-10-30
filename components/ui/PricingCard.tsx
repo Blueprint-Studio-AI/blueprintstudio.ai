@@ -94,6 +94,9 @@ export function GradientCTAButton() {
           "_blank"
         )
       }
+      data-track="cta_click"
+      data-track-cta="book_call"
+      data-track-href="https://cal.com/blueprint-studio/intro-call"
     >
       {/* Static sheen — animating backgroundPosition here was a no-op (no
           backgroundSize set, so nothing moved) yet repainted every frame. */}

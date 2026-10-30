@@ -8,7 +8,7 @@ export default function Overview() {
   const { overview, links } = useBrand();
   if (!overview) return null;
   return (
-    <section id="overview" className="px-edge py-section">
+    <section id="overview" data-section="overview" className="px-edge py-section">
       <div className="flex items-start gap-gutter max-[1360px]:gap-24 max-[860px]:flex-col max-[860px]:gap-10">
         <div className="w-[596px] shrink-0 max-[1360px]:w-[45%] max-[1200px]:w-1/2 max-[860px]:w-full">
           <h1 className="text-headline font-medium text-ink max-[860px]:text-headline-mobile">

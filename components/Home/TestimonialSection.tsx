@@ -291,6 +291,8 @@ export default function TestimonialSection() {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
+              data-track="testimonials_expand"
+              data-track-once
               aria-expanded={open}
               aria-controls="more-testimonials"
               className="group flex h-10 items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 text-[14px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"

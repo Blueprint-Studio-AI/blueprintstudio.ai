@@ -31,6 +31,9 @@ function Chip({
   return (
     <button
       onClick={() => onCopy(id, hex)}
+      data-track="copy"
+      data-track-what="color"
+      data-track-copied={hex}
       // Visible label leads the accessible name so voice control can match what
       // it says on the chip ("click 50"), not just the hex.
       aria-label={`${label} — copy ${hex.toUpperCase()}`}

@@ -134,6 +134,7 @@ export default function RecentWorkSection() {
     <section
       ref={sectionRef}
       id="portfolio"
+      data-section="recent_work"
       // z-[15] sits ABOVE the section this one parallax-covers (z-10) but BELOW
       // the testimonials section that follows (z-20), so the testimonials'
       // opaque background cleanly masks the seam as the stack exits.

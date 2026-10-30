@@ -203,7 +203,7 @@ export default function DepthSection() {
   const bgPosY = useTransform(darkP, [0, 1], ["0%", "100%"]);
 
   return (
-    <section className="relative z-10 w-full">
+    <section data-section="depth" className="relative z-10 w-full">
       {/* ── The descent: identical assets/treatment to the process section's
             thumbprint transition (blue gradient + multiplied prints), landing
             on the dark elliptical sea floor. ── */}

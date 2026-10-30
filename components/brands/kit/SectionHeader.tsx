@@ -55,7 +55,7 @@ export default function SectionHeader({
   children?: ReactNode;
 }) {
   return (
-    <section id={id} className="px-edge pt-section">
+    <section id={id} data-section={id} className="px-edge pt-section">
       <div className="flex items-center justify-between gap-6 max-[600px]:flex-col max-[600px]:items-start max-[600px]:gap-4">
         <h2 className="text-title font-medium text-ink max-[860px]:text-title-mobile">{title}</h2>
         <div className="flex flex-wrap items-center justify-end gap-6 max-[600px]:justify-start">

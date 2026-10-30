@@ -53,7 +53,7 @@ export default function Downloads() {
   if (!rows.length && !agentDoc) return null;
 
   return (
-    <section id="downloads" className="bg-chip px-edge py-section">
+    <section id="downloads" data-section="downloads" className="bg-chip px-edge py-section">
       <div className="flex max-w-measure flex-col gap-10">
         <h2 className="text-title font-medium text-ink">Downloads</h2>
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { trackOnce } from "@/lib/analytics/track";
 
 // The seven brand cards. Each PNG is a complete card composite (hero image +
 // thumbnails), so we just render it inside a rounded, shadowed frame.
@@ -41,6 +42,10 @@ const WHEEL_GATE = 4; // ignore sub-pixel wheel jitter
 const FLICK_DELTA = 90; // first-event |deltaX| above this = a fast flick (2 cards)
 const SNAP_MS = 520; // glide duration — higher = heavier / more deliberate
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+// Analytics: whether people browse the strip at all (any swipe, drag, wheel,
+// press or arrow key), once per page view.
+const carouselUsed = () => trackOnce("carousel_use", { carousel: "brand_hero" }, "brand_hero");
 
 // Coverflow "centre focus": the centred card always rides at full size (388),
 // side cards at the down-scaled size. (At 1.0 hover no longer grows it — there's
@@ -458,6 +463,7 @@ export default function HeroCardCarousel() {
       }, GESTURE_GAP_MS);
       if (gestureActive) return; // already stepped for this swipe — swallow the tail
       gestureActive = true;
+      carouselUsed();
       const dir = e.deltaX > 0 ? 1 : -1;
       const n = ax >= FLICK_DELTA ? 2 : 1;
       stepCards(dir * n);
@@ -465,6 +471,7 @@ export default function HeroCardCarousel() {
 
     // Touch: pause + highlight while the finger's down, resume a beat after.
     const onTouchStart = () => {
+      carouselUsed();
       userMovedRef.current = true;
       pauseAuto();
       grow();
@@ -594,6 +601,7 @@ export default function HeroCardCarousel() {
     (e: React.KeyboardEvent) => {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       e.preventDefault();
+      carouselUsed();
       userMovedRef.current = true;
       pauseAuto();
       stepCards(e.key === "ArrowRight" ? 1 : -1);
@@ -606,6 +614,7 @@ export default function HeroCardCarousel() {
   // a click (handled by the card's onClick), so we only snap on a real drag.
   const drag = useRef({ active: false, lastX: 0, startX: 0, moved: false });
   const onPointerDown = (e: React.PointerEvent) => {
+    carouselUsed();
     drag.current.moved = false; // reset click-vs-drag tracking for every press
     pauseAuto();
     if (e.pointerType !== "mouse") return;

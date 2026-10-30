@@ -126,6 +126,9 @@ export default function CaseStudyCard({
     <Link
       href={href}
       aria-label={`${name}: ${title}`}
+      data-track="project_open"
+      data-track-project={href.split("/").pop()}
+      data-track-href={href}
       className={`${frame} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900`}
     >
       {body}

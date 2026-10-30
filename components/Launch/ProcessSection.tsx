@@ -321,7 +321,7 @@ export default function ProcessSection() {
   }, []);
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section data-section="process" className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

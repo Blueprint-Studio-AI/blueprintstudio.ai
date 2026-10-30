@@ -261,7 +261,7 @@ export default function PortfolioBento() {
         {/* Render all project sections sequentially */}
         <div className="w-full max-w-[1000px]">
           {portfolioSections.map((project, sectionIndex) => (
-            <div key={project.id} className="w-full">
+            <div key={project.id} data-section={`work_${project.id}`} className="w-full">
               {sectionIndex > 0 && (
                 <div className="w-full line-dash-x" />
               )}

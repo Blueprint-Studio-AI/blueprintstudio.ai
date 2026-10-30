@@ -41,6 +41,7 @@ export default function AssetGenerator({ category }: { category: AssetCategory }
   return (
     <div
       id="asset-generator"
+      data-section="asset_generator"
       className="flex scroll-mt-32 items-center justify-center overflow-hidden rounded-3xl bg-chip max-[1024px]:flex-col"
     >
       {/* Copy. On mobile it follows the animation — the motion earns the scroll,
