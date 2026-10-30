@@ -182,7 +182,7 @@ export default function PricingSection() {
                   stiffness: 500,
                   damping: 30
                 }}
-                onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+                onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
               >
                 {/* Shader-like animated gradient */}
                 <motion.div

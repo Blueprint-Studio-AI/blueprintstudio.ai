@@ -129,7 +129,7 @@ export default function HeroSection() {
                     fontSize: 16,
                   }}
                   onClick={() =>
-                    window.open("https://cal.com/blueprint-studio/intro-call", "_blank")
+                    window.open("https://cal.com/tyler-stupart/intro-call", "_blank")
                   }
                 >
                   Book a call
