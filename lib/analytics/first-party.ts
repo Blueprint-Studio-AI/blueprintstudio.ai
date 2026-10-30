@@ -10,7 +10,7 @@ import { isInternal, type EventProps } from "./track";
 
 const ENDPOINT = "/api/analytics";
 const DELAY = 4000;
-const MAX_BATCH = 40;
+const MAX_BATCH = 25; // well under the collector's 16 KB and 50-event caps
 
 type Queued = { n: string; p: EventProps; path: string; t: number; pv: string; entry?: true };
 
