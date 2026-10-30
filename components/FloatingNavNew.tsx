@@ -148,7 +148,7 @@ export const FloatingNavNew = () => {
 
                 <motion.nav
                     aria-label="Main"
-                    className="fixed inset-x-0 z-50 mx-auto overflow-hidden"
+                    className="fixed inset-x-0 z-50 mx-auto select-none overflow-hidden"
                     style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
                     initial={false}
                     animate={{

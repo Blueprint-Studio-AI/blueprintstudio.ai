@@ -158,7 +158,9 @@ function Logo({
             data-track="nav_click"
             data-track-item="logo"
             aria-label="Blueprint Studio"
-            className={`flex w-fit shrink-0 items-center rounded-md ${FOCUS}`}
+            // A link, not text: in Safari's engine (conch's pane) a press that moved a little
+            // selected the logo, tinting it blue under a text cursor, instead of following it.
+            className={`flex w-fit shrink-0 cursor-pointer select-none items-center rounded-md ${FOCUS}`}
         >
             <FoldingLogo fold={fold} />
         </MotionLink>
@@ -731,7 +733,7 @@ function DesktopNav() {
                 aria-hidden={!revealed || undefined}
                 onPointerEnter={(e) => e.pointerType === "mouse" && setPointerInside(true)}
                 onPointerLeave={(e) => e.pointerType === "mouse" && setPointerInside(false)}
-                className="fixed left-0 z-50 hidden md:block"
+                className="fixed left-0 z-50 hidden select-none md:block"
                 style={{ width, height, top, x, borderRadius: radius, paddingLeft, paddingRight }}
                 initial={false}
                 animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : -10 }}

@@ -77,7 +77,7 @@ export function FoldingLogo({ fold }: { fold?: MotionValue<number> }) {
     return (
         <span aria-hidden className="flex items-center" style={{ height: HEIGHT }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/blueprint-logo.svg" alt="" className="block shrink-0" style={{ width: MARK, height: MARK }} />
+            <img src="/blueprint-logo.svg" alt="" draggable={false} className="block shrink-0" style={{ width: MARK, height: MARK }} />
             <motion.span
                 className="block shrink-0"
                 style={{
@@ -93,7 +93,7 @@ export function FoldingLogo({ fold }: { fold?: MotionValue<number> }) {
             >
                 <motion.span className="block w-max" style={{ paddingLeft: GAP, opacity, x, filter }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/blueprint-wordmark-dark.svg" alt="" className="block" style={{ width: WORD, height: HEIGHT }} />
+                    <img src="/blueprint-wordmark-dark.svg" alt="" draggable={false} className="block" style={{ width: WORD, height: HEIGHT }} />
                 </motion.span>
             </motion.span>
         </span>
