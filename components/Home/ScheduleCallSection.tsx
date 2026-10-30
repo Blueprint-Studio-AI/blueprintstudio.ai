@@ -9,10 +9,12 @@ import { useCalBookings } from "@/lib/analytics/cal";
 
 // The calendar's room, held from the first paint: Cal's iframe arrives empty,
 // starts at 300px and grows as its page loads, and everything below moved each
-// time (a visit to /#contact jumped). About the height Cal's month view settles
-// at: stacked in an iframe under 768px (a 954px window, with this card's
-// padding), side by side above. Taller content still grows the card.
-const CAL_HEIGHT = "min-h-[680px] min-[954px]:min-h-[460px]";
+// time (a visit to /#contact jumped). About the height Tyler's intro call
+// settles at: side by side from a 955px window (534px), and below that stacked,
+// its days square, so it grows with the width (1,190px at 320, 1,240px at 390,
+// 1,430px at 768, 1,580px at 954). Taller content still grows the card.
+const CAL_HEIGHT =
+  "min-h-[calc(970px+68vw)] sm:min-h-[calc(789px+87vw)] md:min-h-[calc(790px+83vw)] min-[955px]:min-h-[534px]";
 
 const Cal = dynamic(() => import("@calcom/embed-react").then((mod) => mod.default), {
   ssr: false,
