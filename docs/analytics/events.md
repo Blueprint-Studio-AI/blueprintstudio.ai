@@ -103,6 +103,18 @@ should the dashboard drop it?
 
 ## Google Analytics setup (Tyler)
 
+Done on 30 October 2026, on Blueprint Design Studio (`G-3Q7XS383XP`):
+
+- Steps 1, 2, 3 and 4 below. `booking_made` and `newsletter_signup` are key
+  events with no default value; `book_call` (Cal's confirmation page view) is
+  still listed but stops once Cal's app is off.
+- The Internal Traffic filter went straight to **Active**, without the day in
+  Testing: nothing sent `traffic_type` before this launch, so it can only drop
+  flagged browsers. Each browser still needs `?analytics=off` once (step 3.1),
+  after the launch.
+- Cal.com's Google Analytics app is off for the intro call (see the end of
+  this page).
+
 ### 1. Register the custom dimensions
 
 GA only shows an event's props in reports once each is registered.
@@ -235,6 +247,9 @@ Call event type, and Cal adds its tag to that event type's booking page
 whether it's embedded or not. The embed's config only takes layout, theme and
 page-type settings, with no switch for apps, and a page can't control the
 scripts in a cross-origin frame.
+
+Done on 30 October 2026 for the intro call; the other event types weren't
+checked.
 
 In Cal.com (app.cal.com, signed in as Tyler: the site books into cal.com/tyler-stupart/intro-call):
 
