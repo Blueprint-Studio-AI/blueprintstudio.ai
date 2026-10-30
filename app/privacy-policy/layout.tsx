@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Blueprint Studio',
+  title: 'Privacy Policy', // the root layout's template adds " | Blueprint Studio"
   description: 'Privacy Policy for Blueprint Studio',
   // Legal boilerplate: keep it out of search results but let link equity flow.
   robots: { index: false, follow: true },
