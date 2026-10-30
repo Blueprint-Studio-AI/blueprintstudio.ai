@@ -142,7 +142,14 @@ export default function Nav() {
             WebkitBackdropFilter: "blur(calc(24px * var(--nav-p, 0)))",
           }}
         >
-          <a href={SITE} aria-label="Blueprint Studio" className="flex h-[18px] shrink-0 items-center">
+          <a
+            href={SITE}
+            aria-label="Blueprint Studio"
+            data-track="nav_click"
+            data-track-item="logo"
+            data-track-menu="top"
+            className="flex h-[18px] shrink-0 items-center"
+          >
             {navOnLight ? (
               // Two real marks stacked and cross-faded on --nav-p, rather than
               // inverting the white one. The grey asset carries its own 0.5/0.33
@@ -173,6 +180,7 @@ export default function Nav() {
               Same height as the CTA, so the whole row shares one centre line. */}
           <nav
             aria-label="Sections"
+            data-track-menu="top"
             className="no-scrollbar flex min-w-0 items-center overflow-x-auto max-[860px]:flex-1"
           >
             {SECTIONS.map((s) => {
@@ -181,6 +189,8 @@ export default function Nav() {
                 <a
                   key={s.id}
                   href={`#${s.id}`}
+                  data-track="nav_click"
+                  data-track-item={s.label}
                   aria-current={on ? "true" : undefined}
                   // Mobile drops to a 36px segment at a smaller size: the tabs
                   // wrap to their own row there, so every px is paid for twice.

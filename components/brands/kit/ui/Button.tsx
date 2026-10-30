@@ -74,6 +74,8 @@ export interface ButtonProps {
   children: ReactNode;
   "aria-label"?: string;
   "aria-pressed"?: boolean;
+  /** data-track and its props (lib/analytics). */
+  [data: `data-${string}`]: string | boolean | undefined;
 }
 
 export default function Button({

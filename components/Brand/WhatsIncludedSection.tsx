@@ -96,7 +96,7 @@ export default function WhatsIncludedSection() {
   const { selected, toggleAddon } = usePackage();
 
   return (
-    <section className="flex flex-col items-center px-2.5 sm:px-[60px] relative z-20 bg-white">
+    <section data-section="whats_included" className="flex flex-col items-center px-2.5 sm:px-[60px] relative z-20 bg-white">
       <SectionHeader leftText="BASE PACKAGE" rightText="// FOR FOUNDERS" />
 
       <OuterContainer className="flex-1 flex items-center">
@@ -278,6 +278,8 @@ export default function WhatsIncludedSection() {
                   href={assetGeneratorUrl("/asset-generator/landing", "brand_page")}
                   target="_blank"
                   rel="noopener"
+                  data-track="cta_click"
+                  data-track-cta="primary"
                   className="mt-12 flex w-[262px] cursor-pointer items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-[#33A6F7] py-[20px] transition-colors hover:border-[#1472F6]"
                   style={{
                     background:
@@ -437,6 +439,9 @@ export default function WhatsIncludedSection() {
                   <button
                     type="button"
                     onClick={() => toggleAddon(addon.id)}
+                    data-track="package_addon"
+                    data-track-addon={addon.id}
+                    data-track-added={!selected[addon.id]}
                     className={`mt-8 flex w-full items-center justify-center gap-1.5 rounded-xl border py-4 text-sm font-medium transition-colors cursor-pointer ${
                       selected[addon.id]
                         ? "border-[#186FF5] bg-blue-50/60 text-[#186FF5]"

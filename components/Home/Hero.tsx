@@ -19,6 +19,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import { introSeen, introSkipped } from "@/lib/intro";
+import { track, trackOnce } from "@/lib/analytics/track";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
 
@@ -55,6 +56,7 @@ const SLOT_RADIUS = 12;
 const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
 const LIFT = { type: "spring", visualDuration: 0.6, bounce: 0.08 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+const REEL_STEPS = [25, 50, 75, 100]; // reel_progress: how much of one pass has been seen
 
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
@@ -83,6 +85,8 @@ export default function Hero() {
     const [av1, setAv1] = useState(false);
     const [variantKey, setVariantKey] = useState<VariantKey | null>(null);
     const variant = VARIANTS.find((v) => v.key === variantKey) ?? null;
+    const variantRef = useRef(variantKey);
+    variantRef.current = variantKey;
     const [hasFrame, setHasFrame] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
     const [minTimeElapsed, setMinTimeElapsed] = useState(false);
@@ -159,14 +163,14 @@ export default function Hero() {
         return () => window.removeEventListener("bp:variant", onVariant);
     }, []);
 
-    const chooseVariant = (key: VariantKey | null) => {
+    // A pick doesn't touch the address: Google Analytics counts every history
+    // change as a page view, so writing ?for= on each pick logged the home page
+    // again. A link that arrives with ?for= still opens on its word (above).
+    const chooseVariant = (key: VariantKey | null, via: "word" | "reset") => {
         setVariantKey(key);
         window.dispatchEvent(new CustomEvent("bp:variant", { detail: { key, source: "hero" } }));
-        const url = new URL(window.location.href);
-        if (key) url.searchParams.set("for", key);
-        else url.searchParams.delete("for");
-        window.history.replaceState(window.history.state, "", url);
-        (window as { gtag?: (...args: unknown[]) => void }).gtag?.("event", "hero_variant", { variant: key ?? "everything" });
+        if (via === "word") trackOnce("hero_menu_open", { via: "pick", variant: key ?? "everything" }, "");
+        track("hero_variant", { variant: key ?? "everything", via });
     };
 
     // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
@@ -205,6 +209,43 @@ export default function Hero() {
             clearTimeout(fallback);
         };
     }, [src]);
+
+    // How much of the reel people see: the seconds it plays while it's at least
+    // half on screen, the tab is in front and no picked word's clip covers it,
+    // as 25/50/75/100% of one pass, each once per page view. timeupdate comes a
+    // few times a second; its work is a subtraction.
+    useEffect(() => {
+        const video = videoRef.current;
+        const frame = frameRef.current;
+        if (!video || !frame) return;
+        let onScreen = false;
+        let watched = 0;
+        let last = video.currentTime;
+        let next = 0;
+        const io = new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting), { threshold: 0.5 });
+        io.observe(frame);
+        const restart = () => (last = 0);
+        const tick = () => {
+            const t = video.currentTime;
+            let played = t - last;
+            last = t;
+            if (played < 0) played += video.duration; // looped back to the start
+            // A seek or a new source jumps; only steady playing counts.
+            if (!(played > 0 && played < 1.5) || !video.duration) return;
+            if (!onScreen || document.hidden || variantRef.current || stageRef.current === "loading") return;
+            watched += played;
+            while (next < REEL_STEPS.length && (watched / video.duration) * 100 >= REEL_STEPS[next]) {
+                trackOnce("reel_progress", { percent: REEL_STEPS[next++] });
+            }
+        };
+        video.addEventListener("timeupdate", tick);
+        video.addEventListener("loadedmetadata", restart);
+        return () => {
+            io.disconnect();
+            video.removeEventListener("timeupdate", tick);
+            video.removeEventListener("loadedmetadata", restart);
+        };
+    }, []);
 
     // The loader animates in CSS from the first paint, so its minimum time
     // counts from then (or from now, after a client-side navigation here).
@@ -294,10 +335,13 @@ export default function Hero() {
 
     // From the keyboard, focus moves to Close; from a click it stays put.
     const [focusClose, setFocusClose] = useState(false);
+    const expandedAt = useRef(0);
     const expand = useCallback((fromKeyboard: boolean) => {
         if (stageRef.current !== "docked") return;
         setFocusClose(fromKeyboard);
         setStage("expanded");
+        expandedAt.current = performance.now();
+        trackOnce("reel_open", { via: fromKeyboard ? "keyboard" : "click" }, "");
         if (reduceMotion) progress.set(0);
         else animate(progress, 0, LIFT);
     }, [progress, setStage, reduceMotion]);
@@ -306,6 +350,7 @@ export default function Hero() {
         if (stageRef.current !== "expanded") return;
         // Focus was in the fullscreen reel (keyboard): hand it back to the button that opened it.
         refocusRef.current = frameRef.current?.contains(document.activeElement) ?? false;
+        trackOnce("reel_close", { seconds: Math.round((performance.now() - expandedAt.current) / 1000) }, "");
         const dock = () => {
             if (stageRef.current === "closing") setStage("docked");
         };
@@ -425,7 +470,7 @@ export default function Hero() {
                     // background (not a link, a button or the reel) goes back to the whole line.
                     const target = e.target as Element;
                     if (!variantKey || stageRef.current !== "docked" || target.closest("a, button") || frameRef.current?.contains(target)) return;
-                    chooseVariant(null);
+                    chooseVariant(null, "reset");
                 }}
             >
                 {/* Artificial vertical lines to match the background */}
@@ -451,7 +496,7 @@ export default function Hero() {
                                 className="cursor-default font-medium text-neutral-800"
                                 style={{ fontSize: "clamp(24px, 2.5vw, 36px)", lineHeight: 1.16, letterSpacing: "-0.025em", textWrap: "pretty" }}
                             >
-                                <Statement revealed={revealed} value={variantKey} onPick={chooseVariant} />
+                                <Statement revealed={revealed} value={variantKey} onPick={(key) => chooseVariant(key, "word")} />
                             </motion.h1>
                             <motion.div
                                 {...rise(0.35)}
@@ -459,6 +504,9 @@ export default function Hero() {
                             >
                                 <motion.a
                                     href="#contact"
+                                    data-track="cta_click"
+                                    data-track-cta="book_call"
+                                    data-track-variant={variantKey ?? undefined}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToId("contact");
@@ -483,6 +531,10 @@ export default function Hero() {
                                 </motion.a>
                                 <motion.a
                                     href={link.href}
+                                    data-track="cta_click"
+                                    data-track-cta="secondary"
+                                    data-track-label={link.label}
+                                    data-track-variant={variantKey ?? undefined}
                                     onClick={(e) => {
                                         if (!link.href.startsWith("#")) return;
                                         e.preventDefault();
@@ -696,6 +748,7 @@ const LEAD = "The design and build partner for founders.";
 const TAIL = "from first sketch to launch.";
 const PEEK_FOLLOW = { stiffness: 380, damping: 30, mass: 0.6 };
 const PEEK_HIDE_MS = 140; // long enough to cross the gap between two words
+const PEEK_COUNTS_MS = 400; // a peek held this long counts as opening the picker (hero_menu_open); a cursor crossing the line doesn't
 
 function Statement({ revealed, value, onPick }: { revealed: boolean; value: VariantKey | null; onPick: (key: VariantKey | null) => void }) {
     const reduceMotion = useReducedMotion();
@@ -751,15 +804,25 @@ function Statement({ revealed, value, onPick }: { revealed: boolean; value: Vari
         window.addEventListener("pointermove", follow, { passive: true });
         return () => window.removeEventListener("pointermove", follow);
     }, [peek, follow]);
-    useEffect(() => () => clearTimeout(hideTimer.current), []);
+    const countTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+    useEffect(
+        () => () => {
+            clearTimeout(hideTimer.current);
+            clearTimeout(countTimer.current);
+        },
+        [],
+    );
     const showPeek = (key: VariantKey, e: React.PointerEvent) => {
         if (!canHover || e.pointerType !== "mouse") return;
         clearTimeout(hideTimer.current);
         follow(e);
         setPeek(key);
+        clearTimeout(countTimer.current);
+        countTimer.current = setTimeout(() => trackOnce("hero_menu_open", { via: "peek", variant: key }, ""), PEEK_COUNTS_MS);
     };
     const hidePeek = () => {
         clearTimeout(hideTimer.current);
+        clearTimeout(countTimer.current);
         hideTimer.current = setTimeout(() => setPeek(null), PEEK_HIDE_MS);
     };
 

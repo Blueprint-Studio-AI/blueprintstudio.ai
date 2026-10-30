@@ -27,7 +27,7 @@ const achievements = [
 export default function Achievements() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="edge" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

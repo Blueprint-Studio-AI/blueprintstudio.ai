@@ -56,6 +56,9 @@ function FaqItem({ question, answer }: FaqItemProps) {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        data-track="faq_open"
+        data-track-question={question}
+        data-track-once
         className="w-full flex justify-between items-start py-6 text-left group"
         aria-expanded={isOpen}
       >
@@ -91,7 +94,7 @@ function FaqItem({ question, answer }: FaqItemProps) {
 
 export default function FAQSection() {
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="faq" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

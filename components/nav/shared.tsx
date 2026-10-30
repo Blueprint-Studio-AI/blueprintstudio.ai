@@ -163,6 +163,9 @@ export function CallButton({ onGo, touch = false }: { onGo: () => void; touch?: 
             }}
             whileTap={{ scale: 0.97 }}
             transition={SPRING.press}
+            data-track="cta_click"
+            data-track-cta="book_call"
+            data-track-section="nav"
             className={`flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#1C1C1E] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.12),0_6px_16px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors duration-200 hover:bg-[#2C2C2E] ${touch ? "h-11 px-5 text-[15px]" : "h-9 px-4 text-sm"} ${FOCUS}`}
         >
             Book a call

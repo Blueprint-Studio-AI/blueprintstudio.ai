@@ -38,6 +38,9 @@ export default function ColorFields() {
           <button
             key={c.name}
             onClick={() => onCopy(c.name, c.hex)}
+            data-track="copy"
+            data-track-what="color"
+            data-track-copied={c.hex}
             aria-label={`${c.name} — copy ${c.hex.toUpperCase()}`}
             style={{ background: c.hex }}
             className="relative flex h-[110px] flex-col justify-center overflow-hidden rounded-xl py-5 pl-8 pr-6 text-left transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(30,20,10,0.14)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
