@@ -10,13 +10,14 @@ const METRICS = new Set(["LCP", "INP", "CLS", "TTFB", "FCP"]);
 
 type Metric = Parameters<Parameters<typeof useReportWebVitals>[0]>[0];
 
-// Each reading once: React's strict mode runs the reporter twice in development.
-// A later reading of the same metric (CLS or INP growing) has a new value, so it still goes.
+// Each reading once: React's strict mode runs the reporter twice in development,
+// as two observers with their own metric ids. A later reading of the same metric
+// (CLS or INP growing) has a new value, so it still goes.
 const sent = new Set<string>();
 
 function report(metric: Metric) {
     if (!METRICS.has(metric.name)) return;
-    const key = `${metric.id}:${metric.value}`;
+    const key = `${metric.name}:${metric.value}`;
     if (sent.has(key)) return;
     sent.add(key);
     recordVital({
