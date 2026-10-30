@@ -10,6 +10,7 @@ import { FirstPartyAnalytics } from "@/lib/analytics/FirstPartyAnalytics"
 import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
 import { introScript } from "@/lib/intro"
+import { reelStillScript } from "@/lib/reel"
 import { AnalyticsEvents } from "@/lib/analytics/AnalyticsEvents"
 import { FIRST_PARTY } from "@/lib/analytics/track"
 
@@ -147,6 +148,8 @@ export default function RootLayout({
       <head>
         {/* Before the first paint: skip the home page's opening on a return visit (lib/intro). */}
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
+        {/* Then, coming back to the home page, the reel's last frame under the film until it's cued (lib/reel). */}
+        <script dangerouslySetInnerHTML={{ __html: reelStillScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -19,6 +19,7 @@ import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
 import { introSeen, introSkipped } from "@/lib/intro";
+import { REEL_AT, REEL_STILL, WIDE_REEL, showReelStill } from "@/lib/reel";
 import { track, trackOnce } from "@/lib/analytics/track";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } from "./HeroSelector";
@@ -64,7 +65,6 @@ const LAND = { type: "spring", visualDuration: 0.9, bounce: 0.12 } as const;
 const LIFT = { type: "spring", visualDuration: 0.6, bounce: 0.08 } as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const REEL_STEPS = [25, 50, 75, 100]; // reel_progress: how much of one pass has been seen
-const REEL_AT = "bp:reel-at"; // sessionStorage: { src, t }, where the reel was, for a return in the same visit
 const NEAR = "50% 0px"; // within half a screen of the window, the reel plays (see "Nobody watching")
 
 /** Where the reel was when this visit last left the home page, if it was this film. */
@@ -136,7 +136,17 @@ export default function Hero() {
         if (!skip) return;
         progress.set(1);
         setStage("docked");
+        // Back from another page (no head script on the way): the still goes up before this paint.
+        showReelStill();
     }, [progress, setStage]);
+
+    // Once the film shows, the still under it has done its job: a later cover
+    // (crossing 640px swaps the film) is plain again.
+    useEffect(() => {
+        if (!hasFrame) return;
+        const timer = setTimeout(() => document.documentElement.style.removeProperty("--reel-still"), 600);
+        return () => clearTimeout(timer);
+    }, [hasFrame]);
 
     // Place the frame for the current stage and progress.
     const place = useCallback(() => {
@@ -268,7 +278,7 @@ export default function Hero() {
 
     // The full reel, or the 2:3 phone reel, which suits the phone's 4:5 frame.
     useEffect(() => {
-        const query = window.matchMedia("(min-width: 640px)");
+        const query = window.matchMedia(WIDE_REEL);
         setAv1(document.createElement("video").canPlayType(REEL_AV1.type) === "probably");
         const pick = () => setSrc(query.matches ? REEL_SRC.full : REEL_SRC.small);
         pick();
@@ -330,7 +340,8 @@ export default function Hero() {
     // Nobody watching, nothing playing. The reel, and a picked word's clip over
     // it, pause once the frame is more than half a screen away or the tab is in
     // the background, and play again before the frame is back in view, so no one
-    // sees them stopped. Where the reel is goes in the visit's storage (above).
+    // sees them stopped. Where the reel is goes in the visit's storage, and on
+    // leaving the page, exactly where it was and a still of the frame (lib/reel).
     useEffect(() => {
         const video = videoRef.current;
         const frame = frameRef.current;
@@ -369,8 +380,22 @@ export default function Hero() {
         };
         const tick = () => save();
         video.addEventListener("timeupdate", tick);
-        return () => {
+        const leave = () => {
             save(true);
+            if (video.readyState < 2 || video.seeking || video.currentTime < 0.5 || !video.videoWidth) return;
+            try {
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.min(video.videoWidth, 1280);
+                canvas.height = Math.round((canvas.width * video.videoHeight) / video.videoWidth);
+                canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const url = canvas.toDataURL("image/jpeg", 0.72);
+                sessionStorage.setItem(REEL_STILL, JSON.stringify({ wide: window.matchMedia(WIDE_REEL).matches, url }));
+            } catch {}
+        };
+        window.addEventListener("pagehide", leave);
+        return () => {
+            leave();
+            window.removeEventListener("pagehide", leave);
             io.disconnect();
             document.removeEventListener("visibilitychange", sync);
             window.removeEventListener("pageshow", sync);
@@ -746,6 +771,10 @@ export default function Hero() {
                                     className="pointer-events-none absolute inset-0"
                                     style={{
                                         backgroundColor: "#FBFBFB",
+                                        // On a return, the frame the visitor left (lib/reel), cropped as the film is.
+                                        backgroundImage: "var(--reel-still, none)",
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
                                         opacity: hasFrame ? 0 : 1,
                                         transition: "opacity 400ms cubic-bezier(.25, .46, .45, .94)",
                                     }}
