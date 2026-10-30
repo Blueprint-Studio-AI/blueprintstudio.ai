@@ -179,15 +179,20 @@ function FrameLines() {
     );
 }
 
+// The landing pages' heroes run straight up into the nav: no frame lines or
+// divider over them, and the hero's own background (/brand's is lighter).
+const PLAIN_NAV: Record<string, string> = { "/brand": "bg-[#FAFAFA]", "/launch": "bg-neutral-50", "/launch-videos": "bg-neutral-50" };
+
 export function TopNav() {
     const pathname = usePathname();
     const revealed = useNavReveal();
     if (isNavHidden(pathname)) return null;
+    const plain = PLAIN_NAV[pathname];
     return (
         <>
             {/* The page's top cell: its background, lines and divider are there from the start, like the frame. */}
-            <header id="top-nav" data-track-menu="top" className="relative z-40 bg-neutral-50 px-2.5 sm:px-[60px]">
-                <FrameLines />
+            <header id="top-nav" data-track-menu="top" className={`relative z-40 px-2.5 sm:px-[60px] ${plain ?? "bg-neutral-50"}`}>
+                {!plain && <FrameLines />}
                 <div className="relative flex h-12 items-center px-3 sm:px-5 md:h-16">
                     <motion.div
                         className="md:hidden"
@@ -198,7 +203,7 @@ export function TopNav() {
                         <Logo />
                     </motion.div>
                 </div>
-                <div className="line-dash-x" />
+                {!plain && <div className="line-dash-x" />}
             </header>
             <DesktopNav />
         </>
