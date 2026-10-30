@@ -190,6 +190,37 @@ Enhanced measurement (gear):
 - **Page changes based on browser history events: leave on.** That's how
   client-side navigation gets its page views.
 
+### 5. Funnels
+
+Do step 1 before the site goes live: GA doesn't fill in a custom dimension
+for the days before it was registered, and funnel steps filter on them.
+
+Explore → **Funnel exploration** → Steps (pencil). Each step is an event, with
+a parameter condition where shown. Breakdown by **Device category** or
+**Session source / medium** to compare.
+
+**Home to booking:**
+
+1. `page_view` where **Page path and screen class** exactly matches `/`
+2. `section_view` where `section` = `work`
+3. `section_view` where `section` = `pricing`
+4. `cta_click` where `cta` = `book_call`
+5. `booking_made`
+
+The same works for `/brand`, `/launch` and `/launch-videos`: change step 1's
+path and drop step 2. Step 5 only counts bookings made on the page's own
+calendar, not in a cal.com tab (see the Cal.com section below).
+
+**The hero's words:**
+
+1. `page_view` on `/`
+2. `hero_menu_open` (engaged with the words)
+3. `hero_variant`
+4. `cta_click` where `section` = `hero`
+
+For where people go from the nav, use a **Path exploration** starting from
+`nav_click`, with `item` as the node.
+
 ## Cal.com: stop the booking embed reporting into our property (Tyler)
 
 Every page with the booking calendar logs a second `page_view`, for
