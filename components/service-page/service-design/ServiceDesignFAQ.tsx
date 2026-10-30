@@ -87,7 +87,7 @@ export function ServiceDesignFAQ() {
                 Have more questions? We&apos;re here to help.
             </p>
             <button
-              onClick={() => window.open('https://cal.com/blueprint-studio/intro-call', '_blank')}
+              onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full 
                 bg-primary text-white hover:bg-primary/90 transition-colors"
             >

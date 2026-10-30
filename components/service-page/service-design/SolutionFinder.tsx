@@ -356,7 +356,7 @@ function SolutionResult({
       <div className="flex flex-col sm:flex-row gap-4 pt-4">
         <Button
           className="flex-1"
-          onClick={() => (window.location.href = 'https://cal.com/blueprint-studio/intro-call')}
+          onClick={() => (window.location.href = 'https://cal.com/tyler-stupart/intro-call')}
         >
           Get Started
           <ArrowRight className="ml-2 w-4 h-4" />
@@ -467,7 +467,7 @@ export function SolutionFinder() {
               Not sure what you need?{' '}
               <button
                 onClick={() =>
-                  window.open('https://cal.com/blueprint-studio/intro-call', '_blank')
+                  window.open('https://cal.com/tyler-stupart/intro-call', '_blank')
                 }
                 className="text-primary hover:underline"
               >

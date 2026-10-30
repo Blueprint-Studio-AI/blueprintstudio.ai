@@ -138,7 +138,7 @@ export default function HeroSection() {
               {/* CTA */}
               <GradientButton
                 className="w-full"
-                onClick={() => window.open("https://cal.com/blueprint-studio/intro-call", "_blank")}
+                onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
               >
                 Book a Call
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

@@ -90,7 +90,7 @@ export function GradientCTAButton() {
       }}
       onClick={() =>
         window.open(
-          "https://cal.com/blueprint-studio/intro-call",
+          "https://cal.com/tyler-stupart/intro-call",
           "_blank"
         )
       }
