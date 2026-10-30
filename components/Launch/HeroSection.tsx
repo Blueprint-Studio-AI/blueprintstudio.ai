@@ -4,15 +4,14 @@ import { useRef, useEffect } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import GradientButton from "@/components/ui/GradientButton";
 import GradientText from "@/components/ui/GradientText";
 import DeliverablePill from "@/components/ui/DeliverablePill";
 import SocialProof from "@/components/ui/SocialProof";
 
+import { useGoToSection } from "@/components/nav/shared";
 const deliverables = [
   { num: "01", label: "Brand" },
   { num: "02", label: "Website" },
@@ -76,8 +75,10 @@ function ImageTicker() {
 }
 
 export default function HeroSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   return (
-    <Section className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
+    <Section data-section="hero" className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -88,22 +89,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <SectionHeader
-        leftText="LAUNCH PACKAGE"
-        centerContent={
-          <Link href="/" className="hover:opacity-70 transition-opacity">
-            <Image
-              src="/blueprint-logo-dark.svg"
-              alt="Blueprint Studio"
-              width={80}
-              height={20}
-              className="h-3 sm:h-4 w-auto"
-            />
-          </Link>
-        }
-        rightText="// for founders"
-      />
-
+      {/* No logo row of its own: the site nav above has the logo, and its dashed rule tops the frame. */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-16 sm:pt-24 lg:pt-32 pb-0 px-2.5 sm:px-6 relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />
@@ -138,7 +124,10 @@ export default function HeroSection() {
               {/* CTA */}
               <GradientButton
                 className="w-full"
-                onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
+                data-track="cta_click"
+                data-track-cta="book_call"
+                data-track-href="#contact"
+                onClick={() => goToSection("contact")}
               >
                 Book a Call
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

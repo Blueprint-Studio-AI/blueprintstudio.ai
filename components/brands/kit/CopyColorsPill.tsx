@@ -60,6 +60,8 @@ export default function CopyColorsPill() {
     <Button
       ref={ref}
       variant="pill"
+      data-track="copy"
+      data-track-what="all_colors"
       onClick={async () => {
         const ok = await copyText(paletteText(brand), ref.current);
         toast(ok ? `Copied all ${swatchCount(brand)} colors` : "Couldn’t copy — check clipboard permissions");

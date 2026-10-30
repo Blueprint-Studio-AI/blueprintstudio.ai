@@ -1,310 +1,313 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+
+import { useState } from "react";
+import Image from "next/image";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "../ui/SectionHeader";
-import { Quote } from "lucide-react";
-import { useSmoothScroll } from "@/components/SmoothScroll";
+import SectionHeader from "@/components/ui/SectionHeader";
+import { HRule, InnerLines, OuterLines } from "./GridLines";
+import Reveal, { EASE_OUT } from "./Reveal";
 
-const testimonials = [
-  {
-    id: 1,
-    quote: "Blueprint's design subscription gave us an affordable way to bring our digital vision to life. Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
-    author: "Andrew Jenkins",
-    role: "Former VP of Engineering, Credit Karma",
-    company: "Currently Startup Co-Founder"
-  },
-  {
-    id: 2,
-    quote: "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft. We've been working with them the last two months and continue to do so.",
-    author: "Scott Zimmer",
-    role: "Former EVP of Innovation, Truist Bank",
-    company: "Currently Startup Co-Founder"
-  },
-  {
-    id: 3,
-    quote: "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
-    author: "Shina Foo",
-    role: "Head of Growth",
-    company: "Perena",
-    image: "/testimonials/shina-foo-perena.jpg"
-  },
-  {
-    id: 8,
-    quote: "Blueprint helped us turn our ideas into focused, effective marketing materials. They were fast, responsive, and the quality speaks for itself. We'll definitely be working with them again.",
-    author: "Ali Khalatpour",
-    role: "Founder",
-    company: "Piris Labs"
-  },
-  {
-    id: 4,
-    quote: "This looks so good wtf",
-    author: "Hugo",
-    role: "CEO & Founder",
-    company: "HUCH"
-  },
-  {
-    id: 5,
-    quote: "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
-    author: "Steven Luis Howell",
-    role: "CEO & Co-Founder",
-    company: "Project Metavision"
-  },
-  {
-    id: 6,
-    quote: "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
-    author: "Mauricio Manhaes",
-    role: "President",
-    company: "SDN Academic Task Force"
-  },
-  {
-    id: 7,
-    quote: "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
-    author: "Alex Escudero",
-    role: "Co-Founder",
-    company: "Project Metavision"
-  }
+type Testimonial = {
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  image?: string;
+  /** The opening words to set in ink when this quote leads. */
+  lead?: string;
+};
+
+// Quotes, names and titles as the site already has them: the ticker on /brand,
+// /launch and /launch-videos (with photos), then the home page's own. People
+// with photos come first.
+// The lead is about the work as a whole, not one deliverable.
+const featured: Testimonial = {
+  quote:
+    "What sets Blueprint apart is the quality of their end-to-end design and engineering work. They quickly understood what we needed and made collaboration with our internal team feel effortless. Blueprint is absolutely the perfect fit for a lean, design-forward business that values both aesthetics and function!",
+  lead: "What sets Blueprint apart is the quality of their end-to-end design and engineering work.",
+  author: "Shina Foo",
+  role: "Head of Growth",
+  company: "Perena",
+  image: "/testimonials/shina-foo-perena.jpg",
+};
+
+const shown: Testimonial[][] = [
+  [
+    {
+      quote: "Anyone who sees the video buys the product. Working with you guys is like eating chocolate. We can't go back.",
+      author: "Daniel Greene",
+      role: "COO",
+      company: "TokenWorks",
+      image: "/testimonials/daniel-greene.jpg",
+    },
+    {
+      quote: "I actually fucking love this version, I got goosebumps",
+      author: "Sina Meraji",
+      role: "CMO",
+      company: "Jinba · YC W26",
+      image: "/testimonials/sina.jpg",
+    },
+  ],
+  [
+    {
+      quote:
+        "Thanks again bro, you've really outdone yourselves again, especially with such a tight deadline. The video is doing bits on X, it looks sick!!!",
+      author: "Diego",
+      role: "CEO",
+      company: "Pyra · YC W25",
+      image: "/testimonials/diego.jpeg",
+    },
+    {
+      quote:
+        "You guys are getting great reviews. Even though we haven't started publicizing on social media. You guys did a great job!",
+      author: "Sam Karu",
+      role: "CEO",
+      company: "Logical · YC F25",
+      image: "/testimonials/sam-karu.jpg",
+    },
+  ],
 ];
 
+const more: Testimonial[][] = [
+  [
+    {
+      quote: "The AV3 launch was great, thanks to you guys!! Thanks for the hard work.",
+      author: "Charles Cagliostro",
+      role: "CEO",
+      company: "TokenWorks",
+      image: "/testimonials/charles.png",
+    },
+    {
+      quote: "I absolutely love the video and feel it captures our company impeccably.",
+      author: "Julia Zema",
+      role: "CMO",
+      company: "Hildene",
+      image: "/testimonials/julia.jpg",
+    },
+  ],
+  [
+    {
+      quote:
+        "It was great working with you guys. You helped us focus our ideas and the final product came out really well. We'll be back for sure 🙂",
+      author: "Ali Khalatpour",
+      role: "Founder",
+      company: "Piris Labs · YC W26",
+      image: "/testimonials/ali-khalatpour.png",
+    },
+    {
+      quote:
+        "Blueprint's design subscription gave us an affordable way to bring our digital vision to life. Their relentless dedication and talent accelerated our progress tremendously. Blueprint's blend of design talent and cutting edge ai expertise is truly unique and highly valuable.",
+      author: "Andrew Jenkins",
+      role: "Former VP of Engineering, Credit Karma",
+      company: "Currently Startup Co-Founder",
+      image: "/testimonials/andrew-jenkins.png",
+    },
+  ],
+  [
+    {
+      quote:
+        "Blueprint reduced the time it takes to explain our business from three minutes to 30 seconds. This helped us gain valuable partnerships and create marketing materials that resonate with our audience. Blueprint offers reliable, professional, and speedy service that takes the guesswork out of your public-facing operations.",
+      author: "Alex Escudero",
+      role: "Co-Founder",
+      company: "Project Metavision",
+      image: "/testimonials/alex-escudero.png",
+    },
+    {
+      quote:
+        "Design or strategy needs? Check out Blueprint. They're a really capable team with an impressive background and confidence in their craft. We've been working with them the last two months and continue to do so.",
+      author: "Scott Zimmer",
+      role: "Former EVP of Innovation, Truist Bank",
+      company: "Currently Startup Co-Founder",
+      image: "/testimonials/scott-zimmer.png",
+    },
+  ],
+  [
+    {
+      quote:
+        "Blueprint has been an invaluable partner for our service design efforts. Tyler and his team bring a unique blend of creativity, expertise, and professionalism to every project. They consistently deliver innovative solutions that not only meet our business goals but also exceed our expectations.",
+      author: "Mauricio Manhaes",
+      role: "President",
+      company: "SDN Academic Task Force",
+      image: "/testimonials/mauricio-manhaes.png",
+    },
+    {
+      quote:
+        "Blueprint's ability to deeply understand our needs and translate them into smart solutions was an absolute home run.",
+      author: "Steven Luis Howell",
+      role: "CEO & Co-Founder",
+      company: "Project Metavision",
+      image: "/testimonials/steven-luis-howell.png",
+    },
+  ],
+];
+const moreCount = more.flat().length;
+
+function Avatar({ t, size }: { t: Testimonial; size: number }) {
+  if (t.image)
+    return (
+      <Image
+        src={t.image}
+        alt=""
+        width={size}
+        height={size}
+        className="shrink-0 rounded-full object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
+        style={{ width: size, height: size }}
+      />
+    );
+  const initials = t.author
+    .split(" ")
+    .filter((w) => /^[A-Z]/.test(w))
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("");
+  return (
+    <span
+      aria-hidden
+      className="flex shrink-0 items-center justify-center rounded-full border border-neutral-300 bg-white text-[12px] font-medium tracking-[0.02em] text-neutral-500"
+      style={{ width: size, height: size }}
+    >
+      {initials}
+    </span>
+  );
+}
+
+function Attribution({ t, size = 40 }: { t: Testimonial; size?: number }) {
+  return (
+    <figcaption className="mt-6 flex items-center gap-3">
+      <Avatar t={t} size={size} />
+      <div className="min-w-0 text-[14px] leading-snug" style={{ textWrap: "balance" }}>
+        <p className="font-medium text-neutral-800">{t.author}</p>
+        <p className="text-neutral-500">{t.role}</p>
+        <p className="text-neutral-500">{t.company}</p>
+      </div>
+    </figcaption>
+  );
+}
+
+function Quote({ t }: { t: Testimonial }) {
+  return (
+    <figure className="flex h-full flex-col px-2.5 py-10 sm:px-6 sm:py-12 lg:px-10">
+      <blockquote className="flex-1 text-[17px] leading-[1.55] tracking-[-0.01em] text-neutral-700" style={{ textWrap: "pretty" }}>
+        &ldquo;{t.quote}&rdquo;
+      </blockquote>
+      <Attribution t={t} />
+    </figure>
+  );
+}
+
+// Two quotes side by side, divided by a dashed rule on wide screens.
+function Row({ items }: { items: Testimonial[] }) {
+  return (
+    <div className="relative grid md:grid-cols-2">
+      <div aria-hidden className="line-dash-y absolute bottom-0 left-1/2 top-0 hidden md:block" />
+      {items.map((t, i) => (
+        <div key={t.author}>
+          {i > 0 && (
+            <div className="md:hidden">
+              <HRule />
+            </div>
+          )}
+          <Quote t={t} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function TestimonialSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { scroll: lenis } = useSmoothScroll();
-
-  // Refs for scroll state (no re-renders during scroll)
-  const currentIndex = useRef(0);
-  const isAnimating = useRef(false);
-  const accumulatedDelta = useRef(0);
-  const resetTimer = useRef<NodeJS.Timeout>();
-
-
-  // Scroll to specific card (CSS snap-center handles final centering)
-  const scrollToCard = useCallback((index: number) => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // Get the actual card element (index + 1 because of top spacer)
-    const cardElement = container.children[index + 1] as HTMLElement;
-    if (!cardElement) return;
-
-    isAnimating.current = true;
-    currentIndex.current = index;
-    setActiveIndex(index);
-
-    // Calculate scroll position to center card
-    const containerHeight = container.clientHeight;
-    const cardTop = cardElement.offsetTop;
-    const cardHeight = cardElement.offsetHeight;
-    const targetScroll = cardTop - (containerHeight - cardHeight) / 2;
-
-    container.scrollTo({
-      top: Math.max(0, targetScroll),
-      behavior: 'smooth'
-    });
-
-    // Clear animating flag after scroll settles
-    setTimeout(() => {
-      isAnimating.current = false;
-    }, 600);
-  }, []);
-
-  // Trigger page scroll by dispatching wheel event to document (Lenis will catch it)
-  const scrollPage = useCallback((originalEvent: WheelEvent) => {
-    // Create a new wheel event and dispatch on document body
-    // Lenis listens on window/document, so it will catch this
-    const syntheticEvent = new WheelEvent('wheel', {
-      deltaY: originalEvent.deltaY,
-      deltaX: originalEvent.deltaX,
-      deltaMode: originalEvent.deltaMode,
-      bubbles: true,
-      cancelable: true,
-    });
-    document.body.dispatchEvent(syntheticEvent);
-  }, []);
-
-  // Native wheel event handler (attached directly to DOM to run before React)
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      const { scrollTop } = container;
-      const scrollingUp = e.deltaY < 0;
-      const scrollingDown = e.deltaY > 0;
-
-      // Bounds detection
-      const atTop = scrollTop <= 5;
-      // Use index for bottom since spacer prevents true scroll bottom
-      const atBottom = currentIndex.current >= testimonials.length - 1;
-
-      // At bounds - pass scroll to page via synthetic event
-      if ((scrollingUp && atTop) || (scrollingDown && atBottom)) {
-        scrollPage(e);
-        accumulatedDelta.current = 0;
-        return;
-      }
-
-      // Inside testimonials - we handle it
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Skip if animating
-      if (isAnimating.current) return;
-
-      // Accumulate scroll delta
-      accumulatedDelta.current += e.deltaY;
-
-      // Reset after pause
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-      resetTimer.current = setTimeout(() => {
-        accumulatedDelta.current = 0;
-      }, 120);
-
-      // Threshold to trigger card change
-      const threshold = 400;
-      if (Math.abs(accumulatedDelta.current) >= threshold) {
-        const direction = accumulatedDelta.current > 0 ? 1 : -1;
-        const newIndex = Math.max(0, Math.min(testimonials.length - 1, currentIndex.current + direction));
-
-        if (newIndex !== currentIndex.current) {
-          accumulatedDelta.current = 0;
-          scrollToCard(newIndex);
-        }
-      }
-    };
-
-    // Attach with capture to get event before Lenis
-    container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-
-    return () => {
-      container.removeEventListener('wheel', handleWheel, { capture: true });
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-    };
-  }, [scrollToCard, scrollPage]);
-
-  // Sync activeIndex when scroll settles (for indicator dots)
-  const handleScroll = useCallback(() => {
-    if (isAnimating.current) return;
-
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const containerHeight = container.clientHeight;
-    const containerCenter = container.scrollTop + containerHeight / 2;
-
-    // Find which card is closest to center
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-
-    for (let i = 0; i < testimonials.length; i++) {
-      const card = container.children[i + 1] as HTMLElement; // +1 for top spacer
-      if (!card) continue;
-      const cardCenter = card.offsetTop + card.offsetHeight / 2;
-      const distance = Math.abs(cardCenter - containerCenter);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = i;
-      }
-    }
-
-    if (closestIndex !== currentIndex.current) {
-      currentIndex.current = closestIndex;
-      setActiveIndex(closestIndex);
-    }
-  }, []);
+  const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const rest = featured.quote.slice(featured.lead?.length ?? 0);
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
-      {/* Artificial vertical lines to match the background */}
-      <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
-        <div className="w-full flex-1 flex justify-center relative">
-          {/* Left dashed vertical line (mobile) / solid line (desktop) */}
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-          
-          {/* Right dashed vertical line (mobile) / solid line (desktop) */}
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y custom:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-px bg-neutral-300 hidden custom:block" />
-        </div>
-      </div>
+    <Section className="relative flex flex-col bg-neutral-100">
+      <OuterLines />
+      <SectionHeader leftText="Testimonials" rightText="// proven" />
 
-      <SectionHeader leftText="TESTIMONIALS" rightText="// proven" />
+      <OuterContainer>
+        <InnerContainer className="relative px-0">
+          <InnerLines />
 
-      {/* Main Content */}
-      <OuterContainer className="flex-1 flex items-center">
-        <InnerContainer className="pt-8 sm:pt-12 lg:pt-16 py-8 sm:pb-12 lg:pb-16 px-0 sm:px-0 relative">
-          {/* Inner dashed vertical lines on desktop */}
-          <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block z-20" />
-          <div className="absolute right-0 top-0 bottom-0 line-dash-y hidden custom:block z-20" />
-          
-          {/* Testimonials Container with Scroll Indicators */}
-          <div className="flex gap-0 justify-center items-center">
-            {/* Scrollable Cards Container with Gradient Overlays */}
-            <div className="flex-1 relative">
-              {/* Top fade gradient */}
-              <div className="absolute top-0 left-0 right-0 h-8 sm:h-16 bg-gradient-to-b from-neutral-100 to-transparent z-10 pointer-events-none" />
+          <Reveal className="px-2.5 pb-12 pt-14 text-center sm:px-6 sm:pb-14 sm:pt-20">
+            <h2
+              className="cursor-default font-medium text-neutral-800"
+              style={{ fontSize: "clamp(32px, 4.4vw, 48px)", lineHeight: 1.05, letterSpacing: "-0.035em" }}
+            >
+              What founders say
+            </h2>
+          </Reveal>
 
-              {/* Bottom fade gradient */}
-              <div className="absolute bottom-0 left-0 right-0 h-8 sm:h-16 bg-gradient-to-t from-neutral-100 to-transparent z-10 pointer-events-none" />
+          <HRule />
 
-              <div
-                ref={scrollContainerRef}
-                onScroll={handleScroll}
-                data-lenis-prevent
-                className="flex flex-col gap-6 overflow-y-auto hide-scrollbar px-2.5 md:px-6 snap-y snap-mandatory"
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  height: '420px',
-                  overscrollBehavior: 'none'
-                }}
+          {/* The lead quote, its first line in ink */}
+          <Reveal>
+            <figure className="px-2.5 py-12 sm:px-6 sm:py-16 lg:px-10">
+              <blockquote
+                className="cursor-default font-medium"
+                style={{ fontSize: "clamp(20px, 2.5vw, 30px)", lineHeight: 1.3, letterSpacing: "-0.025em", textWrap: "pretty" }}
               >
-              {/* Top spacer to allow first card to center */}
-              <div className="flex-shrink-0 snap-center" style={{ height: 'calc(50% - 140px)' }} aria-hidden="true" />
-              {testimonials.map((testimonial) => (
-                <div
-                  key={testimonial.id}
-                  className="inline-flex flex-col items-start gap-2 p-6 md:p-8 rounded-3xl border border-neutral-300/50 bg-neutral-50 flex-shrink-0 snap-center"
-                  style={{
-                    minHeight: '256px'
-                  }}
-                >
-                  {/* <Quote className="w-8 h-8 text-neutral-400 mb-4 hidden md:block" /> */}
-                  <p className="text-base md:text-lg text-neutral-700 mb-6 leading-relaxed cursor-default">
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-                  <div className="mt-auto">
-                    <p className="font-medium text-black text-base cursor-default">{testimonial.author}</p>
-                    <p className="text-sm text-neutral-500 cursor-default">{testimonial.role}, {testimonial.company}</p>
-                  </div>
-                </div>
-              ))}
-              {/* Bottom spacer to allow last card to center */}
-              <div className="flex-shrink-0" style={{ height: 'calc(50% - 140px)' }} aria-hidden="true" />
-              </div>
-            </div>
+                <span className="text-neutral-800">&ldquo;{featured.lead}</span>
+                <span className="text-[#767B83]">{rest}&rdquo;</span>
+              </blockquote>
+              <Attribution t={featured} size={44} />
+            </figure>
+          </Reveal>
 
-            {/* Scroll Indicators */}
-            <div className="flex flex-col gap-2 px-2.5 md:px-6">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => scrollToCard(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === activeIndex 
-                      ? 'bg-blue-500 scale-125' 
-                      : 'bg-neutral-400 hover:bg-neutral-500'
-                  }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
-                />
-              ))}
-            </div>
+          <HRule />
+          {shown.map((row) => (
+            <Reveal key={row[0].author}>
+              <Row items={row} />
+              <HRule />
+            </Reveal>
+          ))}
+
+          {/* The rest, on request: the page scrolls as normal throughout */}
+          <AnimatePresence initial={false}>
+            {open && (
+              <motion.div
+                id="more-testimonials"
+                key="more"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { height: { duration: 0.6, ease: EASE_OUT }, opacity: { duration: 0.4 } }}
+                className="overflow-hidden"
+              >
+                {more.map((row) => (
+                  <div key={row[0].author}>
+                    <Row items={row} />
+                    <HRule />
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex justify-center px-2.5 py-8 sm:py-10">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              data-track="testimonials_expand"
+              data-track-once
+              aria-expanded={open}
+              aria-controls="more-testimonials"
+              className="group flex h-10 items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 text-[14px] font-medium text-neutral-800 transition-colors hover:border-neutral-400"
+            >
+              {open ? "Show fewer" : `Read ${moreCount} more`}
+              <ChevronDown
+                aria-hidden
+                className={`h-4 w-4 text-neutral-500 transition-transform duration-500 ease-out ${open ? "rotate-180" : ""}`}
+              />
+            </button>
           </div>
         </InnerContainer>
       </OuterContainer>
-      
-      <div className="w-full line-dash-x"/>
+
+      <div aria-hidden className="line-dash-x" />
     </Section>
   );
 }

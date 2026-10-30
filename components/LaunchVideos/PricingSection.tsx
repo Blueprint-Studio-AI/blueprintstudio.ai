@@ -6,9 +6,12 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight, Check } from "lucide-react";
 
+import { useGoToSection } from "@/components/nav/shared";
 export default function PricingSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section data-section="pricing" className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -88,12 +91,11 @@ export default function PricingSection() {
                 {/* CTA */}
                 <button
                   className="w-full py-3 px-6 font-medium flex items-center justify-center bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 text-sm group"
-                  onClick={() =>
-                    window.open(
-                      "https://cal.com/tyler-stupart/intro-call",
-                      "_blank"
-                    )
-                  }
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="#contact"
+                  data-track-plan="fast"
+                  onClick={() => goToSection("contact")}
                 >
                   <span>Book a Call</span>
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -139,12 +141,11 @@ export default function PricingSection() {
                 {/* CTA */}
                 <button
                   className="w-full py-3 px-6 font-medium flex items-center justify-center bg-white text-black border border-neutral-300 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all duration-200 text-sm group"
-                  onClick={() =>
-                    window.open(
-                      "https://cal.com/tyler-stupart/intro-call",
-                      "_blank"
-                    )
-                  }
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="#contact"
+                  data-track-plan="studio"
+                  onClick={() => goToSection("contact")}
                 >
                   <span>Get Quote</span>
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

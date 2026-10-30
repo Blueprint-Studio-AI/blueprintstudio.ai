@@ -90,6 +90,7 @@ const Socials = ({ className = "" }: { className?: string }) => (
           target="_blank"
           rel="noopener noreferrer"
           aria-label={s.label}
+          data-track="nav_click"
           className="text-neutral-600 transition-colors duration-200 hover:text-neutral-400"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -128,6 +129,8 @@ export default function Footer() {
     <footer
       ref={ref}
       id="footer"
+      data-section="footer"
+      data-track-menu="footer"
       className="relative w-full bg-neutral-900 text-neutral-400"
       // Blueprint's footer, in Blueprint's face (Inter, from the root layout), not
       // the brand's: inside .brand-kit-root everything else inherits the client's
@@ -138,10 +141,11 @@ export default function Footer() {
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:left-[60px]" />
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-2.5 w-px bg-[repeating-linear-gradient(to_bottom,rgb(64_64_64)_0_6px,transparent_6px_12px)] md:right-[60px]" />
 
-      {/* wordmark — natural height, as the site renders it */}
+      {/* wordmark — natural height, as the site renders it; on a phone narrower than
+          it (46px tall is 349px wide), it shrinks to fit inside the padding */}
       <div className={`${PAD} pt-16 md:pt-28`}>
-        <a href="https://blueprintstudio.ai" aria-label="Blueprint Studio" className="inline-block">
-          <BlueprintWordmark className="h-[46px] md:h-[84px]" />
+        <a href="https://blueprintstudio.ai" aria-label="Blueprint Studio" data-track="nav_click" data-track-item="logo" className="inline-block">
+          <BlueprintWordmark className="h-[min(46px,calc((100vw_-_40px)*46/349))] md:h-[84px]" />
         </a>
       </div>
 
@@ -157,6 +161,7 @@ export default function Footer() {
                     <a
                       href={link.href}
                       {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      data-track="nav_click"
                       className="flex w-fit items-center gap-1 text-sm text-neutral-500 transition-colors duration-200 hover:text-neutral-300"
                     >
                       {link.name}
@@ -194,6 +199,7 @@ export default function Footer() {
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-track="nav_click"
                 className="text-sm tracking-[-0.02em] text-neutral-600 transition-colors hover:text-neutral-400"
               >
                 {l.name}

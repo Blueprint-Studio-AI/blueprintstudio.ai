@@ -2,8 +2,11 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Tokenworks | Blueprint Studio',
+  title: 'Tokenworks', // the root layout's template adds " | Blueprint Studio"
   description: 'Tokenworks Task Page for Blueprint Studio',
+  // A client's task form, not a page for search results.
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/clients/tokenworks/tasks' }, // not the root layout's '/'
   openGraph: {
     title: 'Tokenworks | Blueprint Studio',
     description: 'Tokenworks Task Page for Blueprint Studio',

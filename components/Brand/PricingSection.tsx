@@ -46,7 +46,7 @@ export default function PricingSection() {
   const launchRingInView = useInView(launchRingRef);
 
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
+    <Section data-section="pricing" className="flex flex-col relative z-20 bg-neutral-50 overflow-hidden">
       <SectionHeader leftText="PRICING" rightText="// investment" divider={false} />
 
       <OuterContainer className="flex-1 flex items-center">
@@ -74,7 +74,7 @@ export default function PricingSection() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                25+ tech founders
+                30+ founders
               </strong>{" "}
               across AI, Web3, and YC.
             </SocialProof>
@@ -191,6 +191,9 @@ export default function PricingSection() {
 
                         <button
                           onClick={() => toggleAddon(card.id)}
+                          data-track="package_addon"
+                          data-track-addon={card.id}
+                          data-track-added={!added}
                           className={`mt-8 flex w-full items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] py-4 text-[16px] font-medium tracking-[-0.32px] transition-colors cursor-pointer ${
                             added
                               ? "border-[#186FF5] bg-white text-[#186FF5]"
@@ -258,6 +261,8 @@ export default function PricingSection() {
             >
               <Link
                 href="/launch"
+                data-track="cta_click"
+                data-track-cta="package"
                 className="group inline-flex items-center gap-1.5 px-8 py-3 text-sm font-medium text-black rounded-[calc(0.75rem-2px)] bg-neutral-50 transition-colors hover:text-neutral-700"
               >
                 See full launch package

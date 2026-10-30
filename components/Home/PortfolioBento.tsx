@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -8,9 +8,35 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { Pause, Play } from "lucide-react";
 import { portfolioProjects, type PortfolioProject, type MediaAsset, type ShowcaseMedia } from "@/data/portfolioData";
 
-const portfolioSections = [
-  ...portfolioProjects
-];
+// Off the home page for now, to keep it shorter; their portfolio pages stay up.
+const HIDDEN_ON_HOME = ['tokenworks', 'breeze'];
+const portfolioSections = portfolioProjects.filter((p) => !HIDDEN_ON_HOME.includes(p.id));
+
+// Portfolio videos stay unloaded until the hero reel has landed (it sends
+// "bp:opening-landed"), so they don't compete with it. Then they load in page
+// order, two at a time. A card that comes near the screen after that loads
+// straight away.
+type Waiter = { start: () => boolean; started: boolean }; // start: false if it took no slot
+const waiting: Waiter[] = [];
+const MAX_LOADING = 2;
+let released = false;
+let loading = 0;
+
+function pump() {
+  while (released && loading < MAX_LOADING) {
+    const next = waiting.find((w) => !w.started);
+    if (!next) return;
+    next.started = true;
+    if (next.start()) loading++;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('bp:opening-landed', () => {
+    released = true;
+    pump();
+  }, { once: true });
+}
 
 interface MediaCardProps {
   media: MediaAsset | ShowcaseMedia;
@@ -26,6 +52,61 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const slotRef = useRef(false); // holds one of the MAX_LOADING slots
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || media.type !== 'video') return;
+    const waiter: Waiter = {
+      started: false,
+      start: () => {
+        // The phone or desktop copy that's hidden at this width: leave it to the
+        // observer below, which loads it if a resize ever shows it.
+        if (card.getClientRects().length === 0) {
+          waiter.started = false;
+          waiting.splice(waiting.indexOf(waiter), 1);
+          return false;
+        }
+        slotRef.current = true;
+        setShouldLoad(true);
+        return true;
+      },
+    };
+    waiting.push(waiter);
+    pump();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        if (waiter.started) return;
+        // Near the screen while the reel is still landing (the first card sits
+        // just under it): first in line, but it still waits for the reel.
+        if (!released) {
+          waiting.splice(waiting.indexOf(waiter), 1);
+          waiting.unshift(waiter);
+          return;
+        }
+        waiter.started = true; // jumps the queue without taking a slot
+        setShouldLoad(true);
+      },
+      { rootMargin: '100% 0px' }
+    );
+    observer.observe(card);
+    return () => {
+      observer.disconnect();
+      if (waiting.includes(waiter)) waiting.splice(waiting.indexOf(waiter), 1);
+    };
+  }, [media.type]);
+
+  // Buffered enough (or gave up): hand the slot to the next video.
+  const freeSlot = () => {
+    if (!slotRef.current) return;
+    slotRef.current = false;
+    loading--;
+    pump();
+  };
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +125,7 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   const scaleClass = ''; // Hover effect disabled
 
   return (
-    <div className="relative cursor-default">
+    <div ref={cardRef} className="relative cursor-default">
       <div className="group relative">
         <div
           className="bg-neutral-200 absolute left-0 top-0 w-full rounded-md"
@@ -60,18 +141,20 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
               >
                 <video
                   ref={videoRef}
+                  src={shouldLoad ? media.src : undefined}
                   autoPlay
                   loop
                   playsInline
                   muted
-                  poster={media.poster}
+                  preload="none"
+                  poster={shouldLoad ? media.poster : undefined}
+                  onCanPlayThrough={freeSlot}
+                  onSuspend={freeSlot}
+                  onError={freeSlot}
                   className={`pointer-events-none h-full w-full object-cover transition-transform duration-300 ${scaleClass}`}
                   onMouseEnter={() => setShowControls(true)}
                   onMouseLeave={() => setShowControls(false)}
-                >
-                  <source src={media.src} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                />
                 {featured && (
                   <button
                     type="button"
@@ -122,27 +205,21 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   );
 }
 
-export default function PortfolioBento() {
-  const textRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [spacerHeights, setSpacerHeights] = useState<number[]>(
-    portfolioProjects.map(() => 100)
+// A featured project's title and description, under its media on desktop.
+function FeaturedText({ project }: { project: PortfolioProject }) {
+  return (
+    <div className="text-black relative w-full pt-8">
+      <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
+        {project.title}
+      </div>
+      <p className="text-neutral-600 text-base cursor-default">
+        {project.description}
+      </p>
+    </div>
   );
+}
 
-  const measureHeights = useCallback(() => {
-    const heights = textRefs.current.map((ref) => {
-      if (!ref || ref.offsetHeight === 0) return 100;
-      // spacer needs to match text height minus the space-y-6 gap (24px)
-      return Math.max(0, ref.offsetHeight - 24);
-    });
-    setSpacerHeights(heights);
-  }, []);
-
-  useEffect(() => {
-    measureHeights();
-    window.addEventListener("resize", measureHeights);
-    return () => window.removeEventListener("resize", measureHeights);
-  }, [measureHeights]);
-
+export default function PortfolioBento() {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100">
       {/* Background lines matching existing portfolio */}
@@ -177,8 +254,8 @@ export default function PortfolioBento() {
 
         {/* Render all project sections sequentially */}
         <div className="w-full max-w-[1000px]">
-          {portfolioProjects.map((project, sectionIndex) => (
-            <div key={project.id} className="w-full">
+          {portfolioSections.map((project, sectionIndex) => (
+            <div key={project.id} data-section={`work_${project.id}`} className="w-full">
               {sectionIndex > 0 && (
                 <div className="w-full line-dash-x" />
               )}
@@ -224,17 +301,7 @@ export default function PortfolioBento() {
                             featured
                             imageOnly
                           />
-                          <div
-                            ref={(el) => { textRefs.current[sectionIndex] = el; }}
-                            className="text-black relative w-full pt-8"
-                          >
-                            <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
-                              {project.title}
-                            </div>
-                            <p className="text-neutral-600 text-base cursor-default">
-                              {project.description}
-                            </p>
-                          </div>
+                          <FeaturedText project={project} />
                         </div>
                       </div>
                     </div>
@@ -247,8 +314,18 @@ export default function PortfolioBento() {
                             <MediaCard media={item} aspectRatio="1/1" imageOnly />
                           </div>
                         ))}
-                        {/* Spacer matches featured text height so showcase bottoms align with featured media bottom */}
-                        <div style={{ height: spacerHeights[sectionIndex] ?? 100 }} />
+                        {/* Spacer as tall as the featured text, so the showcase bottoms align with
+                            the featured media's: an unseen copy of the text at the featured column's
+                            width (3 columns and 2 gaps, laid over it). Right from the first paint;
+                            measured after load, it moved everything below by up to 120px. */}
+                        <div
+                          aria-hidden
+                          data-nosnippet
+                          className="invisible"
+                          style={{ width: "calc(300% + 48px)", marginLeft: "calc(-300% - 72px)", marginTop: 0 }}
+                        >
+                          <FeaturedText project={project} />
+                        </div>
                       </div>
                     </div>
                   </div>

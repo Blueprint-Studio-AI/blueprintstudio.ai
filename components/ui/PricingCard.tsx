@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 
+import { useGoToSection } from "@/components/nav/shared";
 export function FeatureRow({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="flex items-center gap-4">
@@ -71,6 +72,8 @@ export function PricingFooter({
 }
 
 export function GradientCTAButton() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   return (
     <motion.button
       // Figma primary-button spec (keep in sync with ui/GradientButton):
@@ -88,12 +91,10 @@ export function GradientCTAButton() {
         stiffness: 500,
         damping: 30,
       }}
-      onClick={() =>
-        window.open(
-          "https://cal.com/tyler-stupart/intro-call",
-          "_blank"
-        )
-      }
+      onClick={() => goToSection("contact")}
+      data-track="cta_click"
+      data-track-cta="book_call"
+      data-track-href="#contact"
     >
       {/* Static sheen — animating backgroundPosition here was a no-op (no
           backgroundSize set, so nothing moved) yet repainted every frame. */}

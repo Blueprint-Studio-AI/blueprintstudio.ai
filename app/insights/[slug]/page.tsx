@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return {};
 
   return {
-    title: `${post.title} | Blueprint Studio`,
+    title: post.title, // the root layout's template adds " | Blueprint Studio"
     description: post.description,
     alternates: {
       canonical: `/insights/${post.slug}`,

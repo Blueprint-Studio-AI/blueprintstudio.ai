@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
+import { useCalBookings } from "@/lib/analytics/cal";
 
 const Cal = dynamic(
   () => import("@calcom/embed-react").then((mod) => mod.default),
@@ -24,6 +25,7 @@ const Cal = dynamic(
 );
 
 export default function CTASection() {
+  useCalBookings("brand-call");
   useEffect(() => {
     (async function () {
       const { getCalApi } = await import("@calcom/embed-react");
@@ -41,7 +43,7 @@ export default function CTASection() {
   }, []);
 
   return (
-    <Section className="relative bg-[#fafaf9] overflow-hidden">
+    <Section id="contact" data-section="booking" className="relative bg-[#fafaf9] overflow-hidden">
       {/* Solid vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">

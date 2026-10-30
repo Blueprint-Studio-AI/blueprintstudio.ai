@@ -130,6 +130,9 @@ export default function ColorSystem() {
                   <span className="text-label uppercase text-muted-2">{k}</span>
                   <button
                     onClick={(e) => copyText(v, e.currentTarget)}
+                    data-track="copy"
+                    data-track-what={k.toLowerCase()}
+                    data-track-copied={v}
                     className="group inline-flex w-fit items-center gap-3"
                   >
                     <span className="text-value text-ink group-hover:underline group-hover:underline-offset-[3px]">

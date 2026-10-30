@@ -75,6 +75,8 @@ export default function AgentDoc() {
           ref={btn}
           onClick={copy}
           disabled={!text}
+          data-track="copy"
+          data-track-what="design_md"
           className="inline-flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-nav-surface px-6 text-label text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-default disabled:opacity-45"
         >
           {state === "copied" ? (

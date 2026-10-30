@@ -4,11 +4,14 @@
 // lives inside the main app, it posts to the real same-origin /api/subscribe.
 import { useRef, useState } from "react";
 import { useTurnstileToken } from "@/lib/use-turnstile";
+import { track } from "@/lib/analytics/track";
+import { useBrand } from "@/components/brands/kit/BrandContext";
 
 const ENDPOINT = "/api/subscribe";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Newsletter() {
+  const { slug } = useBrand();
   const [email, setEmail] = useState("");
   const [nlCheck, setNlCheck] = useState(""); // honeypot: hidden, and named so browser autofill leaves it alone
   const mountedAtRef = useRef(Date.now());
@@ -21,25 +24,31 @@ export default function Newsletter() {
     if (!EMAIL_RE.test(email)) {
       setError("Enter a valid email");
       setStatus("error");
+      track("form_submit", { form: "newsletter", ok: false, reason: "invalid_email", section: "footer" });
       return;
     }
     setStatus("loading");
     setError("");
+    let code = 0; // the reply's HTTP status, for form_submit's reason when it fails
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          source: "jinba_footer_newsletter",
+          // Which brand page the sign-up came from (it was "jinba_footer_newsletter" on every one).
+          source: `brands_${slug}_footer_newsletter`,
           nlCheck,
           elapsedMs: Date.now() - mountedAtRef.current,
           turnstileToken,
         }),
       });
+      code = res.status;
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Subscription failed");
       setStatus("done");
+      track("form_submit", { form: "newsletter", ok: true, section: "footer" });
     } catch (err) {
+      track("form_submit", { form: "newsletter", ok: false, reason: code ? `http_${code}` : "network", section: "footer" });
       setError(err instanceof Error ? err.message : "Failed to subscribe");
       setStatus("error");
     }

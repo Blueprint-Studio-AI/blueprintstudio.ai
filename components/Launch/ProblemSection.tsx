@@ -10,6 +10,7 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import GreenCheckmark from "@/components/ui/GreenCheckmark";
 
+import { useGoToSection } from "@/components/nav/shared";
 const comparison = [
   { typical: "3-4 Vendors", blueprint: "1 Unified Team" },
   { typical: "8-12 Weeks", blueprint: "6 Weeks" },
@@ -18,8 +19,10 @@ const comparison = [
 ];
 
 export default function ProblemSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="problem" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Vertical lines */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -74,7 +77,10 @@ export default function ProblemSection() {
               <div className="pt-2">
                 <GradientButton
                   className="w-full justify-center"
-                  onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
+                  onClick={() => goToSection("contact")}
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="#contact"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -135,7 +141,10 @@ export default function ProblemSection() {
               <div className="py-4 sm:py-5 px-3 sm:px-6 relative z-10">
                 <GradientButton
                   className="w-full justify-center"
-                  onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
+                  onClick={() => goToSection("contact")}
+                  data-track="cta_click"
+                  data-track-cta="book_call"
+                  data-track-href="#contact"
                 >
                   Book a Call
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

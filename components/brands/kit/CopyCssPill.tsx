@@ -43,6 +43,8 @@ export default function CopyCssPill() {
     <Button
       ref={ref}
       variant="pill"
+      data-track="copy"
+      data-track-what="css"
       onClick={async () => {
         const ok = await copyText(stylesheet(brand), ref.current);
         toast(ok ? "Copied the type stylesheet" : "Couldn’t copy — check clipboard permissions");

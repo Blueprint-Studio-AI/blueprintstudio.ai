@@ -2,12 +2,17 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { FloatingNavNew } from "@/components/FloatingNavNew";
+import { TopNav } from "@/components/TopNav";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Toaster } from "@/components/ui/toaster"
 import Background from "@/components/ui/Background";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { FirstPartyAnalytics } from "@/lib/analytics/FirstPartyAnalytics"
 import { Analytics } from "@vercel/analytics/next"
 import { SmoothScrollProvider } from "@/components/SmoothScroll"
+import { introScript } from "@/lib/intro"
+import { reelStillScript } from "@/lib/reel"
+import { AnalyticsEvents } from "@/lib/analytics/AnalyticsEvents"
+import { FIRST_PARTY } from "@/lib/analytics/track"
 
 const inter = Inter({
   subsets: ['latin'],
@@ -50,12 +55,24 @@ export const metadata: Metadata = {
     title: 'Blueprint Studio · World-Class Design & Development Solutions',
     description:
       "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
+    // The reel's closing frame, and its first 8 seconds for the apps that play
+    // a clip in the preview (iMessage); everywhere else shows the picture.
     images: [
       {
-        url: 'https://blueprintstudio.ai/og-image.jpg',
+        url: '/og/blueprint-studio.jpg',
         width: 1200,
         height: 630,
         alt: 'Blueprint Studio',
+      },
+    ],
+    videos: [
+      {
+        // In full: Next resolves images against metadataBase, but not videos.
+        url: 'https://blueprintstudio.ai/og/blueprint-studio-reel.mp4',
+        secureUrl: 'https://blueprintstudio.ai/og/blueprint-studio-reel.mp4',
+        type: 'video/mp4',
+        width: 1280,
+        height: 720,
       },
     ],
   },
@@ -68,9 +85,7 @@ export const metadata: Metadata = {
       'Blueprint Studio · World-Class Design & Development Solutions',
     description:
       "Blueprint Studio is a premier creative studio known for its world-class product design, branding, web design, and AI engineering.",
-    images: [
-      'https://blueprintstudio.ai/og-image.jpg'
-    ],
+    images: ['/og/blueprint-studio.jpg'],
   },
 
   /* TODO: Add when verification tokens are ready
@@ -131,6 +146,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Before the first paint: skip the home page's opening on a return visit (lib/intro). */}
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
+        {/* Then, coming back to the home page, the reel's last frame under the film until it's cued (lib/reel). */}
+        <script dangerouslySetInnerHTML={{ __html: reelStillScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -147,6 +166,7 @@ export default function RootLayout({
       <body className={`relative min-h-screen overflow-x-hidden antialiased ${inter.className}`}>
         <SmoothScrollProvider>
           <Background />
+          <TopNav />
           <FloatingNavNew />
           <main>
             {children}
@@ -154,7 +174,9 @@ export default function RootLayout({
           </main>
         </SmoothScrollProvider>
         <Analytics />
-        <SpeedInsights />
+        {/* Page views and web vitals for our own analytics (lib/analytics), once it's switched on; replaces Speed Insights, off since September. */}
+        {FIRST_PARTY && <FirstPartyAnalytics />}
+        <AnalyticsEvents />
         {/* The ID is only set on Vercel; without it, gtag.js would load as id=undefined. */}
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
       </body>

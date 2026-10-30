@@ -27,7 +27,7 @@ const achievements = [
 export default function Achievements() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   return (
-    <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
+    <Section data-section="edge" className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
       {/* Artificial vertical lines to match the background */}
       <div className="absolute inset-0 flex justify-center pointer-events-none px-2.5 sm:px-[60px]">
         <div className="w-full flex-1 flex justify-center relative">
@@ -69,7 +69,7 @@ export default function Achievements() {
                    lineHeight: '110%',
                    letterSpacing: '-0.5px'
                  }}>
-                We&apos;re really f*cking good at what we do.
+                We&apos;re unreasonably good at what we do.
               </p>
             </div>
           </div>

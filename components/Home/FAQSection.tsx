@@ -51,6 +51,9 @@ function FaqItem({ question, answer, isLast = false }: FaqItemProps) {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        data-track="faq_open"
+        data-track-question={question}
+        data-track-once
         className="w-full flex justify-between items-start py-6 text-left group"
         aria-expanded={isOpen}
       >

@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | Blueprint Studio',
+  title: 'Terms & Conditions', // the root layout's template adds " | Blueprint Studio"
   description: 'Terms and Conditions for Blueprint Studio',
   // Legal boilerplate: keep it out of search results but let link equity flow.
   robots: { index: false, follow: true },
