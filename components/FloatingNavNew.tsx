@@ -20,6 +20,7 @@ import {
     SERVICES,
     SPRING,
     isNavHidden,
+    onServiceClick,
     useActiveSection,
     useGoToSection,
     useNavReveal,
@@ -178,7 +179,10 @@ export const FloatingNavNew = () => {
                                 <motion.li key={service.key} variants={ROW}>
                                     <Link
                                         href={service.href}
-                                        onClick={() => setOpen(false)}
+                                        onClick={(e) => {
+                                            setOpen(false);
+                                            onServiceClick(e, service.href, go);
+                                        }}
                                         data-track="nav_click"
                                         data-track-item={service.label}
                                         data-track-group="services"

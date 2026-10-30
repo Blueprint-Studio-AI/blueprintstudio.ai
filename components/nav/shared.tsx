@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, type Transition } from "framer-motion";
 import { useSmoothScroll } from "@/components/SmoothScroll";
-import { VARIANTS, type VariantKey } from "@/components/Home/HeroSelector";
+import { VARIANTS, variantFromUrl, type VariantKey } from "@/components/Home/HeroSelector";
 import { assetGeneratorUrl } from "@/lib/asset-generator";
 
 // What both navs share: where they're hidden, the sections and services they
@@ -66,6 +66,25 @@ export const SERVICES = (
     const variant = VARIANTS.find((v) => v.key === service.key)!;
     return { ...service, label: variant.label, still: variant.still, menuStill: service.menuStill ?? variant.still };
 });
+
+/**
+ * A service link's click. From another page, /?for=apps#work loads home on that
+ * word. On the home page it's a soft navigation to the same page, and the hero
+ * reads ?for= only as it mounts, so there the click picks the word itself, with
+ * the "bp:variant" event the hero and Featured Work follow, and goes to the
+ * section. The address stays as it is: Google Analytics counts each history
+ * change as a page view.
+ */
+export function onServiceClick(e: React.MouseEvent, href: string, goTo: (id: string) => void) {
+    const url = new URL(href, window.location.href);
+    const key = variantFromUrl(url.search);
+    if (!key || url.pathname !== "/" || window.location.pathname !== "/") return;
+    // A modified click opens a new tab, as it does on any link.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent("bp:variant", { detail: { key, source: "nav" } }));
+    if (url.hash) goTo(url.hash.slice(1));
+}
 
 // The industries we have a page for. Each is a card: a line on what we make
 // there, and a few of the clients (from lib/industries on its page's branch).
