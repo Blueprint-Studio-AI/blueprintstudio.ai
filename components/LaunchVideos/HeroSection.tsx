@@ -7,7 +7,10 @@ import InnerContainer from "@/components/ui/InnerContainer";
 import { ArrowUpRight } from "lucide-react";
 import SocialProof from "@/components/ui/SocialProof";
 
+import { useGoToSection } from "@/components/nav/shared";
 export default function HeroSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -92,13 +95,8 @@ export default function HeroSection() {
                 className="w-fit py-3 px-6 font-medium flex items-center justify-center bg-black text-white rounded-lg hover:bg-neutral-800 transition-all duration-200 text-sm group"
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/tyler-stupart/intro-call"
-                onClick={() =>
-                  window.open(
-                    "https://cal.com/tyler-stupart/intro-call",
-                    "_blank"
-                  )
-                }
+                data-track-href="#contact"
+                onClick={() => goToSection("contact")}
               >
                 <span>Book a Call</span>
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

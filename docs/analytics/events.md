@@ -54,7 +54,7 @@ and numbers; `ok` and `added` arrive as `"true"`/`"false"`.
 | `nav_menu_open` | The Services or Products menu opens (hover, click or keys), or the phone's menu sheet. Once per menu per page view. | `item` (`services`, `products`, `industries`, `menu`), `menu` (`top`, `floating`) | `TopNav.tsx` (`show`), `FloatingNavNew.tsx` | — |
 | `hero_menu_open` | The visitor engages with the hero's word picker: a word's preview held for 0.4s (desktop), or the first pick (any device). Once per page view. See the open question below. | `via` (`peek`, `pick`), `variant` (the first word) | `components/Home/Hero.tsx` | — |
 | `hero_variant` | A word is picked or unpicked. | **`variant`** (`apps`, `websites`, `brands`, `launch-videos`, `everything`), `via` (`word`, or `reset` for a click on the hero's background) | `Hero.tsx` | — |
-| `cta_click` | A call to action. | **`cta`**: `book_call` (anything that books: the cal.com tab or the on-page calendar), `secondary` (the hero's second button), `primary`/`secondary` (other non-booking pairs, such as Asset Generator's), `package` (a package page). **`label`**, **`href`** (a link off the site without its query), **`section`**, **`variant`** (the picked word, hero only). Also `plan` (`partnership`, `project`, `fast`, `studio`) where there's a choice. The nav's Book a call has `section` `nav`, with `menu` and `shape`. | Hero, nav (`components/nav/shared.tsx`), home pricing and Asset Generator band, the `/brand`, `/launch` and `/launch-videos` heroes, pricing and problem sections, `ui/PricingCard.tsx` | Optional: `book_call` clicks, see below |
+| `cta_click` | A call to action. | **`cta`**: `book_call` (anything that books: they all scroll to the page's own calendar, `href` `#contact`), `secondary` (the hero's second button), `primary`/`secondary` (other non-booking pairs, such as Asset Generator's), `package` (a package page). **`label`**, **`href`** (a link off the site without its query), **`section`**, **`variant`** (the picked word, hero only). Also `plan` (`partnership`, `project`, `fast`, `studio`) where there's a choice. The nav's Book a call has `section` `nav`, with `menu` and `shape`. | Hero, nav (`components/nav/shared.tsx`), home pricing and Asset Generator band, the `/brand`, `/launch` and `/launch-videos` heroes, pricing and problem sections, `ui/PricingCard.tsx` | Optional: `book_call` clicks, see below |
 | `reel_open` | The hero reel goes fullscreen. Once per page view. | `via` (`click`, `keyboard`) | `Hero.tsx` | — |
 | `reel_close` | It closes (button, Escape or backdrop). Once per page view. | `seconds` fullscreen | `Hero.tsx` | — |
 | `reel_progress` | 25, 50, 75 and 100% of one pass of the reel seen: seconds played while it's at least half on screen, in a visible tab, and not covered by a picked word's clip. Each once per page view. | **`percent`** | `Hero.tsx` | — |
@@ -262,8 +262,7 @@ In Cal.com (app.cal.com, signed in as Tyler: the site books into cal.com/tyler-s
    network panel no request to `google-analytics.com` should come from
    `app.cal.com`.
 
-After that, `booking_made` counts bookings made in the embeds. Bookings made
-in a cal.com tab (the "Book a call" buttons on `/brand`, `/launch`,
-`/launch-videos` and home pricing open one) aren't seen at all. To count them
-too, either point those buttons at the page's own calendar, or send Cal's
-booking webhooks to our collector.
+After that, `booking_made` counts bookings made in the embeds. Every "Book a
+call" on the site now scrolls to its page's own calendar (since 30 October;
+they used to open a cal.com tab), so only someone who opens cal.com directly
+books unseen. To count those too, send Cal's booking webhooks to our collector.

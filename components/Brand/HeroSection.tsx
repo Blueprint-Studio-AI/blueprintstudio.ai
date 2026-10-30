@@ -11,7 +11,10 @@ import GradientText from "@/components/ui/GradientText";
 import SocialProof from "@/components/ui/SocialProof";
 import HeroCardCarousel from "./HeroCardCarousel";
 
+import { useGoToSection } from "@/components/nav/shared";
 export default function HeroSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   // No z-index on the section: the DepthSection's thumbprints rise up behind
   // the card row (above this section's background, below the carousel itself).
   const reduce = useReducedMotion();
@@ -92,7 +95,7 @@ export default function HeroSection() {
                 <GradientButton
                   data-track="cta_click"
                   data-track-cta="book_call"
-                  data-track-href="https://cal.com/tyler-stupart/intro-call"
+                  data-track-href="#contact"
                   // Figma "Book a call" spec: 52px tall, 12px radius, 16px text,
                   // 86px side padding (→ ~271px wide), 12px gap to the arrow.
                   style={{
@@ -102,9 +105,7 @@ export default function HeroSection() {
                     borderRadius: 12,
                     fontSize: 16,
                   }}
-                  onClick={() =>
-                    window.open("https://cal.com/tyler-stupart/intro-call", "_blank")
-                  }
+                  onClick={() => goToSection("contact")}
                 >
                   Book a call
                   <ArrowUpRight className="w-4 h-4 ml-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

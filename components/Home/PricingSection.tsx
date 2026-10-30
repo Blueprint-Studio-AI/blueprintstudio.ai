@@ -8,6 +8,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSmoothScroll } from "@/components/SmoothScroll";
 
+import { useGoToSection } from "@/components/nav/shared";
 // Where a project can start from. Prices live on each page; the home page only
 // gives the "from" number.
 const projectLinks = [
@@ -23,6 +24,8 @@ const GreenCheckIcon = () => (
 );
 
 export default function PricingSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   const { scroll } = useSmoothScroll();
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100 overflow-hidden">
@@ -192,10 +195,10 @@ export default function PricingSection() {
                   stiffness: 500,
                   damping: 30
                 }}
-                onClick={() => window.open('https://cal.com/tyler-stupart/intro-call', '_blank')}
+                onClick={() => goToSection("contact")}
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/tyler-stupart/intro-call"
+                data-track-href="#contact"
                 data-track-plan="partnership"
               >
                 {/* Shader-like animated gradient */}

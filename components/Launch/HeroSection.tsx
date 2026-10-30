@@ -11,6 +11,7 @@ import GradientText from "@/components/ui/GradientText";
 import DeliverablePill from "@/components/ui/DeliverablePill";
 import SocialProof from "@/components/ui/SocialProof";
 
+import { useGoToSection } from "@/components/nav/shared";
 const deliverables = [
   { num: "01", label: "Brand" },
   { num: "02", label: "Website" },
@@ -74,6 +75,8 @@ function ImageTicker() {
 }
 
 export default function HeroSection() {
+  // Book a call goes to this page's own calendar (#contact), where bookings are counted.
+  const goToSection = useGoToSection();
   return (
     <Section data-section="hero" className="relative z-20 bg-neutral-50 overflow-hidden min-h-fit">
       {/* Vertical lines */}
@@ -123,8 +126,8 @@ export default function HeroSection() {
                 className="w-full"
                 data-track="cta_click"
                 data-track-cta="book_call"
-                data-track-href="https://cal.com/tyler-stupart/intro-call"
-                onClick={() => window.open("https://cal.com/tyler-stupart/intro-call", "_blank")}
+                data-track-href="#contact"
+                onClick={() => goToSection("contact")}
               >
                 Book a Call
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
