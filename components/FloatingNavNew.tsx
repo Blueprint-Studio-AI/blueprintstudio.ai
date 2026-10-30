@@ -113,6 +113,8 @@ export const FloatingNavNew = () => {
         <motion.div variants={ROW}>
             <Link
                 href={href}
+                data-track="nav_click"
+                data-track-item={label}
                 onClick={(e) => {
                     if (!onGo) return setOpen(false);
                     e.preventDefault();
@@ -162,6 +164,7 @@ export const FloatingNavNew = () => {
                     {/* The sheet, laid out at its full size from the start so nothing reflows as the shape grows around it */}
                     <motion.div
                         ref={sheetRef}
+                        data-track-menu="mobile"
                         className="absolute left-1/2 -translate-x-1/2 overflow-y-auto p-2"
                         style={{ bottom: PILL_H, width: size.sheetW, maxHeight: "calc(100svh - 120px)" }}
                         initial={false}
@@ -176,6 +179,9 @@ export const FloatingNavNew = () => {
                                     <Link
                                         href={service.href}
                                         onClick={() => setOpen(false)}
+                                        data-track="nav_click"
+                                        data-track-item={service.label}
+                                        data-track-group="services"
                                         className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
                                     >
                                         <span className="relative h-9 w-[54px] shrink-0">
@@ -195,6 +201,9 @@ export const FloatingNavNew = () => {
                                 <Link
                                     href={industry.href}
                                     onClick={() => setOpen(false)}
+                                    data-track="nav_click"
+                                    data-track-item={industry.label}
+                                    data-track-group="industries"
                                     className={`flex items-center gap-3 rounded-2xl px-3 py-2 active:bg-black/[0.04] ${FOCUS}`}
                                 >
                                     <span className="min-w-0 flex-1">
@@ -211,6 +220,9 @@ export const FloatingNavNew = () => {
                                 target="_blank"
                                 rel="noopener"
                                 onClick={() => setOpen(false)}
+                                data-track="nav_click"
+                                data-track-item={ASSET_GENERATOR.label}
+                                data-track-group="products"
                                 className={`flex items-center gap-3 rounded-2xl p-1.5 pr-3 active:bg-black/[0.04] ${FOCUS}`}
                             >
                                 <span className="relative h-9 w-[54px] shrink-0 overflow-hidden rounded-[8px] bg-neutral-100">
@@ -234,6 +246,8 @@ export const FloatingNavNew = () => {
                                 <a
                                     key={link.id}
                                     href={`/#${link.id}`}
+                                    data-track="nav_click"
+                                    data-track-item={link.label}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         go(link.id);
@@ -247,7 +261,7 @@ export const FloatingNavNew = () => {
                     </motion.div>
 
                     {/* The pill's own row, which stays at the bottom edge as the shape grows */}
-                    <div ref={rowRef} className="absolute inset-x-0 bottom-0 flex h-14 items-center justify-between gap-1 px-1.5">
+                    <div ref={rowRef} data-track-menu="floating" className="absolute inset-x-0 bottom-0 flex h-14 items-center justify-between gap-1 px-1.5">
                         <div className="flex shrink-0 items-center gap-1">
                             <motion.a
                                 href="/"
@@ -259,6 +273,8 @@ export const FloatingNavNew = () => {
                                 whileTap={{ scale: 0.94 }}
                                 transition={SPRING.press}
                                 ref={logoRef}
+                                data-track="nav_click"
+                                data-track-item="logo"
                                 aria-label="Blueprint Studio"
                                 className={`flex h-11 items-center rounded-full px-3 active:bg-black/[0.05] ${FOCUS}`}
                             >
@@ -268,6 +284,9 @@ export const FloatingNavNew = () => {
                                 type="button"
                                 aria-expanded={open}
                                 onClick={() => setOpen((o) => !o)}
+                                data-track="nav_menu_open"
+                                data-track-item="menu"
+                                data-track-once
                                 whileTap={{ scale: 0.97 }}
                                 transition={SPRING.press}
                                 className={`flex h-11 items-center gap-2 rounded-full pl-3 pr-4 text-[15px] font-medium text-[rgba(28,28,30,0.9)] active:bg-black/[0.05] ${FOCUS}`}

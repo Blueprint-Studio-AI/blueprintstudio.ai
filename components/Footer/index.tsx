@@ -54,7 +54,8 @@ export function Footer() {
   const iconStyle = "text-neutral-600 hover:text-neutral-500 transition-colors duration-200"
 
   return (
-    <footer className="relative w-full flex flex-col">
+    // Every link here is a nav_click in the "footer" menu, named by its text (or aria-label).
+    <footer data-section="footer" data-track-menu="footer" className="relative w-full flex flex-col">
 
        {/* Background */}
       <div className="absolute inset-0 -z-[10] pointer-events-auto bg-neutral-900">
@@ -79,7 +80,7 @@ export function Footer() {
       <Section semantic="div" className="flex-1">
         <OuterContainer>
           <div className="w-full pt-16 md:pt-28 px-2.5 md:px-6">
-            <Link href="/" className="inline-block">
+            <Link href="/" data-track="nav_click" data-track-item="logo" className="inline-block">
               <Image
                 src="/logo-blueprint.svg"
                 alt="Blueprint Logo"
@@ -107,6 +108,7 @@ export function Footer() {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
+                          data-track="nav_click"
                           className="text-neutral-500 hover:text-neutral-300 text-sm transition-colors duration-200 flex items-center gap-1 w-fit whitespace-nowrap"
                         >
                           {link.name}
@@ -130,6 +132,7 @@ export function Footer() {
                       ) : (
                         <Link
                           href={link.href}
+                          data-track="nav_click"
                           className="text-neutral-500 hover:text-neutral-300 text-sm transition-colors duration-200 block w-fit"
                         >
                           {link.name}
@@ -146,17 +149,17 @@ export function Footer() {
           <div className="w-full pl-0 pb-0 pt-16 md:hidden">
             <ul className="flex flex-row gap-4">
               <li>
-                <Link href="https://github.com/Blueprint-Studio-AI" aria-label="GitHub" >
+                <Link href="https://github.com/Blueprint-Studio-AI" aria-label="GitHub" data-track="nav_click" >
                   <Icon icon="akar-icons:github-fill" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
               <li>
-                <Link href="https://x.com/bpstu" aria-label="X" >
+                <Link href="https://x.com/bpstu" aria-label="X" data-track="nav_click" >
                   <Icon icon="bi:twitter-x" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
               <li>
-                <Link href="https://www.linkedin.com/company/blueprint-studio-ai" aria-label="LinkedIn" >
+                <Link href="https://www.linkedin.com/company/blueprint-studio-ai" aria-label="LinkedIn" data-track="nav_click" >
                   <Icon icon="bi:linkedin" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
@@ -174,17 +177,17 @@ export function Footer() {
             <EmailCapture/>
             <ul className="hidden md:flex flex-row gap-4">
               <li>
-                <Link href="https://github.com/Blueprint-Studio-AI" aria-label="GitHub" >
+                <Link href="https://github.com/Blueprint-Studio-AI" aria-label="GitHub" data-track="nav_click" >
                   <Icon icon="akar-icons:github-fill" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
               <li>
-                <Link href="https://x.com/bpstu" aria-label="X" >
+                <Link href="https://x.com/bpstu" aria-label="X" data-track="nav_click" >
                   <Icon icon="bi:twitter-x" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
               <li>
-                <Link href="https://www.linkedin.com/company/blueprint-studio-ai" aria-label="LinkedIn" >
+                <Link href="https://www.linkedin.com/company/blueprint-studio-ai" aria-label="LinkedIn" data-track="nav_click" >
                   <Icon icon="bi:linkedin" width="24" height="24" className={iconStyle} />
                 </Link>
               </li>
@@ -201,8 +204,8 @@ export function Footer() {
           <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 px-6 pb-7 pt-20">
             <div className="flex flex-col md:flex-row md:flex-wrap items-start md:items-center gap-2 md:gap-x-5 md:gap-y-2 text-neutral-600 text-sm tracking-[-0.02em]">
               <span>Copyright © Blueprint Studio 2026</span>
-              <Link href="/terms" className="hover:text-neutral-400 transition-colors duration-200">Terms of Service</Link>
-              <Link href="/privacy-policy" className="hover:text-neutral-400 transition-colors duration-200">Privacy Policy</Link>
+              <Link href="/terms" data-track="nav_click" className="hover:text-neutral-400 transition-colors duration-200">Terms of Service</Link>
+              <Link href="/privacy-policy" data-track="nav_click" className="hover:text-neutral-400 transition-colors duration-200">Privacy Policy</Link>
             </div>
             <span className="text-neutral-600 text-[12px] tracking-[-0.02em]">33°59&apos;19.0&quot;N 118°28&apos;33.8&quot;W</span>
           </div>

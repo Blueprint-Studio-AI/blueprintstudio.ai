@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { validateEmail } from '@/lib/validation';
 import { useTurnstileToken } from '@/lib/use-turnstile';
 import Cookies from 'js-cookie';
+import { track } from '@/lib/analytics/track';
 
 const COOKIE_NAME = 'blueprint_email_access';
 
@@ -37,11 +38,13 @@ export default function EmailCapture() {
         const { isValid, message } = validateEmail(email);
         if (!isValid) {
             setError(message || 'Invalid email');
+            track('form_submit', { form: 'newsletter', ok: false, reason: 'invalid_email', section: 'footer' });
             return;
         }
 
         setIsLoading(true);
 
+        let status = 0; // the reply's HTTP status, for form_submit's reason when it fails
         try {
             const response = await fetch('/api/subscribe', {
                 method: 'POST',
@@ -57,12 +60,14 @@ export default function EmailCapture() {
                 }),
             });
 
+            status = response.status;
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.error || 'Subscription failed');
             }
 
+            track('form_submit', { form: 'newsletter', ok: true, section: 'footer' });
             // Show success state
             setIsSuccess(true);
 
@@ -77,6 +82,7 @@ export default function EmailCapture() {
             }, 2000);
 
         } catch (err) {
+            track('form_submit', { form: 'newsletter', ok: false, reason: status ? `http_${status}` : 'network', section: 'footer' });
             setError(err instanceof Error ? err.message : 'Failed to subscribe');
         } finally {
             setIsLoading(false);
