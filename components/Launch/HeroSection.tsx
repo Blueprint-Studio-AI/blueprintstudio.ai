@@ -4,10 +4,8 @@ import { useRef, useEffect } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import GradientButton from "@/components/ui/GradientButton";
 import GradientText from "@/components/ui/GradientText";
 import DeliverablePill from "@/components/ui/DeliverablePill";
@@ -88,22 +86,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <SectionHeader
-        leftText="LAUNCH PACKAGE"
-        centerContent={
-          <Link href="/" data-track="nav_click" data-track-item="logo" data-track-menu="top" className="hover:opacity-70 transition-opacity">
-            <Image
-              src="/blueprint-logo-dark.svg"
-              alt="Blueprint Studio"
-              width={80}
-              height={20}
-              className="h-3 sm:h-4 w-auto"
-            />
-          </Link>
-        }
-        rightText="// for founders"
-      />
-
+      {/* No logo row of its own: the site nav above has the logo, and its dashed rule tops the frame. */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-16 sm:pt-24 lg:pt-32 pb-0 px-2.5 sm:px-6 relative">
           <div className="absolute left-0 top-0 bottom-0 line-dash-y hidden custom:block" />

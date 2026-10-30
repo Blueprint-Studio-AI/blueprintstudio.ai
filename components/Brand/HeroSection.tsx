@@ -4,10 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import GradientButton from "@/components/ui/GradientButton";
 import GradientText from "@/components/ui/GradientText";
 import SocialProof from "@/components/ui/SocialProof";
@@ -33,34 +31,7 @@ export default function HeroSection() {
         };
   return (
     <Section data-section="hero" className="relative bg-[#FAFAFA] overflow-hidden min-h-fit">
-      {/* Top nav — shared SectionHeader strip, matching /launch & /launch-videos:
-          construction labels flanking the centred logo + a dashed divider beneath.
-          Wrapped in motion so it blur-drops in first, then the hero builds below. */}
-      <motion.div
-        className="w-full"
-        initial={reduce ? { opacity: 0 } : { opacity: 0, y: -10, filter: "blur(6px)" }}
-        animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={reduce ? { duration: 0.4 } : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <SectionHeader
-          divider={false}
-          leftText=""
-          centerContent={
-            <Link href="/" data-track="nav_click" data-track-item="logo" data-track-menu="top" className="hover:opacity-70 transition-opacity">
-              <Image
-                src="/blueprint-logo-dark.svg"
-                alt="Blueprint Studio"
-                width={80}
-                height={20}
-                className="h-3 sm:h-4 w-auto"
-                priority
-              />
-            </Link>
-          }
-          rightText=""
-        />
-      </motion.div>
-
+      {/* The site nav sits above the hero, so it no longer has a logo row of its own. */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-16 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 px-2.5 sm:px-6 relative">
           <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">

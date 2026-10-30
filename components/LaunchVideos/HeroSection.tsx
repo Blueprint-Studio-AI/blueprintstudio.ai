@@ -4,11 +4,8 @@ import { useRef, useEffect, useState } from "react";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
 import InnerContainer from "@/components/ui/InnerContainer";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowUpRight } from "lucide-react";
 import SocialProof from "@/components/ui/SocialProof";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -51,22 +48,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <SectionHeader
-        leftText="YC LAUNCH VIDEOS"
-        centerContent={
-          <Link href="/" data-track="nav_click" data-track-item="logo" data-track-menu="top" className="hover:opacity-70 transition-opacity">
-            <Image
-              src="/blueprint-logo-dark.svg"
-              alt="Blueprint Studio"
-              width={80}
-              height={20}
-              className="h-3 sm:h-4 w-auto"
-            />
-          </Link>
-        }
-        rightText="// fast-track"
-      />
-
+      {/* No logo row of its own: the site nav above has the logo, and its dashed rule tops the frame. */}
       <OuterContainer className="flex-1 flex items-center">
         <InnerContainer className="pt-2.5 sm:pt-20 lg:pt-28 pb-8 sm:pb-20 lg:pb-28 px-2.5 sm:px-6 relative">
           {/* Inner dashed lines */}

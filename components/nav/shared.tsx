@@ -22,9 +22,9 @@ export const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 export const FOCUS = "outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]";
 
-// The paid landing pages (/brand, /launch, /launch-videos) and the client brand
-// kits (/brands/*) keep their own focused header, so both navs stay off them.
-const HIDDEN_NAV_ROUTES = ["/launch-videos", "/launch", "/brand", "/brands"];
+// The client brand kits (/brands/*) have their own nav (components/brands/kit/Nav),
+// so both navs stay off them. Every other page, the paid landing pages included, has this one.
+const HIDDEN_NAV_ROUTES = ["/brands"];
 
 export const isNavHidden = (pathname: string) =>
     HIDDEN_NAV_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"));
