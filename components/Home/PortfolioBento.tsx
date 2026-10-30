@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Section from "@/components/ui/Section";
 import OuterContainer from "@/components/ui/OuterContainer";
@@ -205,27 +205,21 @@ function MediaCard({ media, title, description, aspectRatio, featured = false, i
   );
 }
 
-export default function PortfolioBento() {
-  const textRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [spacerHeights, setSpacerHeights] = useState<number[]>(
-    portfolioSections.map(() => 100)
+// A featured project's title and description, under its media on desktop.
+function FeaturedText({ project }: { project: PortfolioProject }) {
+  return (
+    <div className="text-black relative w-full pt-8">
+      <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
+        {project.title}
+      </div>
+      <p className="text-neutral-600 text-base cursor-default">
+        {project.description}
+      </p>
+    </div>
   );
+}
 
-  const measureHeights = useCallback(() => {
-    const heights = textRefs.current.map((ref) => {
-      if (!ref || ref.offsetHeight === 0) return 100;
-      // spacer needs to match text height minus the space-y-6 gap (24px)
-      return Math.max(0, ref.offsetHeight - 24);
-    });
-    setSpacerHeights(heights);
-  }, []);
-
-  useEffect(() => {
-    measureHeights();
-    window.addEventListener("resize", measureHeights);
-    return () => window.removeEventListener("resize", measureHeights);
-  }, [measureHeights]);
-
+export default function PortfolioBento() {
   return (
     <Section className="flex flex-col relative z-20 bg-neutral-100">
       {/* Background lines matching existing portfolio */}
@@ -307,17 +301,7 @@ export default function PortfolioBento() {
                             featured
                             imageOnly
                           />
-                          <div
-                            ref={(el) => { textRefs.current[sectionIndex] = el; }}
-                            className="text-black relative w-full pt-8"
-                          >
-                            <div className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 cursor-default">
-                              {project.title}
-                            </div>
-                            <p className="text-neutral-600 text-base cursor-default">
-                              {project.description}
-                            </p>
-                          </div>
+                          <FeaturedText project={project} />
                         </div>
                       </div>
                     </div>
@@ -330,8 +314,18 @@ export default function PortfolioBento() {
                             <MediaCard media={item} aspectRatio="1/1" imageOnly />
                           </div>
                         ))}
-                        {/* Spacer matches featured text height so showcase bottoms align with featured media bottom */}
-                        <div style={{ height: spacerHeights[sectionIndex] ?? 100 }} />
+                        {/* Spacer as tall as the featured text, so the showcase bottoms align with
+                            the featured media's: an unseen copy of the text at the featured column's
+                            width (3 columns and 2 gaps, laid over it). Right from the first paint;
+                            measured after load, it moved everything below by up to 120px. */}
+                        <div
+                          aria-hidden
+                          data-nosnippet
+                          className="invisible"
+                          style={{ width: "calc(300% + 48px)", marginLeft: "calc(-300% - 72px)", marginTop: 0 }}
+                        >
+                          <FeaturedText project={project} />
+                        </div>
                       </div>
                     </div>
                   </div>

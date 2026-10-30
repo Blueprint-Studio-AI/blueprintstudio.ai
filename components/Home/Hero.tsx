@@ -31,6 +31,13 @@ import { SpringText, VARIANTS, VariantVideo, variantFromUrl, type VariantKey } f
 // slot's live rect (progress 1), so it lands where the slot is even if the
 // visitor scrolls mid-flight. Once it lands it sits in the slot like any
 // other element. "View fullscreen" runs the same path backwards.
+//
+// The flight moves nothing in layout, so it adds nothing to Cumulative Layout
+// Shift: the frame keeps the slot's size, parked (fixed) at the slot's place
+// in the document, and is scaled and moved from there with a transform; a
+// clip-path trims it to the card's shape. Parked by its document position, not
+// its place on screen, Chrome sees the switch between fixed and the slot as no
+// move even when the page is scrolled.
 
 const REEL_SRC = {
     full: "/media/highlight-reel/highlight-reel-horizontal-005-compressed.mp4",
@@ -61,6 +68,11 @@ const REEL_STEPS = [25, 50, 75, 100]; // reel_progress: how much of one pass has
 type Stage = "loading" | "reel" | "landing" | "docked" | "expanded" | "closing";
 
 const mix = (from: number, to: number, p: number) => from + (to - from) * p;
+
+/** A rounded rectangle as SVG path data, for clip-path: path(). */
+const roundRect = (x: number, y: number, w: number, h: number, r: number) =>
+    `M${x + r},${y}H${x + w - r}A${r},${r} 0 0 1 ${x + w},${y + r}V${y + h - r}A${r},${r} 0 0 1 ${x + w - r},${y + h}` +
+    `H${x + r}A${r},${r} 0 0 1 ${x},${y + h - r}V${y + r}A${r},${r} 0 0 1 ${x + r},${y}Z`;
 
 // The second button's link for each variant.
 const LINKS = [{ key: "all", label: "See our work", href: "#work" }, ...VARIANTS.map((v) => ({ key: v.key, ...v.cta }))];
@@ -96,6 +108,9 @@ export default function Hero() {
     const frameRef = useRef<HTMLDivElement>(null);
     const slotRef = useRef<HTMLDivElement>(null);
     const maximizeRef = useRef<HTMLButtonElement>(null);
+    const hairlineRef = useRef<HTMLDivElement>(null);
+    const closeRef = useRef<HTMLDivElement>(null);
+    const parkRef = useRef<{ left: number; top: number } | null>(null); // where the fixed frame is laid out (see the top)
     const refocusRef = useRef(false);
     const progress = useMotionValue(0); // 0 = full-screen card, 1 = in its slot
     const backdropOpacity = useTransform(progress, [0, 1], [1, 0]);
@@ -115,36 +130,102 @@ export default function Hero() {
     const place = useCallback(() => {
         const frame = frameRef.current;
         const slot = slotRef.current;
-        if (!frame || !slot) return;
+        const line = hairlineRef.current;
+        if (!frame || !slot || !line) return;
         const s = frame.style;
+        const films = frame.querySelectorAll("video");
         if (stageRef.current === "docked") {
+            parkRef.current = null;
             s.position = "absolute";
             s.left = "0px";
             s.top = "0px";
             s.width = "100%";
             s.height = "100%";
+            s.transform = s.transformOrigin = "";
+            s.clipPath = "";
             s.borderRadius = `${SLOT_RADIUS}px`;
+            for (const film of films) film.style.width = film.style.height = film.style.transform = "";
+            line.style.boxShadow = line.style.background = line.style.clipPath = "";
             return;
         }
         const p = progress.get();
         const to = slot.getBoundingClientRect();
+        if (!to.width || !to.height) return;
         const vw = document.documentElement.clientWidth;
         const vh = document.documentElement.clientHeight;
         const inset = cardInset(vw);
+        // Where the reel shows, between the card and the slot.
+        const x = mix(inset, to.left, p);
+        const y = mix(inset, to.top, p);
+        const w = mix(vw - inset * 2, to.width, p);
+        const h = mix(vh - inset * 2, to.height, p);
+        // The slot-sized frame, scaled to cover that and centred on it; the
+        // clip trims the overflow, in the frame's own (unscaled) pixels. Its
+        // place and size are whole device pixels, as Chrome would draw them
+        // anyway, so the transform lands it exactly.
+        const px = (n: number) => Math.round(n * devicePixelRatio) / devicePixelRatio;
+        const fw = px(to.width);
+        const fh = px(to.height);
+        const scale = Math.max(w / fw, h / fh);
+        const cw = w / scale;
+        const ch = h / scale;
+        const cx = Math.max(0, (fw - cw) / 2);
+        const cy = Math.max(0, (fh - ch) / 2);
+        const radius = mix(CARD_RADIUS, SLOT_RADIUS, p) / scale;
+        const park = (parkRef.current ??= { left: px(to.left + window.scrollX), top: px(to.top + window.scrollY) });
         s.position = "fixed";
-        s.left = `${mix(inset, to.left, p)}px`;
-        s.top = `${mix(inset, to.top, p)}px`;
-        s.width = `${mix(vw - inset * 2, to.width, p)}px`;
-        s.height = `${mix(vh - inset * 2, to.height, p)}px`;
-        s.borderRadius = `${mix(CARD_RADIUS, SLOT_RADIUS, p)}px`;
+        s.left = `${park.left}px`;
+        s.top = `${park.top}px`;
+        s.width = `${fw}px`;
+        s.height = `${fh}px`;
+        s.transformOrigin = "0 0";
+        s.transform = `translate(${x - cx * scale - park.left}px, ${y - cy * scale - park.top}px) scale(${scale})`;
+        s.clipPath = `inset(${cy}px ${cx}px round ${radius}px)`;
+        s.borderRadius = "0px";
+        // Each film covers the card the way object-cover would. Where its shape
+        // isn't the slot's (the 2:3 reel in a phone's 4:5 slot), it gets its
+        // whole picture and its own scale, since the card needs more of its height.
+        for (const film of films) {
+            const { videoWidth: vw0, videoHeight: vh0 } = film;
+            const docked = vw0 && vh0 ? Math.max(fw / vw0, fh / vh0) : 0; // its object-cover scale in the frame
+            const k = docked && Math.max(w / vw0, h / vh0) / (docked * scale);
+            const bw = px(vw0 * docked);
+            const bh = px(vh0 * docked);
+            // No picture yet (a poster at most), or the slot's own shape: the frame's scale is right.
+            if (!docked || (Math.abs(k - 1) < 1e-4 && bw === fw && bh === fh)) {
+                film.style.width = film.style.height = film.style.transform = "";
+                continue;
+            }
+            film.style.width = `${bw}px`;
+            film.style.height = `${bh}px`;
+            film.style.transformOrigin = "0 0";
+            film.style.transform = `translate(${fw / 2}px, ${fh / 2}px) scale(${k}) translate(${-bw / 2}px, ${-bh / 2}px)`;
+        }
+        // The hairline: a 1px ring on the clip's edge.
+        const t = 1 / scale;
+        line.style.boxShadow = "none";
+        line.style.background = "rgba(0, 0, 0, 0.06)";
+        line.style.clipPath = `path(evenodd, "${roundRect(cx, cy, cw, ch, radius)}${roundRect(cx + t, cy + t, cw - 2 * t, ch - 2 * t, Math.max(0, radius - t))}")`;
+        // Close sits 12px in from the card's corner, at its own size.
+        const close = closeRef.current;
+        if (close) {
+            close.style.transformOrigin = "0 0";
+            close.style.transform = `translate(${cx + cw - 52 * t - (fw - 52)}px, ${cy + 12 * t - 12}px) scale(${t})`; // 52: right-3 plus w-10
+        }
     }, [progress]);
 
     useMotionValueEvent(progress, "change", place);
     useLayoutEffect(place, [place, stage]);
 
     useEffect(() => {
+        const frame = frameRef.current;
         window.addEventListener("resize", place);
-        return () => window.removeEventListener("resize", place);
+        // A film's shape arrives with its metadata.
+        frame?.addEventListener("loadedmetadata", place, true);
+        return () => {
+            window.removeEventListener("resize", place);
+            frame?.removeEventListener("loadedmetadata", place, true);
+        };
     }, [place]);
 
     // A link like /?for=websites opens on that variant.
@@ -436,8 +517,9 @@ export default function Hero() {
                                 <Image
                                     src="/blueprint-logo-dark.svg"
                                     alt="Blueprint Studio"
-                                    width={30}
-                                    height={30}
+                                    // The file's own size, so w-auto is right before it loads.
+                                    width={173}
+                                    height={23}
                                     className="loader-fade mb-6 h-6 w-auto sm:mb-8 sm:h-7"
                                     style={{ animationDuration: "700ms", animationDelay: "150ms" }}
                                     priority
@@ -598,7 +680,11 @@ export default function Hero() {
                                     {variant && src && <VariantVideo key={variant.key} {...variant.video} compact={src === REEL_SRC.small} />}
                                 </AnimatePresence>
                                 {/* A hairline edge, so pale frames don't melt into the page. */}
-                                <div className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]" style={{ borderRadius: "inherit" }} />
+                                <div
+                                    ref={hairlineRef}
+                                    className="pointer-events-none absolute inset-0 z-[1] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
+                                    style={{ borderRadius: "inherit" }}
+                                />
 
                                 {stage === "docked" && (
                                     <button
@@ -614,25 +700,30 @@ export default function Hero() {
                                         <Maximize2 className="h-3.5 w-3.5" />
                                     </button>
                                 )}
-                                <AnimatePresence>
-                                    {stage === "expanded" && (
-                                        <motion.button
-                                            type="button"
-                                            autoFocus={focusClose}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1, transition: { delay: 0.2, duration: 0.25 } }}
-                                            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                collapse();
-                                            }}
-                                            className="absolute right-3 top-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition-colors duration-200 hover:bg-black/60"
-                                            aria-label="Close fullscreen"
-                                        >
-                                            <X className="h-5 w-5" />
-                                        </motion.button>
-                                    )}
-                                </AnimatePresence>
+                                {fullscreen && (
+                                    // Holds Close at the card's corner while the frame scales (place).
+                                    <div ref={closeRef} className="pointer-events-none absolute right-3 top-3 h-10 w-10">
+                                        <AnimatePresence>
+                                            {stage === "expanded" && (
+                                                <motion.button
+                                                    type="button"
+                                                    autoFocus={focusClose}
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1, transition: { delay: 0.2, duration: 0.25 } }}
+                                                    exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        collapse();
+                                                    }}
+                                                    className="pointer-events-auto absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-lg transition-colors duration-200 hover:bg-black/60"
+                                                    aria-label="Close fullscreen"
+                                                >
+                                                    <X className="h-5 w-5" />
+                                                </motion.button>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </InnerContainer>

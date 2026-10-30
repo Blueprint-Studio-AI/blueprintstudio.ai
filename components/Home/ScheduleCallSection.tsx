@@ -7,10 +7,17 @@ import InnerContainer from "../ui/InnerContainer";
 import Section from "../ui/Section";
 import { useCalBookings } from "@/lib/analytics/cal";
 
+// The calendar's room, held from the first paint: Cal's iframe arrives empty,
+// starts at 300px and grows as its page loads, and everything below moved each
+// time (a visit to /#contact jumped). About the height Cal's month view settles
+// at: stacked in an iframe under 768px (a 954px window, with this card's
+// padding), side by side above. Taller content still grows the card.
+const CAL_HEIGHT = "min-h-[680px] min-[954px]:min-h-[460px]";
+
 const Cal = dynamic(() => import("@calcom/embed-react").then((mod) => mod.default), {
   ssr: false,
   loading: () => (
-    <div className="h-[520px] flex flex-col items-center justify-center gap-3 text-neutral-500">
+    <div className={`${CAL_HEIGHT} flex flex-col items-center justify-center gap-3 text-neutral-500`}>
       <span className="text-xs uppercase tracking-[0.36em] text-neutral-400">Blueprint Studio</span>
       <p className="text-sm sm:text-base text-neutral-500">Loading calendar…</p>
     </div>
@@ -85,12 +92,14 @@ export default function ScheduleCallSection() {
             {/* Calendar embed container */}
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-8">
-                <Cal
-                  namespace="intro-call"
-                  calLink="tyler-stupart/intro-call"
-                  style={{ width: "100%", height: "100%" }}
-                  config={{ layout: "month_view", theme: "light" }}
-                />
+                <div className={CAL_HEIGHT}>
+                  <Cal
+                    namespace="intro-call"
+                    calLink="tyler-stupart/intro-call"
+                    style={{ width: "100%", height: "100%" }}
+                    config={{ layout: "month_view", theme: "light" }}
+                  />
+                </div>
               </div>
             </div>
 
